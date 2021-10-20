@@ -1,4 +1,4 @@
-package com.example.pafanalysisbackend
+package ch.unil.pafanalysis
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
