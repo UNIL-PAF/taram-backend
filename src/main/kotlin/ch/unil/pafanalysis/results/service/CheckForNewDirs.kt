@@ -3,11 +3,7 @@ package ch.unil.pafanalysis.results.service
 import ch.unil.pafanalysis.results.model.AvailableDir
 import ch.unil.pafanalysis.results.model.InitialResult
 import ch.unil.pafanalysis.results.model.ResultPaths
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes

@@ -4,7 +4,6 @@ import ch.unil.pafanalysis.results.model.AvailableDir
 import ch.unil.pafanalysis.results.model.InitialResult
 import ch.unil.pafanalysis.results.model.ResultPaths
 import ch.unil.pafanalysis.results.service.CheckForNewDirs
-import ch.unil.pafanalysis.results.service.CheckForNewResults
 import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -47,18 +46,6 @@ class ResultController {
     fun availableDirs(): Iterable<AvailableDir>? {
         val existingRes = resultRepository?.findAll()
         return CheckForNewDirs.checkAll(existingRes?.asSequence(), getResultPaths())
-    }
-
-    @GetMapping("/refresh")
-    fun refreshResults(): Iterable<InitialResult>? {
-        val existingRes = resultRepository?.findAll()
-        val newRes: List<InitialResult> = CheckForNewResults.checkAll(existingRes?.asSequence(), getResultPaths())
-
-        newRes.forEach{
-            resultRepository?.save(it)
-        }
-
-        return newRes
     }
 
 }
