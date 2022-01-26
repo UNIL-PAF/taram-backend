@@ -27,18 +27,14 @@ class ResultController {
     )
 
     @PostMapping("/add")
-    fun addResult(@RequestParam name: String){
-        val res = InitialResult(
-            id = 0,
-            name = name,
-            fileCreationDate = LocalDateTime.now(),
-            type = "MaxQuant"
-        )
+    @ResponseBody
+    fun addResult(@RequestBody res: InitialResult){
         resultRepository?.save(res)
     }
 
     @GetMapping("/list")
     fun listResults(): Iterable<InitialResult>? {
+        println("here")
         return resultRepository?.findAll()
     }
 
