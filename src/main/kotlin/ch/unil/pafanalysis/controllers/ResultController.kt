@@ -34,7 +34,6 @@ class ResultController {
 
     @GetMapping("/list")
     fun listResults(): Iterable<InitialResult>? {
-        println("here")
         return resultRepository?.findAll()
     }
 
