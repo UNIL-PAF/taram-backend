@@ -2,7 +2,7 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.ColumnMapping
+import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControl
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,16 +19,15 @@ class AnalysisService {
     private var resultRepo: ResultRepository? = null
 
     @Autowired
-    private var analysisStepRepo: AnalysisStepRepository? = null
+    private var qualityControl: QualityControl? = null
+
 
     private fun createNewAnalysis(result: Result?): List<Analysis>?{
 
         val newAnalysis = Analysis(idx=0, resultId = result?.id, lastModifDate = LocalDateTime.now())
         val analysis: Analysis? = analysisRepo?.save(newAnalysis)
 
-        val columnMapping = ColumnMapping(nameMapping = hashMapOf("coucou" to 1, "haha" to 3, "blibla" to 2))
-        val initialStep = AnalysisStep(resultTablePath = result?.resFile, type = "initial", status = "created", analysis = analysis, lastModifDate = LocalDateTime.now(), columnMapping = columnMapping)
-        analysisStepRepo?.save(initialStep)
+        // start
 
         val analysisList =  listOf(analysis)
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>

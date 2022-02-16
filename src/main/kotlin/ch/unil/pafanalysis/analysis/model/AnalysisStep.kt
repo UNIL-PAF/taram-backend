@@ -24,6 +24,10 @@ class AnalysisStep (
     @Column(columnDefinition="json")
     val columnMapping: ColumnMapping? = null,
 
+    @Type(type="json")
+    @Column(columnDefinition="json")
+    val results: String? = null,
+
     @ManyToOne
     @JoinColumn(name="analysis_id", nullable=false)
     private val analysis: Analysis? = null

@@ -27,7 +27,7 @@ class CheckForNewDirs {
         }
 
         private fun checkMaxQuant(maxQuantRes: Sequence<Result>?): List<AvailableDir>{
-            val usedDirs = if(maxQuantRes == null) emptySequence<String>() else maxQuantRes!!.map { it.resFile }
+            val usedDirs = if(maxQuantRes == null) emptySequence<String>() else maxQuantRes!!.map { it.resPath }
 
             val maxQuantDirs = Files.walk(Paths.get(localResultPaths?.maxQuantPath))
                 .filter(Files::isRegularFile)
@@ -36,7 +36,7 @@ class CheckForNewDirs {
             val newResults = maxQuantDirs.map{
                 val attr: BasicFileAttributes = it.readAttributes()
                 val creationTime = LocalDateTime.ofInstant( attr.creationTime().toInstant(), ZoneId.systemDefault())
-                val pathString = it.pathString.replace(localResultPaths!!.maxQuantPath!!, "")
+                val pathString = it.pathString.replace(localResultPaths!!.maxQuantPath!!, "").replace("proteinGroups.txt", "")
 
                 AvailableDir(
                     type="MaxQuant",
