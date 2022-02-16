@@ -1,9 +1,8 @@
 package ch.unil.pafanalysis.results.service
 
-import ch.unil.pafanalysis.analysis.model.Analysis
 import org.springframework.data.repository.CrudRepository
-import ch.unil.pafanalysis.results.model.InitialResult
+import ch.unil.pafanalysis.results.model.Result
 
-interface ResultRepository: CrudRepository<InitialResult, Integer> {
-    fun findById(resultId: Int): InitialResult
+interface ResultRepository: CrudRepository<Result, Integer> {
+    fun findById(resultId: Int): Result
 }

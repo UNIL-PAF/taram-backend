@@ -1,14 +1,13 @@
 package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.results.model.AvailableDir
-import ch.unil.pafanalysis.results.model.InitialResult
+import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultPaths
 import ch.unil.pafanalysis.results.service.CheckForNewDirs
 import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
 
 @CrossOrigin(origins = ["http://localhost:3000"], maxAge = 3600)
 @RestController
@@ -28,12 +27,12 @@ class ResultController {
 
     @PostMapping("/add")
     @ResponseBody
-    fun addResult(@RequestBody res: InitialResult){
+    fun addResult(@RequestBody res: Result){
         resultRepository?.save(res)
     }
 
     @GetMapping("/list")
-    fun listResults(): Iterable<InitialResult>? {
+    fun listResults(): Iterable<Result>? {
         return resultRepository?.findAll()
     }
 

@@ -3,7 +3,7 @@ package ch.unil.pafanalysis.analysis.service
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ColumnMapping
-import ch.unil.pafanalysis.results.model.InitialResult
+import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -21,7 +21,7 @@ class AnalysisService {
     @Autowired
     private var analysisStepRepo: AnalysisStepRepository? = null
 
-    private fun createNewAnalysis(result: InitialResult?): List<Analysis>?{
+    private fun createNewAnalysis(result: Result?): List<Analysis>?{
 
         val newAnalysis = Analysis(idx=0, resultId = result?.id, lastModifDate = LocalDateTime.now())
         val analysis: Analysis? = analysisRepo?.save(newAnalysis)

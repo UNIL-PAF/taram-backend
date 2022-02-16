@@ -1,7 +1,7 @@
 package ch.unil.pafanalysis.results.service
 
 import ch.unil.pafanalysis.results.model.AvailableDir
-import ch.unil.pafanalysis.results.model.InitialResult
+import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultPaths
 import org.springframework.stereotype.Component
 import java.nio.file.Files
@@ -20,13 +20,13 @@ class CheckForNewDirs {
         private val maxQuantResName = "proteinGroups.txt"
         private var localResultPaths: ResultPaths? = null
 
-        fun checkAll(existingRes: Sequence<InitialResult>?, resultPaths: ResultPaths): List<AvailableDir>{
+        fun checkAll(existingRes: Sequence<Result>?, resultPaths: ResultPaths): List<AvailableDir>{
             localResultPaths = resultPaths
             val maxQuantRes = existingRes?.filter { it.type == "MaxQuant" }
             return checkMaxQuant(maxQuantRes)
         }
 
-        private fun checkMaxQuant(maxQuantRes: Sequence<InitialResult>?): List<AvailableDir>{
+        private fun checkMaxQuant(maxQuantRes: Sequence<Result>?): List<AvailableDir>{
             val usedDirs = if(maxQuantRes == null) emptySequence<String>() else maxQuantRes!!.map { it.resFile }
 
             val maxQuantDirs = Files.walk(Paths.get(localResultPaths?.maxQuantPath))
