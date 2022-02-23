@@ -19,6 +19,7 @@ class AnalysisStep (
     val status: String? = null,
     val type: String? = null,
     val lastModifDate: LocalDateTime? = null,
+    val error: String? = null,
 
     @Type(type="json")
     @Column(columnDefinition="json")

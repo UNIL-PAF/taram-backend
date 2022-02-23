@@ -27,7 +27,7 @@ class CheckForNewDirs {
         }
 
         private fun checkMaxQuant(maxQuantRes: Sequence<Result>?): List<AvailableDir>{
-            val usedDirs = if(maxQuantRes == null) emptySequence<String>() else maxQuantRes!!.map { it.resPath }
+            val usedDirs = if(maxQuantRes == null) emptySequence<String>() else maxQuantRes!!.map { it.path }
 
             val maxQuantDirs = Files.walk(Paths.get(localResultPaths?.maxQuantPath))
                 .filter(Files::isRegularFile)

@@ -12,7 +12,6 @@ class Result (
     val description: String? = null,
     val type: String? = null,
     val status: String? = null,
-    val resPath: String? = null,
     val path: String? = null,
     val fileCreationDate: LocalDateTime? = null,
     val lastModifDate: LocalDateTime? = null

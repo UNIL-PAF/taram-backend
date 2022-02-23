@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class QualityControl {
+class QualityControlRunner {
     @Autowired
     private var analysisStepRepo: AnalysisStepRepository? = null
 
