@@ -22,7 +22,6 @@ class AnalysisService {
     @Autowired
     private var initialResult: InitialResultRunner? = null
 
-
     private fun createNewAnalysis(result: Result?): List<Analysis>?{
 
         val newAnalysis = Analysis(idx=0, resultId = result?.id, lastModifDate = LocalDateTime.now(), status = AnalysisStatus.CREATED.value)
