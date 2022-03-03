@@ -39,13 +39,7 @@ class QualityControlRunner {
 
     fun run(stepId: Int): String {
         val oldStep: AnalysisStep? = analysisStepRepo?.findById(stepId)
-
-        println(oldStep!!.id!!)
-
         val newStep: AnalysisStep? = createNewStep(oldStep)
-
-        println(newStep!!.id!!)
-
         analysisStepRepo?.setAfterIndexById(newStep!!.id!!, oldStep!!.id!!)
 
 /*

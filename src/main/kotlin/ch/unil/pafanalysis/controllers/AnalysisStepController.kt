@@ -16,15 +16,11 @@ class AnalysisStepController {
     @Autowired
     private var qualityControlRunner: QualityControlRunner? = null
 
-    //@Autowired
-    //private var analysisService: AnalysisService? = null
-
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
         val status: String? = when (stepParams.type) {
             QUALITY_CONTROL.value -> {
-                println("quality control !!")
                 qualityControlRunner?.run(stepId)
             }
             else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")

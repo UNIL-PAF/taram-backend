@@ -13,8 +13,4 @@ interface AnalysisStepRepository: CrudRepository<AnalysisStep, Integer> {
     @Modifying
     @Query("update AnalysisStep a set a.afterId =:afterId where a.id =:stepId")
     fun setAfterIndexById(@Param("afterId") afterId: Int, @Param("stepId") id: Int): Int
-
-    /*@Query("select analysis from AnalysisStep a where a.id = ?1")
-    fun getAnalysisId(id: Int): Int*/
-
 }
