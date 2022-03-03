@@ -21,6 +21,9 @@ class AnalysisStep (
     val lastModifDate: LocalDateTime? = null,
     val error: String? = null,
 
+    @Column(name="analysis_id", insertable=false, updatable = false)
+    val analysis_id: Int? = null,
+
     @Type(type="json")
     @Column(columnDefinition="json")
     val columnMapping: ColumnMapping? = null,
