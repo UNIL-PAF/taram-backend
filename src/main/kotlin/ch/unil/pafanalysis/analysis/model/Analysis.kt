@@ -1,10 +1,12 @@
 package ch.unil.pafanalysis.analysis.model
 
+import org.hibernate.annotations.SortNatural
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.*
 
 @Entity
-class Analysis (
+data class Analysis (
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,
@@ -15,5 +17,5 @@ class Analysis (
     val lastModifDate: LocalDateTime? = null,
 
     @OneToMany(mappedBy="analysis")
-    val analysisSteps: Set<AnalysisStep>? = null
+    val analysisSteps: List<AnalysisStep>? = null
 )

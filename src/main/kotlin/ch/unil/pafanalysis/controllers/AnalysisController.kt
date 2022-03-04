@@ -17,9 +17,10 @@ class AnalysisController {
     @Autowired
     private var analysisService: AnalysisService? = null
 
+
     @GetMapping
     fun getAnalysis(@RequestParam resultId: Int): List<Analysis>? {
-        return analysisService?.getByResultId(resultId)
+        return analysisService?.getSortedAnalysisList(resultId)
     }
 
     /*@DeleteMapping("/{analysisId}")
