@@ -57,7 +57,6 @@ class AnalysisService {
         return analysis
     }
 
-
     fun sortAnalysisSteps(oldList: List<AnalysisStep>?): List<AnalysisStep>? {
         val first: AnalysisStep? = oldList?.find { it.type == AnalysisStepType.INITIAL_RESULT.value }
         var sortedList = mutableListOf<AnalysisStep>(first!!)

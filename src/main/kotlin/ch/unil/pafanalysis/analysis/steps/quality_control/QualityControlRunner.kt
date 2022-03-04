@@ -22,6 +22,9 @@ class QualityControlRunner {
     @Autowired
     private var analysisRepository: AnalysisRepository? = null
 
+    @Autowired
+    private var qualityControlR: QualityControlR? = null
+
     fun createNewStep(oldStep: AnalysisStep?): AnalysisStep? {
         val lastModif = LocalDateTime.now()
 
@@ -42,29 +45,11 @@ class QualityControlRunner {
         val newStep: AnalysisStep? = createNewStep(oldStep)
         analysisStepRepo?.setAfterIndexById(newStep!!.id!!, oldStep!!.id!!)
 
-/*
-
-        val step: AnalysisStep = try {
-            val initialResult = createInitialResult(maxQuantPath)
-
-            AnalysisStep(
-                resultTablePath = newTable.name,
-                status = AnalysisStepStatus.DONE.value,
-                type = type,
-                analysis = analysis,
-                lastModifDate = lastModif,
-                results = gson.toJson(initialResult)
-            )
-        } catch (e: StepException) {
-            AnalysisStep(
-                status = AnalysisStepStatus.ERROR.value,
-                type = type,
-                error = e.message,
-                analysis = analysis,
-                lastModifDate = lastModif
-            )
+        if(newStep != null){
+            qualityControlR?.runR(newStep)
+        }else{
+            throw RuntimeException("Could not create new step QualityControl.")
         }
-*/
 
         return RUNNING.value
     }
