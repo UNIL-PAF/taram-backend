@@ -1,20 +1,19 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
+import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
-import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.results.model.Result
-import ch.unil.pafanalysis.results.service.ResultRepository
 import com.google.gson.Gson
-import org.hibernate.dialect.function.StandardAnsiSqlAggregationFunctions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.io.File
+import java.sql.Timestamp
 import java.time.LocalDateTime
 
 @Service
@@ -33,42 +32,45 @@ class InitialResultRunner {
     private val gson = Gson()
 
     fun run(analysisId: Int?, result: Result?): String {
-        val resDir = env?.getProperty("output.path.maxquant")?.plus(analysisId)
+        val outputRoot = env?.getProperty("output.path.maxquant")
         val maxQuantPath = env?.getProperty("result.path.maxquant") + result?.path
-        val outputPath: String = this.createResultDir(resDir)
-        val newTable = copyProteinGroupsTable(outputPath, maxQuantPath)
+        val outputPath: String = analysisId.toString()
 
         val analysis = if (analysisId == null) null else analysisRepository?.findById(analysisId)
-        val lastModif = LocalDateTime.now()
+        val newStep: AnalysisStep? = createEmptyAnalysisStep(analysis)
 
-        val step: AnalysisStep = try {
+        createResultDir(outputRoot?.plus(outputPath))
+        val stepPath = "$outputPath/${newStep?.id}"
+        createResultDir(outputRoot?.plus(stepPath))
+        val newTable = copyProteinGroupsTable(stepPath, maxQuantPath)
+
+        val step: AnalysisStep? = try {
             val initialResult = createInitialResult(maxQuantPath)
-
-            AnalysisStep(
-                resultTablePath = newTable.name,
-                status = AnalysisStepStatus.DONE.value,
-                type = type,
-                analysis = analysis,
-                lastModifDate = lastModif,
-                results = gson.toJson(initialResult)
-            )
+            newStep?.copy(resultPath = stepPath, resultTablePath = "$stepPath/${newTable?.name}", status = AnalysisStepStatus.DONE.value, results = gson.toJson(initialResult))
         } catch (e: StepException) {
-            AnalysisStep(
-                status = AnalysisStepStatus.ERROR.value,
-                type = type,
-                error = e.message,
-                analysis = analysis,
-                lastModifDate = lastModif
-            )
+            newStep?.copy(status = AnalysisStepStatus.ERROR.value,  error = e.message)
         }
 
-        analysisStepRepository?.save(step)
-        return "done"
+        if(step != null){
+            analysisStepRepository?.save(step)
+            return "done"
+        }else{
+            throw RuntimeException("Could not create/save initial_result.")
+        }
+    }
+
+    private fun createEmptyAnalysisStep(analysis: Analysis?): AnalysisStep? {
+        val newStep = AnalysisStep(
+            status = AnalysisStepStatus.IDLE.value,
+            type = type,
+            analysis = analysis,
+            lastModifDate = LocalDateTime.now()
+        )
+        return analysisStepRepository?.save(newStep)
     }
 
     private fun createInitialResult(maxQuantPath: String?): InitialResult {
         val parametersTable: String = maxQuantPath + "parameters.txt"
-
         val maxQuantParameters: MaxQuantParameters = this.parseMaxquantParameters(parametersTable)
         return InitialResult(
             maxQuantParameters = maxQuantParameters
@@ -77,7 +79,8 @@ class InitialResultRunner {
 
     private fun copyProteinGroupsTable(outputPath: String, maxQuantPath: String?): File {
         val originalTable = File(maxQuantPath + "proteinGroups.txt")
-        return originalTable.copyTo(File(outputPath + "proteinGroups_" + type + ".txt"), overwrite = true)
+        val timestamp = Timestamp(System.currentTimeMillis())
+        return originalTable.copyTo(File(outputPath + "/proteinGroups_" + timestamp.time + ".txt"), overwrite = true)
     }
 
     fun parseMaxquantParameters(parametersTable: String): MaxQuantParameters {

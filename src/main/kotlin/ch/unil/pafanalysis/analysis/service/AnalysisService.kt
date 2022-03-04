@@ -59,11 +59,15 @@ class AnalysisService {
 
     fun sortAnalysisSteps(oldList: List<AnalysisStep>?): List<AnalysisStep>? {
         val first: AnalysisStep? = oldList?.find { it.type == AnalysisStepType.INITIAL_RESULT.value }
-        var sortedList = mutableListOf<AnalysisStep>(first!!)
+        var sortedList = if (first != null) {
+            mutableListOf<AnalysisStep>(first!!)
+        } else {
+            return oldList
+        }
         var nextEl: AnalysisStep? = first
 
-        while(nextEl?.afterId != null){
-            nextEl = oldList?.find{it.id == nextEl?.afterId}
+        while (nextEl?.afterId != null) {
+            nextEl = oldList?.find { it.id == nextEl?.afterId }
             sortedList.add(nextEl!!)
         }
 
