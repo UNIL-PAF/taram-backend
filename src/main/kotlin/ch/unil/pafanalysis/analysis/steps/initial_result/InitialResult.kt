@@ -8,5 +8,6 @@ data class MaxQuantParameters(
 data class InitialResult(
     val proteinGroupsTable: String? = null,
     val parametersTable: String? = null,
-    val maxQuantParameters: MaxQuantParameters? = null
+    val maxQuantParameters: MaxQuantParameters? = null,
+    val nrProteinGroups: Int? = null
 )

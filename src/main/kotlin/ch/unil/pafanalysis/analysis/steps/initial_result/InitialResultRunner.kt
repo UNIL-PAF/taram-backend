@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.StepException
@@ -12,9 +9,12 @@ import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import java.sql.Timestamp
 import java.time.LocalDateTime
+
 
 @Service
 class InitialResultRunner {
@@ -42,19 +42,28 @@ class InitialResultRunner {
         createResultDir(outputRoot?.plus(outputPath))
         val stepPath = "$outputPath/${newStep?.id}"
         createResultDir(outputRoot?.plus(stepPath))
-        val newTable = copyProteinGroupsTable(stepPath, maxQuantPath)
+        val newTable = copyProteinGroupsTable(outputRoot?.plus(stepPath), maxQuantPath)
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(maxQuantPath)
-            newStep?.copy(resultPath = stepPath, resultTablePath = "$stepPath/${newTable?.name}", status = AnalysisStepStatus.DONE.value, results = gson.toJson(initialResult))
+            val experiments = getExperiments(maxQuantPath + "summary.txt")
+            val columnMapping = ColumnMapping(experiments = experiments)
+
+            newStep?.copy(
+                resultPath = stepPath,
+                resultTablePath = "$stepPath/${newTable?.name}",
+                status = AnalysisStepStatus.DONE.value,
+                results = gson.toJson(initialResult),
+                columnMapping = columnMapping
+            )
         } catch (e: StepException) {
-            newStep?.copy(status = AnalysisStepStatus.ERROR.value,  error = e.message)
+            newStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
         }
 
-        if(step != null){
+        if (step != null) {
             analysisStepRepository?.save(step)
             return "done"
-        }else{
+        } else {
             throw RuntimeException("Could not create/save initial_result.")
         }
     }
@@ -70,20 +79,28 @@ class InitialResultRunner {
     }
 
     private fun createInitialResult(maxQuantPath: String?): InitialResult {
-        val parametersTable: String = maxQuantPath + "parameters.txt"
-        val maxQuantParameters: MaxQuantParameters = this.parseMaxquantParameters(parametersTable)
         return InitialResult(
-            maxQuantParameters = maxQuantParameters
+            maxQuantParameters = parseMaxquantParameters(maxQuantPath + "parameters.txt"),
+            nrProteinGroups = getNrProteinGroups(maxQuantPath + "proteinGroups.txt")
         )
     }
 
-    private fun copyProteinGroupsTable(outputPath: String, maxQuantPath: String?): File {
+    private fun copyProteinGroupsTable(outputPath: String?, maxQuantPath: String?): File {
         val originalTable = File(maxQuantPath + "proteinGroups.txt")
         val timestamp = Timestamp(System.currentTimeMillis())
         return originalTable.copyTo(File(outputPath + "/proteinGroups_" + timestamp.time + ".txt"), overwrite = true)
     }
 
-    fun parseMaxquantParameters(parametersTable: String): MaxQuantParameters {
+    private fun getNrProteinGroups(proteinGroupsTable: String): Int {
+        val reader = BufferedReader(FileReader(proteinGroupsTable))
+        var lines = 0
+        while (reader.readLine() != null) lines++
+        reader.close()
+        lines--
+        return lines
+    }
+
+    private fun parseMaxquantParameters(parametersTable: String): MaxQuantParameters {
         val paramsFile = File(parametersTable)
         if (!paramsFile.exists()) throw StepException("Could not find parameters.txt in the results directory.")
         val pMap: HashMap<String, String> = HashMap<String, String>()
@@ -94,14 +111,21 @@ class InitialResultRunner {
             }
         }
 
-        val matchBetweenRuns = if (pMap["Match between runs"] == "True") true else false
+        val matchBetweenRuns = pMap["Match between runs"] == "True"
         return MaxQuantParameters(version = pMap["Version"], matchBetweenRuns = matchBetweenRuns)
     }
 
-    fun createResultDir(outputPath: String?): String {
+    private fun createResultDir(outputPath: String?): String {
         if (outputPath == null) throw RuntimeException("There is no output path defined.")
-        val dir: File = File(outputPath)
+        val dir = File(outputPath)
         if (!dir.exists()) dir.mkdir()
         return outputPath
+    }
+
+    private fun getExperiments(summaryTable: String): List<String> {
+        val lines: List<String> = File(summaryTable).bufferedReader().readLines()
+        val headers: List<String> = lines[0].split("\t")
+        val expIdx = headers.indexOf("Experiment")
+        return lines.subList(1, lines.size-1).map { it.split("\t")[expIdx] }
     }
 }
