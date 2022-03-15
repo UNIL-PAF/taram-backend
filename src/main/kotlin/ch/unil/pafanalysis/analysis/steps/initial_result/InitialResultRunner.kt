@@ -47,7 +47,7 @@ class InitialResultRunner {
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(maxQuantPath)
             val experiments = getExperiments(maxQuantPath + "summary.txt")
-            val columnMapping = ColumnMapping(experiments = experiments)
+            val columnMapping = ColumnMapping(experimentNames = experiments.second, experimentDetails = experiments.first)
 
             newStep?.copy(
                 resultPath = stepPath,
@@ -122,10 +122,25 @@ class InitialResultRunner {
         return outputPath
     }
 
-    private fun getExperiments(summaryTable: String): List<String> {
+    private fun getExperiments(summaryTable: String): Pair<HashMap<String, ExpInfo>, List<String>> {
         val lines: List<String> = File(summaryTable).bufferedReader().readLines()
         val headers: List<String> = lines[0].split("\t")
         val expIdx = headers.indexOf("Experiment")
-        return lines.subList(1, lines.size-1).map { it.split("\t")[expIdx] }
+        val fileIdx = headers.indexOf("Raw file")
+
+        val res = lines.subList(1, lines.size-1).fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())){ sum, el ->
+            val l = el.split("\t")
+            val expName = l[expIdx]
+            val expInfo = ExpInfo(fileName = l[fileIdx], isUsed = true, name = expName)
+            if(! sum.first.containsKey(expName)){
+                sum.first[expName] = expInfo
+                sum.second.add(expName)
+            }
+            sum
+        }
+        return res
     }
+
+
+
 }
