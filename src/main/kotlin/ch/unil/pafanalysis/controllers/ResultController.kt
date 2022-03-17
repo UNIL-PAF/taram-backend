@@ -22,7 +22,8 @@ class ResultController {
     private var env: Environment? = null
 
     private fun getResultPaths(): ResultPaths = ResultPaths(
-        maxQuantPath = env?.getProperty("result.path.maxquant")
+        maxQuantPath = env?.getProperty("result.path.maxquant"),
+        spectronautPath = env?.getProperty("result.path.spectronaut")
     )
 
     @PostMapping("/add")
