@@ -2,8 +2,9 @@ package ch.unil.pafanalysis.analysis.model
 
 data class ExpInfo(
     val fileName: String? = null,
-    val isUsed: Boolean? = null,
+    val isSelected: Boolean? = null,
     val name: String? = null,
+    val originalName: String? = null
 )
 
 data class ColumnMapping (

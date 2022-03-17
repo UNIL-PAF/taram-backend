@@ -131,7 +131,7 @@ class InitialResultRunner {
         val res = lines.subList(1, lines.size-1).fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())){ sum, el ->
             val l = el.split("\t")
             val expName = l[expIdx]
-            val expInfo = ExpInfo(fileName = l[fileIdx], isUsed = true, name = expName)
+            val expInfo = ExpInfo(fileName = l[fileIdx], isSelected = true, name = expName, originalName = expName)
             if(! sum.first.containsKey(expName)){
                 sum.first[expName] = expInfo
                 sum.second.add(expName)
