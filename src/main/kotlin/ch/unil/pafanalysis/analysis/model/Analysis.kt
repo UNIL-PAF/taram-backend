@@ -1,8 +1,6 @@
 package ch.unil.pafanalysis.analysis.model
 
-import org.hibernate.annotations.SortNatural
 import java.time.LocalDateTime
-import java.util.*
 import javax.persistence.*
 
 @Entity

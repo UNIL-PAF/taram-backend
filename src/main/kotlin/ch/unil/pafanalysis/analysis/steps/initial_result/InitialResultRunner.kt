@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.initial_result
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
+import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
@@ -29,6 +30,9 @@ class InitialResultRunner {
     @Autowired
     private var analysisStepRepository: AnalysisStepRepository? = null
 
+    @Autowired
+    private var columnInfoService: ColumnInfoService? = null
+
     private val type = AnalysisStepType.INITIAL_RESULT.value
     private val gson = Gson()
 
@@ -51,19 +55,14 @@ class InitialResultRunner {
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
-            val columns = getColumns(resultPath + "/" + result?.resFile)
-            val columnMapping = getColumnMapping(resultPath, columns, resultType)
-            /*val columnMapping =
-                ColumnMapping(experimentNames = experiments.second, experimentDetails = experiments.first, columns = columns)
-
-             */
+            val columnInfo = columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)
 
             newStep?.copy(
                 resultPath = stepPath,
                 resultTablePath = "$stepPath/${newTable?.name}",
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
-                columnMapping = columnMapping
+                columnInfo = columnInfo
             )
         } catch (e: StepException) {
             newStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
@@ -158,87 +157,5 @@ class InitialResultRunner {
         return outputPath
     }
 
-    private fun getColumns(filePath: String?): List<String> {
-        val header: String = File(filePath).bufferedReader().readLine()
-        return header.split("\t")
-    }
 
-    private fun getColumnMapping(resultPath: String, columns: List<String>, type: ResultType): ColumnMapping {
-        if (type == ResultType.MaxQuant) {
-            return getMaxQuantExperiments(columns, resultPath.plus("summary.txt"))
-        } else {
-            return getSpectronautExperiments(columns)
-        }
-    }
-
-    private fun parseExperimentalColumns(columns: List<String>, oneOrigName: String?): List<String> {
-        return columns.fold(emptyList<String>()) { sum, col ->
-            if (col.contains(oneOrigName!!)) {
-                sum.plus(col.replace(oneOrigName, "").trim())
-            } else {
-                sum
-            }
-        }
-    }
-
-    private fun getSpectronautExperiments(columns: List<String>): ColumnMapping {
-        val quantRegex = Regex(".+DIA_(.+?)_.+\\.Quantity$")
-
-        val quantityCols: List<Pair<String, Int>> = columns.foldIndexed(emptyList()) { index, sum, col ->
-            val matchResult = quantRegex.matchEntire(col)
-            if (matchResult != null) {
-                sum.plus(Pair(matchResult.groupValues[1], index))
-            } else {
-                sum
-            }
-        }
-
-        if (quantityCols.isEmpty()) throw StepException("Could not parse experiment names from columns.")
-
-        val experimentDetails = quantityCols.map { col ->
-            val originalName = columns[col.second].replace("Quantity", "")
-            val expInfo = ExpInfo(isSelected = true, originalName = originalName, name = col.first)
-            col.first to expInfo
-        }.toMap()
-
-        val experimentNames = quantityCols.map { it.first }
-        val experimentalColumns = parseExperimentalColumns(columns, experimentDetails[experimentNames[0]]?.originalName)
-
-        return ColumnMapping(
-            columns = columns,
-            intColumn = "Quantity",
-            experimentColumns = experimentalColumns,
-            experimentNames = experimentNames,
-            experimentDetails = experimentDetails as HashMap
-        )
-    }
-
-    private fun getMaxQuantExperiments(columns: List<String>, summaryTable: String): ColumnMapping {
-        val lines: List<String> = File(summaryTable).bufferedReader().readLines()
-        val headers: List<String> = lines[0].split("\t")
-        val expIdx = headers.indexOf("Experiment")
-        val fileIdx = headers.indexOf("Raw file")
-
-        val experiments = lines.subList(1, lines.size - 1)
-            .fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())) { sum, el ->
-                val l = el.split("\t")
-                val expName = l[expIdx]
-                val expInfo = ExpInfo(fileName = l[fileIdx], isSelected = true, name = expName, originalName = expName)
-                if (!sum.first.containsKey(expName)) {
-                    sum.first[expName] = expInfo
-                    sum.second.add(expName)
-                }
-                sum
-            }
-
-        val experimentalColumns = parseExperimentalColumns(columns, experiments.first[experiments.second[0]]?.originalName)
-
-        return ColumnMapping(
-            columns = columns,
-            intColumn = "Intensity",
-            experimentNames = experiments.second,
-            experimentColumns = experimentalColumns,
-            experimentDetails = experiments.first
-        )
-    }
 }
