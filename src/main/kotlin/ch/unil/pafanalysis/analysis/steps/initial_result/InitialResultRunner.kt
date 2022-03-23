@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.results.model.Result
+import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -32,8 +33,12 @@ class InitialResultRunner {
     private val gson = Gson()
 
     fun run(analysisId: Int?, result: Result?): String {
-        val outputRoot = env?.getProperty("output.path.maxquant")
-        val maxQuantPath = env?.getProperty("result.path.maxquant") + result?.path
+        val resultType = if (result?.type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
+
+        val outputRoot =
+            env?.getProperty(if (resultType == ResultType.MaxQuant) "output.path.maxquant" else "output.path.spectronaut")
+        val resultPath =
+            env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + result?.path
         val outputPath: String = analysisId.toString()
 
         val analysis = if (analysisId == null) null else analysisRepository?.findById(analysisId)
@@ -42,12 +47,16 @@ class InitialResultRunner {
         createResultDir(outputRoot?.plus(outputPath))
         val stepPath = "$outputPath/${newStep?.id}"
         createResultDir(outputRoot?.plus(stepPath))
-        val newTable = copyProteinGroupsTable(outputRoot?.plus(stepPath), maxQuantPath)
+        val newTable = copyResultsTable(outputRoot?.plus(stepPath) + "/" + (result?.resFile), resultPath, resultType)
 
         val step: AnalysisStep? = try {
-            val initialResult = createInitialResult(maxQuantPath)
-            val experiments = getExperiments(maxQuantPath + "summary.txt")
-            val columnMapping = ColumnMapping(experimentNames = experiments.second, experimentDetails = experiments.first)
+            val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
+            val columns = getColumns(resultPath + "/" + result?.resFile)
+            val columnMapping = getColumnMapping(resultPath, columns, resultType)
+            /*val columnMapping =
+                ColumnMapping(experimentNames = experiments.second, experimentDetails = experiments.first, columns = columns)
+
+             */
 
             newStep?.copy(
                 resultPath = stepPath,
@@ -78,16 +87,43 @@ class InitialResultRunner {
         return analysisStepRepository?.save(newStep)
     }
 
-    private fun createInitialResult(maxQuantPath: String?): InitialResult {
+    private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType): InitialResult {
+        if (type == ResultType.MaxQuant) {
+            return createInitialMaxQuantResult(resultPath, resultFilename)
+        } else {
+            return createInitialSpectronautResult(resultPath, resultFilename)
+        }
+    }
+
+    private fun createInitialSpectronautResult(spectronautPath: String?, fileName: String?): InitialResult {
         return InitialResult(
-            maxQuantParameters = parseMaxquantParameters(maxQuantPath + "parameters.txt"),
+            nrProteinGroups = getNrProteinGroups(spectronautPath.plus(fileName))
+        )
+    }
+
+    private fun createInitialMaxQuantResult(maxQuantPath: String?, fileName: String?): InitialResult {
+        return InitialResult(
+            maxQuantParameters = parseMaxquantParameters(maxQuantPath.plus(fileName)),
             nrProteinGroups = getNrProteinGroups(maxQuantPath + "proteinGroups.txt")
         )
     }
 
-    private fun copyProteinGroupsTable(outputPath: String?, maxQuantPath: String?): File {
-        val originalTable = File(maxQuantPath + "proteinGroups.txt")
+    private fun copyResultsTable(outputPath: String?, resultPath: String, type: ResultType): File {
         val timestamp = Timestamp(System.currentTimeMillis())
+        if (type == ResultType.MaxQuant) {
+            return copyProteinGroupsTable(outputPath, resultPath, timestamp)
+        } else {
+            return copySpectronautResultTable(outputPath, resultPath, timestamp)
+        }
+    }
+
+    private fun copySpectronautResultTable(outputPath: String?, spectronautPath: String?, timestamp: Timestamp): File {
+        val originalTable = File(spectronautPath)
+        return originalTable.copyTo(File(outputPath + "/Report_" + timestamp.time + ".txt"), overwrite = true)
+    }
+
+    private fun copyProteinGroupsTable(outputPath: String?, maxQuantPath: String?, timestamp: Timestamp): File {
+        val originalTable = File(maxQuantPath + "proteinGroups.txt")
         return originalTable.copyTo(File(outputPath + "/proteinGroups_" + timestamp.time + ".txt"), overwrite = true)
     }
 
@@ -122,25 +158,76 @@ class InitialResultRunner {
         return outputPath
     }
 
-    private fun getExperiments(summaryTable: String): Pair<HashMap<String, ExpInfo>, List<String>> {
+    private fun getColumns(filePath: String?): List<String> {
+        val header: String = File(filePath).bufferedReader().readLine()
+        return header.split("\t")
+    }
+
+    private fun getColumnMapping(resultPath: String, columns: List<String>, type: ResultType): ColumnMapping {
+        if (type == ResultType.MaxQuant) {
+            return getMaxQuantExperiments(resultPath.plus("summary.txt"))
+        } else {
+            return getSpectronautExperiments(columns)
+        }
+    }
+
+    private fun getSpectronautExperiments(columns: List<String>): ColumnMapping {
+        val quantRegex = Regex(".+DIA_(.+?)_.+\\.Quantity$")
+
+        val quantityCols: List<Pair<String, Int>> = columns.foldIndexed(emptyList()) { index, sum, col ->
+            val matchResult = quantRegex.matchEntire(col)
+            if (matchResult != null) {
+                sum.plus(Pair(matchResult.groupValues[1], index))
+            } else {
+                sum
+            }
+        }
+
+        if (quantityCols.isEmpty()) throw StepException("Could not parse experiment names from columns.")
+
+        val experimentDetails = quantityCols.map { col ->
+            val originalName = columns[col.second].replace("Quantity", "")
+            val expInfo = ExpInfo(isSelected = true, originalName = originalName, name = col.first)
+            col.first to expInfo
+        }.toMap()
+
+        val experimentNames = quantityCols.map { it.first }
+
+        val oneOrigName = experimentDetails[experimentNames[0]]?.originalName
+        val experimentColumns = columns.fold(emptyList<String>()) { sum, col ->
+            if (col.contains(oneOrigName!!)) {
+                sum.plus(col.replace(oneOrigName, ""))
+            } else {
+                sum
+            }
+        }
+
+        return ColumnMapping(
+            columns = columns,
+            intColumn = "Quantity",
+            experimentColumns = experimentColumns,
+            experimentNames = experimentNames,
+            experimentDetails = experimentDetails as HashMap
+        )
+    }
+
+    private fun getMaxQuantExperiments(summaryTable: String): ColumnMapping {
         val lines: List<String> = File(summaryTable).bufferedReader().readLines()
         val headers: List<String> = lines[0].split("\t")
         val expIdx = headers.indexOf("Experiment")
         val fileIdx = headers.indexOf("Raw file")
 
-        val res = lines.subList(1, lines.size-1).fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())){ sum, el ->
-            val l = el.split("\t")
-            val expName = l[expIdx]
-            val expInfo = ExpInfo(fileName = l[fileIdx], isSelected = true, name = expName, originalName = expName)
-            if(! sum.first.containsKey(expName)){
-                sum.first[expName] = expInfo
-                sum.second.add(expName)
+        val res = lines.subList(1, lines.size - 1)
+            .fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())) { sum, el ->
+                val l = el.split("\t")
+                val expName = l[expIdx]
+                val expInfo = ExpInfo(fileName = l[fileIdx], isSelected = true, name = expName, originalName = expName)
+                if (!sum.first.containsKey(expName)) {
+                    sum.first[expName] = expInfo
+                    sum.second.add(expName)
+                }
+                sum
             }
-            sum
-        }
-        return res
+        return ColumnMapping()
     }
-
-
-
 }
