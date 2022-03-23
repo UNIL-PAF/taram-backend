@@ -165,9 +165,19 @@ class InitialResultRunner {
 
     private fun getColumnMapping(resultPath: String, columns: List<String>, type: ResultType): ColumnMapping {
         if (type == ResultType.MaxQuant) {
-            return getMaxQuantExperiments(resultPath.plus("summary.txt"))
+            return getMaxQuantExperiments(columns, resultPath.plus("summary.txt"))
         } else {
             return getSpectronautExperiments(columns)
+        }
+    }
+
+    private fun parseExperimentalColumns(columns: List<String>, oneOrigName: String?): List<String> {
+        return columns.fold(emptyList<String>()) { sum, col ->
+            if (col.contains(oneOrigName!!)) {
+                sum.plus(col.replace(oneOrigName, "").trim())
+            } else {
+                sum
+            }
         }
     }
 
@@ -192,32 +202,24 @@ class InitialResultRunner {
         }.toMap()
 
         val experimentNames = quantityCols.map { it.first }
-
-        val oneOrigName = experimentDetails[experimentNames[0]]?.originalName
-        val experimentColumns = columns.fold(emptyList<String>()) { sum, col ->
-            if (col.contains(oneOrigName!!)) {
-                sum.plus(col.replace(oneOrigName, ""))
-            } else {
-                sum
-            }
-        }
+        val experimentalColumns = parseExperimentalColumns(columns, experimentDetails[experimentNames[0]]?.originalName)
 
         return ColumnMapping(
             columns = columns,
             intColumn = "Quantity",
-            experimentColumns = experimentColumns,
+            experimentColumns = experimentalColumns,
             experimentNames = experimentNames,
             experimentDetails = experimentDetails as HashMap
         )
     }
 
-    private fun getMaxQuantExperiments(summaryTable: String): ColumnMapping {
+    private fun getMaxQuantExperiments(columns: List<String>, summaryTable: String): ColumnMapping {
         val lines: List<String> = File(summaryTable).bufferedReader().readLines()
         val headers: List<String> = lines[0].split("\t")
         val expIdx = headers.indexOf("Experiment")
         val fileIdx = headers.indexOf("Raw file")
 
-        val res = lines.subList(1, lines.size - 1)
+        val experiments = lines.subList(1, lines.size - 1)
             .fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())) { sum, el ->
                 val l = el.split("\t")
                 val expName = l[expIdx]
@@ -228,6 +230,15 @@ class InitialResultRunner {
                 }
                 sum
             }
-        return ColumnMapping()
+
+        val experimentalColumns = parseExperimentalColumns(columns, experiments.first[experiments.second[0]]?.originalName)
+
+        return ColumnMapping(
+            columns = columns,
+            intColumn = "Intensity",
+            experimentNames = experiments.second,
+            experimentColumns = experimentalColumns,
+            experimentDetails = experiments.first
+        )
     }
 }
