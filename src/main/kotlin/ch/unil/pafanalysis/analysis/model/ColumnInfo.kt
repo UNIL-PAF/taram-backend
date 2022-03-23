@@ -8,12 +8,9 @@ data class ColumnInfo (
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,
-    val crc32hash: String? = null,
+    val crc32hash: Long? = null,
 
     @Type(type="json")
     @Column(columnDefinition="json")
     val columnMapping: ColumnMapping? = null,
-
-    //@OneToOne(mappedBy="analysis_step")
-    //val analysisStep: AnalysisStep? = null
 )

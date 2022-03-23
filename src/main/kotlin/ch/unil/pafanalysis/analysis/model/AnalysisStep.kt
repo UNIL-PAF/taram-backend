@@ -25,7 +25,7 @@ data class AnalysisStep (
     @Column(name="analysis_id", insertable=false, updatable = false)
     val analysis_id: Int? = null,
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="column_info_id")
     val columnInfo: ColumnInfo? = null,
 

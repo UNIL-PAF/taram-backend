@@ -2,16 +2,15 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
-import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControlRunner
-import ch.unil.pafanalysis.results.model.Result
+import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
-import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.io.File
-import java.time.LocalDateTime
+import java.util.zip.CRC32
+import java.util.zip.Checksum
+
 
 @Transactional
 @Service
@@ -22,15 +21,14 @@ class ColumnInfoService {
 
     fun createAndSaveColumnInfo(filePath: String?, resultPath: String, type: ResultType): ColumnInfo ? {
         val columnInfo = createColumnInfo(filePath, resultPath, type)
-        //val columnInfoWithStep = columnInfo.copy(analysisStep=analysisStep)
         return columnInfoRepository?.save(columnInfo)
     }
 
     fun createColumnInfo(filePath: String?, resultPath: String, type: ResultType): ColumnInfo {
         val columns = getColumns(filePath)
         val columnMapping = getColumnMapping(resultPath, columns, type)
-        println(columnMapping.toString())
-        return ColumnInfo(columnMapping = columnMapping)
+        val crc32Hash = Crc32HashComputations().computeCrc32Hash(columnMapping.toString())
+        return ColumnInfo(columnMapping = columnMapping, crc32hash = crc32Hash)
     }
 
     private fun getColumns(filePath: String?): List<String> {
