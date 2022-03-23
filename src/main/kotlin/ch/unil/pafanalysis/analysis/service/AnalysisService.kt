@@ -28,7 +28,7 @@ class AnalysisService {
 
         val newAnalysis = Analysis(
             idx = 0,
-            resultId = result?.id,
+            result = result,
             lastModifDate = LocalDateTime.now(),
             status = AnalysisStatus.CREATED.value
         )

@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
+import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
@@ -19,7 +20,7 @@ import java.time.LocalDateTime
 
 
 @Service
-class InitialResultRunner {
+class InitialResultRunner(): CommonStep() {
 
     @Autowired
     private var env: Environment? = null
@@ -28,12 +29,9 @@ class InitialResultRunner {
     private var analysisRepository: AnalysisRepository? = null
 
     @Autowired
-    private var analysisStepRepository: AnalysisStepRepository? = null
-
-    @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
-    private val type = AnalysisStepType.INITIAL_RESULT.value
+    override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
 
     fun run(analysisId: Int?, result: Result?): String {
@@ -74,16 +72,6 @@ class InitialResultRunner {
         } else {
             throw RuntimeException("Could not create/save initial_result.")
         }
-    }
-
-    private fun createEmptyAnalysisStep(analysis: Analysis?): AnalysisStep? {
-        val newStep = AnalysisStep(
-            status = AnalysisStepStatus.IDLE.value,
-            type = type,
-            analysis = analysis,
-            lastModifDate = LocalDateTime.now()
-        )
-        return analysisStepRepository?.save(newStep)
     }
 
     private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType): InitialResult {
