@@ -19,12 +19,12 @@ class ColumnInfoService {
     @Autowired
     private var columnInfoRepository: ColumnInfoRepository? = null
 
-    fun createAndSaveColumnInfo(filePath: String?, resultPath: String, type: ResultType): ColumnInfo ? {
+    fun createAndSaveColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): ColumnInfo ? {
         val columnInfo = createColumnInfo(filePath, resultPath, type)
         return columnInfoRepository?.save(columnInfo)
     }
 
-    fun createColumnInfo(filePath: String?, resultPath: String, type: ResultType): ColumnInfo {
+    fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): ColumnInfo {
         val columns = getColumns(filePath)
         val columnMapping = getColumnMapping(resultPath, columns, type)
         val crc32Hash = Crc32HashComputations().computeCrc32Hash(columnMapping.toString())
@@ -36,7 +36,7 @@ class ColumnInfoService {
         return header.split("\t")
     }
 
-    private fun getColumnMapping(resultPath: String, columns: List<String>?, type: ResultType): ColumnMapping {
+    private fun getColumnMapping(resultPath: String?, columns: List<String>?, type: ResultType?): ColumnMapping {
         if (type == ResultType.MaxQuant) {
             return getMaxQuantExperiments(columns, resultPath.plus("summary.txt"))
         } else {

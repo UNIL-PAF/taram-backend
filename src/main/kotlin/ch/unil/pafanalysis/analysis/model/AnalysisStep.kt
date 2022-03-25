@@ -15,12 +15,19 @@ data class AnalysisStep (
     val beforeId: Int? = null,
     val afterId: Int? = null,
     val comments: String? = null,
-    val resultTablePath: String? = null,
-    val resultPath: String? = null,
     val status: String? = null,
     val type: String? = null,
     val lastModifDate: LocalDateTime? = null,
     val error: String? = null,
+
+    val resultPath: String? = null,
+    val resultTablePath: String? = null,
+    val resultTableHash: Long? = null,
+
+    @Type(type="json")
+    @Column(columnDefinition="json")
+    val parameters: String? = null,
+    val parametersHash: Long? = null,
 
     @Column(name="analysis_id", insertable=false, updatable = false)
     val analysis_id: Int? = null,

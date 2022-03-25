@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.results.model.ResultType
 import com.github.rcaller.rstuff.RCaller
 import com.github.rcaller.rstuff.RCallerOptions
 import com.github.rcaller.rstuff.RCode
@@ -37,7 +38,8 @@ class QualityControlR {
             val code = RCode.create()
             code.addRCode(content)
 
-            val outputRoot: String? = env?.getProperty("output.path.maxquant")
+            val outputRoot =
+                env?.getProperty(if (analysisStep.type == ResultType.MaxQuant.value) "output.path.maxquant" else "output.path.spectronaut")
             code.addString("output_path", outputRoot!!+"/"+analysisStep.resultPath)
             code.addRCode("result <- run(output_path)")
 
@@ -55,27 +57,3 @@ class QualityControlR {
     }
 
 }
-
-/*
-
-        val step: AnalysisStep = try {
-            val initialResult = createInitialResult(maxQuantPath)
-
-            AnalysisStep(
-                resultTablePath = newTable.name,
-                status = AnalysisStepStatus.DONE.value,
-                type = type,
-                analysis = analysis,
-                lastModifDate = lastModif,
-                results = gson.toJson(initialResult)
-            )
-        } catch (e: StepException) {
-            AnalysisStep(
-                status = AnalysisStepStatus.ERROR.value,
-                type = type,
-                error = e.message,
-                analysis = analysis,
-                lastModifDate = lastModif
-            )
-        }
-*/
