@@ -76,7 +76,8 @@ class AnalysisService {
 
     fun getSortedAnalysisList(resultId: Int): List<Analysis>? {
         // sort the analysis steps
-        val analysisList = getByResultId(resultId)
+        val analysisList: List<Analysis>? = getByResultId(resultId)
+
         val sortedList = analysisList?.map { a ->
             a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
         }

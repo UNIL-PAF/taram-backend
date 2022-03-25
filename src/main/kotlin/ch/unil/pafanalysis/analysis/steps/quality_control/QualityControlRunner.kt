@@ -1,6 +1,8 @@
 package ch.unil.pafanalysis.analysis.steps.quality_control
 
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus.RUNNING
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -14,7 +16,7 @@ class QualityControlRunner : CommonStep(){
     private var qualityControlR: QualityControlR? = null
 
     fun run(oldStepId: Int): String {
-        val newStep = runCommonStep(oldStepId, modifiesResult = false)
+        val newStep = runCommonStep(AnalysisStepType.QUALITY_CONTROL, oldStepId, modifiesResult = false)
 
         if (newStep != null) {
           qualityControlR?.runR(newStep)

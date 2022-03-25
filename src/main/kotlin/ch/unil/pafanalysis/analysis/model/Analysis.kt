@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.model
 
 import ch.unil.pafanalysis.results.model.Result
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -17,7 +18,8 @@ data class Analysis (
 
     //val resultId: Int? = null,
 
-    @OneToMany(mappedBy="analysis")
+    @OneToMany(mappedBy="analysis", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @JsonManagedReference
     val analysisSteps: List<AnalysisStep>? = null,
 
     @ManyToOne

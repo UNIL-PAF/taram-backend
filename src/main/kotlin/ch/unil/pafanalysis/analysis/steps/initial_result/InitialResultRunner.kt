@@ -28,7 +28,7 @@ class InitialResultRunner(): CommonStep() {
 
     fun run(analysisId: Int?, result: Result?): String {
         val analysis = analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
-        val emptyStep = createEmptyAnalysisStep(analysis)
+        val emptyStep = createEmptyAnalysisStep(analysis, AnalysisStepType.INITIAL_RESULT)
         val stepPath = setMainPaths(analysis, emptyStep)
 
         val newTable = copyResultsTable(outputRoot?.plus(stepPath) + "/" + (result?.resFile), resultPath, resultType)

@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.analysis.model
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import com.vladmihalcea.hibernate.type.json.JsonType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
@@ -29,9 +30,6 @@ data class AnalysisStep (
     val parameters: String? = null,
     val parametersHash: Long? = null,
 
-    @Column(name="analysis_id", insertable=false, updatable = false)
-    val analysis_id: Int? = null,
-
     @ManyToOne
     @JoinColumn(name="column_info_id")
     val columnInfo: ColumnInfo? = null,
@@ -42,6 +40,7 @@ data class AnalysisStep (
 
     @ManyToOne
     @JoinColumn(name="analysis_id", nullable=false)
-    private val analysis: Analysis? = null
+    @JsonBackReference
+    val analysis: Analysis? = null
 
 )

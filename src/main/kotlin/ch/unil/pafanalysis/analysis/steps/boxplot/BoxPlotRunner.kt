@@ -12,7 +12,7 @@ class BoxPlotRunner(): CommonStep() {
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
     fun run(oldStepId: Int): String {
-        val newStep = runCommonStep(oldStepId, false)
+        val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false)
 
         return "run"
     }

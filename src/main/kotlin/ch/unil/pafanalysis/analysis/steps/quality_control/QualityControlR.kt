@@ -39,7 +39,7 @@ class QualityControlR {
             code.addRCode(content)
 
             val outputRoot =
-                env?.getProperty(if (analysisStep.type == ResultType.MaxQuant.value) "output.path.maxquant" else "output.path.spectronaut")
+                env?.getProperty(if (analysisStep.analysis?.result?.type == ResultType.MaxQuant.value) "output.path.maxquant" else "output.path.spectronaut")
             code.addString("output_path", outputRoot!!+"/"+analysisStep.resultPath)
             code.addRCode("result <- run(output_path)")
 

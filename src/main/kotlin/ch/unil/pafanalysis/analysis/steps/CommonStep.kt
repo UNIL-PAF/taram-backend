@@ -32,20 +32,16 @@ open class CommonStep {
     var resultPath: String? = null
     var resultType: ResultType? = null
 
-    fun runCommonStep(oldStepId: Int? = null, modifiesResult: Boolean? = null): AnalysisStep?{
-        val oldStep = if(oldStepId != null){analysisStepRepository?.findById(oldStepId)}else{null}
-        val analysis: Analysis? = analysisRepository?.findById(oldStep!!.analysis_id!!)
+    fun runCommonStep(type: AnalysisStepType, oldStepId: Int? = null, modifiesResult: Boolean? = null): AnalysisStep?{
+        val oldStep: AnalysisStep? = if(oldStepId != null){analysisStepRepository?.findById(oldStepId)}else{null}
 
-        val emptyStep = createEmptyAnalysisStep(analysis, oldStep?.beforeId, oldStep?.afterId)
-        val stepPath = setMainPaths(analysis, emptyStep)
+        val emptyStep = createEmptyAnalysisStep(oldStep?.analysis, type, oldStep?.id, oldStep?.afterId)
+        val stepPath = setMainPaths(oldStep?.analysis, emptyStep)
         val resultTablePath = getResultTablePath(modifiesResult, oldStep, stepPath)
 
-        return updateEmptyStep(emptyStep, stepPath, resultTablePath, oldStep?.resultTableHash)
-    }
+        updateOldStep(oldStep, emptyStep?.id)
 
-    private fun updateEmptyStep(emptyStep: AnalysisStep? , stepPath: String?, resultTablePath: String?, resultTableHash: Long?): AnalysisStep? {
-        val newStep = emptyStep?.copy(resultPath = stepPath, resultTablePath = resultTablePath, resultTableHash = resultTableHash)
-        return analysisStepRepository?.save(newStep!!)
+        return updateEmptyStep(emptyStep, stepPath, resultTablePath, oldStep?.resultTableHash)
     }
 
     fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
@@ -62,6 +58,28 @@ open class CommonStep {
         val stepPath = "$outputPath/${emptyStep?.id}"
         createResultDir(outputRoot?.plus(stepPath))
         return stepPath
+    }
+
+    fun createEmptyAnalysisStep(analysis: Analysis?, type: AnalysisStepType, beforeId: Int? = null, afterId: Int? = null): AnalysisStep? {
+        val newStep = AnalysisStep(
+            status = AnalysisStepStatus.IDLE.value,
+            type = type.value,
+            analysis = analysis,
+            lastModifDate = LocalDateTime.now(),
+            beforeId = beforeId,
+            afterId = afterId,
+        )
+        return analysisStepRepository?.save(newStep)
+    }
+
+    private fun updateEmptyStep(emptyStep: AnalysisStep? , stepPath: String?, resultTablePath: String?, resultTableHash: Long?): AnalysisStep? {
+        val newStep = emptyStep?.copy(resultPath = stepPath, resultTablePath = resultTablePath, resultTableHash = resultTableHash)
+        return analysisStepRepository?.save(newStep!!)
+    }
+
+    private fun updateOldStep(oldStep: AnalysisStep?, newAfterId: Int?){
+        val updatedOldStep = oldStep?.copy(afterId = newAfterId)
+        analysisStepRepository?.save(updatedOldStep!!)
     }
 
     private fun getResultTablePath(modifiesResult: Boolean?, oldStep: AnalysisStep?, stepPath: String?): String? {
@@ -81,17 +99,5 @@ open class CommonStep {
         val dir = File(outputPath)
         if (!dir.exists()) dir.mkdir()
         return outputPath
-    }
-
-    fun createEmptyAnalysisStep(analysis: Analysis?, beforeId: Int? = null, afterId: Int? = null): AnalysisStep? {
-        val newStep = AnalysisStep(
-            status = AnalysisStepStatus.IDLE.value,
-            type = type?.value,
-            analysis = analysis,
-            lastModifDate = LocalDateTime.now(),
-            beforeId = beforeId,
-            afterId = afterId,
-        )
-        return analysisStepRepository?.save(newStep)
     }
 }
