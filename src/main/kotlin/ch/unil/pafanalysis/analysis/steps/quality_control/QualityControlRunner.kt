@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.analysis.steps.quality_control
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus.RUNNING
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonStep
