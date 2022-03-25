@@ -66,8 +66,8 @@ class AnalysisService {
         }
         var nextEl: AnalysisStep? = first
 
-        while (nextEl?.afterId != null) {
-            nextEl = oldList?.find { it.id == nextEl?.afterId }
+        while (nextEl?.nextId != null) {
+            nextEl = oldList?.find { it.id == nextEl?.nextId }
             sortedList.add(nextEl!!)
         }
 
