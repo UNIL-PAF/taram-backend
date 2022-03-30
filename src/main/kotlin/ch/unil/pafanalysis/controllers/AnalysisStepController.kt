@@ -1,9 +1,12 @@
 package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
+import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControlRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -15,19 +18,37 @@ import org.springframework.web.bind.annotation.*
 class AnalysisStepController {
 
     @Autowired
+    private var analysisStepRepository: AnalysisStepRepository? = null
+
+    @Autowired
     private var qualityControlRunner: QualityControlRunner? = null
 
     @Autowired
     private var boxPlotRunner: BoxPlotRunner? = null
 
+    @Autowired
+    private var initialResult: InitialResultRunner? = null
+
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
-        val status: String? = when (stepParams.type) {
+        val status: AnalysisStepStatus? = when (stepParams.type) {
             QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
             BOXPLOT.value -> boxPlotRunner?.run(stepId)
             else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
         }
-        return status
+        return status?.value
+    }
+
+    @PostMapping(path = ["/parameters/{stepId}"])
+    @ResponseBody
+    fun parameters(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
+        val analysisStep = analysisStepRepository?.findById(stepId)
+
+        val status: AnalysisStepStatus? = when (analysisStep?.type) {
+            INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)
+            else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
+        }
+        return status?.value
     }
 }

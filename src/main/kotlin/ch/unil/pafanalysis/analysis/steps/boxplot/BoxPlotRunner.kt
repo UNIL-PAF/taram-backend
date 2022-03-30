@@ -15,10 +15,10 @@ class BoxPlotRunner(): CommonStep() {
 
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
-    fun run(oldStepId: Int): String {
+    fun run(oldStepId: Int): AnalysisStepStatus {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false)
         analysisStepService?.setAnalysisStepStatus(newStep!!.id!!, AnalysisStepStatus.DONE)
 
-        return "done"
+        return AnalysisStepStatus.DONE
     }
 }

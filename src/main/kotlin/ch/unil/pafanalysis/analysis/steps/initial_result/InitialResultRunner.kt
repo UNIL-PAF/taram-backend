@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
@@ -26,7 +27,7 @@ class InitialResultRunner(): CommonStep() {
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
 
-    fun run(analysisId: Int?, result: Result?): String {
+    fun run(analysisId: Int?, result: Result?): AnalysisStepStatus {
         val analysis = analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
         val emptyStep = createEmptyAnalysisStep(analysis, AnalysisStepType.INITIAL_RESULT)
         val stepPath = setMainPaths(analysis, emptyStep)
@@ -50,11 +51,17 @@ class InitialResultRunner(): CommonStep() {
 
         if (step != null) {
             analysisStepRepository?.save(step)
-            return "done"
+            return AnalysisStepStatus.DONE
         } else {
             throw RuntimeException("Could not create/save initial_result.")
         }
     }
+
+    fun updateParams(analysisStep: AnalysisStep, params: AnalysisStepParams): AnalysisStepStatus{
+        println(params)
+        return AnalysisStepStatus.DONE
+    }
+
 
     private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType?): InitialResult {
         if (type == ResultType.MaxQuant) {

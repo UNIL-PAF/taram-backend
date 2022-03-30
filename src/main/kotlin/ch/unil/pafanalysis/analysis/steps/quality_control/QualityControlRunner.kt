@@ -1,5 +1,8 @@
 package ch.unil.pafanalysis.analysis.steps.quality_control
 
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus.RUNNING
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonStep
@@ -14,7 +17,7 @@ class QualityControlRunner : CommonStep(){
     @Autowired
     private var qualityControlR: QualityControlR? = null
 
-    fun run(oldStepId: Int): String {
+    fun run(oldStepId: Int): AnalysisStepStatus {
         val newStep = runCommonStep(AnalysisStepType.QUALITY_CONTROL, oldStepId, modifiesResult = false)
 
         if (newStep != null) {
@@ -23,6 +26,7 @@ class QualityControlRunner : CommonStep(){
             throw RuntimeException("Could not create new step for QualityControl.")
         }
 
-        return RUNNING.value
+        return RUNNING
     }
+
 }
