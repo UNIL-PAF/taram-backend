@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
+import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -22,6 +23,10 @@ open class CommonStep {
 
     @Autowired
     var analysisRepository: AnalysisRepository? = null
+
+    @Autowired
+    var columnInfoRepository: ColumnInfoRepository? = null
+
 
     @Autowired
     private var env: Environment? = null

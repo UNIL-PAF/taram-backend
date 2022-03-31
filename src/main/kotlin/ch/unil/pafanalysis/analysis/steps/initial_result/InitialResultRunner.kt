@@ -1,21 +1,21 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
+import java.lang.reflect.Type
 import java.sql.Timestamp
+import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf
 
 
 @Service
@@ -57,8 +57,12 @@ class InitialResultRunner(): CommonStep() {
         }
     }
 
-    fun updateParams(analysisStep: AnalysisStep, params: AnalysisStepParams): AnalysisStepStatus{
-        println(params)
+    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus{
+        val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
+        val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
+        val newColumnMapping: ColumnMapping? = analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+        val newColumnInfo: ColumnInfo? = analysisStep.columnInfo?.copy(columnMapping = newColumnMapping)
+        columnInfoRepository?.save(newColumnInfo!!)
         return AnalysisStepStatus.DONE
     }
 

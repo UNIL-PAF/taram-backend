@@ -42,12 +42,12 @@ class AnalysisStepController {
 
     @PostMapping(path = ["/parameters/{stepId}"])
     @ResponseBody
-    fun parameters(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
+    fun parameters(@RequestBody stepParams: String, @PathVariable(value = "stepId") stepId: Int): String? {
         val analysisStep = analysisStepRepository?.findById(stepId)
 
         val status: AnalysisStepStatus? = when (analysisStep?.type) {
             INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)
-            else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
+            else -> throw StepException("Analysis step [" + analysisStep?.type + "] not found.")
         }
         return status?.value
     }
