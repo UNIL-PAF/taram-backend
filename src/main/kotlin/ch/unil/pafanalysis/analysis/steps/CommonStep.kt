@@ -60,14 +60,17 @@ open class CommonStep {
         return updateEmptyStep(emptyStep, stepPath, resultTablePathAndHash, stepHash)
     }
 
-    fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
+    fun setPathes(analysis: Analysis?) {
         resultType =
             if (analysis?.result?.type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
         outputRoot =
             env?.getProperty(if (resultType == ResultType.MaxQuant) "output.path.maxquant" else "output.path.spectronaut")
         resultPath =
             env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
+    }
 
+    fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
+        setPathes(analysis)
         val outputPath: String = analysis?.id.toString()
         createResultDir(outputRoot?.plus(outputPath))
 

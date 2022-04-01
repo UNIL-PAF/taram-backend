@@ -7,7 +7,7 @@ data class BoxPlot(
 
 data class BoxPlotGroupData(
     val group: String? = null,
-    val data: List<List<BoxPlotData>>? = null,
+    val data: List<BoxPlotData>? = null,
 )
 
 data class BoxPlotData(

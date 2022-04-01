@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.analysis.steps.boxplot
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
-import ch.unil.pafanalysis.analysis.model.ColumnMapping
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -14,9 +11,6 @@ import kotlin.math.ceil
 
 @Service
 class BoxPlotRunner(): CommonStep() {
-
-    @Autowired
-    private var analysisStepService: AnalysisStepService? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
@@ -32,24 +26,37 @@ class BoxPlotRunner(): CommonStep() {
     }
 
     override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
+        setPathes(step.analysis)
         val boxplot = createBoxplotObj(step.columnInfo?.columnMapping, step.resultTablePath)
 
         val newStep = step.copy(resultTableHash = stepBefore?.resultTableHash, results = gson.toJson(boxplot))
         analysisStepRepository?.save(newStep)
-        
+
         updateNextStep(step)
     }
 
     private fun createBoxplotObj(columnMapping: ColumnMapping?, resultTablePath: String?): BoxPlot {
-        val boxplotGroupData = columnMapping?.experimentNames?.map{ name ->
-            createBoxplotGroupData()
-        }
-        return BoxPlot(experimentNames = null, data = boxplotGroupData)
+        val expDetailsTable = columnMapping?.experimentNames?.map{ name ->
+            columnMapping?.experimentDetails?.get(name)
+        }?.filter{ it?.isSelected?:false }
+
+        val experimentNames = expDetailsTable?.map{ it?.name!! }
+        val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
+        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, it.value, resultTablePath) }
+
+        return BoxPlot(experimentNames = experimentNames, data = boxplotGroupData?.keys?.toList())
     }
 
-    private fun createBoxplotGroupData(): BoxPlotGroupData {
-        val listOfBoxplots = null
-        return BoxPlotGroupData(group = "blibla", data = listOfBoxplots)
+    private fun createBoxplotGroupData(group: String?, expInfoList: List<ExpInfo?>?, resultTablePath: String?): BoxPlotGroupData {
+        val listOfInts = getListOfInts(expInfoList, resultTablePath)
+        val listOfBoxplots = listOfInts.map{ BoxPlotData( it.first, computeBoxplotData(it.second)) }
+        return BoxPlotGroupData(group = group, data = listOfBoxplots)
+    }
+
+    private fun getListOfInts(expInfoList: List<ExpInfo?>?, resultTablePath: String?): List<Pair<String, List<Double>>>{
+        println(outputRoot?.plus(resultTablePath))
+
+        return emptyList<Pair<String, List<Double>>>()
     }
 
     private fun computeBoxplotData(ints: List<Double>): List<Double>{
