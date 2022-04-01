@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.Crc32HashComputations
+import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import kotlin.math.ceil
@@ -19,19 +20,23 @@ class BoxPlotRunner(): CommonStep() {
 
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
+    private val gson = Gson()
+
     fun run(oldStepId: Int): AnalysisStepStatus {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false)
-
         val boxplot = createBoxplotObj(newStep?.columnInfo?.columnMapping, newStep?.resultTablePath)
-
-        analysisStepService?.setAnalysisStepStatus(newStep!!.id!!, AnalysisStepStatus.DONE)
+        val updatedStep = newStep?.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
+        analysisStepRepository?.save(updatedStep!!)
 
         return AnalysisStepStatus.DONE
     }
 
     override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
-        println("update boxplot")
+        val boxplot = createBoxplotObj(step.columnInfo?.columnMapping, step.resultTablePath)
 
+        val newStep = step.copy(resultTableHash = stepBefore?.resultTableHash, results = gson.toJson(boxplot))
+        analysisStepRepository?.save(newStep)
+        
         updateNextStep(step)
     }
 
