@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
@@ -29,10 +30,11 @@ class InitialResultRunner(): CommonStep() {
 
     fun run(analysisId: Int?, result: Result?): AnalysisStepStatus {
         val analysis = analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
-        val emptyStep = createEmptyAnalysisStep(analysis, AnalysisStepType.INITIAL_RESULT)
+        val emptyStep = createEmptyAnalysisStep(AnalysisStep(analysis = analysis), AnalysisStepType.INITIAL_RESULT)
         val stepPath = setMainPaths(analysis, emptyStep)
 
         val newTable = copyResultsTable(outputRoot?.plus(stepPath) + "/" + (result?.resFile), resultPath, resultType)
+        val newTableHash = Crc32HashComputations().computeFileHash(newTable)
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
@@ -41,6 +43,7 @@ class InitialResultRunner(): CommonStep() {
             emptyStep?.copy(
                 resultPath = stepPath,
                 resultTablePath = "$stepPath/${newTable?.name}",
+                resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
                 columnInfo = columnInfo
@@ -61,8 +64,12 @@ class InitialResultRunner(): CommonStep() {
         val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
         val newColumnMapping: ColumnMapping? = analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
-        val newColumnInfo: ColumnInfo? = analysisStep.columnInfo?.copy(columnMapping = newColumnMapping)
+        val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
+        val newColumnInfo: ColumnInfo? = analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.save(newColumnInfo!!)
+
+        updateNextStep(analysisStep)
+
         return AnalysisStepStatus.DONE
     }
 

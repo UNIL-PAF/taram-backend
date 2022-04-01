@@ -19,6 +19,7 @@ data class AnalysisStep (
     val type: String? = null,
     val lastModifDate: LocalDateTime? = null,
     val error: String? = null,
+    val stepHash: Long? = null,
 
     val resultPath: String? = null,
     val resultTablePath: String? = null,

@@ -27,8 +27,8 @@ class ColumnInfoService {
     fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): ColumnInfo {
         val columns = getColumns(filePath)
         val columnMapping = getColumnMapping(resultPath, columns, type)
-        val crc32Hash = Crc32HashComputations().computeCrc32Hash(columnMapping.toString())
-        return ColumnInfo(columnMapping = columnMapping, crc32hash = crc32Hash)
+        val crc32Hash = Crc32HashComputations().computeStringHash(columnMapping.toString())
+        return ColumnInfo(columnMapping = columnMapping, columnMappingHash = crc32Hash)
     }
 
     private fun getColumns(filePath: String?): List<String> {
