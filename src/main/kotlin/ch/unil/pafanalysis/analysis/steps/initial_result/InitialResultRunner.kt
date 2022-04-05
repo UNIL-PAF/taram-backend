@@ -19,7 +19,7 @@ import java.sql.Timestamp
 
 
 @Service
-class InitialResultRunner(): CommonStep() {
+class InitialResultRunner() : CommonStep() {
 
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
@@ -28,16 +28,18 @@ class InitialResultRunner(): CommonStep() {
     private val gson = Gson()
 
     fun run(analysisId: Int?, result: Result?): AnalysisStepStatus {
-        val analysis = analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
+        val analysis =
+            analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
         val emptyStep = createEmptyAnalysisStep(AnalysisStep(analysis = analysis), AnalysisStepType.INITIAL_RESULT)
         val stepPath = setMainPaths(analysis, emptyStep)
 
-        val newTable = copyResultsTable(outputRoot?.plus(stepPath) + "/" + (result?.resFile), resultPath, resultType)
+        val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath)
         val newTableHash = Crc32HashComputations().computeFileHash(newTable)
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
-            val columnInfo = columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)
+            val columnInfo =
+                columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)
 
             emptyStep?.copy(
                 resultPath = stepPath,
@@ -59,12 +61,14 @@ class InitialResultRunner(): CommonStep() {
         }
     }
 
-    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus{
+    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
         val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
-        val newColumnMapping: ColumnMapping? = analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+        val newColumnMapping: ColumnMapping? =
+            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
-        val newColumnInfo: ColumnInfo? = analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
+        val newColumnInfo: ColumnInfo? =
+            analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.save(newColumnInfo!!)
 
         updateNextStep(analysisStep)
@@ -94,23 +98,22 @@ class InitialResultRunner(): CommonStep() {
         )
     }
 
-    private fun copyResultsTable(outputPath: String?, resultPath: String?, type: ResultType?): File {
+    private fun copyResultsTable(outputPath: String?, resultFile: String?, resultPath: String?): File {
         val timestamp = Timestamp(System.currentTimeMillis())
-        if (type == ResultType.MaxQuant) {
-            return copyProteinGroupsTable(outputPath, resultPath, timestamp)
+
+        if (resultType == ResultType.MaxQuant) {
+            return copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "proteinGroups")
         } else {
-            return copySpectronautResultTable(outputPath, resultPath, timestamp)
+            return copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "Report")
         }
     }
 
-    private fun copySpectronautResultTable(outputPath: String?, spectronautPath: String?, timestamp: Timestamp): File {
-        val originalTable = File(spectronautPath)
-        return originalTable.copyTo(File(outputPath + "/Report_" + timestamp.time + ".txt"))
-    }
-
-    private fun copyProteinGroupsTable(outputPath: String?, maxQuantPath: String?, timestamp: Timestamp): File {
-        val originalTable = File(maxQuantPath + "proteinGroups.txt")
-        return originalTable.copyTo(File(outputPath + "/proteinGroups_" + timestamp.time + ".txt"))
+    private fun copyResultTableWithName(outputPath: String?, resultFile: String?, resultPath: String?, timestamp: Timestamp, fileName: String?): File {
+        val originalTable = File("$resultPath/$resultFile")
+        val newTableName = "${fileName}_${timestamp.time}.txt"
+        val newTable = File("$outputPath/$newTableName")
+        originalTable.copyTo(newTable)
+        return newTable
     }
 
     private fun getNrProteinGroups(proteinGroupsTable: String): Int {
@@ -136,8 +139,6 @@ class InitialResultRunner(): CommonStep() {
         val matchBetweenRuns = pMap["Match between runs"] == "True"
         return MaxQuantParameters(version = pMap["Version"], matchBetweenRuns = matchBetweenRuns)
     }
-
-
 
 
 }
