@@ -59,7 +59,7 @@ class BoxPlotRunner(): CommonStep() {
         val intColumn = columnMapping?.intColumn
         val intColumnNames = expInfoList?.map { exp -> intColumn + " " + exp?.originalName }
         val columnInts: List<List<Double>> = ReadTableData().getColumnNumbers(outputRoot?.plus(resultTablePath), columnMapping!!.columns!!, intColumnNames!!)
-        return columnInts.mapIndexed{ i, ints -> Pair(intColumnNames[i], ints)}
+        return columnInts.mapIndexed{ i, ints -> Pair(expInfoList[i]!!.name!!, ints)}
     }
 
     private fun computeBoxplotData(ints: List<Double>): List<Double>{
