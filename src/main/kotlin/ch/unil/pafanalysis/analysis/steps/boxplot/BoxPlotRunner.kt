@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import kotlin.math.ceil
+import kotlin.math.ln
 
 @Service
 class BoxPlotRunner(): CommonStep() {
@@ -62,7 +63,9 @@ class BoxPlotRunner(): CommonStep() {
         return columnInts.mapIndexed{ i, ints -> Pair(expInfoList[i]!!.name!!, ints)}
     }
 
-    private fun computeBoxplotData(ints: List<Double>): List<Double>{
+    private fun computeBoxplotData(intsX: List<Double>): List<Double>{
+        val ints = intsX.filter{it != 0.0}.map { ln(it) }
+
         val min = ints.minOrNull()!!
         val Q1 = percentile(ints, 25.0)
         val median = percentile(ints, 50.0)
