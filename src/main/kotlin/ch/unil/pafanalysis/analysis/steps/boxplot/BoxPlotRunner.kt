@@ -3,8 +3,8 @@ package ch.unil.pafanalysis.analysis.steps.boxplot
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
+import com.google.common.math.Quantiles
 import com.google.gson.Gson
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import kotlin.math.ln
 
@@ -12,9 +12,6 @@ import kotlin.math.ln
 class BoxPlotRunner() : CommonStep() {
 
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
-
-    @Autowired
-    private var boxPlotR: BoxPlotR? = null
 
     private val gson = Gson()
 
@@ -76,16 +73,12 @@ class BoxPlotRunner() : CommonStep() {
     private fun computeBoxplotData(intsX: List<Double>): List<Double>? {
         val ints = intsX.filter { it != 0.0 }.map { ln(it) }
 
-        val dInts: DoubleArray = ints.toDoubleArray()
-        return boxPlotR?.runR(dInts)?.toList()
+        val min = ints.minOrNull()!!
+        val q25: Double = Quantiles.percentiles().index(25).compute(ints)
+        val q50: Double = Quantiles.percentiles().index(50).compute(ints)
+        val q75: Double = Quantiles.percentiles().index(75).compute(ints)
+        val max = ints.maxOrNull()!!
+        return listOf(min, q25, q50, q75, max)
     }
-
-    /*
-    private fun percentile(ints: List<Double>, percentile: Double): Double {
-        val sortedInts = ints.sorted()
-        val index = ceil(percentile / 100.0 * sortedInts.size).toInt()
-        return ints[index - 1]
-    }
-     */
 
 }
