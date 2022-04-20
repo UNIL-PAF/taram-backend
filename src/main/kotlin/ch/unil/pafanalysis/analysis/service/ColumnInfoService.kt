@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.CheckTypes
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,20 +26,25 @@ class ColumnInfoService {
     }
 
     fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): ColumnInfo {
-        val columns = getColumns(filePath)
-        val columnMapping = getColumnMapping(resultPath, columns, type)
+        val (columns, isNumerical) = getColumns(filePath)
+        val columnMapping = getColumnMapping(resultPath, columns, type, isNumerical)
         val crc32Hash = Crc32HashComputations().computeStringHash(columnMapping.toString())
         return ColumnInfo(columnMapping = columnMapping, columnMappingHash = crc32Hash)
     }
 
-    private fun getColumns(filePath: String?): List<String> {
-        val header: String = File(filePath).bufferedReader().readLine()
-        return header.split("\t")
+    private fun getColumns(filePath: String?): Pair<List<String>, List<Boolean>> {
+        val reader = File(filePath).bufferedReader()
+        val header: String = reader.readLine()
+
+        val firstLine: String = reader.readLine()
+        val isNumerical: List<Boolean> = firstLine.split("\t").map{ v -> CheckTypes().isNumerical(v)}
+
+        return Pair(header.split("\t"), isNumerical)
     }
 
-    private fun getColumnMapping(resultPath: String?, columns: List<String>?, type: ResultType?): ColumnMapping {
+    private fun getColumnMapping(resultPath: String?, columns: List<String>?, type: ResultType?, isNumerical: List<Boolean>?): ColumnMapping {
         if (type == ResultType.MaxQuant) {
-            return getMaxQuantExperiments(columns, resultPath.plus("summary.txt"))
+            return getMaxQuantExperiments(columns, resultPath.plus("summary.txt"), isNumerical)
         } else {
             return getSpectronautExperiments(columns)
         }
@@ -51,6 +57,15 @@ class ColumnInfoService {
             } else {
                 sum
             }
+        }
+    }
+
+    private fun parseNumericalColumns(columns: List<String>?, expCols: List<String>?, isNumerical: List<Boolean>?): List<String>? {
+        return expCols?.filter { exp ->
+            val validCols: List<String>? = columns?.filterIndexed{ i, col ->
+                col.contains(exp) && isNumerical?.get(i)!!
+            }
+            validCols?.size!! >= 1
         }
     }
 
@@ -86,7 +101,7 @@ class ColumnInfoService {
         )
     }
 
-    private fun getMaxQuantExperiments(columns: List<String>?, summaryTable: String): ColumnMapping {
+    private fun getMaxQuantExperiments(columns: List<String>?, summaryTable: String, isNumerical: List<Boolean>?): ColumnMapping {
         val lines: List<String> = File(summaryTable).bufferedReader().readLines()
         val headers: List<String> = lines[0].split("\t")
         val expIdx = headers.indexOf("Experiment")
@@ -105,12 +120,14 @@ class ColumnInfoService {
             }
 
         val experimentalColumns = parseExperimentalColumns(columns, experiments.first[experiments.second[0]]?.originalName)
+        val numericalColumns = parseNumericalColumns(columns, experimentalColumns, isNumerical)
 
         return ColumnMapping(
             columns = columns,
             intColumn = "Intensity",
             experimentNames = experiments.second,
             experimentColumns = experimentalColumns,
+            numericalColumns = numericalColumns,
             experimentDetails = experiments.first
         )
     }
