@@ -20,7 +20,8 @@ class ReadTableData {
 
        return  reader.readLines().fold(selIdx.map{ emptyList<Double>() }){ acc, l ->
            val cols: List<String> = l.split("\t")
-           val colVals: List<Double> = selIdx.map{ cols[it].toDouble() }
+           val colVals: List<Double> = selIdx.map{
+               cols[it].toDouble() }
            acc.mapIndexed { index, list ->  list + colVals[index] }
         }
     }
