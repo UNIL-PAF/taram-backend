@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import org.springframework.stereotype.Service
 import javax.swing.Box
 import kotlin.math.ln
+import kotlin.math.log2
 
 @Service
 class BoxPlotRunner() : CommonStep() {
@@ -62,9 +63,12 @@ class BoxPlotRunner() : CommonStep() {
         expInfoList: List<ExpInfo?>?,
         analysisStep: AnalysisStep?
     ): BoxPlotGroupData {
-        println("createBoxplotGHroupData")
+        val logScale = if(analysisStep?.parameters != null){
+            val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
+            boxPlotParams.logScale
+        }else false
         val listOfInts = getListOfInts(expInfoList, analysisStep)
-        val listOfBoxplots = listOfInts.map { BoxPlotData(it.first, computeBoxplotData(it.second)) }
+        val listOfBoxplots = listOfInts.map { BoxPlotData(it.first, computeBoxplotData(it.second, logScale)) }
         return BoxPlotGroupData(group = group, data = listOfBoxplots)
     }
 
@@ -78,7 +82,7 @@ class BoxPlotRunner() : CommonStep() {
         } else columnMapping?.intColumn
 
         val intColumnNames = expInfoList?.map { exp -> intColumn + " " + exp?.originalName }
-        println(intColumnNames)
+
         val columnInts: List<List<Double>> = ReadTableData().getColumnNumbers(
             outputRoot?.plus(analysisStep?.resultTablePath),
             columnMapping!!.columns!!,
@@ -88,14 +92,20 @@ class BoxPlotRunner() : CommonStep() {
         return columnInts.mapIndexed { i, ints -> Pair(expInfoList[i]!!.name!!, ints) }
     }
 
-    private fun computeBoxplotData(intsX: List<Double>): List<Double>? {
+    private fun computeBoxplotData(intsX: List<Double>, logScale: Boolean?): List<Double>? {
         val ints = intsX.filter { ! it.isNaN() }
 
-        val min = ints.minOrNull()!!
-        val q25: Double = Quantiles.percentiles().index(25).compute(ints)
-        val q50: Double = Quantiles.percentiles().index(50).compute(ints)
-        val q75: Double = Quantiles.percentiles().index(75).compute(ints)
-        val max = ints.maxOrNull()!!
+        val normInts = if(logScale != false){
+            ints.filter { it != 0.0}.map{ log2(it) }
+        }else{
+            ints
+        }
+
+        val min = normInts.minOrNull()!!
+        val q25: Double = Quantiles.percentiles().index(25).compute(normInts)
+        val q50: Double = Quantiles.percentiles().index(50).compute(normInts)
+        val q75: Double = Quantiles.percentiles().index(75).compute(normInts)
+        val max = normInts.maxOrNull()!!
         return listOf(min, q25, q50, q75, max)
     }
 
