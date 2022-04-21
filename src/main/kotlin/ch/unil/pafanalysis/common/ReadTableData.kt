@@ -8,7 +8,8 @@ class ReadTableData {
     fun getColumnNumbers(
         resultTablePath: String?,
         columnNames: List<String>,
-        selColumns: List<String>
+        selColumns: List<String>,
+        nanStrings: List<String>? = null
     ): List<List<Double>> {
         val reader = BufferedReader(FileReader(resultTablePath))
 
@@ -16,13 +17,19 @@ class ReadTableData {
         reader.readLine()
 
         val selIdx = columnNames.foldIndexed(emptyList<Int>()) { i, acc, col ->
-            if (selColumns.contains(col)) acc + i else acc }
+            if (selColumns.contains(col)) acc + i else acc
+        }
 
-       return  reader.readLines().fold(selIdx.map{ emptyList<Double>() }){ acc, l ->
-           val cols: List<String> = l.split("\t")
-           val colVals: List<Double> = selIdx.map{
-               cols[it].toDouble() }
-           acc.mapIndexed { index, list ->  list + colVals[index] }
+        return reader.readLines().fold(selIdx.map { emptyList<Double>() }) { acc, l ->
+            val cols: List<String> = l.split("\t")
+            val colVals: List<Double> = selIdx.map {
+                if (nanStrings != null && nanStrings.contains(cols[it])) {
+                    Double.NaN
+                } else {
+                    cols[it].toDouble()
+                }
+            }
+            acc.mapIndexed { index, list -> list + colVals[index] }
         }
     }
 }

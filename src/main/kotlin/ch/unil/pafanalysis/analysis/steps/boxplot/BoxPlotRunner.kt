@@ -3,11 +3,10 @@ package ch.unil.pafanalysis.analysis.steps.boxplot
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.results.model.ResultType
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
 import org.springframework.stereotype.Service
-import javax.swing.Box
-import kotlin.math.ln
 import kotlin.math.log2
 
 @Service
@@ -55,6 +54,7 @@ class BoxPlotRunner() : CommonStep() {
         val experimentNames = expDetailsTable?.map { it?.name!! }
         val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
         val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, it.value, analysisStep) }
+
         return BoxPlot(experimentNames = experimentNames, data = boxplotGroupData?.keys?.toList())
     }
 
@@ -63,10 +63,11 @@ class BoxPlotRunner() : CommonStep() {
         expInfoList: List<ExpInfo?>?,
         analysisStep: AnalysisStep?
     ): BoxPlotGroupData {
-        val logScale = if(analysisStep?.parameters != null){
+        val logScale = if (analysisStep?.parameters != null) {
             val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
             boxPlotParams.logScale
-        }else false
+        } else false
+
         val listOfInts = getListOfInts(expInfoList, analysisStep)
         val listOfBoxplots = listOfInts.map { BoxPlotData(it.first, computeBoxplotData(it.second, logScale)) }
         return BoxPlotGroupData(group = group, data = listOfBoxplots)
@@ -76,28 +77,37 @@ class BoxPlotRunner() : CommonStep() {
         expInfoList: List<ExpInfo?>?,
         analysisStep: AnalysisStep?
     ): List<Pair<String, List<Double>>> {
-        val intColumn = if(analysisStep?.parameters != null) {
+        val intColumn = if (analysisStep?.parameters != null) {
             val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
             boxPlotParams.column
         } else columnMapping?.intColumn
 
-        val intColumnNames = expInfoList?.map { exp -> intColumn + " " + exp?.originalName }
+        val intColumnNames = expInfoList?.map { exp ->
+            if (analysisStep?.type == ResultType.MaxQuant.value) {
+                intColumn + " " + exp?.originalName
+            } else exp?.originalName + intColumn
+        }
+
+        val filterTerms: List<String>? = if (analysisStep?.analysis?.result?.type == ResultType.Spectronaut.value) {
+            listOf("Filtered")
+        } else null
 
         val columnInts: List<List<Double>> = ReadTableData().getColumnNumbers(
             outputRoot?.plus(analysisStep?.resultTablePath),
             columnMapping!!.columns!!,
-            intColumnNames!!
+            intColumnNames!!,
+            filterTerms
         )
 
         return columnInts.mapIndexed { i, ints -> Pair(expInfoList[i]!!.name!!, ints) }
     }
 
     private fun computeBoxplotData(intsX: List<Double>, logScale: Boolean?): List<Double>? {
-        val ints = intsX.filter { ! it.isNaN() }
+        val ints = intsX.filter { !it.isNaN() }
 
-        val normInts = if(logScale != false){
-            ints.filter { it != 0.0}.map{ log2(it) }
-        }else{
+        val normInts = if (logScale != false) {
+            ints.filter { it != 0.0 }.map { log2(it) }
+        } else {
             ints
         }
 
