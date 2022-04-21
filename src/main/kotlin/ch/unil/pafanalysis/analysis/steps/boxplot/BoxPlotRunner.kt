@@ -83,7 +83,7 @@ class BoxPlotRunner() : CommonStep() {
         } else columnMapping?.intColumn
 
         val intColumnNames = expInfoList?.map { exp ->
-            if (analysisStep?.type == ResultType.MaxQuant.value) {
+            if (analysisStep?.analysis?.result?.type == ResultType.MaxQuant.value) {
                 intColumn + " " + exp?.originalName
             } else exp?.originalName + intColumn
         }
