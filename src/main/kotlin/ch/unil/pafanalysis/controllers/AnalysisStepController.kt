@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControlRunner
+import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -29,12 +30,16 @@ class AnalysisStepController {
     @Autowired
     private var initialResult: InitialResultRunner? = null
 
+    @Autowired
+    private var transformationRunner: TransformationRunner? = null
+
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
         val status: AnalysisStepStatus? = when (stepParams.type) {
             QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
             BOXPLOT.value -> boxPlotRunner?.run(stepId)
+            TRANSFORMATION.value -> transformationRunner?.run(stepId)
             else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
         }
         return status?.value

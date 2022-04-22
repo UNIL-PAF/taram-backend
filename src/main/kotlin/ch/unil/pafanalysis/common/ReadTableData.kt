@@ -7,16 +7,15 @@ class ReadTableData {
 
     fun getColumnNumbers(
         resultTablePath: String?,
-        columnNames: List<String>,
         selColumns: List<String>,
         nanStrings: List<String>? = null
     ): List<List<Double>> {
         val reader = BufferedReader(FileReader(resultTablePath))
 
         // the first line is the header
-        reader.readLine()
+        val header = reader.readLine().split("\t")
 
-        val selIdx = columnNames.foldIndexed(emptyList<Int>()) { i, acc, col ->
+        val selIdx = header.foldIndexed(emptyList<Int>()) { i, acc, col ->
             if (selColumns.contains(col)) acc + i else acc
         }
 

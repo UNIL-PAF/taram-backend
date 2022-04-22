@@ -84,7 +84,7 @@ class BoxPlotRunner() : CommonStep() {
         val intColumn = if (analysisStep?.parameters != null) {
             val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
             boxPlotParams.column
-        } else columnMapping?.intColumn
+        } else analysisStep?.commonResult?.intCol
 
         val intColumnNames = expInfoList?.map { exp ->
             if (analysisStep?.analysis?.result?.type == ResultType.MaxQuant.value) {
@@ -98,7 +98,6 @@ class BoxPlotRunner() : CommonStep() {
 
         val columnInts: List<List<Double>> = ReadTableData().getColumnNumbers(
             outputRoot?.plus(analysisStep?.resultTablePath),
-            columnMapping!!.columns!!,
             intColumnNames!!,
             filterTerms
         )

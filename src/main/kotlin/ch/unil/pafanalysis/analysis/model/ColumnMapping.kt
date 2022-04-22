@@ -9,9 +9,8 @@ data class ExpInfo(
 )
 
 data class ColumnMapping (
-    val columns: List<String>? = null,
+    //val columns: List<String>? = null,
     val intColumn: String? = null,
-    val experimentColumns: List<String>? = null,
     val numericalColumns: List<String>? = null,
     val experimentDetails: HashMap<String, ExpInfo>? = null,
     val experimentNames: List<String>? = null,

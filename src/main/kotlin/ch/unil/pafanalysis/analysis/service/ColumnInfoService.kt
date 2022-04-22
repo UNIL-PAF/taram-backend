@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.service
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.model.ExpInfo
+import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.CheckTypes
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -20,16 +21,16 @@ class ColumnInfoService {
     @Autowired
     private var columnInfoRepository: ColumnInfoRepository? = null
 
-    fun createAndSaveColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): ColumnInfo? {
-        val columnInfo = createColumnInfo(filePath, resultPath, type)
-        return columnInfoRepository?.save(columnInfo)
+    fun createAndSaveColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo?, CommonResult> ? {
+        val (columnInfo, commonResult) = createColumnInfo(filePath, resultPath, type)
+        return Pair(columnInfoRepository?.save(columnInfo), commonResult)
     }
 
-    fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): ColumnInfo {
+    fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo, CommonResult> {
         val (columns, isNumerical) = getColumns(filePath)
-        val columnMapping = getColumnMapping(resultPath, columns, type, isNumerical)
+        val (columnMapping, commonResult) = getColumnMapping(resultPath, columns, type, isNumerical)
         val crc32Hash = Crc32HashComputations().computeStringHash(columnMapping.toString())
-        return ColumnInfo(columnMapping = columnMapping, columnMappingHash = crc32Hash)
+        return Pair(ColumnInfo(columnMapping = columnMapping, columnMappingHash = crc32Hash), commonResult)
     }
 
     private fun getColumns(filePath: String?): Pair<List<String>, List<Boolean>> {
@@ -47,7 +48,7 @@ class ColumnInfoService {
         columns: List<String>?,
         type: ResultType?,
         isNumerical: List<Boolean>?
-    ): ColumnMapping {
+    ): Pair<ColumnMapping, CommonResult> {
         if (type == ResultType.MaxQuant) {
             return getMaxQuantExperiments(columns, resultPath.plus("summary.txt"), isNumerical)
         } else {
@@ -78,7 +79,7 @@ class ColumnInfoService {
         }
     }
 
-    private fun getSpectronautExperiments(columns: List<String>?, isNumerical: List<Boolean>?): ColumnMapping {
+    private fun getSpectronautExperiments(columns: List<String>?, isNumerical: List<Boolean>?): Pair<ColumnMapping, CommonResult> {
         val quantRegex = Regex(".+DIA_(.+?)_.+\\.Quantity$")
 
         val quantityCols: List<Pair<String, Int>>? = columns?.foldIndexed(emptyList()) { index, sum, col ->
@@ -102,21 +103,25 @@ class ColumnInfoService {
         val experimentalColumns = parseExperimentalColumns(columns, experimentDetails[experimentNames[0]]?.originalName)
         val numericalColumns = parseNumericalColumns(columns, experimentalColumns, isNumerical)
 
-        return ColumnMapping(
-            columns = columns,
-            intColumn = "Quantity",
-            experimentColumns = experimentalColumns,
+        val colMapping = ColumnMapping(
             numericalColumns = numericalColumns,
             experimentNames = experimentNames,
             experimentDetails = experimentDetails as HashMap
         )
+
+        val commonResult = CommonResult(
+            intCol = "Quantity",
+            numericalColumns = numericalColumns
+        )
+
+        return Pair(colMapping, commonResult)
     }
 
     private fun getMaxQuantExperiments(
         columns: List<String>?,
         summaryTable: String,
         isNumerical: List<Boolean>?
-    ): ColumnMapping {
+    ): Pair<ColumnMapping, CommonResult> {
         val lines: List<String> = File(summaryTable).bufferedReader().readLines()
         val headers: List<String> = lines[0].split("\t")
         val expIdx = headers.indexOf("Experiment")
@@ -138,13 +143,16 @@ class ColumnInfoService {
             parseExperimentalColumns(columns, experiments.first[experiments.second[0]]?.originalName)
         val numericalColumns = parseNumericalColumns(columns, experimentalColumns, isNumerical)
 
-        return ColumnMapping(
-            columns = columns,
-            intColumn = "Intensity",
+        val colMapping =  ColumnMapping(
             experimentNames = experiments.second,
-            experimentColumns = experimentalColumns,
-            numericalColumns = numericalColumns,
             experimentDetails = experiments.first
         )
+
+        val commonResult = CommonResult(
+            intCol = "Intensity",
+            numericalColumns = numericalColumns
+        )
+
+        return Pair(colMapping, commonResult)
     }
 }

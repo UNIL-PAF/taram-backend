@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.analysis.model
 
+import ch.unil.pafanalysis.analysis.steps.CommonResult
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.vladmihalcea.hibernate.type.json.JsonType
 import org.hibernate.annotations.Type
@@ -25,6 +26,10 @@ data class AnalysisStep (
     val resultPath: String? = null,
     val resultTablePath: String? = null,
     val resultTableHash: Long? = null,
+
+    @Type(type="json")
+    @Column(columnDefinition="json")
+    val commonResult: CommonResult? = null,
 
     @Type(type="json")
     @Column(columnDefinition="json")

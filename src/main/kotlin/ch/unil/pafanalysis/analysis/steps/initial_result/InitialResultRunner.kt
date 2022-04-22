@@ -17,7 +17,6 @@ import java.io.FileReader
 import java.lang.reflect.Type
 import java.sql.Timestamp
 
-
 @Service
 class InitialResultRunner() : CommonStep() {
 
@@ -38,7 +37,7 @@ class InitialResultRunner() : CommonStep() {
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
-            val columnInfo =
+            val columnParseRes =
                 columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)
 
             emptyStep?.copy(
@@ -47,7 +46,8 @@ class InitialResultRunner() : CommonStep() {
                 resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
-                columnInfo = columnInfo
+                columnInfo = columnParseRes?.first,
+                commonResult = columnParseRes?.second
             )
         } catch (e: StepException) {
             emptyStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)

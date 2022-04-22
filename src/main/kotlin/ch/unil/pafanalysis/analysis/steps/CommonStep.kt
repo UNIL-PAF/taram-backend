@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
+import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,6 +37,9 @@ open class CommonStep {
 
     @Autowired
     private var boxPlotRunner: BoxPlotRunner? = null
+
+    @Autowired
+    private var transformationRunner: TransformationRunner? = null
 
     var type: AnalysisStepType? = null
 
@@ -88,6 +92,7 @@ open class CommonStep {
             status = AnalysisStepStatus.IDLE.value,
             type = type.value,
             analysis = oldStep?.analysis,
+            commonResult = oldStep?.commonResult,
             lastModifDate = LocalDateTime.now(),
             beforeId = oldStep?.id,
             nextId = oldStep?.nextId,
@@ -103,6 +108,7 @@ open class CommonStep {
             thread(start = true, isDaemon = true) {
                 when (nextStep?.type) {
                     AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.update(nextStep, step)
+                    AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.update(nextStep, step)
                     else -> throw StepException("Analysis step [" + nextStep?.type + "] not found.")
                 }
             }
