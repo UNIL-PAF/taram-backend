@@ -55,7 +55,7 @@ open class CommonStep {
         val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath)
         val stepHash: Long = computeStepHash(step = emptyStep, resultTableHash = resultTablePathAndHash.second)
 
-        if(emptyStep?.nextId != null) setNextStepBeforeId(emptyStep?.nextId, emptyStep?.id) 
+        if(emptyStep?.nextId != null) setNextStepBeforeId(emptyStep?.nextId, emptyStep?.id)
         updateOldStep(oldStep, emptyStep?.id)
 
         return updateEmptyStep(emptyStep, stepPath, resultTablePathAndHash, stepHash)
@@ -117,7 +117,6 @@ open class CommonStep {
         val newHash = computeStepHash(step, stepBefore)
 
         if (newHash != step.stepHash) {
-            println("hash changed")
             computeAndUpdate(step, stepBefore, newHash)
         }
         updateNextStep(step)
@@ -127,7 +126,8 @@ open class CommonStep {
         val paramsHash = (step?.parametersHash ?: 0).toString()
         val columnsMappingHash = step?.columnInfo?.columnMappingHash.toString()
         val resultTableHash = (resultTableHash ?: stepBefore?.resultTableHash).toString()
-        return Crc32HashComputations().computeStringHash(paramsHash + columnsMappingHash + resultTableHash)
+        val combinedHashString = "$paramsHash:$columnsMappingHash:$resultTableHash"
+        return Crc32HashComputations().computeStringHash(combinedHashString)
     }
 
     private fun updateEmptyStep(
@@ -147,7 +147,6 @@ open class CommonStep {
     }
 
     private fun updateOldStep(oldStep: AnalysisStep?, newNextId: Int?) {
-        println("Update next_id from ${oldStep?.nextId} to $newNextId.")
         val updatedOldStep = oldStep?.copy(nextId = newNextId)
         analysisStepRepository?.save(updatedOldStep!!)
     }

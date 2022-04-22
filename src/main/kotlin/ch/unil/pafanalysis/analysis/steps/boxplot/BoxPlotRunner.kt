@@ -48,7 +48,6 @@ class BoxPlotRunner() : CommonStep() {
         val boxplot = createBoxplotObj(stepWithNewResTable)
         val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot))
         analysisStepRepository?.save(stepToSave)
-        updateNextStep(step)
     }
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {
