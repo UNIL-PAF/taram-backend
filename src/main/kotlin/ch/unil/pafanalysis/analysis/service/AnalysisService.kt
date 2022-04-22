@@ -58,6 +58,7 @@ class AnalysisService {
     }
 
     fun sortAnalysisSteps(oldList: List<AnalysisStep>?): List<AnalysisStep>? {
+        var emergencyBreak = 10000
         val first: AnalysisStep? = oldList?.find { it.type == AnalysisStepType.INITIAL_RESULT.value }
         var sortedList = if (first != null) {
             mutableListOf<AnalysisStep>(first!!)
@@ -66,9 +67,14 @@ class AnalysisService {
         }
         var nextEl: AnalysisStep? = first
 
-        while (nextEl?.nextId != null) {
+        while (nextEl?.nextId != null && emergencyBreak > 0) {
             nextEl = oldList?.find { it.id == nextEl?.nextId }
             sortedList.add(nextEl!!)
+            emergencyBreak--
+        }
+
+        if(emergencyBreak == 0){
+            throw RuntimeException("Could not sort the analysis steps (or you have over 10000 steps).")
         }
 
         return sortedList

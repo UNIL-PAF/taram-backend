@@ -55,6 +55,7 @@ open class CommonStep {
         val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath)
         val stepHash: Long = computeStepHash(step = emptyStep, resultTableHash = resultTablePathAndHash.second)
 
+        if(emptyStep?.nextId != null) setNextStepBeforeId(emptyStep?.nextId, emptyStep?.id) 
         updateOldStep(oldStep, emptyStep?.id)
 
         return updateEmptyStep(emptyStep, stepPath, resultTablePathAndHash, stepHash)
@@ -88,6 +89,7 @@ open class CommonStep {
             type = type.value,
             analysis = oldStep?.analysis,
             lastModifDate = LocalDateTime.now(),
+            beforeId = oldStep?.id,
             nextId = oldStep?.nextId,
             columnInfo = oldStep?.columnInfo
         )
@@ -115,6 +117,7 @@ open class CommonStep {
         val newHash = computeStepHash(step, stepBefore)
 
         if (newHash != step.stepHash) {
+            println("hash changed")
             computeAndUpdate(step, stepBefore, newHash)
         }
         updateNextStep(step)
@@ -144,8 +147,15 @@ open class CommonStep {
     }
 
     private fun updateOldStep(oldStep: AnalysisStep?, newNextId: Int?) {
+        println("Update next_id from ${oldStep?.nextId} to $newNextId.")
         val updatedOldStep = oldStep?.copy(nextId = newNextId)
         analysisStepRepository?.save(updatedOldStep!!)
+    }
+
+    private fun setNextStepBeforeId(nextStepId: Int, currentStepId: Int?) {
+        val nextStep = analysisStepRepository?.findById(nextStepId)
+        val newNextStep = nextStep?.copy(beforeId = currentStepId)
+        analysisStepRepository?.save(newNextStep!!)
     }
 
     private fun getResultTablePath(

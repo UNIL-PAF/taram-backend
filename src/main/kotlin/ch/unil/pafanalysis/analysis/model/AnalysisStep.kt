@@ -14,6 +14,7 @@ data class AnalysisStep (
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,
     val nextId: Int? = null,
+    val beforeId: Int? = null,
     val comments: String? = null,
     val status: String? = null,
     val type: String? = null,

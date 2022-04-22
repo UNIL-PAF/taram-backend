@@ -66,7 +66,9 @@ class InitialResultRunner() : CommonStep() {
         val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+        println("old column hash: " + analysisStep.columnInfo?.columnMappingHash)
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
+        println("new column hash: " + columnHash)
         val newColumnInfo: ColumnInfo? =
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.save(newColumnInfo!!)

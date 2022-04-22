@@ -31,8 +31,12 @@ class BoxPlotRunner() : CommonStep() {
         setPathes(analysisStep.analysis)
         columnMapping = analysisStep?.columnInfo?.columnMapping
         val stepWithParams = analysisStep.copy(parameters = params)
+
+        val oldStep = if(analysisStep?.beforeId != null) analysisStepRepository?.findById(analysisStep?.beforeId) else null
+        val newHash = computeStepHash(stepWithParams, oldStep)
         val boxplot = createBoxplotObj(stepWithParams)
-        val newStep = stepWithParams.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
+
+        val newStep = stepWithParams.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot), stepHash = newHash)
         analysisStepRepository?.save(newStep!!)
         return AnalysisStepStatus.DONE
     }
@@ -40,9 +44,10 @@ class BoxPlotRunner() : CommonStep() {
     override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
         setPathes(step.analysis)
         columnMapping = step?.columnInfo?.columnMapping
-        val boxplot = createBoxplotObj(step)
-        val newStep = step.copy(resultTableHash = stepBefore?.resultTableHash, results = gson.toJson(boxplot))
-        analysisStepRepository?.save(newStep)
+        val stepWithNewResTable = step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath)
+        val boxplot = createBoxplotObj(stepWithNewResTable)
+        val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot))
+        analysisStepRepository?.save(stepToSave)
         updateNextStep(step)
     }
 
