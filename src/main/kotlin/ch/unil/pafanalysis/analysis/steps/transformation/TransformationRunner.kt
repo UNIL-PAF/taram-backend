@@ -36,13 +36,12 @@ class TransformationRunner() : CommonStep() {
             imputationType = ImputationType.NAN.value
         )
 
-        val resultTableHash = transformTable(newStep, defaultParams)
+        val (resultTableHash, commonResult) = transformTable(newStep, defaultParams)
         val stepWithRes = newStep?.copy(parameters = gson.toJson(defaultParams), resultTableHash = resultTableHash)
         val oldStep = analysisStepRepository?.findById(oldStepId)
         val newHash = computeStepHash(stepWithRes, oldStep)
 
-        val updatedStep = stepWithRes?.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
-        println(analysisStepRepository)
+        val updatedStep = stepWithRes?.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash, commonResult = commonResult)
         analysisStepRepository?.save(updatedStep!!)
         return AnalysisStepStatus.DONE
     }
@@ -69,7 +68,7 @@ class TransformationRunner() : CommonStep() {
         //analysisStepRepository?.save(stepToSave)
     }
 
-    private fun transformTable(step: AnalysisStep?, transformationParams: TransformationParams): Long {
+    private fun transformTable(step: AnalysisStep?, transformationParams: TransformationParams): Pair<Long, CommonResult?> {
         val expDetailsTable = columnMapping?.experimentNames?.map { name ->
             columnMapping?.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
@@ -77,8 +76,11 @@ class TransformationRunner() : CommonStep() {
         val ints = readTableData.getListOfInts(expInfoList = expDetailsTable, analysisStep = step, outputRoot = outputRoot)
         val normInts = normalization(ints, transformationParams)
 
-        val resTable = writeTableData.writeTable(step, normInts, outputRoot = outputRoot, "trans")
-        return Crc32HashComputations().computeFileHash(File(resTable))
+        val newColName = "trans ${step?.commonResult?.intCol}"
+        val resTable = writeTableData.writeTable(step, normInts, outputRoot = outputRoot, newColName)
+        val resTableHash =  Crc32HashComputations().computeFileHash(File(resTable))
+        val commonRes = step?.commonResult?.copy(intCol = newColName, numericalColumns = step?.commonResult?.numericalColumns?.plus(newColName))
+        return Pair(resTableHash, commonRes)
     }
 
 

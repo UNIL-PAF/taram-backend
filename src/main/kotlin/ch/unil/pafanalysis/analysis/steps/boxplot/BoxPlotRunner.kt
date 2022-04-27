@@ -90,20 +90,20 @@ class BoxPlotRunner() : CommonStep() {
     }
 
 
-    private fun computeBoxplotData(intsX: List<Double>, logScale: Boolean?): List<Double>? {
-        val ints = intsX.filter { !it.isNaN() }
-
+    private fun computeBoxplotData(ints: List<Double>, logScale: Boolean?): List<Double>? {
         val normInts = if (logScale != false) {
-            ints.filter { it != 0.0 }.map { log2(it) }
+            ints.filter { it != 0.0 && !it.isNaN() }.map { log2(it) }
         } else {
             ints
         }
 
-        val min = normInts.minOrNull()!!
-        val q25: Double = Quantiles.percentiles().index(25).compute(normInts)
-        val q50: Double = Quantiles.percentiles().index(50).compute(normInts)
-        val q75: Double = Quantiles.percentiles().index(75).compute(normInts)
-        val max = normInts.maxOrNull()!!
+        val intsFlt = normInts.filter { !it.isNaN() }
+
+        val min = intsFlt.minOrNull()!!
+        val q25: Double = Quantiles.percentiles().index(25).compute(intsFlt)
+        val q50: Double = Quantiles.percentiles().index(50).compute(intsFlt)
+        val q75: Double = Quantiles.percentiles().index(75).compute(intsFlt)
+        val max = intsFlt.maxOrNull()!!
         return listOf(min, q25, q50, q75, max)
     }
 
