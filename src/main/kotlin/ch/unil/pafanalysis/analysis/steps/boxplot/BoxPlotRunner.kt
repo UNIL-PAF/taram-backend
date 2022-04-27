@@ -3,7 +3,6 @@ package ch.unil.pafanalysis.analysis.steps.boxplot
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.results.model.ResultType
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
 import org.springframework.stereotype.Service
@@ -17,6 +16,8 @@ class BoxPlotRunner() : CommonStep() {
     private val gson = Gson()
 
     private var columnMapping: ColumnMapping? = null
+
+    private val readTableData = ReadTableData()
 
     fun run(oldStepId: Int): AnalysisStepStatus {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false)
@@ -32,11 +33,16 @@ class BoxPlotRunner() : CommonStep() {
         columnMapping = analysisStep?.columnInfo?.columnMapping
         val stepWithParams = analysisStep.copy(parameters = params)
 
-        val oldStep = if(analysisStep?.beforeId != null) analysisStepRepository?.findById(analysisStep?.beforeId) else null
+        val oldStep =
+            if (analysisStep?.beforeId != null) analysisStepRepository?.findById(analysisStep?.beforeId) else null
         val newHash = computeStepHash(stepWithParams, oldStep)
         val boxplot = createBoxplotObj(stepWithParams)
 
-        val newStep = stepWithParams.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot), stepHash = newHash)
+        val newStep = stepWithParams.copy(
+            status = AnalysisStepStatus.DONE.value,
+            results = gson.toJson(boxplot),
+            stepHash = newHash
+        )
         analysisStepRepository?.save(newStep!!)
         return AnalysisStepStatus.DONE
     }
@@ -44,7 +50,8 @@ class BoxPlotRunner() : CommonStep() {
     override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
         setPathes(step.analysis)
         columnMapping = step?.columnInfo?.columnMapping
-        val stepWithNewResTable = step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath)
+        val stepWithNewResTable =
+            step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath)
         val boxplot = createBoxplotObj(stepWithNewResTable)
         val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot))
         analysisStepRepository?.save(stepToSave)
@@ -72,38 +79,16 @@ class BoxPlotRunner() : CommonStep() {
             boxPlotParams.logScale
         } else false
 
-        val listOfInts = getListOfInts(expInfoList, analysisStep)
+        val intColumn = if (analysisStep?.parameters != null) {
+            val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
+            boxPlotParams.column
+        } else null
+
+        val listOfInts = readTableData.getListOfInts(expInfoList, analysisStep, outputRoot, intColumn)
         val listOfBoxplots = listOfInts.map { BoxPlotData(it.first, computeBoxplotData(it.second, logScale)) }
         return BoxPlotGroupData(group = group, data = listOfBoxplots)
     }
 
-    private fun getListOfInts(
-        expInfoList: List<ExpInfo?>?,
-        analysisStep: AnalysisStep?
-    ): List<Pair<String, List<Double>>> {
-        val intColumn = if (analysisStep?.parameters != null) {
-            val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
-            boxPlotParams.column
-        } else analysisStep?.commonResult?.intCol
-
-        val intColumnNames = expInfoList?.map { exp ->
-            if (analysisStep?.analysis?.result?.type == ResultType.MaxQuant.value) {
-                intColumn + " " + exp?.originalName
-            } else exp?.originalName + intColumn
-        }
-
-        val filterTerms: List<String>? = if (analysisStep?.analysis?.result?.type == ResultType.Spectronaut.value) {
-            listOf("Filtered")
-        } else null
-
-        val columnInts: List<List<Double>> = ReadTableData().getColumnNumbers(
-            outputRoot?.plus(analysisStep?.resultTablePath),
-            intColumnNames!!,
-            filterTerms
-        )
-
-        return columnInts.mapIndexed { i, ints -> Pair(expInfoList[i]!!.name!!, ints) }
-    }
 
     private fun computeBoxplotData(intsX: List<Double>, logScale: Boolean?): List<Double>? {
         val ints = intsX.filter { !it.isNaN() }
