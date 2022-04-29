@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.io.File
-import java.lang.Exception
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import kotlin.Exception
 import kotlin.concurrent.thread
 
 @Service
@@ -123,7 +123,11 @@ open class CommonStep {
         val newHash = computeStepHash(step, stepBefore)
 
         if (newHash != step.stepHash) {
-            computeAndUpdate(step, stepBefore, newHash)
+            try {
+                computeAndUpdate(step, stepBefore, newHash)
+            }catch (e: Exception) {
+                step?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
+            }
         }else{
             analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.DONE.value))
         }
@@ -167,7 +171,7 @@ open class CommonStep {
         analysisStepRepository?.save(newNextStep!!)
     }
 
-    private fun getResultTablePath(
+    fun getResultTablePath(
         modifiesResult: Boolean?,
         oldStep: AnalysisStep?,
         stepPath: String?

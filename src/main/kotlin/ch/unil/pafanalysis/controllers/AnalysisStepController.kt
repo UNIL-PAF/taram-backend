@@ -57,12 +57,20 @@ class AnalysisStepController {
 
         analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
-        val status: AnalysisStepStatus? = when (analysisStep?.type) {
-            INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)
-            BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
-            TRANSFORMATION.value -> transformationRunner?.updateParams(analysisStep, stepParams)
-            else -> throw StepException("Analysis step [" + analysisStep?.type + "] not found.")
+        val status: AnalysisStepStatus? = try {
+             when (analysisStep?.type) {
+                INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)
+                BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
+                TRANSFORMATION.value -> transformationRunner?.updateParams(analysisStep, stepParams)
+                else -> throw RuntimeException("Analysis step [" + analysisStep?.type + "] not found.")
+            }
+        }catch (e: Exception){
+            println(e.stackTrace)
+            analysisStepRepository?.save(analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)!!)
+            AnalysisStepStatus.ERROR
         }
+
+
         return status?.value
     }
 }
