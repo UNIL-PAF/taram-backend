@@ -53,6 +53,7 @@ class AnalysisStepController {
         val status: AnalysisStepStatus? = when (analysisStep?.type) {
             INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)
             BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
+            TRANSFORMATION.value -> transformationRunner?.updateParams(analysisStep, stepParams)
             else -> throw StepException("Analysis step [" + analysisStep?.type + "] not found.")
         }
         return status?.value

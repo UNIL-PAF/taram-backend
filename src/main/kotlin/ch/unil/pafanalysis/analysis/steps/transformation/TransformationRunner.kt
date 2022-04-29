@@ -36,8 +36,10 @@ class TransformationRunner() : CommonStep() {
             imputationType = ImputationType.NAN.value
         )
 
+        val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
+
         val (resultTableHash, commonResult) = transformTable(newStep, defaultParams)
-        val stepWithRes = newStep?.copy(parameters = gson.toJson(defaultParams), resultTableHash = resultTableHash)
+        val stepWithRes = newStep?.copy(parameters = gson.toJson(defaultParams), resultTableHash = resultTableHash, results = gson.toJson(defaultResult))
         val oldStep = analysisStepRepository?.findById(oldStepId)
         val newHash = computeStepHash(stepWithRes, oldStep)
 
@@ -49,13 +51,15 @@ class TransformationRunner() : CommonStep() {
     fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
         setPathes(analysisStep.analysis)
         columnMapping = analysisStep?.columnInfo?.columnMapping
-        val stepWithParams = analysisStep.copy(parameters = params)
 
-        val oldStep = if(analysisStep?.beforeId != null) analysisStepRepository?.findById(analysisStep?.beforeId) else null
-        val newHash = computeStepHash(stepWithParams, oldStep)
+        val parsedParams: TransformationParams = gson.fromJson(params, TransformationParams().javaClass)
+        val (resultTableHash, commonResult) = transformTable(analysisStep, parsedParams)
+        val stepWithRes = analysisStep?.copy(parameters = params, resultTableHash = resultTableHash, commonResult = commonResult)
+        val oldStep = analysisStepRepository?.findById(stepWithRes?.beforeId!!)
+        val newHash = computeStepHash(stepWithRes, oldStep)
 
-        //val newStep = stepWithParams.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot), stepHash = newHash)
-        //analysisStepRepository?.save(newStep!!)
+        val newStep = stepWithRes.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
+        analysisStepRepository?.save(newStep!!)
         return AnalysisStepStatus.DONE
     }
 
@@ -76,7 +80,9 @@ class TransformationRunner() : CommonStep() {
         val ints = readTableData.getListOfInts(expInfoList = expDetailsTable, analysisStep = step, outputRoot = outputRoot)
         val normInts = normalization(ints, transformationParams)
 
-        val newColName = "trans ${step?.commonResult?.intCol}"
+        val intCol = if(transformationParams != null && transformationParams.intCol != null) transformationParams.intCol else step?.commonResult?.intCol
+
+        val newColName = "trans $intCol"
         val resTable = writeTableData.writeTable(step, normInts, outputRoot = outputRoot, newColName)
         val resTableHash =  Crc32HashComputations().computeFileHash(File(resTable))
         val commonRes = step?.commonResult?.copy(intCol = newColName, numericalColumns = step?.commonResult?.numericalColumns?.plus(newColName))
