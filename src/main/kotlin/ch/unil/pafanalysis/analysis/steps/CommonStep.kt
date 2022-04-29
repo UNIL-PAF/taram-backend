@@ -150,7 +150,8 @@ open class CommonStep {
                 resultPath = stepPath,
                 resultTablePath = resultTablePath.first,
                 resultTableHash = resultTablePath.second,
-                stepHash = stepHash
+                stepHash = stepHash,
+                status = AnalysisStepStatus.RUNNING.value
             )
         return analysisStepRepository?.save(newStep!!)
     }

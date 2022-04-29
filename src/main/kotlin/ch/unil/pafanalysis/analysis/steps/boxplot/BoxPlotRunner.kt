@@ -53,7 +53,7 @@ class BoxPlotRunner() : CommonStep() {
 
         columnMapping = step?.columnInfo?.columnMapping
         val stepWithNewResTable =
-            step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath)
+            step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath, commonResult = stepBefore?.commonResult)
         val boxplot = createBoxplotObj(stepWithNewResTable)
         val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot), status = AnalysisStepStatus.DONE.value)
         analysisStepRepository?.save(stepToSave)

@@ -93,7 +93,8 @@ class TransformationRunner() : CommonStep() {
         val newColName = "trans $intCol"
         val resTable = writeTableData.writeTable(step, normInts, outputRoot = outputRoot, newColName)
         val resTableHash =  Crc32HashComputations().computeFileHash(File(resTable))
-        val commonRes = step?.commonResult?.copy(intCol = newColName, numericalColumns = step?.commonResult?.numericalColumns?.plus(newColName))
+        val numCols = step?.commonResult?.numericalColumns?.filter{it != step?.commonResult?.intCol}?.plus(newColName)
+        val commonRes = step?.commonResult?.copy(intCol = newColName, numericalColumns = numCols)
         return Pair(resTableHash, commonRes)
     }
 
