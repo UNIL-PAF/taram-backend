@@ -62,6 +62,8 @@ class InitialResultRunner() : CommonStep() {
     }
 
     fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
+        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
+
         val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
         val newColumnMapping: ColumnMapping? =
@@ -72,6 +74,7 @@ class InitialResultRunner() : CommonStep() {
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.save(newColumnInfo!!)
 
+        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
         updateNextStep(analysisStep)
 
         return AnalysisStepStatus.DONE

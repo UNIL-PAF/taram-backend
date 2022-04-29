@@ -21,4 +21,12 @@ class AnalysisStepService {
         return analysisStepRepo?.setStatusById(status.value, id)
     }
 
+    fun setAllStepsStatus(analysisStep: AnalysisStep?, status: AnalysisStepStatus){
+        setAnalysisStepStatus(analysisStep?.id!!, status)
+        if(analysisStep?.nextId != null){
+            val nextStep = analysisStepRepo?.findById(analysisStep?.nextId)
+            setAllStepsStatus(nextStep, status)
+        }
+    }
+
 }

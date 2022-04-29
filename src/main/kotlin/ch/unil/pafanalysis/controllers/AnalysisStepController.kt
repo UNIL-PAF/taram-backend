@@ -4,6 +4,8 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
+import ch.unil.pafanalysis.analysis.service.AnalysisStepService
+import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -20,6 +22,9 @@ class AnalysisStepController {
 
     @Autowired
     private var analysisStepRepository: AnalysisStepRepository? = null
+
+    @Autowired
+    private var analysisStepService: AnalysisStepService? = null
 
     @Autowired
     private var qualityControlRunner: QualityControlRunner? = null
@@ -49,6 +54,8 @@ class AnalysisStepController {
     @ResponseBody
     fun parameters(@RequestBody stepParams: String, @PathVariable(value = "stepId") stepId: Int): String? {
         val analysisStep = analysisStepRepository?.findById(stepId)
+
+        analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
         val status: AnalysisStepStatus? = when (analysisStep?.type) {
             INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)

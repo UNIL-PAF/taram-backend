@@ -49,11 +49,13 @@ class BoxPlotRunner() : CommonStep() {
 
     override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
         setPathes(step.analysis)
+        analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.RUNNING.value))
+
         columnMapping = step?.columnInfo?.columnMapping
         val stepWithNewResTable =
             step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath)
         val boxplot = createBoxplotObj(stepWithNewResTable)
-        val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot))
+        val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot), status = AnalysisStepStatus.DONE.value)
         analysisStepRepository?.save(stepToSave)
     }
 

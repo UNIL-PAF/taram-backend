@@ -124,7 +124,10 @@ open class CommonStep {
 
         if (newHash != step.stepHash) {
             computeAndUpdate(step, stepBefore, newHash)
+        }else{
+            analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.DONE.value))
         }
+
         updateNextStep(step)
     }
 

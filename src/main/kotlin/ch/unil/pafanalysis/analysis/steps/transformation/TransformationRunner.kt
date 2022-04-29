@@ -51,6 +51,7 @@ class TransformationRunner() : CommonStep() {
     fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
         setPathes(analysisStep.analysis)
         columnMapping = analysisStep?.columnInfo?.columnMapping
+        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
         val parsedParams: TransformationParams = gson.fromJson(params, TransformationParams().javaClass)
         val (resultTableHash, commonResult) = transformTable(analysisStep, parsedParams)
@@ -60,16 +61,23 @@ class TransformationRunner() : CommonStep() {
 
         val newStep = stepWithRes.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
         analysisStepRepository?.save(newStep!!)
+
+        updateNextStep(newStep)
         return AnalysisStepStatus.DONE
     }
 
     override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
         setPathes(step.analysis)
-        columnMapping = step?.columnInfo?.columnMapping
-        val stepWithNewResTable = step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath)
+        analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.RUNNING.value))
 
-        //val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot))
-        //analysisStepRepository?.save(stepToSave)
+        columnMapping = step?.columnInfo?.columnMapping
+        val (resultTableHash, commonResult) = transformTable(step, gson.fromJson(step.parameters, TransformationParams().javaClass))
+
+        val stepWithRes = step?.copy(resultTableHash = resultTableHash, commonResult = commonResult)
+        val oldStep = analysisStepRepository?.findById(stepWithRes?.beforeId!!)
+        val newHash = computeStepHash(stepWithRes, oldStep)
+        val newStep = stepWithRes.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
+        analysisStepRepository?.save(newStep!!)
     }
 
     private fun transformTable(step: AnalysisStep?, transformationParams: TransformationParams): Pair<Long, CommonResult?> {
