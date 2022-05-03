@@ -54,7 +54,7 @@ open class CommonStep {
             null
         }
 
-        val emptyStep = createEmptyAnalysisStep(oldStep, type)
+        val emptyStep = createEmptyAnalysisStep(oldStep, type, modifiesResult)
         val stepPath = setMainPaths(oldStep?.analysis, emptyStep)
         val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath)
         val stepHash: Long = computeStepHash(step = emptyStep, resultTableHash = resultTablePathAndHash.second)
@@ -86,7 +86,8 @@ open class CommonStep {
 
     fun createEmptyAnalysisStep(
         oldStep: AnalysisStep?,
-        type: AnalysisStepType
+        type: AnalysisStepType,
+        modifiesResult: Boolean? = null
     ): AnalysisStep? {
         val newStep = AnalysisStep(
             status = AnalysisStepStatus.IDLE.value,
@@ -96,7 +97,8 @@ open class CommonStep {
             lastModifDate = LocalDateTime.now(),
             beforeId = oldStep?.id,
             nextId = oldStep?.nextId,
-            columnInfo = oldStep?.columnInfo
+            columnInfo = oldStep?.columnInfo,
+            modifiesResult = modifiesResult
         )
         return analysisStepRepository?.save(newStep)
     }
