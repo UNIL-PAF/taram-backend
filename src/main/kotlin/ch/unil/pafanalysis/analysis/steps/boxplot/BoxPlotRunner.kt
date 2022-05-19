@@ -15,13 +15,10 @@ class BoxPlotRunner() : CommonStep() {
 
     private val gson = Gson()
 
-    private var columnMapping: ColumnMapping? = null
-
     private val readTableData = ReadTableData()
 
-    fun run(oldStepId: Int): AnalysisStepStatus {
-        val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false)
-        columnMapping = newStep?.columnInfo?.columnMapping
+    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStepStatus {
+        val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step)
         val boxplot = createBoxplotObj(newStep)
         val updatedStep = newStep?.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
         analysisStepRepository?.save(updatedStep!!)
@@ -29,8 +26,6 @@ class BoxPlotRunner() : CommonStep() {
     }
 
     fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
-        setPathes(analysisStep.analysis)
-        columnMapping = analysisStep?.columnInfo?.columnMapping
         val stepWithParams = analysisStep.copy(parameters = params)
 
         val oldStep =
@@ -47,21 +42,9 @@ class BoxPlotRunner() : CommonStep() {
         return AnalysisStepStatus.DONE
     }
 
-    override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
-        setPathes(step.analysis)
-        analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.RUNNING.value))
-
-        columnMapping = step?.columnInfo?.columnMapping
-        val stepWithNewResTable =
-            step.copy(resultTableHash = stepBefore?.resultTableHash, resultTablePath = stepBefore?.resultTablePath, commonResult = stepBefore?.commonResult)
-        val boxplot = createBoxplotObj(stepWithNewResTable)
-        val stepToSave = stepWithNewResTable.copy(results = gson.toJson(boxplot), status = AnalysisStepStatus.DONE.value)
-        analysisStepRepository?.save(stepToSave)
-    }
-
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {
-        val expDetailsTable = columnMapping?.experimentNames?.map { name ->
-            columnMapping?.experimentDetails?.get(name)
+        val expDetailsTable = analysisStep?.columnInfo?.columnMapping?.experimentNames?.map { name ->
+            analysisStep?.columnInfo?.columnMapping?.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
 
         val experimentNames = expDetailsTable?.map { it?.name!! }

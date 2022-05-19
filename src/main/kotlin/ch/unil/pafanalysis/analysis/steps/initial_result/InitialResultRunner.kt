@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
 import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
@@ -16,6 +17,7 @@ import java.io.File
 import java.io.FileReader
 import java.lang.reflect.Type
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Service
 class InitialResultRunner() : CommonStep() {
@@ -23,13 +25,18 @@ class InitialResultRunner() : CommonStep() {
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
+    @Autowired
+    private var analysisStepService: AnalysisStepService? = null
+
+
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
 
     fun run(analysisId: Int?, result: Result?): AnalysisStepStatus {
         val analysis =
             analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
-        val emptyStep = createEmptyAnalysisStep(AnalysisStep(analysis = analysis), AnalysisStepType.INITIAL_RESULT)
+        setPathes(analysis)
+        val emptyStep = createEmptyInitialResult(analysis)
         val stepPath = setMainPaths(analysis, emptyStep)
 
         val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath)
@@ -73,11 +80,22 @@ class InitialResultRunner() : CommonStep() {
         val newColumnInfo: ColumnInfo? =
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.save(newColumnInfo!!)
-
         analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
+
         updateNextStep(analysisStep)
 
         return AnalysisStepStatus.DONE
+    }
+
+    private fun createEmptyInitialResult(analysis: Analysis?): AnalysisStep? {
+        val newStep = AnalysisStep(
+            status = AnalysisStepStatus.RUNNING.value,
+            type = AnalysisStepType.INITIAL_RESULT.value,
+            analysis = analysis,
+            lastModifDate = LocalDateTime.now(),
+            modifiesResult = true
+        )
+        return analysisStepRepository?.save(newStep)
     }
 
 

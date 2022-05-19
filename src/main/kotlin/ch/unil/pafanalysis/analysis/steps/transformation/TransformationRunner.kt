@@ -1,19 +1,19 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
-import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
-import ch.unil.pafanalysis.results.model.ResultType
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
 import org.springframework.stereotype.Service
-import java.io.*
+import java.io.File
 import kotlin.math.ln
-import kotlin.math.log2
 
 @Service
 class TransformationRunner() : CommonStep() {
@@ -25,23 +25,23 @@ class TransformationRunner() : CommonStep() {
     private val readTableData = ReadTableData()
     private val writeTableData = WriteTableData()
 
-    private var columnMapping: ColumnMapping? = null
+    val defaultParams = TransformationParams(
+        normalizationType = NormalizationType.MEDIAN.value,
+        transformationType = TransformationType.NONE.value,
+        imputationType = ImputationType.NAN.value
+    )
 
-    fun run(oldStepId: Int): AnalysisStepStatus {
-        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true)
-        columnMapping = newStep?.columnInfo?.columnMapping
-
-        val defaultParams = TransformationParams(
-            normalizationType = NormalizationType.MEDIAN.value,
-            transformationType = TransformationType.NONE.value,
-            imputationType = ImputationType.NAN.value
-        )
+    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStepStatus {
+        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step)
 
         val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
+        val params: TransformationParams = if (newStep!!.parameters != null) {
+            gson.fromJson(step!!.parameters, TransformationParams().javaClass)
+        } else defaultParams
 
-        val (resultTableHash, commonResult) = transformTable(newStep, defaultParams)
+        val (resultTableHash, commonResult) = transformTable(newStep, params)
         val stepWithRes = newStep?.copy(
-            parameters = gson.toJson(defaultParams),
+            parameters = gson.toJson(params),
             resultTableHash = resultTableHash,
             results = gson.toJson(defaultResult)
         )
@@ -56,7 +56,6 @@ class TransformationRunner() : CommonStep() {
 
     fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
         setPathes(analysisStep.analysis)
-        columnMapping = analysisStep?.columnInfo?.columnMapping
         analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
         val oldStep = analysisStepRepository?.findById(analysisStep.beforeId!!)
@@ -77,40 +76,42 @@ class TransformationRunner() : CommonStep() {
         return AnalysisStepStatus.DONE
     }
 
-    override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
-        setPathes(step.analysis)
-        analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.RUNNING.value))
+    /*
+    override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long, stepPath: String) {
+        val resultTablePath = getResultTablePath(true, stepBefore, stepPath).first
 
-        columnMapping = step?.columnInfo?.columnMapping
+        val stepWithTable = step.copy(status = AnalysisStepStatus.RUNNING.value, resultTablePath = resultTablePath, commonResult = stepBefore.commonResult)
+        analysisStepRepository?.save(stepWithTable)
+
+        columnMapping = stepWithTable?.columnInfo?.columnMapping
         val (resultTableHash, commonResult) = transformTable(
-            step,
-            gson.fromJson(step.parameters, TransformationParams().javaClass)
+            stepWithTable,
+            gson.fromJson(stepWithTable.parameters, TransformationParams().javaClass)
         )
 
-        val stepWithRes = step?.copy(resultTableHash = resultTableHash, commonResult = commonResult)
-        val oldStep = analysisStepRepository?.findById(stepWithRes?.beforeId!!)
-        val newHash = computeStepHash(stepWithRes, oldStep)
+        val stepWithRes = stepWithTable.copy(resultTableHash = resultTableHash, commonResult = commonResult)
+        val newHash = computeStepHash(stepWithRes, stepBefore)
         val newStep = stepWithRes.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
         analysisStepRepository?.save(newStep!!)
     }
+     */
 
     private fun transformTable(
         step: AnalysisStep?,
         transformationParams: TransformationParams
     ): Pair<Long, CommonResult?> {
-        val expDetailsTable = columnMapping?.experimentNames?.map { name ->
-            columnMapping?.experimentDetails?.get(name)
+        val expDetailsTable = step?.columnInfo?.columnMapping?.experimentNames?.map { name ->
+            step?.columnInfo?.columnMapping?.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
 
         val ints =
             readTableData.getListOfInts(expInfoList = expDetailsTable, analysisStep = step, outputRoot = outputRoot)
         val transInts = transformation(ints, transformationParams)
-        val normInts = normalization(transInts, transformationParams)
-
-        val intCol =
-            if (transformationParams != null && transformationParams.intCol != null) transformationParams.intCol else step?.commonResult?.intCol
+        val normInts: List<Pair<String, List<Double>>> = normalization(transInts, transformationParams)
+        val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
 
         val newColName = "trans $intCol"
+
         val resTable = writeTableData.writeTable(step, normInts, outputRoot = outputRoot, newColName)
         val resTableHash = Crc32HashComputations().computeFileHash(File(resTable))
         val numCols =
@@ -145,7 +146,9 @@ class TransformationRunner() : CommonStep() {
         transformationParams: TransformationParams
     ): List<Pair<String, List<Double>>> {
         val subtract = when (transformationParams.normalizationType) {
-            NormalizationType.MEDIAN.value -> fun(orig: List<Double>): Double { return Quantiles.median().compute(orig) }
+            NormalizationType.MEDIAN.value -> fun(orig: List<Double>): Double {
+                return Quantiles.median().compute(orig)
+            }
             NormalizationType.MEAN.value -> fun(orig: List<Double>): Double { return orig.average() }
             else -> {
                 throw StepException("${transformationParams.normalizationType} is not implemented.")

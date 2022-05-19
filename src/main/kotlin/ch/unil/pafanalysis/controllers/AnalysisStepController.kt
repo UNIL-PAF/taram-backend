@@ -65,11 +65,10 @@ class AnalysisStepController {
                 else -> throw RuntimeException("Analysis step [" + analysisStep?.type + "] not found.")
             }
         }catch (e: Exception){
-            println(e.stackTrace)
+            e.printStackTrace()
             analysisStepRepository?.save(analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)!!)
             AnalysisStepStatus.ERROR
         }
-
 
         return status?.value
     }

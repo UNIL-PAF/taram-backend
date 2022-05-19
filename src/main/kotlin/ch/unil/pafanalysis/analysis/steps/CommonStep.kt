@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.analysis.steps
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
@@ -47,22 +44,25 @@ open class CommonStep {
     var resultPath: String? = null
     var resultType: ResultType? = null
 
-    fun runCommonStep(type: AnalysisStepType, oldStepId: Int? = null, modifiesResult: Boolean? = null): AnalysisStep? {
+    fun runCommonStep(
+        type: AnalysisStepType,
+        oldStepId: Int? = null,
+        modifiesResult: Boolean? = null,
+        step: AnalysisStep? = null
+    ): AnalysisStep? {
         val oldStep: AnalysisStep? = if (oldStepId != null) {
             analysisStepRepository?.findById(oldStepId)
         } else {
             null
         }
 
-        val emptyStep = createEmptyAnalysisStep(oldStep, type, modifiesResult)
-        val stepPath = setMainPaths(oldStep?.analysis, emptyStep)
+        val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
+        setPathes(currentStep?.analysis)
+        val stepPath = setMainPaths(oldStep?.analysis, currentStep)
         val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath)
-        val stepHash: Long = computeStepHash(step = emptyStep, resultTableHash = resultTablePathAndHash.second)
 
-        if(emptyStep?.nextId != null) setNextStepBeforeId(emptyStep?.nextId, emptyStep?.id)
-        updateOldStep(oldStep, emptyStep?.id)
-
-        return updateEmptyStep(emptyStep, stepPath, resultTablePathAndHash, stepHash)
+        //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
+        return updateEmptyStep(currentStep, stepPath, resultTablePathAndHash, oldStep?.commonResult)
     }
 
     fun setPathes(analysis: Analysis?) {
@@ -75,7 +75,6 @@ open class CommonStep {
     }
 
     fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
-        setPathes(analysis)
         val outputPath: String = analysis?.id.toString()
         createResultDir(outputRoot?.plus(outputPath))
 
@@ -90,7 +89,7 @@ open class CommonStep {
         modifiesResult: Boolean? = null
     ): AnalysisStep? {
         val newStep = AnalysisStep(
-            status = AnalysisStepStatus.IDLE.value,
+            status = AnalysisStepStatus.RUNNING.value,
             type = type.value,
             analysis = oldStep?.analysis,
             commonResult = oldStep?.commonResult,
@@ -100,8 +99,24 @@ open class CommonStep {
             columnInfo = oldStep?.columnInfo,
             modifiesResult = modifiesResult
         )
-        return analysisStepRepository?.save(newStep)
+        val insertedStep = analysisStepRepository?.save(newStep)
+        if(oldStep?.nextId != null) setNextStepBeforeId(oldStep?.nextId, insertedStep?.id)
+        updateOldStep(oldStep, insertedStep?.id)
+        return insertedStep
     }
+
+    fun getNextStep(currentStep: AnalysisStep): AnalysisStep? {
+        return if(currentStep.nextId != null) analysisStepRepository?.findById(currentStep.nextId) else null
+    }
+
+    /*fun setAllFollowingToIdle(step: AnalysisStep) {
+        var nextStep: AnalysisStep? = getNextStep(step)
+
+        while(nextStep != null){
+            analysisStepRepository?.save(nextStep.copy(status = AnalysisStepStatus.IDLE.value))
+            nextStep  = getNextStep(nextStep)
+        }
+    }*/
 
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
@@ -117,7 +132,7 @@ open class CommonStep {
         }
     }
 
-    open fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long) {
+    open fun run(oldStepId: Int, step: AnalysisStep? = null): AnalysisStepStatus {
         throw Exception("missing implementation of computeAndUpdate")
     }
 
@@ -126,11 +141,16 @@ open class CommonStep {
 
         if (newHash != step.stepHash) {
             try {
-                computeAndUpdate(step, stepBefore, newHash)
-            }catch (e: Exception) {
-                step?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
+                run(stepBefore.id!!, step)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                step?.copy(
+                    status = AnalysisStepStatus.ERROR.value,
+                    error = e.message,
+                    stepHash = Crc32HashComputations().getRandomHash()
+                )
             }
-        }else{
+        } else {
             analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.DONE.value))
         }
 
@@ -141,7 +161,8 @@ open class CommonStep {
         val paramsHash = (step?.parametersHash ?: 0).toString()
         val columnsMappingHash = step?.columnInfo?.columnMappingHash.toString()
         val resultTableHash = (resultTableHash ?: stepBefore?.resultTableHash).toString()
-        val combinedHashString = "$paramsHash:$columnsMappingHash:$resultTableHash"
+        val commonHash = (step?.commonResult ?: 0).toString()
+        val combinedHashString = "$paramsHash:$columnsMappingHash:$resultTableHash:$commonHash"
         return Crc32HashComputations().computeStringHash(combinedHashString)
     }
 
@@ -149,15 +170,15 @@ open class CommonStep {
         emptyStep: AnalysisStep?,
         stepPath: String?,
         resultTablePath: Pair<String?, Long?>,
-        stepHash: Long?
+        commonResult: CommonResult?
     ): AnalysisStep? {
         val newStep =
             emptyStep?.copy(
                 resultPath = stepPath,
                 resultTablePath = resultTablePath.first,
                 resultTableHash = resultTablePath.second,
-                stepHash = stepHash,
-                status = AnalysisStepStatus.RUNNING.value
+                status = AnalysisStepStatus.RUNNING.value,
+                commonResult = commonResult
             )
         return analysisStepRepository?.save(newStep!!)
     }
@@ -178,7 +199,7 @@ open class CommonStep {
         oldStep: AnalysisStep?,
         stepPath: String?
     ): Pair<String?, Long?> {
-        return if (modifiesResult != null && modifiesResult) {
+        val pathAndHash = if (modifiesResult != null && modifiesResult) {
             val oldTab = outputRoot?.plus("/") + oldStep?.resultTablePath
             val tabName = if (resultType == ResultType.MaxQuant) {
                 "/proteinGroups_"
@@ -192,6 +213,8 @@ open class CommonStep {
         } else {
             Pair(oldStep?.resultTablePath, oldStep?.resultTableHash)
         }
+
+        return pathAndHash
     }
 
     private fun createResultDir(outputPath: String?): String {

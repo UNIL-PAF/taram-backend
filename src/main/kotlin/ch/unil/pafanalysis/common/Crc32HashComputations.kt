@@ -6,20 +6,29 @@ import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.sql.Timestamp
 import java.util.zip.CRC32
 import java.util.zip.Checksum
 
 
 class Crc32HashComputations {
+
+    private val crc: Checksum = CRC32()
+
     fun computeStringHash(objString: String): Long {
         val bytes: ByteArray = objString.toByteArray()
-        val checksum: Checksum = CRC32()
-        checksum.update(bytes, 0, bytes.size)
-        return checksum.value
+        crc.update(bytes, 0, bytes.size)
+        return crc.value
+    }
+
+    fun getRandomHash(): Long {
+        val currentTime = Timestamp(System.currentTimeMillis()).toString()
+        val bytes: ByteArray = currentTime.toByteArray()
+        crc.update(bytes, 0, bytes.size)
+        return crc.value
     }
 
     fun computeFileHash(file: File): Long {
-        val crc = CRC32()
         val buffer: ByteBuffer = ByteBuffer.allocate(1024)
         var len = 0
         Files.newByteChannel(file.toPath(), StandardOpenOption.READ).use { input ->

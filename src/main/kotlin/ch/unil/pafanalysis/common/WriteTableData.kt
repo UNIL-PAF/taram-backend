@@ -23,7 +23,6 @@ class WriteTableData {
         writer.write(newHeader.joinToString(separator = "\t"))
         writer.newLine()
 
-
         val initialList: List<List<Double>> = newInts[0].second.map { emptyList<Double>() }
         val intMatrix: List<List<Double>> = newInts.fold(initialList) { sum, (name, ints) ->
             val myInts: List<Double> = ints
