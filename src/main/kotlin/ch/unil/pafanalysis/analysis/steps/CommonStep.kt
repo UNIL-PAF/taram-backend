@@ -38,6 +38,8 @@ open class CommonStep {
     @Autowired
     private var transformationRunner: TransformationRunner? = null
 
+    val hashComp: Crc32HashComputations = Crc32HashComputations()
+
     var type: AnalysisStepType? = null
 
     var outputRoot: String? = null
@@ -105,19 +107,6 @@ open class CommonStep {
         return insertedStep
     }
 
-    fun getNextStep(currentStep: AnalysisStep): AnalysisStep? {
-        return if(currentStep.nextId != null) analysisStepRepository?.findById(currentStep.nextId) else null
-    }
-
-    /*fun setAllFollowingToIdle(step: AnalysisStep) {
-        var nextStep: AnalysisStep? = getNextStep(step)
-
-        while(nextStep != null){
-            analysisStepRepository?.save(nextStep.copy(status = AnalysisStepStatus.IDLE.value))
-            nextStep  = getNextStep(nextStep)
-        }
-    }*/
-
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
@@ -132,7 +121,7 @@ open class CommonStep {
         }
     }
 
-    open fun run(oldStepId: Int, step: AnalysisStep? = null): AnalysisStepStatus {
+    open fun run(oldStepId: Int, step: AnalysisStep? = null): AnalysisStep {
         throw Exception("missing implementation of computeAndUpdate")
     }
 
@@ -157,13 +146,19 @@ open class CommonStep {
         updateNextStep(step)
     }
 
+    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
+        val newStep = run(analysisStep.beforeId!!, analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params)))
+        updateNextStep(newStep)
+        return newStep
+    }
+
     fun computeStepHash(step: AnalysisStep?, stepBefore: AnalysisStep? = null, resultTableHash: Long? = null): Long {
         val paramsHash = (step?.parametersHash ?: 0).toString()
         val columnsMappingHash = step?.columnInfo?.columnMappingHash.toString()
         val resultTableHash = (resultTableHash ?: stepBefore?.resultTableHash).toString()
         val commonHash = (step?.commonResult ?: 0).toString()
         val combinedHashString = "$paramsHash:$columnsMappingHash:$resultTableHash:$commonHash"
-        return Crc32HashComputations().computeStringHash(combinedHashString)
+        return hashComp.computeStringHash(combinedHashString)
     }
 
     private fun updateEmptyStep(

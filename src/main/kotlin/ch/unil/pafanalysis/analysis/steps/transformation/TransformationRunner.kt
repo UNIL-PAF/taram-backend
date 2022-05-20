@@ -31,7 +31,7 @@ class TransformationRunner() : CommonStep() {
         imputationType = ImputationType.NAN.value
     )
 
-    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStepStatus {
+    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step)
 
         val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
@@ -51,50 +51,8 @@ class TransformationRunner() : CommonStep() {
         val updatedStep =
             stepWithRes?.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash, commonResult = commonResult)
         analysisStepRepository?.save(updatedStep!!)
-        return AnalysisStepStatus.DONE
+        return updatedStep
     }
-
-    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
-        setPathes(analysisStep.analysis)
-        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
-
-        val oldStep = analysisStepRepository?.findById(analysisStep.beforeId!!)
-        val stepPath = setMainPaths(oldStep?.analysis, analysisStep)
-        val resultTablePath = getResultTablePath(true, oldStep, stepPath).first
-        val stepWithTable = analysisStep.copy(resultTablePath = resultTablePath)
-
-        val parsedParams: TransformationParams = gson.fromJson(params, TransformationParams().javaClass)
-        val (resultTableHash, commonResult) = transformTable(stepWithTable, parsedParams)
-        val stepWithRes =
-            stepWithTable?.copy(parameters = params, resultTableHash = resultTableHash, commonResult = commonResult)
-        val newHash = computeStepHash(stepWithRes, oldStep)
-
-        val newStep = stepWithRes.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
-        analysisStepRepository?.save(newStep!!)
-
-        updateNextStep(newStep)
-        return AnalysisStepStatus.DONE
-    }
-
-    /*
-    override fun computeAndUpdate(step: AnalysisStep, stepBefore: AnalysisStep, newHash: Long, stepPath: String) {
-        val resultTablePath = getResultTablePath(true, stepBefore, stepPath).first
-
-        val stepWithTable = step.copy(status = AnalysisStepStatus.RUNNING.value, resultTablePath = resultTablePath, commonResult = stepBefore.commonResult)
-        analysisStepRepository?.save(stepWithTable)
-
-        columnMapping = stepWithTable?.columnInfo?.columnMapping
-        val (resultTableHash, commonResult) = transformTable(
-            stepWithTable,
-            gson.fromJson(stepWithTable.parameters, TransformationParams().javaClass)
-        )
-
-        val stepWithRes = stepWithTable.copy(resultTableHash = resultTableHash, commonResult = commonResult)
-        val newHash = computeStepHash(stepWithRes, stepBefore)
-        val newStep = stepWithRes.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash)
-        analysisStepRepository?.save(newStep!!)
-    }
-     */
 
     private fun transformTable(
         step: AnalysisStep?,
@@ -126,13 +84,23 @@ class TransformationRunner() : CommonStep() {
     ): List<Pair<String, List<Double>>> {
 
         fun transformList(intList: List<Double>): List<Double> {
-            return when (transformationParams.transformationType) {
+            val a: List<Double> = when (transformationParams.transformationType) {
                 TransformationType.NONE.value -> intList
-                TransformationType.LOG2.value -> intList.map { i -> if (i == 0.0) Double.NaN else ln(i) / ln(2.0) }
+                TransformationType.LOG2.value -> {
+                    val newList = intList.map { i ->
+                        if (i == 0.0) {
+                            Double.NaN
+                        } else {
+                            ln(i)// / ln(2.0)
+                        }
+                    }
+                    newList
+                }
                 else -> {
                     throw StepException("${transformationParams.normalizationType} is not implemented.")
                 }
             }
+            return a
         }
 
         return ints.map { (name, orig: List<Double>) ->
@@ -155,7 +123,8 @@ class TransformationRunner() : CommonStep() {
             }
         }
         return ints.map { (name, orig: List<Double>) ->
-            Pair(name, orig.map { it - subtract(orig) })
+            val noNaNs = orig.filter { ! it.isNaN() }
+            Pair(name, orig.map { it - subtract(noNaNs) })
         }
     }
 

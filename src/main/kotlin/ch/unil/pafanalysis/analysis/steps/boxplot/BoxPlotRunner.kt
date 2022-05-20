@@ -17,29 +17,12 @@ class BoxPlotRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
 
-    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStepStatus {
+    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step)
         val boxplot = createBoxplotObj(newStep)
         val updatedStep = newStep?.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
         analysisStepRepository?.save(updatedStep!!)
-        return AnalysisStepStatus.DONE
-    }
-
-    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
-        val stepWithParams = analysisStep.copy(parameters = params)
-
-        val oldStep =
-            if (analysisStep?.beforeId != null) analysisStepRepository?.findById(analysisStep?.beforeId) else null
-        val newHash = computeStepHash(stepWithParams, oldStep)
-        val boxplot = createBoxplotObj(stepWithParams)
-
-        val newStep = stepWithParams.copy(
-            status = AnalysisStepStatus.DONE.value,
-            results = gson.toJson(boxplot),
-            stepHash = newHash
-        )
-        analysisStepRepository?.save(newStep!!)
-        return AnalysisStepStatus.DONE
+        return updatedStep!!
     }
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {

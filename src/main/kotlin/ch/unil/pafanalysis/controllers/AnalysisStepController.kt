@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.controllers
 
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
@@ -41,13 +42,13 @@ class AnalysisStepController {
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
-        val status: AnalysisStepStatus? = when (stepParams.type) {
-            QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
+        val step: AnalysisStep? = when (stepParams.type) {
+            //QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
             BOXPLOT.value -> boxPlotRunner?.run(stepId)
             TRANSFORMATION.value -> transformationRunner?.run(stepId)
             else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
         }
-        return status?.value
+        return step?.status
     }
 
     @PostMapping(path = ["/parameters/{stepId}"])
@@ -57,19 +58,20 @@ class AnalysisStepController {
 
         analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
-        val status: AnalysisStepStatus? = try {
+        val step: AnalysisStep? = try {
              when (analysisStep?.type) {
-                INITIAL_RESULT.value -> initialResult?.updateParams(analysisStep, stepParams)
+                INITIAL_RESULT.value -> initialResult?.updateColumnParams(analysisStep, stepParams)
                 BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
                 TRANSFORMATION.value -> transformationRunner?.updateParams(analysisStep, stepParams)
                 else -> throw RuntimeException("Analysis step [" + analysisStep?.type + "] not found.")
             }
         }catch (e: Exception){
             e.printStackTrace()
-            analysisStepRepository?.save(analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)!!)
-            AnalysisStepStatus.ERROR
+            val errorStep = analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
+            analysisStepRepository?.save(errorStep!!)
+            errorStep
         }
 
-        return status?.value
+        return step?.status
     }
 }

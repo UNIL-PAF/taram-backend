@@ -68,7 +68,7 @@ class InitialResultRunner() : CommonStep() {
         }
     }
 
-    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStepStatus {
+    fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
         analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
         val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
@@ -84,7 +84,7 @@ class InitialResultRunner() : CommonStep() {
 
         updateNextStep(analysisStep)
 
-        return AnalysisStepStatus.DONE
+        return analysisStep
     }
 
     private fun createEmptyInitialResult(analysis: Analysis?): AnalysisStep? {
