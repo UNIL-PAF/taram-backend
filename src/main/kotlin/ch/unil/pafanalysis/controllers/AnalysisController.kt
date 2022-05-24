@@ -28,5 +28,11 @@ class AnalysisController {
         return analysisRepository?.deleteById(analysisId)
     }*/
 
+    @PostMapping(path = ["/duplicate/{analysisId}"])
+    fun duplicateAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Analysis? {
+        return analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = true)
+    }
+
+
 
 }

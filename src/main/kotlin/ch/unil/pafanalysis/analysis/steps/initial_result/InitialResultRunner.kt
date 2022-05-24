@@ -25,14 +25,10 @@ class InitialResultRunner() : CommonStep() {
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
-    @Autowired
-    private var analysisStepService: AnalysisStepService? = null
-
-
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
 
-    fun run(analysisId: Int?, result: Result?): AnalysisStepStatus {
+    fun run(analysisId: Int?, result: Result?): AnalysisStep? {
         val analysis =
             analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
         setPathes(analysis)
@@ -61,8 +57,7 @@ class InitialResultRunner() : CommonStep() {
         }
 
         if (step != null) {
-            analysisStepRepository?.save(step)
-            return AnalysisStepStatus.DONE
+            return analysisStepRepository?.save(step)
         } else {
             throw RuntimeException("Could not create/save initial_result.")
         }

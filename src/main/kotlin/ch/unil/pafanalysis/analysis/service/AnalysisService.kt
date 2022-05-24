@@ -24,6 +24,9 @@ class AnalysisService {
     @Autowired
     private var initialResult: InitialResultRunner? = null
 
+    @Autowired
+    private var analysisStepService: AnalysisStepService? = null
+
     private fun createNewAnalysis(result: Result?): List<Analysis>? {
 
         val newAnalysis = Analysis(
@@ -88,6 +91,15 @@ class AnalysisService {
             a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
         }
         return sortedList
+    }
+
+    fun duplicateAnalysis(analysisId: Int, copyAllSteps: Boolean): Analysis {
+        val analysis = analysisRepo?.findById(analysisId)
+        val newAnalysis = analysisRepo?.save(analysis!!.copy(id = 0, idx = analysis?.idx?.plus(1)))
+        val sortedSteps = newAnalysis!!.analysisSteps!!
+
+        analysisStepService?.duplicateAnalysisSteps(sortedSteps, newAnalysis, copyAllSteps)
+        return newAnalysis!!
     }
 
 }
