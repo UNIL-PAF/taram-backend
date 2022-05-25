@@ -33,6 +33,11 @@ class AnalysisController {
         return analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = true)
     }
 
+    @PostMapping(path = ["/copy/{analysisId}"])
+    fun copyAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Analysis? {
+        return analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = false)
+    }
+
 
 
 }
