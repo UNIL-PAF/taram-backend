@@ -61,7 +61,7 @@ open class CommonStep {
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
         setPathes(currentStep?.analysis)
         val stepPath = setMainPaths(oldStep?.analysis, currentStep)
-        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath)
+        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, step?.resultTablePath)
 
         //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
         return updateEmptyStep(currentStep, stepPath, resultTablePathAndHash, oldStep?.commonResult)
@@ -192,7 +192,8 @@ open class CommonStep {
     fun getResultTablePath(
         modifiesResult: Boolean?,
         oldStep: AnalysisStep?,
-        stepPath: String?
+        stepPath: String?,
+        oldTablePath: String?
     ): Pair<String?, Long?> {
         val pathAndHash = if (modifiesResult != null && modifiesResult) {
             val oldTab = outputRoot?.plus("/") + oldStep?.resultTablePath
@@ -204,6 +205,10 @@ open class CommonStep {
             val newTab = stepPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
             val newFile = File(outputRoot?.plus(newTab))
             File(oldTab).copyTo(newFile)
+
+            // remove old if exists
+            if(oldTablePath != null) File(outputRoot?.plus("/")?.plus(oldTablePath)).delete()
+
             Pair(newTab, Crc32HashComputations().computeFileHash(newFile))
         } else {
             Pair(oldStep?.resultTablePath, oldStep?.resultTableHash)
