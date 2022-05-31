@@ -4,9 +4,13 @@ import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
+import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.nio.file.Files
+import java.nio.file.Path
 
 @Transactional
 @Service
@@ -20,6 +24,9 @@ class AnalysisStepService {
 
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null
+
+    @Autowired
+    private var env: Environment? = null
 
     fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
         return analysisStepRepo?.setStatusById(status.value, id)
@@ -76,6 +83,32 @@ class AnalysisStepService {
                 beforeId = stepBefore?.id
                 )
         )
+    }
+
+    fun deleteStep(stepId: Int): List<Boolean> {
+        val step: AnalysisStep = analysisStepRepo?.findById(stepId)!!
+        val before: AnalysisStep = analysisStepRepo?.findById(step!!.beforeId!!)!!
+        val after: AnalysisStep? = if(step.nextId != null) analysisStepRepo?.findById(step.nextId) else null
+
+        if(after != null){
+            analysisStepRepo?.save(after.copy(beforeId = before.id))
+            analysisStepRepo?.save(before.copy(nextId = after.id))
+        }else{
+            analysisStepRepo?.save(before.copy(nextId = null))
+        }
+
+        return deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
+    }
+
+    fun getOutputRoot(resultType: String?): String? {
+        return env?.getProperty(if (resultType == ResultType.MaxQuant.value) "output.path.maxquant" else "output.path.spectronaut")
+    }
+
+    fun deleteDirectory(directory: Path?): List<Boolean> {
+        return Files.walk(directory)
+            .sorted(Comparator.reverseOrder())
+            .map { it.toFile() }
+            .map { it.delete() }.toList()
     }
 
 }

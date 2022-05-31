@@ -51,6 +51,12 @@ class AnalysisStepController {
         return step?.status
     }
 
+    @DeleteMapping(path = ["/{stepId}"])
+    @ResponseBody
+    fun deleteStep(@PathVariable(value = "stepId") stepId: Int): List<Boolean>? {
+        return analysisStepService?.deleteStep(stepId)
+    }
+
     @PostMapping(path = ["/parameters/{stepId}"])
     @ResponseBody
     fun parameters(@RequestBody stepParams: String, @PathVariable(value = "stepId") stepId: Int): String? {
