@@ -94,25 +94,29 @@ class AnalysisStepService {
         )
     }
 
-    fun deleteStep(stepId: Int): List<Boolean> {
+    fun deleteStep(stepId: Int): Int? {
         val step: AnalysisStep = analysisStepRepo?.findById(stepId)!!
-        val before: AnalysisStep = analysisStepRepo?.findById(step!!.beforeId!!)!!
+        val before: AnalysisStep? = if(step.beforeId != null) analysisStepRepo?.findById(step.beforeId) else null
         val after: AnalysisStep? = if(step.nextId != null) analysisStepRepo?.findById(step.nextId) else null
 
-        if(after != null){
-            analysisStepRepo?.save(after.copy(beforeId = before.id))
-            analysisStepRepo?.save(before.copy(nextId = after.id))
-        }else{
-            analysisStepRepo?.save(before.copy(nextId = null))
+        if(before != null){
+            if(after != null){
+                analysisStepRepo?.save(after.copy(beforeId = before?.id))
+                analysisStepRepo?.save(before.copy(nextId = after.id))
+            }else{
+                analysisStepRepo?.save(before.copy(nextId = null))
+            }
         }
 
-        val deleted = deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
+        deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
+        val res: Int? = analysisStepRepo?.deleteById(stepId)
+
         if(after != null){
             commonStep?.runStep(after)
             commonStep?.updateNextStep(after)
         }
 
-        return deleted
+        return res
     }
 
     fun getOutputRoot(resultType: String?): String? {

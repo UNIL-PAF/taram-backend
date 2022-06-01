@@ -23,10 +23,10 @@ class AnalysisController {
         return analysisService?.getSortedAnalysisList(resultId)
     }
 
-    /*@DeleteMapping("/{analysisId}")
-    fun deleteAnalysis(@PathParam analysisId: Int): Iterable<Analysis>? {
-        return analysisRepository?.deleteById(analysisId)
-    }*/
+    @DeleteMapping("/{analysisId}")
+    fun deleteAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Int? {
+        return analysisService?.delete(analysisId)
+    }
 
     @PostMapping(path = ["/duplicate/{analysisId}"])
     fun duplicateAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Analysis? {

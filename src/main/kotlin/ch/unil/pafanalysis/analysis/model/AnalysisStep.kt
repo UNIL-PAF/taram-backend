@@ -31,11 +31,12 @@ data class AnalysisStep (
     @Type(type="json")
     @Column(columnDefinition="json")
     val commonResult: CommonResult? = null,
-    val commonHash: Long? = null,
 
     @Type(type="json")
     @Column(columnDefinition="json")
     val parameters: String? = null,
+
+    val commonHash: Long? = null,
     val parametersHash: Long? = null,
 
     @ManyToOne

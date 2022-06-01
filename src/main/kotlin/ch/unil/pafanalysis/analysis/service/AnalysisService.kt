@@ -43,10 +43,17 @@ class AnalysisService {
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>
     }
 
+    fun delete(analysisId: Int): Int? {
+        val analysis = analysisRepo?.findById(analysisId)
+        val steps: List<AnalysisStep>? = sortAnalysisSteps(analysis?.analysisSteps)?.asReversed()
+        steps?.map{ analysisStepService?.deleteStep(it.id!!) }
+        return analysisRepo?.deleteById(analysisId)
+    }
+
     fun getByResultId(resultId: Int): List<Analysis>? {
         // check first if this result really exists
         val result = resultRepo?.findById(resultId)
-        if (result == null) throw RuntimeException("There is no result for resultId [" + resultId + "]")
+            ?: throw RuntimeException("There is no result for resultId [" + resultId + "]")
 
         val analysisInDb: List<Analysis>? = analysisRepo?.findByResultId(resultId)?.toList()
 

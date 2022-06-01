@@ -10,7 +10,9 @@ import org.springframework.data.repository.query.Param
 interface AnalysisStepRepository: CrudRepository<AnalysisStep, Integer> {
     fun findById(id: Int): AnalysisStep
 
-    fun deleteAnalysisStepById(id: Int)
+    @Modifying
+    @Query("delete from AnalysisStep a where a.id =:id")
+    fun deleteById(id: Int): Int?
 
     @Modifying
     @Query("update AnalysisStep a set a.status =:status where a.id =:stepId")

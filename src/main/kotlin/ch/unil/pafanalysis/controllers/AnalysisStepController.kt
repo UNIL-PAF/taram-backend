@@ -50,7 +50,7 @@ class AnalysisStepController {
 
     @DeleteMapping(path = ["/{stepId}"])
     @ResponseBody
-    fun deleteStep(@PathVariable(value = "stepId") stepId: Int): List<Boolean>? {
+    fun deleteStep(@PathVariable(value = "stepId") stepId: Int): Int? {
         return analysisStepService?.deleteStep(stepId)
     }
 
