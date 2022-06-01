@@ -2,9 +2,13 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.ResultType
+import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -27,6 +31,11 @@ class AnalysisStepService {
 
     @Autowired
     private var env: Environment? = null
+
+    @Autowired
+    private var commonStep: CommonStep? = null
+
+    private val gson = Gson()
 
     fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
         return analysisStepRepo?.setStatusById(status.value, id)
@@ -97,7 +106,13 @@ class AnalysisStepService {
             analysisStepRepo?.save(before.copy(nextId = null))
         }
 
-        return deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
+        val deleted = deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
+        if(after != null){
+            commonStep?.runStep(after)
+            commonStep?.updateNextStep(after)
+        }
+
+        return deleted
     }
 
     fun getOutputRoot(resultType: String?): String? {

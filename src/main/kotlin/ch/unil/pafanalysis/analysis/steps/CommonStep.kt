@@ -67,6 +67,25 @@ open class CommonStep {
         return updateEmptyStep(currentStep, stepPath, resultTablePathAndHash, oldStep?.commonResult)
     }
 
+    fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
+        return when (stepParams.type) {
+            //QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
+            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.run(stepId)
+            AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.run(stepId)
+            else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
+        }
+    }
+
+    fun runStep(step: AnalysisStep): AnalysisStep? {
+        return when (step.type) {
+            //QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
+            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.run(step?.beforeId!!, step)
+            AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.run(step?.beforeId!!, step)
+            else -> throw StepException("Analysis step [" + step.type + "] not found.")
+        }
+    }
+
+
     fun setPathes(analysis: Analysis?) {
         resultType =
             if (analysis?.result?.type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
@@ -122,7 +141,7 @@ open class CommonStep {
     }
 
     open fun run(oldStepId: Int, step: AnalysisStep? = null): AnalysisStep {
-        throw Exception("missing implementation of computeAndUpdate")
+        throw Exception("missing implementation of run.")
     }
 
     fun update(step: AnalysisStep, stepBefore: AnalysisStep) {

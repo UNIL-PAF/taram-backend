@@ -37,18 +37,15 @@ class AnalysisStepController {
     private var initialResult: InitialResultRunner? = null
 
     @Autowired
+    private var commonStep: CommonStep? = null
+
+    @Autowired
     private var transformationRunner: TransformationRunner? = null
 
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
-        val step: AnalysisStep? = when (stepParams.type) {
-            //QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
-            BOXPLOT.value -> boxPlotRunner?.run(stepId)
-            TRANSFORMATION.value -> transformationRunner?.run(stepId)
-            else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
-        }
-        return step?.status
+        return commonStep?.addStep(stepId, stepParams)?.status
     }
 
     @DeleteMapping(path = ["/{stepId}"])
