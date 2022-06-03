@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.service.AnalysisService
+import ch.unil.pafanalysis.pdf.PdfService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -13,6 +14,9 @@ class AnalysisController {
 
     @Autowired
     private var analysisService: AnalysisService? = null
+
+    @Autowired
+    private var pdfService: PdfService? = null
 
 
     @GetMapping
@@ -35,6 +39,10 @@ class AnalysisController {
         return analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = false)
     }
 
+    @GetMapping(path = ["/pdf/{analysisId}"])
+    fun createPdf(@PathVariable(value = "analysisId") analysisId: Int): String? {
+        return pdfService?.createPdf(analysisId)
+    }
 
 
 }

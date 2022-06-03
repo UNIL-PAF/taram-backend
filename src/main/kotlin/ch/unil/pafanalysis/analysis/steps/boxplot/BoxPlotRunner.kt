@@ -1,7 +1,9 @@
 package ch.unil.pafanalysis.analysis.steps.boxplot
 
 import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.ReadTableData
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service
 import kotlin.math.log2
 
 @Service
-class BoxPlotRunner() : CommonStep() {
+class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
@@ -23,6 +25,13 @@ class BoxPlotRunner() : CommonStep() {
         val updatedStep = newStep?.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
         analysisStepRepository?.save(updatedStep!!)
         return updatedStep!!
+    }
+
+    override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {
+        val newResults = gson.fromJson(step.results, BoxPlot().javaClass).copy(plot = echartsPlot)
+        val newStep = step.copy(results = gson.toJson(newResults))
+        analysisStepRepository?.save(newStep)
+        return echartsPlot.echartsHash.toString()
     }
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {

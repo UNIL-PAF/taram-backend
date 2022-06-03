@@ -66,23 +66,20 @@ open class CommonStep {
     }
 
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
-        return when (stepParams.type) {
-            //QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
-            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.run(stepId)
-            AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.run(stepId)
-            else -> throw StepException("Analysis step [" + stepParams.type + "] not found.")
+        return getRunner(stepParams.type)?.run(stepId)
+    }
+
+    fun getRunner(type: String?): CommonRunner? {
+        return when (type){
+            AnalysisStepType.BOXPLOT.value -> boxPlotRunner
+            AnalysisStepType.TRANSFORMATION.value -> transformationRunner
+            else -> throw StepException("Analysis step [$type] not found.")
         }
     }
 
     fun runStep(step: AnalysisStep): AnalysisStep? {
-        return when (step.type) {
-            //QUALITY_CONTROL.value -> qualityControlRunner?.run(stepId)
-            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.run(step?.beforeId!!, step)
-            AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.run(step?.beforeId!!, step)
-            else -> throw StepException("Analysis step [" + step.type + "] not found.")
-        }
+        return getRunner(step.type)?.run(step?.beforeId!!, step)
     }
-
 
     fun setPathes(analysis: Analysis?) {
         resultType =
@@ -127,19 +124,8 @@ open class CommonStep {
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
-
-            //thread(start = true, isDaemon = true) {
-                when (nextStep?.type) {
-                    AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.update(nextStep, step)
-                    AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.update(nextStep, step)
-                    else -> throw StepException("Analysis step [" + nextStep?.type + "] not found.")
-                }
-            //}
+            update(nextStep!!, step)
         }
-    }
-
-    open fun run(oldStepId: Int, step: AnalysisStep? = null): AnalysisStep {
-        throw Exception("missing implementation of run.")
     }
 
     fun update(step: AnalysisStep, stepBefore: AnalysisStep) {
@@ -147,7 +133,7 @@ open class CommonStep {
 
         if (newHash != step.stepHash) {
             try {
-                run(stepBefore.id!!, step)
+                getRunner(step.type)?.run(stepBefore.id!!, step)
             } catch (e: Exception) {
                 e.printStackTrace()
                 step?.copy(
@@ -164,7 +150,7 @@ open class CommonStep {
     }
 
     fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
-        val newStep = run(analysisStep.beforeId!!, analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params)))
+        val newStep = getRunner(analysisStep.type)?.run(analysisStep.beforeId!!, analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params)))!!
         updateNextStep(newStep)
         return newStep
     }

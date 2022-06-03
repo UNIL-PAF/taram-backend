@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -46,6 +47,13 @@ class AnalysisStepController {
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
         return commonStep?.addStep(stepId, stepParams)?.status
+    }
+
+    @PostMapping(path = ["/plot-options/{stepId}"])
+    @ResponseBody
+    fun plotOptions(@RequestBody echartsPlot: EchartsPlot, @PathVariable(value = "stepId") stepId: Int): String? {
+        analysisStepService?.updatePlotOptions(stepId, echartsPlot)
+        return "done"
     }
 
     @DeleteMapping(path = ["/{stepId}"])

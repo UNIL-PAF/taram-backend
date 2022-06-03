@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonResult
+import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -16,7 +17,7 @@ import java.io.File
 import kotlin.math.ln
 
 @Service
-class TransformationRunner() : CommonStep() {
+class TransformationRunner() : CommonStep(), CommonRunner {
 
     private val gson = Gson()
 

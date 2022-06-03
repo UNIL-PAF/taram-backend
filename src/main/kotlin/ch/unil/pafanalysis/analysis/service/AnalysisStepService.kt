@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.ResultType
@@ -35,7 +36,11 @@ class AnalysisStepService {
     @Autowired
     private var commonStep: CommonStep? = null
 
-    private val gson = Gson()
+    fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
+        val step = analysisStepRepo?.findById(stepId)!!
+        println(echartsPlot)
+        return commonStep?.getRunner(step?.type)?.updatePlotOptions(step, echartsPlot)
+    }
 
     fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
         return analysisStepRepo?.setStatusById(status.value, id)
