@@ -70,7 +70,11 @@ class AnalysisStepService {
             }else { null }
         }
 
-        return setCorrectNextIds(copiedSteps)
+        val analysisSteps = setCorrectNextIds(copiedSteps)
+        if(analysisSteps != null && analysisSteps.size > 1) {
+            commonStep?.updateNextStep(analysisSteps[0]!!)
+        }
+        return analysisSteps
     }
 
     fun setCorrectNextIds(copiedSteps:List<AnalysisStep?>): List<AnalysisStep> {

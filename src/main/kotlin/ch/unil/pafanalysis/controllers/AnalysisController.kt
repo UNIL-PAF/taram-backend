@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(path = ["/analysis"])
 class AnalysisController {
 
-   // @Autowired
-   // private var analysisRepository: AnalysisRepository? = null
-
     @Autowired
     private var analysisService: AnalysisService? = null
 

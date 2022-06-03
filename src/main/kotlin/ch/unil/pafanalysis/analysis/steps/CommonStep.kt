@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import kotlin.Exception
-import kotlin.concurrent.thread
 
 @Service
 open class CommonStep {
@@ -130,13 +128,13 @@ open class CommonStep {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
 
-            thread(start = true, isDaemon = true) {
+            //thread(start = true, isDaemon = true) {
                 when (nextStep?.type) {
                     AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.update(nextStep, step)
                     AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.update(nextStep, step)
                     else -> throw StepException("Analysis step [" + nextStep?.type + "] not found.")
                 }
-            }
+            //}
         }
     }
 
