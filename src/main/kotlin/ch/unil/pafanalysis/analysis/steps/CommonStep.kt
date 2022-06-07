@@ -40,9 +40,9 @@ open class CommonStep {
 
     var type: AnalysisStepType? = null
 
+    var resultType: ResultType? = null
     var outputRoot: String? = null
     var resultPath: String? = null
-    var resultType: ResultType? = null
 
     fun runCommonStep(
         type: AnalysisStepType,
@@ -82,12 +82,18 @@ open class CommonStep {
     }
 
     fun setPathes(analysis: Analysis?) {
-        resultType =
-            if (analysis?.result?.type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
-        outputRoot =
-            env?.getProperty(if (resultType == ResultType.MaxQuant) "output.path.maxquant" else "output.path.spectronaut")
+        resultType = getResultType(analysis?.result?.type)
+        outputRoot = getOutputRoot(resultType)
         resultPath =
             env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
+    }
+
+    fun getResultType(type: String?): ResultType? {
+        return if (type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
+    }
+
+    fun getOutputRoot(resultType: ResultType?): String? {
+        return env?.getProperty(if (resultType == ResultType.MaxQuant) "output.path.maxquant" else "output.path.spectronaut")
     }
 
     fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
