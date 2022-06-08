@@ -4,9 +4,12 @@ import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
 import ch.unil.pafanalysis.common.ReadTableData
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
 import kotlin.math.log2
 
@@ -18,6 +21,13 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     private val gson = Gson()
 
     private val readTableData = ReadTableData()
+
+    override fun createPdf(step: AnalysisStep): List<Paragraph> {
+        val title = Paragraph().add(Text(step.type).setBold())
+        val params = gson.fromJson(step.parameters, BoxPlotParams::class.java)
+        val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
+        return listOf(title, selCol)
+    }
 
     override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step)

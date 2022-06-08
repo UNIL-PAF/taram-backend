@@ -1,8 +1,8 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
 import ch.unil.pafanalysis.analysis.model.*
-import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
+import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -10,6 +10,8 @@ import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
@@ -20,13 +22,24 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 
 @Service
-class InitialResultRunner() : CommonStep() {
+class InitialResultRunner() : CommonStep(), CommonRunner {
 
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
+
+    override fun createPdf(step: AnalysisStep): List<Paragraph> {
+        val title = Paragraph().add(Text(step.type).setBold())
+        val initialResult = gson.fromJson(step.results, InitialResult::class.java)
+        val nrResults = Paragraph().add(Text("Number of protein groups: ${initialResult.nrProteinGroups}"))
+        return listOf(title, nrResults)
+    }
+
+    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
+        throw Exception("InitialResultRunner does not implement ordinary run function.")
+    }
 
     fun run(analysisId: Int?, result: Result?): AnalysisStep? {
         val analysis =

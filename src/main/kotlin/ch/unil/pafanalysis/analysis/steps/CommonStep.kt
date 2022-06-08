@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
@@ -35,6 +36,9 @@ open class CommonStep {
 
     @Autowired
     private var transformationRunner: TransformationRunner? = null
+
+    @Autowired
+    private var initialResultRunner: InitialResultRunner? = null
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
 
@@ -71,6 +75,7 @@ open class CommonStep {
 
     fun getRunner(type: String?): CommonRunner? {
         return when (type){
+            AnalysisStepType.INITIAL_RESULT.value -> initialResultRunner
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner
             AnalysisStepType.TRANSFORMATION.value -> transformationRunner
             else -> throw StepException("Analysis step [$type] not found.")

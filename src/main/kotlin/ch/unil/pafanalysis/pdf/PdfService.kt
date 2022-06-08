@@ -37,15 +37,13 @@ class PdfService {
         val pdf = PdfDocument(PdfWriter(filePath))
         val document = Document(pdf)
 
-        steps?.forEach{
-            val title = it.type
-            document.add(Paragraph(title))
+        steps?.forEach{ step ->
+            val stepParagraphs = commonStep?.getRunner(step.type)?.createPdf(step)
+            stepParagraphs?.forEach { document.add(it) }
 
-            
-
-            if(it.type == AnalysisStepType.BOXPLOT.value){
+            if(step.type == AnalysisStepType.BOXPLOT.value){
                 val image: Image = SvgConverter.convertToImage(FileInputStream("/tmp/bar.svg"), pdf)
-                image.scaleToFit(300f, 300f)
+                //image.scaleToFit(300f, 300f)
                 document.add(image)
             }
 

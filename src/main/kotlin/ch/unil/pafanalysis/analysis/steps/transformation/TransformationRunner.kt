@@ -7,11 +7,14 @@ import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
 import java.io.File
 import kotlin.math.ln
@@ -31,6 +34,13 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         transformationType = TransformationType.NONE.value,
         imputationType = ImputationType.NAN.value
     )
+
+    override fun createPdf(step: AnalysisStep): List<Paragraph> {
+        val title = Paragraph().add(Text(step.type).setBold())
+        val transParams = gson.fromJson(step.parameters, TransformationParams::class.java)
+        val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
+        return listOf(title, selCol)
+    }
 
     override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step)
