@@ -10,6 +10,7 @@ import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,11 +31,13 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
 
-    override fun createPdf(step: AnalysisStep): List<Paragraph> {
+    override fun createPdf(step: AnalysisStep, document: Document?): Document?{
         val title = Paragraph().add(Text(step.type).setBold())
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
         val nrResults = Paragraph().add(Text("Number of protein groups: ${initialResult.nrProteinGroups}"))
-        return listOf(title, nrResults)
+        document?.add(title)
+        document?.add(nrResults)
+        return document
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {

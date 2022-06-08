@@ -35,27 +35,27 @@ class PdfService {
 
         val filePath = "/tmp/a.pdf"
         val pdf = PdfDocument(PdfWriter(filePath))
-        val document = Document(pdf)
+        val document: Document? = Document(pdf)
 
-        steps?.forEach{ step ->
-            val stepParagraphs = commonStep?.getRunner(step.type)?.createPdf(step)
-            stepParagraphs?.forEach { document.add(it) }
+        steps?.fold(document) { acc, el ->
+            commonStep?.getRunner(el.type)?.createPdf(el, acc)
 
-            if(step.type == AnalysisStepType.BOXPLOT.value){
+           /* if(step.type == AnalysisStepType.BOXPLOT.value){
                 val image: Image = SvgConverter.convertToImage(FileInputStream("/tmp/bar.svg"), pdf)
                 //image.scaleToFit(300f, 300f)
                 document.add(image)
             }
-
+*/
         }
 
-        val outputRoot = commonStep?.getOutputRoot(commonStep?.getResultType(analysis?.result?.type))
-        document.close()
+        document?.close()
 
         return filePath
     }
 
     fun createEcharts(step: AnalysisStep): String? {
+
+        val outputRoot = commonStep?.getOutputRoot(commonStep?.getResultType(step?.analysis?.result?.type))
         return step.resultPath + "/echarts.svg"
     }
 
