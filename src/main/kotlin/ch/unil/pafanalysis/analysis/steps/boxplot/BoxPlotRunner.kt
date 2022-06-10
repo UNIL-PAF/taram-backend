@@ -33,7 +33,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     private val readTableData = ReadTableData()
 
-    override fun createPdf(step: AnalysisStep, document: Document?): Document? {
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, BoxPlotParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
@@ -51,11 +51,11 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         val outputRoot = getOutputRoot(getResultType(step?.analysis?.result?.type))
 
         val svgPath = outputRoot + response.body()
-
-        //val image: Image = SvgConverter.convertToImage(FileInputStream(svgPath), pdf)
+        val image: Image = SvgConverter.convertToImage(FileInputStream(svgPath), pdf)
 
         document?.add(title)
         document?.add(selCol)
+        document?.add(image)
 
         return document
     }

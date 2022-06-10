@@ -38,7 +38,7 @@ class PdfService {
         val document: Document? = Document(pdf)
 
         steps?.fold(document) { acc, el ->
-            commonStep?.getRunner(el.type)?.createPdf(el, acc)
+            commonStep?.getRunner(el.type)?.createPdf(el, acc, pdf)
 
            /* if(step.type == AnalysisStepType.BOXPLOT.value){
                 val image: Image = SvgConverter.convertToImage(FileInputStream("/tmp/bar.svg"), pdf)

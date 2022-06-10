@@ -10,6 +10,7 @@ import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
@@ -31,7 +32,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
     private val gson = Gson()
 
-    override fun createPdf(step: AnalysisStep, document: Document?): Document?{
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?{
         val title = Paragraph().add(Text(step.type).setBold())
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
         val nrResults = Paragraph().add(Text("Number of protein groups: ${initialResult.nrProteinGroups}"))

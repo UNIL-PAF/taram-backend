@@ -13,6 +13,7 @@ import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
+import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
@@ -36,7 +37,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         imputationType = ImputationType.NAN.value
     )
 
-    override fun createPdf(step: AnalysisStep, document: Document?): Document?{
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?{
         val title = Paragraph().add(Text(step.type).setBold())
         val transParams = gson.fromJson(step.parameters, TransformationParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
