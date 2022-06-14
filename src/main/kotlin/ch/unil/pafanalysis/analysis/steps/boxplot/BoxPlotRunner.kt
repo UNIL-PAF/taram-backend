@@ -4,13 +4,14 @@ import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
 import ch.unil.pafanalysis.common.ReadTableData
 import com.google.common.math.Quantiles
 import com.google.gson.Gson
+import com.itextpdf.kernel.geom.Rectangle
 import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.IBlockElement
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
@@ -23,6 +24,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
 import kotlin.math.log2
+
 
 @Service
 class BoxPlotRunner() : CommonStep(), CommonRunner {
@@ -42,7 +44,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
         val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
         val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:3001/svg"))
+            .uri(URI.create("http://localhost:3001/pdf"))
             .timeout(Duration.ofSeconds(5))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
@@ -50,12 +52,23 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         val outputRoot = getOutputRoot(getResultType(step?.analysis?.result?.type))
 
-        val svgPath = outputRoot + response.body()
-        val image: Image = SvgConverter.convertToImage(FileInputStream(svgPath), pdf)
+        val pdfPath = outputRoot + response.body()
+        val sourcePdf = PdfDocument(PdfReader(pdfPath))
+        val pdfPlot = sourcePdf.getPage(1)
+        //val orig: Rectangle = pdfPlot.pageSize
+        val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
+
+        //val properties: ISvgConverterProperties = SvgConverterProperties().setBaseUri(svgPath)
+        //val xObj = SvgConverter.convertToXObject(FileInputStream(svgPath), pdf, props)
+
+        //SvgConverter.drawOnDocument(FileInputStream(svgPath), pdf, 1, properties)
+
+        //val image: Image = SvgConverter.convertToImage(FileInputStream(svgPath), pdf)
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(image)
+        document?.add(Image(pdfPlotCopy))
+        //document?.add(image)
 
         return document
     }
