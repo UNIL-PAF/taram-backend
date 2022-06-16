@@ -129,7 +129,7 @@ class AnalysisStepService {
     }
 
     fun getOutputRoot(resultType: String?): String? {
-        return env?.getProperty(if (resultType == ResultType.MaxQuant.value) "output.path.maxquant" else "output.path.spectronaut")
+        return env?.getProperty("output.path")
     }
 
     fun deleteDirectory(directory: Path?): List<Boolean> {

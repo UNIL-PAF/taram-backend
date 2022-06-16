@@ -112,7 +112,7 @@ open class CommonStep {
     }
 
     fun getOutputRoot(resultType: ResultType?): String? {
-        return env?.getProperty(if (resultType == ResultType.MaxQuant) "output.path.maxquant" else "output.path.spectronaut")
+        return env?.getProperty("output.path")
     }
 
     fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
