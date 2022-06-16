@@ -8,6 +8,7 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.io.File
 
 
 @Service
@@ -22,11 +23,11 @@ class PdfService {
     @Autowired
     private var commonStep: CommonStep? = null
 
-    fun createPdf(analysisId: Int): String {
+    fun createPdf(analysisId: Int): File {
         val analysis = analysisRepo?.findById(analysisId)
         val steps = analysisService?.sortAnalysisSteps(analysis?.analysisSteps)
 
-        val filePath = "/tmp/a.pdf"
+        val filePath = kotlin.io.path.createTempFile(suffix = ".pdf").toFile()
         val pdf = PdfDocument(PdfWriter(filePath))
         val document: Document? = Document(pdf)
 

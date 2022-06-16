@@ -51,7 +51,7 @@ class AnalysisController {
     @GetMapping(path = ["/pdf/{analysisId}"])
     fun createPdf(@PathVariable(value = "analysisId") analysisId: Int): ResponseEntity<ByteArray>? {
         val pdfFile =  pdfService?.createPdf(analysisId)
-        val inputStream: InputStream = FileInputStream(File(pdfFile)) //load the file
+        val inputStream: InputStream = FileInputStream(pdfFile)
         val contents = inputStream.readAllBytes()
 
         val headers = HttpHeaders();
