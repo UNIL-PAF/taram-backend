@@ -158,9 +158,11 @@ open class CommonStep {
         val results = gson.fromJson(step.results, BoxPlot::class.java)
         val echartsPlot = results.plot?.copy(outputPath = step.resultPath)
 
+        val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
+
         val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
         val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:3001/pdf"))
+            .uri(URI.create(echartsServerUrl))
             .timeout(Duration.ofSeconds(5))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
