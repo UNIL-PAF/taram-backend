@@ -3,8 +3,17 @@ package ch.unil.pafanalysis.controllers
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.pdf.PdfService
+import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
+
 
 @CrossOrigin(origins = ["http://localhost:3000"], maxAge = 3600)
 @RestController
@@ -40,8 +49,18 @@ class AnalysisController {
     }
 
     @GetMapping(path = ["/pdf/{analysisId}"])
-    fun createPdf(@PathVariable(value = "analysisId") analysisId: Int): String? {
-        return pdfService?.createPdf(analysisId)
+    fun createPdf(@PathVariable(value = "analysisId") analysisId: Int): ResponseEntity<ByteArray>? {
+        val pdfFile =  pdfService?.createPdf(analysisId)
+        val inputStream: InputStream = FileInputStream(File(pdfFile)) //load the file
+        val contents = inputStream.readAllBytes()
+
+        val headers = HttpHeaders();
+        headers.contentType = MediaType.APPLICATION_PDF;
+        val filename = "output.pdf";
+        headers.setContentDispositionFormData(filename, filename);
+        headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
+        val response = ResponseEntity(contents, headers, HttpStatus.OK);
+        return response;
     }
 
 
