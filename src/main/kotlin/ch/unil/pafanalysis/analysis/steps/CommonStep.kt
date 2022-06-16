@@ -4,16 +4,28 @@ import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
+import com.google.gson.Gson
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Image
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.sql.Timestamp
+import java.time.Duration
 import java.time.LocalDateTime
 
 @Service
@@ -39,6 +51,8 @@ open class CommonStep {
 
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null
+
+    val gson = Gson()
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
 
@@ -137,6 +151,28 @@ open class CommonStep {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
             update(nextStep!!, step)
         }
+    }
+
+    fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument): Image? {
+
+        val results = gson.fromJson(step.results, BoxPlot::class.java)
+        val echartsPlot = results.plot?.copy(outputPath = step.resultPath)
+
+        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:3001/pdf"))
+            .timeout(Duration.ofSeconds(5))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
+            .build();
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        val outputRoot = getOutputRoot(getResultType(step?.analysis?.result?.type))
+
+        val pdfPath: String = outputRoot + response.body()
+        val sourcePdf = PdfDocument(PdfReader(pdfPath))
+        val pdfPlot = sourcePdf.getPage(1)
+        val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
+        return Image(pdfPlotCopy)
     }
 
     fun update(step: AnalysisStep, stepBefore: AnalysisStep) {

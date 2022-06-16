@@ -1,28 +1,19 @@
 package ch.unil.pafanalysis.analysis.steps.boxplot
 
-import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.ReadTableData
 import com.google.common.math.Quantiles
-import com.google.gson.Gson
-import com.itextpdf.kernel.geom.Rectangle
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfReader
-import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
-import com.itextpdf.svg.converter.SvgConverter
 import org.springframework.stereotype.Service
-import java.io.FileInputStream
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.time.Duration
 import kotlin.math.log2
 
 
@@ -31,44 +22,16 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
-    private val gson = Gson()
-
     private val readTableData = ReadTableData()
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, BoxPlotParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
-        val results = gson.fromJson(step.results, BoxPlot::class.java)
-        val echartsPlot = results.plot?.copy(outputPath = step.resultPath)
-
-        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:3001/pdf"))
-            .timeout(Duration.ofSeconds(5))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
-            .build();
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        val outputRoot = getOutputRoot(getResultType(step?.analysis?.result?.type))
-
-        val pdfPath = outputRoot + response.body()
-        val sourcePdf = PdfDocument(PdfReader(pdfPath))
-        val pdfPlot = sourcePdf.getPage(1)
-        //val orig: Rectangle = pdfPlot.pageSize
-        val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
-
-        //val properties: ISvgConverterProperties = SvgConverterProperties().setBaseUri(svgPath)
-        //val xObj = SvgConverter.convertToXObject(FileInputStream(svgPath), pdf, props)
-
-        //SvgConverter.drawOnDocument(FileInputStream(svgPath), pdf, 1, properties)
-
-        //val image: Image = SvgConverter.convertToImage(FileInputStream(svgPath), pdf)
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(Image(pdfPlotCopy))
-        //document?.add(image)
+        document?.add(makeEchartsPlot(step, pdf))
 
         return document
     }

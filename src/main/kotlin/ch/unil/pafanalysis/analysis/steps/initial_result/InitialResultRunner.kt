@@ -30,7 +30,6 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     private var columnInfoService: ColumnInfoService? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
-    private val gson = Gson()
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?{
         val title = Paragraph().add(Text(step.type).setBold())

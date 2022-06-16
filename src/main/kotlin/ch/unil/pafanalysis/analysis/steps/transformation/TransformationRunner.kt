@@ -24,8 +24,6 @@ import kotlin.math.ln
 @Service
 class TransformationRunner() : CommonStep(), CommonRunner {
 
-    private val gson = Gson()
-
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
     private val readTableData = ReadTableData()

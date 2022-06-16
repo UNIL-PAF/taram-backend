@@ -5,8 +5,12 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
+import com.google.gson.Gson
 import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
@@ -14,6 +18,11 @@ import com.itextpdf.svg.converter.SvgConverter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.FileInputStream
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 
 
 @Service
@@ -28,6 +37,7 @@ class PdfService {
     @Autowired
     private var commonStep: CommonStep? = null
 
+    private val gson = Gson()
 
     fun createPdf(analysisId: Int): String {
         val analysis = analysisRepo?.findById(analysisId)
@@ -51,12 +61,6 @@ class PdfService {
         document?.close()
 
         return filePath
-    }
-
-    fun createEcharts(step: AnalysisStep): String? {
-
-        val outputRoot = commonStep?.getOutputRoot(commonStep?.getResultType(step?.analysis?.result?.type))
-        return step.resultPath + "/echarts.svg"
     }
 
 }
