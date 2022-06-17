@@ -70,13 +70,13 @@ class AnalysisStepController {
         analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
         val step: AnalysisStep? = try {
-             when (analysisStep?.type) {
+            when (analysisStep?.type) {
                 INITIAL_RESULT.value -> initialResult?.updateColumnParams(analysisStep, stepParams)
                 BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
                 TRANSFORMATION.value -> transformationRunner?.updateParams(analysisStep, stepParams)
                 else -> throw RuntimeException("Analysis step [" + analysisStep?.type + "] not found.")
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             val errorStep = analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
             analysisStepRepository?.save(errorStep!!)
@@ -85,4 +85,20 @@ class AnalysisStepController {
 
         return step?.status
     }
+
+    @PostMapping(path = ["/comment/{stepId}"])
+    @ResponseBody
+    fun updateComment(
+        @RequestBody comment: String,
+        @PathVariable(value = "stepId") stepId: Int
+    ): Boolean? {
+        return analysisStepService?.updateComment(stepId, comment)
+    }
+
+    @DeleteMapping(path = ["/comment/{stepId}"])
+    @ResponseBody
+    fun deleteComment(@PathVariable(value = "stepId") stepId: Int): Boolean? {
+        return analysisStepService?.updateComment(stepId, null)
+    }
+
 }

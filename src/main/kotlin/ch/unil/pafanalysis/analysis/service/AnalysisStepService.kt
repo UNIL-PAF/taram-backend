@@ -139,4 +139,10 @@ class AnalysisStepService {
             .map { it.delete() }.toList()
     }
 
+    fun updateComment(analysisStepId: Int, comment: String?): Boolean? {
+        val analysisStep = analysisStepRepo?.findById(analysisStepId)
+        val step = analysisStepRepo?.save(analysisStep!!.copy(comments = comment))
+        return step != null
+    }
+
 }
