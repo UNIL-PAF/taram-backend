@@ -37,6 +37,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val nrResults = Paragraph().add(Text("Number of protein groups: ${initialResult.nrProteinGroups}"))
         document?.add(title)
         document?.add(nrResults)
+        if(step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
         return document
     }
 

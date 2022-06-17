@@ -41,6 +41,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
         document?.add(title)
         document?.add(selCol)
+        if(step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
         return document
     }
 
