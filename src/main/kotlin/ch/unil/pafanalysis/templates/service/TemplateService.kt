@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.templates.service
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.templates.model.Template
 import ch.unil.pafanalysis.templates.model.TemplateStep
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,6 +40,17 @@ class TemplateService {
         }
 
         return templateRepo?.findById(template!!.id!!)
+    }
+
+    fun update(id: Int, fieldName: String?, fieldValue: String?): Boolean? {
+        val template = templateRepo?.findById(id)
+        val updatedTemplate = when (fieldName){
+            "name" -> template?.copy(name = fieldValue)
+            "description" -> template?.copy(description = fieldValue)
+            else -> throw Exception("No field [$fieldName] available.")
+        }
+        val res = templateRepo?.save(updatedTemplate!!)
+        return res != null
     }
 
     private fun setNextIds(templateSteps: List<TemplateStep?>?): List<TemplateStep?>? {

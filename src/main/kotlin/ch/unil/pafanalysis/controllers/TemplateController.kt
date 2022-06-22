@@ -25,6 +25,11 @@ class TemplateController {
         return templateService?.create(analysisId = analysisId, name = name)
     }
 
+    @PostMapping(path = ["/update/{templateId}"])
+    fun updateTemplate(@PathVariable(value = "templateId") templateId: Int,  @RequestParam name: String? = null, @RequestParam value: String? = null): Boolean? {
+        return templateService?.update(id = templateId, fieldName = name, fieldValue = value)
+    }
+
     @GetMapping()
     fun getAllTemplates(): List<Template>? {
         return templateRepository?.findAll()?.toList()

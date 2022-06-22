@@ -12,6 +12,7 @@ data class Template (
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,
     val name: String? = null,
+    val description: String? = null,
     val lastModifDate: LocalDateTime? = null,
 
     @OneToMany(mappedBy="template", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
