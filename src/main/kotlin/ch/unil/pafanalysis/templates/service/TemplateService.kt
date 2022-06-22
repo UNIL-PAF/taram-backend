@@ -42,6 +42,12 @@ class TemplateService {
         return templateRepo?.findById(template!!.id!!)
     }
 
+    fun delete(id: Int): Int? {
+        val template = templateRepo?.findById(id)
+        template?.templateSteps?.forEach { templateStepRepo?.deleteById(it.id!!) }
+        return templateRepo?.deleteById(id)
+    }
+
     fun update(id: Int, fieldName: String?, fieldValue: String?): Boolean? {
         val template = templateRepo?.findById(id)
         val updatedTemplate = when (fieldName){

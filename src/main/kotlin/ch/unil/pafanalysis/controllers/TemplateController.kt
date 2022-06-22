@@ -30,6 +30,12 @@ class TemplateController {
         return templateService?.update(id = templateId, fieldName = name, fieldValue = value)
     }
 
+    @DeleteMapping(path = ["/{templateId}"])
+    @ResponseBody
+    fun deleteTemplate(@PathVariable(value = "templateId") templateId: Int): Int? {
+        return templateService?.delete(templateId)
+    }
+
     @GetMapping()
     fun getAllTemplates(): List<Template>? {
         return templateRepository?.findAll()?.toList()
