@@ -26,16 +26,23 @@ class TemplateService {
     private var analysisService: AnalysisService? = null
 
 
-    fun create(analysisId: Int, name: String?): Template? {
+    fun create(analysisId: Int, name: String?, description: String?): Template? {
         val analysis = analysisRepo?.findById(analysisId)
         val origSteps: List<AnalysisStep>? = analysisService?.sortAnalysisSteps(analysis?.analysisSteps)
 
-        val templateName = (name?: analysis?.name)?: "template_" + analysis?.id
-        val template = templateRepo?.save(Template(id=0, name = templateName, lastModifDate = LocalDateTime.now()))
+        val templateName = (name ?: analysis?.name) ?: "template_" + analysis?.id
+        val template = templateRepo?.save(
+            Template(
+                id = 0,
+                name = templateName,
+                lastModifDate = LocalDateTime.now(),
+                description = description
+            )
+        )
 
-        val templateSteps: List<TemplateStep?>? = origSteps?.map{ analysisToTemplateStep(it, template) }
+        val templateSteps: List<TemplateStep?>? = origSteps?.map { analysisToTemplateStep(it, template) }
         val stepsWithNextIds = setNextIds(templateSteps!!)
-        stepsWithNextIds?.forEach{
+        stepsWithNextIds?.forEach {
             templateStepRepo?.save(it!!)!!
         }
 
@@ -50,7 +57,7 @@ class TemplateService {
 
     fun update(id: Int, fieldName: String?, fieldValue: String?): Boolean? {
         val template = templateRepo?.findById(id)
-        val updatedTemplate = when (fieldName){
+        val updatedTemplate = when (fieldName) {
             "name" -> template?.copy(name = fieldValue)
             "description" -> template?.copy(description = fieldValue)
             else -> throw Exception("No field [$fieldName] available.")
@@ -61,10 +68,10 @@ class TemplateService {
 
     private fun setNextIds(templateSteps: List<TemplateStep?>?): List<TemplateStep?>? {
         val nrSteps: Int = templateSteps?.size?.minus(1)!!
-        return templateSteps?.mapIndexed{ i, step ->
-            if(i < nrSteps){
-                step!!.copy(nextId = templateSteps[i+1]!!.id)
-            }else{
+        return templateSteps?.mapIndexed { i, step ->
+            if (i < nrSteps) {
+                step!!.copy(nextId = templateSteps[i + 1]!!.id)
+            } else {
                 step!!
             }
         }

@@ -21,8 +21,8 @@ class TemplateController {
     private var templateRepository: TemplateRepository? = null
 
     @PostMapping(path = ["/from-analysis/{analysisId}"])
-    fun createTemplate(@PathVariable(value = "analysisId") analysisId: Int, @RequestParam name: String? = null): Template? {
-        return templateService?.create(analysisId = analysisId, name = name)
+    fun createTemplate(@PathVariable(value = "analysisId") analysisId: Int, @RequestParam name: String? = null, @RequestParam description: String? = null): Template? {
+        return templateService?.create(analysisId = analysisId, name = name, description = description)
     }
 
     @PostMapping(path = ["/update/{templateId}"])
