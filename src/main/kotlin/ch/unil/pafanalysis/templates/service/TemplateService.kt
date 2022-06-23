@@ -1,8 +1,10 @@
 package ch.unil.pafanalysis.templates.service
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
+import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.templates.model.Template
 import ch.unil.pafanalysis.templates.model.TemplateStep
@@ -25,6 +27,8 @@ class TemplateService {
     @Autowired
     private var analysisService: AnalysisService? = null
 
+    @Autowired
+    private var commonStep: CommonStep? = null
 
     fun create(analysisId: Int, name: String?, description: String?): Template? {
         val analysis = analysisRepo?.findById(analysisId)
@@ -40,7 +44,7 @@ class TemplateService {
             )
         )
 
-        val templateSteps: List<TemplateStep?>? = origSteps?.map { analysisToTemplateStep(it, template) }
+        val templateSteps: List<TemplateStep?>? = origSteps?.drop(1)?.map { analysisToTemplateStep(it, template) }
         val stepsWithNextIds = setNextIds(templateSteps!!)
         stepsWithNextIds?.forEach {
             templateStepRepo?.save(it!!)!!
@@ -64,6 +68,17 @@ class TemplateService {
         }
         val res = templateRepo?.save(updatedTemplate!!)
         return res != null
+    }
+
+    fun runTemplate(templateId: Int, analysisId: Int): Int? {
+        val analysis = analysisRepo?.findById(analysisId)
+        val lastStep: AnalysisStep? =  analysisService?.sortAnalysisSteps(analysis?.analysisSteps)?.last()
+        val template = templateRepo?.findById(templateId)
+
+        template?.templateSteps?.fold(lastStep){al, tl ->
+            commonStep?.addStep(al!!.id!!, AnalysisStepParams(type = tl.type, params = tl.parameters))
+        }
+        return analysis?.id
     }
 
     private fun setNextIds(templateSteps: List<TemplateStep?>?): List<TemplateStep?>? {

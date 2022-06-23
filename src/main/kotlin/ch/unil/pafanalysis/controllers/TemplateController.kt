@@ -21,12 +21,20 @@ class TemplateController {
     private var templateRepository: TemplateRepository? = null
 
     @PostMapping(path = ["/from-analysis/{analysisId}"])
-    fun createTemplate(@PathVariable(value = "analysisId") analysisId: Int, @RequestParam name: String? = null, @RequestParam description: String? = null): Template? {
+    fun createTemplate(
+        @PathVariable(value = "analysisId") analysisId: Int,
+        @RequestParam name: String? = null,
+        @RequestParam description: String? = null
+    ): Template? {
         return templateService?.create(analysisId = analysisId, name = name, description = description)
     }
 
     @PostMapping(path = ["/update/{templateId}"])
-    fun updateTemplate(@PathVariable(value = "templateId") templateId: Int,  @RequestParam name: String? = null, @RequestParam value: String? = null): Boolean? {
+    fun updateTemplate(
+        @PathVariable(value = "templateId") templateId: Int,
+        @RequestParam name: String? = null,
+        @RequestParam value: String? = null
+    ): Boolean? {
         return templateService?.update(id = templateId, fieldName = name, fieldValue = value)
     }
 
@@ -44,6 +52,14 @@ class TemplateController {
     @GetMapping(path = ["/{templateId}"])
     fun getTemplate(@PathVariable(value = "templateId") templateId: Int): Template? {
         return templateRepository?.findById(templateId)
+    }
+
+    @PostMapping(path = ["/run/{templateId}/analysis/{analysisId}"])
+    fun runTemplate(
+        @PathVariable(value = "templateId") templateId: Int,
+        @PathVariable(value = "analysisId") analysisId: Int
+    ): Int? {
+        return templateService?.runTemplate(templateId, analysisId)
     }
 
 }
