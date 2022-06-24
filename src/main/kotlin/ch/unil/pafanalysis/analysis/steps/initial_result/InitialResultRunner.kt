@@ -41,7 +41,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         return document
     }
 
-    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
+    override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         throw Exception("InitialResultRunner does not implement ordinary run function.")
     }
 

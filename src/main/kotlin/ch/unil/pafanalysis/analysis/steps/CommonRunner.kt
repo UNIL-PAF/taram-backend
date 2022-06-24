@@ -5,7 +5,7 @@ import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 
 interface CommonRunner {
-    fun run(oldStepId: Int, step: AnalysisStep? = null): AnalysisStep
+    fun run(oldStepId: Int, step: AnalysisStep? = null, params: String? = null): AnalysisStep
 
     fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {
         throw Exception("'updatePlotOptions' is not implemented for this Runner.")

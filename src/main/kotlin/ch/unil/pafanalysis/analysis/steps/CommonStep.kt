@@ -66,7 +66,8 @@ open class CommonStep {
         type: AnalysisStepType,
         oldStepId: Int? = null,
         modifiesResult: Boolean? = null,
-        step: AnalysisStep? = null
+        step: AnalysisStep? = null,
+        params: String? = null,
     ): AnalysisStep? {
         val oldStep: AnalysisStep? = if (oldStepId != null) {
             analysisStepRepository?.findById(oldStepId)
@@ -75,16 +76,17 @@ open class CommonStep {
         }
 
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
-        setPathes(currentStep?.analysis)
-        val stepPath = setMainPaths(oldStep?.analysis, currentStep)
-        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, step?.resultTablePath)
+        val stepWithParams = if(currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
+        setPathes(stepWithParams?.analysis)
+        val stepPath = setMainPaths(oldStep?.analysis, stepWithParams)
+        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath)
 
         //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
-        return updateEmptyStep(currentStep, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+        return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
     }
 
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
-        return getRunner(stepParams.type)?.run(stepId)
+        return getRunner(stepParams.type)?.run(stepId, params = stepParams.params)
     }
 
     fun getRunner(type: String?): CommonRunner? {

@@ -37,8 +37,8 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         return document
     }
 
-    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
-        val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step)
+    override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
+        val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
         val boxplot = createBoxplotObj(newStep)
         val updatedStep = newStep?.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
         analysisStepRepository?.save(updatedStep!!)

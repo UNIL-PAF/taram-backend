@@ -45,8 +45,8 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         return document
     }
 
-    override fun run(oldStepId: Int, step: AnalysisStep?): AnalysisStep {
-        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step)
+    override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
+        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, params)
 
         val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
         val params: TransformationParams = if (newStep!!.parameters != null) {
