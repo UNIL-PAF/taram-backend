@@ -66,7 +66,7 @@ class AnalysisStepService {
             if(i == 0){
                 val initialStep = initialResultRunner?.run(analysisId = newAnalysis.id, newAnalysis.result)
                 val columnInfo = columnInfoRepository?.save(step.columnInfo!!.copy(id=0))
-                stepBefore = initialStep!!.copy(columnInfo = columnInfo)
+                stepBefore = initialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id)
                 stepBefore
             }else if(copyAllSteps) {
                 stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis)
@@ -97,7 +97,8 @@ class AnalysisStepService {
             analysisStep.copy(
                 id = 0,
                 analysis = newAnalysis,
-                beforeId = stepBefore?.id
+                beforeId = stepBefore?.id,
+                copyFromId = analysisStep.id
                 )
         )
     }

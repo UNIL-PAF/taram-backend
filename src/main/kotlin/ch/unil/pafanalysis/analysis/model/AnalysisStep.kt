@@ -28,6 +28,9 @@ data class AnalysisStep (
     val resultTablePath: String? = null,
     val resultTableHash: Long? = null,
 
+    val copyFromId: Int? = null,
+    val copyDifference: String? = null,
+
     @Type(type="json")
     @Column(columnDefinition="json")
     val commonResult: CommonResult? = null,
