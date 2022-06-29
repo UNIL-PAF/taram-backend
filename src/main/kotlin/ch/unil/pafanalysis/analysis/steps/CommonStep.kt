@@ -14,7 +14,6 @@ import com.google.gson.Gson
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
-import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -77,12 +76,13 @@ open class CommonStep {
 
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
         val stepWithParams = if(currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
-        setPathes(stepWithParams?.analysis)
-        val stepPath = setMainPaths(oldStep?.analysis, stepWithParams)
-        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath)
+        val stepWithHash = stepWithParams?.copy(parametersHash = hashComp.computeStringHash(stepWithParams?.parameters))
+        setPathes(stepWithHash?.analysis)
+        val stepPath = setMainPaths(oldStep?.analysis, stepWithHash)
+        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, stepWithHash?.resultTablePath)
 
         //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
-        return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+        return updateEmptyStep(stepWithHash, stepPath, resultTablePathAndHash, oldStep?.commonResult)
     }
 
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
@@ -206,7 +206,7 @@ open class CommonStep {
         return newStep
     }
 
-    fun computeStepHash(step: AnalysisStep?, stepBefore: AnalysisStep? = null, resultTableHash: Long? = null): Long {
+    fun computeStepHash(step: AnalysisStep?, stepBefore: AnalysisStep? = null, resultTableHash: Long? = null): Long? {
         val paramsHash = (step?.parametersHash ?: 0).toString()
         val columnsMappingHash = step?.columnInfo?.columnMappingHash.toString()
         val resultTableHash = (resultTableHash ?: stepBefore?.resultTableHash).toString()

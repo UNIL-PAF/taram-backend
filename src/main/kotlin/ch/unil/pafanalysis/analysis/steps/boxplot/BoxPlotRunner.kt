@@ -32,7 +32,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         document?.add(title)
         document?.add(selCol)
         document?.add(makeEchartsPlot(step, pdf))
-        if(step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
+        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
 
         return document
     }
@@ -40,7 +40,11 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
         val boxplot = createBoxplotObj(newStep)
-        val updatedStep = newStep?.copy(status = AnalysisStepStatus.DONE.value, results = gson.toJson(boxplot))
+        val updatedStep = newStep?.copy(
+            status = AnalysisStepStatus.DONE.value,
+            results = gson.toJson(boxplot),
+            parametersHash = hashComp.computeStringHash(newStep?.parameters),
+        )
         analysisStepRepository?.save(updatedStep!!)
         return updatedStep!!
     }

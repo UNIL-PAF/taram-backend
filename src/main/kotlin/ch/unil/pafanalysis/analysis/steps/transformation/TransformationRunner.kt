@@ -53,9 +53,12 @@ class TransformationRunner() : CommonStep(), CommonRunner {
             gson.fromJson(newStep!!.parameters, TransformationParams().javaClass)
         } else defaultParams
 
+        val paramsString = gson.toJson(params)
+
         val (resultTableHash, commonResult) = transformTable(newStep, params)
         val stepWithRes = newStep?.copy(
-            parameters = gson.toJson(params),
+            parameters = paramsString,
+            parametersHash = hashComp.computeStringHash(paramsString),
             resultTableHash = resultTableHash,
             results = gson.toJson(defaultResult)
         )

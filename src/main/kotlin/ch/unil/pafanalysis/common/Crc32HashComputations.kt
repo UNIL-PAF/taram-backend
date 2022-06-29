@@ -15,10 +15,14 @@ class Crc32HashComputations {
 
     private val crc: Checksum = CRC32()
 
-    fun computeStringHash(objString: String): Long {
-        val bytes: ByteArray = objString.toByteArray()
-        crc.update(bytes, 0, bytes.size)
-        return crc.value
+    fun computeStringHash(objString: String?): Long? {
+        return if(objString != null){
+            val bytes: ByteArray = objString.toByteArray()
+            crc.update(bytes, 0, bytes.size)
+            crc.value
+        }else{
+            null
+        }
     }
 
     fun getRandomHash(): Long {
