@@ -50,7 +50,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
         val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
         val params: TransformationParams = if (newStep!!.parameters != null) {
-            gson.fromJson(step!!.parameters, TransformationParams().javaClass)
+            gson.fromJson(newStep!!.parameters, TransformationParams().javaClass)
         } else defaultParams
 
         val (resultTableHash, commonResult) = transformTable(newStep, params)
