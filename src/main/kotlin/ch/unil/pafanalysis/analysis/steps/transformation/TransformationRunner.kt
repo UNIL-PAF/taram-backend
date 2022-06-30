@@ -65,10 +65,10 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
         val params = gson.fromJson(step.parameters, TransformationParams::class.java)
-        val origParams = if(origStep?.parameters != null) gson.fromJson(step.parameters, TransformationParams::class.java) else null
+        val origParams = if(origStep?.parameters != null) gson.fromJson(origStep.parameters, TransformationParams::class.java) else null
 
         return "Parameter(s) changed:"
-            .plus(if(params.intCol != origParams?.intCol) " [Column: ${params.intCol}]" else null)
+            .plus(if(params.intCol != origParams?.intCol) " [Column: ${params.intCol}]" else "")
             .plus(if(params.normalizationType != origParams?.normalizationType) " [Normmalization: ${params.normalizationType}]" else "")
             .plus(if(params.transformationType != origParams?.transformationType) " [Transformation: ${params.transformationType}]" else "")
     }
