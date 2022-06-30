@@ -76,13 +76,15 @@ open class CommonStep {
 
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
         val stepWithParams = if(currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
-        val stepWithHash = stepWithParams?.copy(parametersHash = hashComp.computeStringHash(stepWithParams?.parameters))
-        setPathes(stepWithHash?.analysis)
-        val stepPath = setMainPaths(oldStep?.analysis, stepWithHash)
-        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, stepWithHash?.resultTablePath)
+        val paramsHash = hashComp.computeStringHash(stepWithParams?.parameters)
+        val stepWithHash = stepWithParams?.copy(parametersHash = paramsHash)
+        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
+        setPathes(stepWithDiff?.analysis)
+        val stepPath = setMainPaths(oldStep?.analysis, stepWithDiff)
+        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, stepWithDiff?.resultTablePath)
 
         //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
-        return updateEmptyStep(stepWithHash, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+        return updateEmptyStep(stepWithDiff, stepPath, resultTablePathAndHash, oldStep?.commonResult)
     }
 
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
@@ -124,6 +126,15 @@ open class CommonStep {
         val stepPath = "$outputPath/${emptyStep?.id}"
         createResultDir(outputRoot?.plus(stepPath))
         return stepPath
+    }
+
+    fun getCopyDifference(step: AnalysisStep): String? {
+        return if(step.parametersHash != null && step.copyFromId != null){
+            val origStep = analysisStepRepository?.findById(step.copyFromId)
+            if(step.parametersHash != origStep?.parametersHash){
+                getRunner(step.type)?.getCopyDifference(step, origStep)
+            } else null
+        } else null
     }
 
     fun createEmptyAnalysisStep(

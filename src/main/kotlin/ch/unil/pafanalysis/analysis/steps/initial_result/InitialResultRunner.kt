@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
@@ -78,6 +79,10 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         } else {
             throw RuntimeException("Could not create/save initial_result.")
         }
+    }
+
+    override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
+        throw Exception("InitialResultRunner does not implement getCopyDifference function.")
     }
 
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {

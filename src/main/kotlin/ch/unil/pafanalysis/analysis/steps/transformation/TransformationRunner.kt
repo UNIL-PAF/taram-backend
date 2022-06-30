@@ -7,12 +7,10 @@ import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import com.google.common.math.Quantiles
-import com.google.gson.Gson
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -46,16 +44,11 @@ class TransformationRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, params)
-
+        val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
+        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, paramsString)
         val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
-        val params: TransformationParams = if (newStep!!.parameters != null) {
-            gson.fromJson(newStep!!.parameters, TransformationParams().javaClass)
-        } else defaultParams
 
-        val paramsString = gson.toJson(params)
-
-        val (resultTableHash, commonResult) = transformTable(newStep, params)
+        val (resultTableHash, commonResult) = transformTable(newStep, gson.fromJson(paramsString, TransformationParams().javaClass))
         val stepWithRes = newStep?.copy(
             parameters = paramsString,
             parametersHash = hashComp.computeStringHash(paramsString),
@@ -67,8 +60,17 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
         val updatedStep =
             stepWithRes?.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash, commonResult = commonResult)
-        analysisStepRepository?.save(updatedStep!!)
-        return updatedStep
+        return analysisStepRepository?.save(updatedStep!!)!!
+    }
+
+    override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
+        val params = gson.fromJson(step.parameters, TransformationParams::class.java)
+        val origParams = if(origStep?.parameters != null) gson.fromJson(step.parameters, TransformationParams::class.java) else null
+
+        return "Parameter(s) changed:"
+            .plus(if(params.intCol != origParams?.intCol) " [Column: ${params.intCol}]" else null)
+            .plus(if(params.normalizationType != origParams?.normalizationType) " [Normmalization: ${params.normalizationType}]" else "")
+            .plus(if(params.transformationType != origParams?.transformationType) " [Transformation: ${params.transformationType}]" else "")
     }
 
     private fun transformTable(

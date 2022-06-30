@@ -40,10 +40,10 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
         val boxplot = createBoxplotObj(newStep)
+
         val updatedStep = newStep?.copy(
             status = AnalysisStepStatus.DONE.value,
             results = gson.toJson(boxplot),
-            parametersHash = hashComp.computeStringHash(newStep?.parameters),
         )
         analysisStepRepository?.save(updatedStep!!)
         return updatedStep!!
@@ -54,6 +54,15 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         val newStep = step.copy(results = gson.toJson(newResults))
         analysisStepRepository?.save(newStep)
         return echartsPlot.echartsHash.toString()
+    }
+
+    override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
+        val params = gson.fromJson(step.parameters, BoxPlotParams().javaClass)
+        val origParams = if(origStep?.parameters != null) gson.fromJson(origStep?.parameters, BoxPlotParams().javaClass) else null
+
+        return "Parameter(s) changed:"
+            .plus(if(params.column != origParams?.column) " [Column: ${params.column}]" else "")
+            .plus(if(params.logScale != origParams?.logScale) " [Log scale: ${params.logScale}]" else "")
     }
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {

@@ -12,4 +12,6 @@ interface CommonRunner {
     }
 
     fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?
+
+    fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String?
 }
