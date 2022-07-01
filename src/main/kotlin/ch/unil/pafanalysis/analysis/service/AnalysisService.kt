@@ -95,7 +95,7 @@ class AnalysisService {
             a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
         }
 
-        val analysisStatus: String? = getAnalysisStatus(sortedList)
+        val analysisStatus: String = getAnalysisStatus(sortedList)
 
         return Pair(sortedList, analysisStatus)
     }
@@ -112,14 +112,14 @@ class AnalysisService {
         return newAnalysis!!
     }
 
-    private fun getAnalysisStatus(analysis: List<Analysis>?): String? {
+    private fun getAnalysisStatus(analysis: List<Analysis>?): String {
         val emptyString: String? = null
         return analysis?.fold(emptyString) { acc, a ->
             val newStat = a.analysisSteps?.fold(emptyString) { accS, s ->
                 chooseAnalysisStatus(accS, s.status)
             }
             chooseAnalysisStatus(acc, newStat)
-        }
+        } ?: AnalysisStepStatus.IDLE.value
     }
 
     private fun chooseAnalysisStatus(currStat: String?, newStat: String?): String? {
