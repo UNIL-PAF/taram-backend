@@ -102,7 +102,10 @@ class AnalysisService {
 
     fun duplicateAnalysis(analysisId: Int, copyAllSteps: Boolean): Analysis {
         val analysis = analysisRepo?.findById(analysisId)
-        val newAnalysis = analysisRepo?.save(analysis!!.copy(id = 0, idx = analysis?.idx?.plus(1)))
+        val allAnalysisIdx: List<Int?>? = analysisRepo?.findByResultId(analysis!!.result!!.id!!)?.map{ it.idx }
+        val maxIdx = allAnalysisIdx?.maxOfOrNull { it ?: 0 } ?: 0
+
+        val newAnalysis = analysisRepo?.save(analysis!!.copy(id = 0, idx = maxIdx.plus(1)))
         val sortedSteps = newAnalysis!!.analysisSteps!!
 
         analysisStepService?.duplicateAnalysisSteps(sortedSteps, newAnalysis, copyAllSteps)
