@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControlRunner
 import ch.unil.pafanalysis.results.model.Result
@@ -46,7 +43,7 @@ class AnalysisService {
     fun delete(analysisId: Int): Int? {
         val analysis = analysisRepo?.findById(analysisId)
         val steps: List<AnalysisStep>? = sortAnalysisSteps(analysis?.analysisSteps)?.asReversed()
-        steps?.map{ analysisStepService?.deleteStep(it.id!!) }
+        steps?.map { analysisStepService?.deleteStep(it.id!!) }
         return analysisRepo?.deleteById(analysisId)
     }
 
@@ -83,21 +80,24 @@ class AnalysisService {
             emergencyBreak--
         }
 
-        if(emergencyBreak == 0){
+        if (emergencyBreak == 0) {
             throw RuntimeException("Could not sort the analysis steps (or you have over 10000 steps).")
         }
 
         return sortedList
     }
 
-    fun getSortedAnalysisList(resultId: Int): List<Analysis>? {
+    fun getSortedAnalysisList(resultId: Int): Pair<List<Analysis>?, String?> {
         // sort the analysis steps
         val analysisList: List<Analysis>? = getByResultId(resultId)
 
         val sortedList = analysisList?.map { a ->
             a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
         }
-        return sortedList
+
+        val analysisStatus: String? = getAnalysisStatus(sortedList)
+
+        return Pair(sortedList, analysisStatus)
     }
 
     fun duplicateAnalysis(analysisId: Int, copyAllSteps: Boolean): Analysis {
@@ -107,6 +107,30 @@ class AnalysisService {
 
         analysisStepService?.duplicateAnalysisSteps(sortedSteps, newAnalysis, copyAllSteps)
         return newAnalysis!!
+    }
+
+    private fun getAnalysisStatus(analysis: List<Analysis>?): String? {
+        val emptyString: String? = null
+        return analysis?.fold(emptyString) { acc, a ->
+            val newStat = a.analysisSteps?.fold(emptyString) { accS, s ->
+                chooseAnalysisStatus(accS, s.status)
+            }
+            chooseAnalysisStatus(acc, newStat)
+        }
+    }
+
+    private fun chooseAnalysisStatus(currStat: String?, newStat: String?): String? {
+        val statOrder = listOf(
+            AnalysisStepStatus.RUNNING.value,
+            AnalysisStepStatus.IDLE.value,
+            AnalysisStepStatus.ERROR.value,
+            AnalysisStepStatus.DONE.value
+        )
+        val currIdx = statOrder.indexOf(currStat)
+        val newIdx = statOrder.indexOf(newStat)
+
+        val idx = if (currStat == null || newIdx < currIdx) newIdx else currIdx
+        return if(idx < 0) null else statOrder[idx]
     }
 
 }

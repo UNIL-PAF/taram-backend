@@ -29,7 +29,7 @@ class AnalysisController {
 
 
     @GetMapping
-    fun getAnalysis(@RequestParam resultId: Int): List<Analysis>? {
+    fun getAnalysis(@RequestParam resultId: Int): Pair<List<Analysis>?, String?>? {
         return analysisService?.getSortedAnalysisList(resultId)
     }
 
