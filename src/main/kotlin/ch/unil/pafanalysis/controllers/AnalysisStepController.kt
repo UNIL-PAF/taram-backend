@@ -69,7 +69,7 @@ class AnalysisStepController {
 
         analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
-        val step: AnalysisStep? = try {
+        try {
             when (analysisStep?.type) {
                 INITIAL_RESULT.value -> initialResult?.updateColumnParams(analysisStep, stepParams)
                 BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
@@ -83,7 +83,7 @@ class AnalysisStepController {
             errorStep
         }
 
-        return step?.status
+        return analysisStep?.status
     }
 
     @PostMapping(path = ["/comment/{stepId}"])

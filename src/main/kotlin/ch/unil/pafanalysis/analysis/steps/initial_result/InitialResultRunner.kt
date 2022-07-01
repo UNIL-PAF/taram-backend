@@ -23,6 +23,7 @@ import java.io.FileReader
 import java.lang.reflect.Type
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import kotlin.concurrent.thread
 
 @Service
 class InitialResultRunner() : CommonStep(), CommonRunner {
@@ -86,22 +87,24 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
-        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
+        val runningStep = analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
-        val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
-        val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
-        val newColumnMapping: ColumnMapping? =
-            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+        thread(start = true, isDaemon = true) {
+            val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
+            val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
+            val newColumnMapping: ColumnMapping? =
+                analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
 
-        val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
-        val newColumnInfo: ColumnInfo? =
-            analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
-        columnInfoRepository?.save(newColumnInfo!!)
-        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
+            val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
+            val newColumnInfo: ColumnInfo? =
+                analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
+            columnInfoRepository?.save(newColumnInfo!!)
+            analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
 
-        updateNextStep(analysisStep)
+            updateNextStep(analysisStep)
+        }
 
-        return analysisStep
+        return runningStep!!
     }
 
     private fun createEmptyInitialResult(analysis: Analysis?): AnalysisStep? {

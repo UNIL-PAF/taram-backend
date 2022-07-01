@@ -17,6 +17,7 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
 import java.io.File
+import kotlin.concurrent.thread
 import kotlin.math.ln
 
 @Service
@@ -33,22 +34,26 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         imputationType = ImputationType.NAN.value
     )
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?{
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val transParams = gson.fromJson(step.parameters, TransformationParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
         document?.add(title)
         document?.add(selCol)
-        if(step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
+        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
         return document
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
         val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, paramsString)
+
         val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
 
-        val (resultTableHash, commonResult) = transformTable(newStep, gson.fromJson(paramsString, TransformationParams().javaClass))
+        val (resultTableHash, commonResult) = transformTable(
+            newStep,
+            gson.fromJson(paramsString, TransformationParams().javaClass)
+        )
         val stepWithRes = newStep?.copy(
             parameters = paramsString,
             parametersHash = hashComp.computeStringHash(paramsString),
@@ -59,18 +64,28 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         val newHash = computeStepHash(stepWithRes, oldStep)
 
         val updatedStep =
-            stepWithRes?.copy(status = AnalysisStepStatus.DONE.value, stepHash = newHash, commonResult = commonResult)
-        return analysisStepRepository?.save(updatedStep!!)!!
+            stepWithRes?.copy(
+                status = AnalysisStepStatus.DONE.value,
+                stepHash = newHash,
+                commonResult = commonResult
+            )
+        analysisStepRepository?.save(updatedStep!!)!!
+        updateNextStep(updatedStep!!)
+
+        return updatedStep!!
     }
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
         val params = gson.fromJson(step.parameters, TransformationParams::class.java)
-        val origParams = if(origStep?.parameters != null) gson.fromJson(origStep.parameters, TransformationParams::class.java) else null
+        val origParams = if (origStep?.parameters != null) gson.fromJson(
+            origStep.parameters,
+            TransformationParams::class.java
+        ) else null
 
         return "Parameter(s) changed:"
-            .plus(if(params.intCol != origParams?.intCol) " [Column: ${params.intCol}]" else "")
-            .plus(if(params.normalizationType != origParams?.normalizationType) " [Normmalization: ${params.normalizationType}]" else "")
-            .plus(if(params.transformationType != origParams?.transformationType) " [Transformation: ${params.transformationType}]" else "")
+            .plus(if (params.intCol != origParams?.intCol) " [Column: ${params.intCol}]" else "")
+            .plus(if (params.normalizationType != origParams?.normalizationType) " [Normalization: ${params.normalizationType}]" else "")
+            .plus(if (params.transformationType != origParams?.transformationType) " [Transformation: ${params.transformationType}]" else "")
     }
 
     private fun transformTable(
@@ -142,7 +157,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
             }
         }
         return ints.map { (name, orig: List<Double>) ->
-            val noNaNs = orig.filter { ! it.isNaN() }
+            val noNaNs = orig.filter { !it.isNaN() }
             Pair(name, orig.map { it - subtract(noNaNs) })
         }
     }

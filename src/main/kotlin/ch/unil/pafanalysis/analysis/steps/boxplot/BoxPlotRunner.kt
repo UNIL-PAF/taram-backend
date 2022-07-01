@@ -14,6 +14,7 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
+import kotlin.concurrent.thread
 import kotlin.math.log2
 
 
@@ -39,6 +40,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
+
         val boxplot = createBoxplotObj(newStep)
 
         val updatedStep = newStep?.copy(
@@ -46,7 +48,9 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
             results = gson.toJson(boxplot),
         )
         analysisStepRepository?.save(updatedStep!!)
-        return updatedStep!!
+        updateNextStep(updatedStep!!)
+
+        return updatedStep
     }
 
     override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {
@@ -58,11 +62,12 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
         val params = gson.fromJson(step.parameters, BoxPlotParams().javaClass)
-        val origParams = if(origStep?.parameters != null) gson.fromJson(origStep?.parameters, BoxPlotParams().javaClass) else null
+        val origParams =
+            if (origStep?.parameters != null) gson.fromJson(origStep?.parameters, BoxPlotParams().javaClass) else null
 
         return "Parameter(s) changed:"
-            .plus(if(params.column != origParams?.column) " [Column: ${params.column}]" else "")
-            .plus(if(params.logScale != origParams?.logScale) " [Log scale: ${params.logScale}]" else "")
+            .plus(if (params.column != origParams?.column) " [Column: ${params.column}]" else "")
+            .plus(if (params.logScale != origParams?.logScale) " [Log scale: ${params.logScale}]" else "")
     }
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {

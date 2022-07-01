@@ -76,13 +76,15 @@ open class CommonStep {
         }
 
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
-        val stepWithParams = if(currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
+        val stepWithParams =
+            if (currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
         val paramsHash = hashComp.computeStringHash(stepWithParams?.parameters)
         val stepWithHash = stepWithParams?.copy(parametersHash = paramsHash)
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
         setPathes(stepWithDiff?.analysis)
         val stepPath = setMainPaths(oldStep?.analysis, stepWithDiff)
-        val resultTablePathAndHash = getResultTablePath(modifiesResult, oldStep, stepPath, stepWithDiff?.resultTablePath)
+        val resultTablePathAndHash =
+            getResultTablePath(modifiesResult, oldStep, stepPath, stepWithDiff?.resultTablePath)
 
         //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
         return updateEmptyStep(stepWithDiff, stepPath, resultTablePathAndHash, oldStep?.commonResult)
@@ -93,7 +95,7 @@ open class CommonStep {
     }
 
     fun getRunner(type: String?): CommonRunner? {
-        return when (type){
+        return when (type) {
             AnalysisStepType.INITIAL_RESULT.value -> initialResultRunner
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner
             AnalysisStepType.TRANSFORMATION.value -> transformationRunner
@@ -130,9 +132,9 @@ open class CommonStep {
     }
 
     fun getCopyDifference(step: AnalysisStep): String? {
-        return if(step.parametersHash != null && step.copyFromId != null){
+        return if (step.parametersHash != null && step.copyFromId != null) {
             val origStep = analysisStepRepository?.findById(step.copyFromId)
-            if(step.parametersHash != origStep?.parametersHash){
+            if (step.parametersHash != origStep?.parametersHash) {
                 getRunner(step.type)?.getCopyDifference(step, origStep)
             } else null
         } else null
@@ -155,7 +157,7 @@ open class CommonStep {
             modifiesResult = modifiesResult
         )
         val insertedStep = analysisStepRepository?.save(newStep)
-        if(oldStep?.nextId != null) setNextStepBeforeId(oldStep?.nextId, insertedStep?.id)
+        if (oldStep?.nextId != null) setNextStepBeforeId(oldStep?.nextId, insertedStep?.id)
         updateOldStep(oldStep, insertedStep?.id)
         return insertedStep
     }
@@ -197,27 +199,33 @@ open class CommonStep {
         val newHash = computeStepHash(step, stepBefore)
 
         if (newHash != step.stepHash) {
-            try {
-                getRunner(step.type)?.run(stepBefore.id!!, step)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                step?.copy(
-                    status = AnalysisStepStatus.ERROR.value,
-                    error = e.message,
-                    stepHash = Crc32HashComputations().getRandomHash()
-                )
+            analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.RUNNING.value))
+            thread(start = true, isDaemon = true) {
+                try {
+                    getRunner(step.type)?.run(stepBefore.id!!, step)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    step?.copy(
+                        status = AnalysisStepStatus.ERROR.value,
+                        error = e.message,
+                        stepHash = Crc32HashComputations().getRandomHash()
+                    )
+                }
             }
         } else {
             analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.DONE.value))
         }
-
-        updateNextStep(step)
     }
 
-    fun updateParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
-        val newStep = getRunner(analysisStep.type)?.run(analysisStep.beforeId!!, analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params)))!!
-        updateNextStep(newStep)
-        return newStep
+    fun updateParams(analysisStep: AnalysisStep, params: String) {
+        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
+
+        thread(start = true, isDaemon = true) {
+            getRunner(analysisStep.type)?.run(
+                analysisStep.beforeId!!,
+                analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params))
+            )
+        }
     }
 
     fun computeStepHash(step: AnalysisStep?, stepBefore: AnalysisStep? = null, resultTableHash: Long? = null): Long? {
@@ -275,7 +283,7 @@ open class CommonStep {
             File(oldTab).copyTo(newFile)
 
             // remove old if exists
-            if(oldTablePath != null) File(outputRoot?.plus("/")?.plus(oldTablePath)).delete()
+            if (oldTablePath != null) File(outputRoot?.plus("/")?.plus(oldTablePath)).delete()
 
             Pair(newTab, Crc32HashComputations().computeFileHash(newFile))
         } else {
