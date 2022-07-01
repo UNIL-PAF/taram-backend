@@ -29,7 +29,7 @@ class AnalysisService {
             idx = 0,
             result = result,
             lastModifDate = LocalDateTime.now(),
-            status = AnalysisStatus.CREATED.value
+            status = AnalysisStepStatus.IDLE.value
         )
         val analysis: Analysis? = analysisRepo?.save(newAnalysis)
 
@@ -86,7 +86,7 @@ class AnalysisService {
         return sortedList
     }
 
-    fun getSortedAnalysisList(resultId: Int): Pair<List<Analysis>?, String?> {
+    fun getSortedAnalysisList(resultId: Int): Pair<List<Analysis>?, String?>? {
         // sort the analysis steps
         val analysisList: List<Analysis>? = getByResultId(resultId)
 
@@ -94,9 +94,7 @@ class AnalysisService {
             a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
         }
 
-        val analysisStatus: String = getAnalysisStatus(sortedList)
-
-        return Pair(sortedList, analysisStatus)
+        return getAnalysisWithStatus(sortedList)
     }
 
     fun duplicateAnalysis(analysisId: Int, copyAllSteps: Boolean): Analysis {
@@ -111,23 +109,35 @@ class AnalysisService {
         return newAnalysis!!
     }
 
-    private fun getAnalysisStatus(analysis: List<Analysis>?): String {
+    private fun getAnalysisWithStatus(analysis: List<Analysis>?): Pair<List<Analysis>?, String?>? {
         val emptyString: String? = null
-        return analysis?.fold(emptyString) { acc, a ->
-            val newStat = a.analysisSteps?.fold(emptyString) { accS, s ->
-                chooseAnalysisStatus(accS, s.status)
-            }
-            chooseAnalysisStatus(acc, newStat)
+        val analysisWithStatus =  analysis?.map {
+            it.copy(status = it.analysisSteps?.fold(emptyString) { accS, s ->
+                chooseAnalysisStatus(accS, s.status, analysisStatusOrder)
+            })
+        }
+        val globalStatus = analysisWithStatus?.fold(emptyString) { acc, a ->
+            chooseAnalysisStatus(acc, a.status, globalAnalysisStatusOrder)
         } ?: AnalysisStepStatus.IDLE.value
+
+        return Pair(analysisWithStatus, globalStatus)
     }
 
-    private fun chooseAnalysisStatus(currStat: String?, newStat: String?): String? {
-        val statOrder = listOf(
-            AnalysisStepStatus.RUNNING.value,
-            AnalysisStepStatus.IDLE.value,
-            AnalysisStepStatus.ERROR.value,
-            AnalysisStepStatus.DONE.value
-        )
+    private val analysisStatusOrder = listOf(
+        AnalysisStepStatus.RUNNING.value,
+        AnalysisStepStatus.ERROR.value,
+        AnalysisStepStatus.IDLE.value,
+        AnalysisStepStatus.DONE.value
+    )
+
+    private val globalAnalysisStatusOrder = listOf(
+        AnalysisStepStatus.RUNNING.value,
+        AnalysisStepStatus.IDLE.value,
+        AnalysisStepStatus.ERROR.value,
+        AnalysisStepStatus.DONE.value
+    )
+
+    private fun chooseAnalysisStatus(currStat: String?, newStat: String?, statOrder: List<String>): String? {
         val currIdx = statOrder.indexOf(currStat)
         val newIdx = statOrder.indexOf(newStat)
 
