@@ -2,7 +2,6 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
-import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControlRunner
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired

@@ -26,6 +26,7 @@ import java.net.http.HttpResponse
 import java.sql.Timestamp
 import java.time.Duration
 import java.time.LocalDateTime
+import kotlin.concurrent.thread
 
 @Service
 open class CommonStep {
@@ -162,7 +163,9 @@ open class CommonStep {
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
-            update(nextStep!!, step)
+            thread(start = true, isDaemon = true) {
+                update(nextStep!!, step)
+            }
         }
     }
 
