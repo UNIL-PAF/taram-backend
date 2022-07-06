@@ -47,7 +47,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
             status = AnalysisStepStatus.DONE.value,
             results = gson.toJson(boxplot),
         )
-        analysisStepRepository?.save(updatedStep!!)
+        analysisStepRepository?.saveAndFlush(updatedStep!!)
         updateNextStep(updatedStep!!)
 
         return updatedStep
@@ -56,7 +56,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {
         val newResults = gson.fromJson(step.results, BoxPlot().javaClass).copy(plot = echartsPlot)
         val newStep = step.copy(results = gson.toJson(newResults))
-        analysisStepRepository?.save(newStep)
+        analysisStepRepository?.saveAndFlush(newStep)
         return echartsPlot.echartsHash.toString()
     }
 

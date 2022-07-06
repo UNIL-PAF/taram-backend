@@ -2,14 +2,10 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
-import ch.unil.pafanalysis.results.model.ResultType
-import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -60,67 +56,74 @@ class AnalysisStepService {
     ): List<AnalysisStep>? {
         var stepBefore: AnalysisStep? = null
 
-        val fltSteps = sortedSteps.filterIndexed{ i: Int, step: AnalysisStep -> i ==0 || copyAllSteps }
+        val fltSteps = sortedSteps.filterIndexed { i: Int, step: AnalysisStep -> i == 0 || copyAllSteps }
 
         val copiedSteps = fltSteps.mapIndexed { i: Int, step: AnalysisStep ->
-            if(i == 0){
+            if (i == 0) {
                 val initialStep = initialResultRunner?.run(analysisId = newAnalysis.id, newAnalysis.result)
-                val columnInfo = columnInfoRepository?.save(step.columnInfo!!.copy(id=0))
+                val columnInfo = columnInfoRepository?.saveAndFlush(step.columnInfo!!.copy(id = 0))
                 stepBefore = initialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id)
                 stepBefore
-            }else if(copyAllSteps) {
+            } else if (copyAllSteps) {
                 stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis)
                 stepBefore
-            }else { null }
+            } else {
+                null
+            }
         }
 
         val analysisSteps = setCorrectNextIds(copiedSteps)
-        if(analysisSteps != null && analysisSteps.size > 1) {
+        if (analysisSteps != null && analysisSteps.size > 1) {
             commonStep?.updateNextStep(analysisSteps[0]!!)
         }
         return analysisSteps
     }
 
-    fun setCorrectNextIds(copiedSteps:List<AnalysisStep?>): List<AnalysisStep> {
+    fun setCorrectNextIds(copiedSteps: List<AnalysisStep?>): List<AnalysisStep> {
         val nrSteps = copiedSteps.size - 1
-        return copiedSteps.mapIndexed{ i, step ->
-            if(i < nrSteps){
-                analysisStepRepo?.save(step!!.copy(nextId = copiedSteps[i+1]!!.id))!!
-            }else{
+        return copiedSteps.mapIndexed { i, step ->
+            if (i < nrSteps) {
+                analysisStepRepo?.saveAndFlush(step!!.copy(nextId = copiedSteps[i + 1]!!.id))!!
+            } else {
                 step!!
             }
         }
     }
 
     fun copyAnalysisStep(analysisStep: AnalysisStep, stepBefore: AnalysisStep?, newAnalysis: Analysis): AnalysisStep? {
-        return analysisStepRepo?.save(
+        return analysisStepRepo?.saveAndFlush(
             analysisStep.copy(
                 id = 0,
                 analysis = newAnalysis,
                 beforeId = stepBefore?.id,
-                copyFromId = analysisStep.id
-                )
+                copyFromId = analysisStep.id,
+                status = AnalysisStepStatus.IDLE.value
+            )
         )
     }
 
-    fun deleteStep(stepId: Int): Int? {
+    fun deleteStep(stepId: Int, relinkRemaining: Boolean? = true): Int? {
         val step: AnalysisStep = analysisStepRepo?.findById(stepId)!!
-        val before: AnalysisStep? = if(step.beforeId != null) analysisStepRepo?.findById(step.beforeId) else null
-        val after: AnalysisStep? = if(step.nextId != null) analysisStepRepo?.findById(step.nextId) else null
+        var after: AnalysisStep? = null
 
-        if(before != null){
-            if(after != null){
-                analysisStepRepo?.save(after.copy(beforeId = before?.id))
-                analysisStepRepo?.save(before.copy(nextId = after.id))
-            }else{
-                analysisStepRepo?.save(before.copy(nextId = null))
+        if (relinkRemaining == true) {
+            val before: AnalysisStep? = if (step.beforeId != null) analysisStepRepo?.findById(step.beforeId) else null
+            val after: AnalysisStep? = if (step.nextId != null) analysisStepRepo?.findById(step.nextId) else null
+
+            if (before != null) {
+                if (after != null) {
+                    analysisStepRepo?.saveAndFlush(after.copy(beforeId = before?.id))
+                    analysisStepRepo?.saveAndFlush(before.copy(nextId = after.id))
+                } else {
+                    analysisStepRepo?.saveAndFlush(before.copy(nextId = null))
+                }
             }
         }
 
         deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
         val res: Int? = analysisStepRepo?.deleteById(stepId)
 
-        if(after != null){
+        if (relinkRemaining == true && after !== null) {
             commonStep?.runStep(after)
             commonStep?.updateNextStep(after)
         }
@@ -141,7 +144,7 @@ class AnalysisStepService {
 
     fun updateComment(analysisStepId: Int, comment: String?): Boolean? {
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
-        val step = analysisStepRepo?.save(analysisStep!!.copy(comments = comment))
+        val step = analysisStepRepo?.saveAndFlush(analysisStep!!.copy(comments = comment))
         return step != null
     }
 

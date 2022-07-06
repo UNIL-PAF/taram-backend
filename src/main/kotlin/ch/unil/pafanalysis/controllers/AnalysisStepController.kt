@@ -79,7 +79,7 @@ class AnalysisStepController {
         } catch (e: Exception) {
             e.printStackTrace()
             val errorStep = analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
-            analysisStepRepository?.save(errorStep!!)
+            analysisStepRepository?.saveAndFlush(errorStep!!)
             errorStep
         }
 

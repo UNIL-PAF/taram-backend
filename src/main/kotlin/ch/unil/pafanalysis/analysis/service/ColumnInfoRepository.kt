@@ -1,8 +1,8 @@
 package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface ColumnInfoRepository: CrudRepository<ColumnInfo, Integer> {
+interface ColumnInfoRepository: JpaRepository<ColumnInfo, Integer> {
 
 }

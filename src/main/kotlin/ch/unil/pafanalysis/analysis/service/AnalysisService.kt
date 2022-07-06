@@ -1,6 +1,9 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.model.Analysis
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.service.ResultRepository
@@ -24,14 +27,13 @@ class AnalysisService {
     private var analysisStepService: AnalysisStepService? = null
 
     private fun createNewAnalysis(result: Result?): List<Analysis>? {
-
         val newAnalysis = Analysis(
             idx = 0,
             result = result,
             lastModifDate = LocalDateTime.now(),
             status = AnalysisStepStatus.IDLE.value
         )
-        val analysis: Analysis? = analysisRepo?.save(newAnalysis)
+        val analysis: Analysis? = analysisRepo?.saveAndFlush(newAnalysis)
 
         initialResult?.run(analysis?.id, result)
 
@@ -42,14 +44,14 @@ class AnalysisService {
     fun delete(analysisId: Int): Int? {
         val analysis = analysisRepo?.findById(analysisId)
         val steps: List<AnalysisStep>? = sortAnalysisSteps(analysis?.analysisSteps)?.asReversed()
-        steps?.map { analysisStepService?.deleteStep(it.id!!) }
+        steps?.map { analysisStepService?.deleteStep(it.id!!, relinkRemaining = false) }
         return analysisRepo?.deleteById(analysisId)
     }
 
     fun getByResultId(resultId: Int): List<Analysis>? {
         // check first if this result really exists
         val result = resultRepo?.findById(resultId)
-            ?: throw RuntimeException("There is no result for resultId [" + resultId + "]")
+            ?: throw RuntimeException("There is no result for resultId [$resultId]")
 
         val analysisInDb: List<Analysis>? = analysisRepo?.findByResultId(resultId)?.toList()
 
@@ -99,19 +101,20 @@ class AnalysisService {
 
     fun duplicateAnalysis(analysisId: Int, copyAllSteps: Boolean): Analysis {
         val analysis = analysisRepo?.findById(analysisId)
-        val allAnalysisIdx: List<Int?>? = analysisRepo?.findByResultId(analysis!!.result!!.id!!)?.map{ it.idx }
+        val allAnalysisIdx: List<Int?>? = analysisRepo?.findByResultId(analysis!!.result!!.id!!)?.map { it.idx }
         val maxIdx = allAnalysisIdx?.maxOfOrNull { it ?: 0 } ?: 0
 
-        val newAnalysis = analysisRepo?.save(analysis!!.copy(id = 0, idx = maxIdx.plus(1)))
-        val sortedSteps = newAnalysis!!.analysisSteps!!
+        val newAnalysis = analysisRepo?.saveAndFlush(analysis!!.copy(id = 0, idx = maxIdx.plus(1)))
 
-        analysisStepService?.duplicateAnalysisSteps(sortedSteps, newAnalysis, copyAllSteps)
+        val sortedSteps = analysis!!.analysisSteps!!
+
+        analysisStepService?.duplicateAnalysisSteps(sortedSteps, newAnalysis!!, copyAllSteps)
         return newAnalysis!!
     }
 
     private fun getAnalysisWithStatus(analysis: List<Analysis>?): Pair<List<Analysis>?, String?>? {
         val emptyString: String? = null
-        val analysisWithStatus =  analysis?.map {
+        val analysisWithStatus = analysis?.map {
             it.copy(status = it.analysisSteps?.fold(emptyString) { accS, s ->
                 chooseAnalysisStatus(accS, s.status, analysisStatusOrder)
             })
@@ -142,7 +145,7 @@ class AnalysisService {
         val newIdx = statOrder.indexOf(newStat)
 
         val idx = if (currStat == null || newIdx < currIdx) newIdx else currIdx
-        return if(idx < 0) null else statOrder[idx]
+        return if (idx < 0) null else statOrder[idx]
     }
 
 }

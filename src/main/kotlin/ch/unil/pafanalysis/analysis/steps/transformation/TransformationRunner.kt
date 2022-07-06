@@ -17,7 +17,6 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
 import java.io.File
-import kotlin.concurrent.thread
 import kotlin.math.ln
 
 @Service
@@ -69,7 +68,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
                 stepHash = newHash,
                 commonResult = commonResult
             )
-        analysisStepRepository?.save(updatedStep!!)!!
+        analysisStepRepository?.saveAndFlush(updatedStep!!)!!
         updateNextStep(updatedStep!!)
 
         return updatedStep!!

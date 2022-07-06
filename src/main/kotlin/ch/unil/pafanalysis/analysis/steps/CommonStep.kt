@@ -156,7 +156,7 @@ open class CommonStep {
             columnInfo = oldStep?.columnInfo,
             modifiesResult = modifiesResult
         )
-        val insertedStep = analysisStepRepository?.save(newStep)
+        val insertedStep = analysisStepRepository?.saveAndFlush(newStep)
         if (oldStep?.nextId != null) setNextStepBeforeId(oldStep?.nextId, insertedStep?.id)
         updateOldStep(oldStep, insertedStep?.id)
         return insertedStep
@@ -165,9 +165,9 @@ open class CommonStep {
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
-            thread(start = true, isDaemon = true) {
-                update(nextStep!!, step)
-            }
+            //thread(start = true, isDaemon = true) {
+            update(nextStep!!, step)
+            //}
         }
     }
 
@@ -199,36 +199,55 @@ open class CommonStep {
         val newHash = computeStepHash(step, stepBefore)
 
         if (newHash != step.stepHash) {
-            analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.RUNNING.value))
+            val runningStep = analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.RUNNING.value))
             thread(start = true, isDaemon = true) {
                 try {
-                    getRunner(step.type)?.run(stepBefore.id!!, step)
+                    getRunner(runningStep!!.type)?.run(stepBefore.id!!, runningStep)
                 } catch (e: Exception) {
+                    println("Error in update ${runningStep?.id}")
                     e.printStackTrace()
-                    step?.copy(
-                        status = AnalysisStepStatus.ERROR.value,
-                        error = e.message,
-                        stepHash = Crc32HashComputations().getRandomHash()
+                    analysisStepRepository?.saveAndFlush(
+                        runningStep!!.copy(
+                            status = AnalysisStepStatus.ERROR.value,
+                            error = e.message,
+                            stepHash = Crc32HashComputations().getRandomHash()
+                        )
                     )
                 }
             }
         } else {
-            analysisStepRepository?.save(step.copy(status = AnalysisStepStatus.DONE.value))
+            analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.DONE.value))
         }
     }
 
     fun updateParams(analysisStep: AnalysisStep, params: String) {
-        analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
+        analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
         thread(start = true, isDaemon = true) {
-            getRunner(analysisStep.type)?.run(
-                analysisStep.beforeId!!,
-                analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params))
-            )
+            try {
+                getRunner(analysisStep.type)?.run(
+                    analysisStep.beforeId!!,
+                    analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params))
+                )
+            } catch (e: Exception) {
+                println("Error in updateParams ${analysisStep.id} params: [$params]")
+                e.printStackTrace()
+                analysisStepRepository?.saveAndFlush(
+                    analysisStep!!.copy(
+                        status = AnalysisStepStatus.ERROR.value,
+                        error = e.message,
+                        stepHash = Crc32HashComputations().getRandomHash()
+                    )
+                )
+            }
         }
     }
 
-    fun computeStepHash(step: AnalysisStep?, stepBefore: AnalysisStep? = null, resultTableHash: Long? = null): Long? {
+    fun computeStepHash(
+        step: AnalysisStep?,
+        stepBefore: AnalysisStep? = null,
+        resultTableHash: Long? = null
+    ): Long? {
         val paramsHash = (step?.parametersHash ?: 0).toString()
         val columnsMappingHash = step?.columnInfo?.columnMappingHash.toString()
         val resultTableHash = (resultTableHash ?: stepBefore?.resultTableHash).toString()
@@ -251,18 +270,18 @@ open class CommonStep {
                 status = AnalysisStepStatus.RUNNING.value,
                 commonResult = commonResult
             )
-        return analysisStepRepository?.save(newStep!!)
+        return analysisStepRepository?.saveAndFlush(newStep!!)
     }
 
     private fun updateOldStep(oldStep: AnalysisStep?, newNextId: Int?) {
         val updatedOldStep = oldStep?.copy(nextId = newNextId)
-        analysisStepRepository?.save(updatedOldStep!!)
+        analysisStepRepository?.saveAndFlush(updatedOldStep!!)
     }
 
     private fun setNextStepBeforeId(nextStepId: Int, currentStepId: Int?) {
         val nextStep = analysisStepRepository?.findById(nextStepId)
         val newNextStep = nextStep?.copy(beforeId = currentStepId)
-        analysisStepRepository?.save(newNextStep!!)
+        analysisStepRepository?.saveAndFlush(newNextStep!!)
     }
 
     fun getResultTablePath(

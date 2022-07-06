@@ -23,7 +23,7 @@ class ColumnInfoService {
 
     fun createAndSaveColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo?, CommonResult> ? {
         val (columnInfo, commonResult) = createColumnInfo(filePath, resultPath, type)
-        return Pair(columnInfoRepository?.save(columnInfo), commonResult)
+        return Pair(columnInfoRepository?.saveAndFlush(columnInfo), commonResult)
     }
 
     fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo, CommonResult> {

@@ -5,11 +5,9 @@ import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
@@ -33,13 +31,13 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?{
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
         val nrResults = Paragraph().add(Text("Number of protein groups: ${initialResult.nrProteinGroups}"))
         document?.add(title)
         document?.add(nrResults)
-        if(step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
+        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
         return document
     }
 
@@ -76,7 +74,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         }
 
         if (step != null) {
-            return analysisStepRepository?.save(step)
+            return analysisStepRepository?.saveAndFlush(step)
         } else {
             throw RuntimeException("Could not create/save initial_result.")
         }
@@ -87,7 +85,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
-        val runningStep = analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
+        val runningStep = analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
         thread(start = true, isDaemon = true) {
             val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
@@ -98,8 +96,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
             val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
             val newColumnInfo: ColumnInfo? =
                 analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
-            columnInfoRepository?.save(newColumnInfo!!)
-            analysisStepRepository?.save(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
+            columnInfoRepository?.saveAndFlush(newColumnInfo!!)
+            analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
 
             updateNextStep(analysisStep)
         }
@@ -115,7 +113,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
             lastModifDate = LocalDateTime.now(),
             modifiesResult = true
         )
-        return analysisStepRepository?.save(newStep)
+        return analysisStepRepository?.saveAndFlush(newStep)
     }
 
 
@@ -150,7 +148,13 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         }
     }
 
-    private fun copyResultTableWithName(outputPath: String?, resultFile: String?, resultPath: String?, timestamp: Timestamp, fileName: String?): File {
+    private fun copyResultTableWithName(
+        outputPath: String?,
+        resultFile: String?,
+        resultPath: String?,
+        timestamp: Timestamp,
+        fileName: String?
+    ): File {
         val originalTable = File("$resultPath/$resultFile")
         val newTableName = "${fileName}_${timestamp.time}.txt"
         val newTable = File("$outputPath/$newTableName")
