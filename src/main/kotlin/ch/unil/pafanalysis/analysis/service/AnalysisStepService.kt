@@ -37,8 +37,10 @@ class AnalysisStepService {
     private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
 
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
-        val step = analysisStepRepo?.findById(stepId)!!
-        return commonStep?.getRunner(step?.type)?.updatePlotOptions(step, echartsPlot)
+        return if(analysisStepRepo?.existsById(stepId) == true){
+            val step = analysisStepRepo?.findById(stepId)!!
+            return commonStep?.getRunner(step?.type)?.updatePlotOptions(step, echartsPlot)
+        }else null
     }
 
     fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {

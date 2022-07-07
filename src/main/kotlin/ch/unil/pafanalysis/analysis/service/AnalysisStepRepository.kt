@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param
 interface AnalysisStepRepository: JpaRepository<AnalysisStep, Integer> {
     fun findById(id: Int): AnalysisStep
 
+    fun existsById(id: Int): Boolean
+
     @Modifying
     @Query("delete from AnalysisStep a where a.id =:id")
     fun deleteById(id: Int): Int?
