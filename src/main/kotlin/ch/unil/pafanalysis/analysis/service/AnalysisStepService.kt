@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
 
 @Transactional
 @Service
@@ -136,10 +137,14 @@ class AnalysisStepService {
     }
 
     fun deleteDirectory(directory: Path?): List<Boolean> {
-        return Files.walk(directory)
-            .sorted(Comparator.reverseOrder())
-            .map { it.toFile() }
-            .map { it.delete() }.toList()
+        return if(directory != null && directory?.exists()){
+            Files.walk(directory)
+                .sorted(Comparator.reverseOrder())
+                .map { it.toFile() }
+                .map { it.delete() }.toList()
+        }else{
+            emptyList<Boolean>()
+        }
     }
 
     fun updateComment(analysisStepId: Int, comment: String?): Boolean? {
