@@ -27,7 +27,6 @@ class AnalysisController {
     @Autowired
     private var pdfService: PdfService? = null
 
-
     @GetMapping
     fun getAnalysis(@RequestParam resultId: Int): Pair<List<Analysis>?, String?>? {
         return analysisService?.getSortedAnalysisList(resultId)
@@ -40,7 +39,7 @@ class AnalysisController {
 
     @PostMapping(path = ["/duplicate/{analysisId}"])
     fun duplicateAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Analysis? {
-        return analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = true)
+        return  analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = true)
     }
 
     @PostMapping(path = ["/copy/{analysisId}"])

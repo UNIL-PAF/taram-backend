@@ -35,7 +35,8 @@ class AnalysisService {
         )
         val analysis: Analysis? = analysisRepo?.saveAndFlush(newAnalysis)
 
-        initialResult?.run(analysis?.id, result)
+        val emptyRun = initialResult?.prepareRun(analysis?.id, result)
+        initialResult?.run(emptyRun, result)
 
         val analysisList = listOf(analysis)
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>

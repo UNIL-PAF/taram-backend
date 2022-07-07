@@ -26,7 +26,6 @@ import java.net.http.HttpResponse
 import java.sql.Timestamp
 import java.time.Duration
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
 @Service
 open class CommonStep {
@@ -165,9 +164,7 @@ open class CommonStep {
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
-            //thread(start = true, isDaemon = true) {
             update(nextStep!!, step)
-            //}
         }
     }
 
@@ -200,20 +197,18 @@ open class CommonStep {
 
         if (newHash != step.stepHash) {
             val runningStep = analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.RUNNING.value))
-            thread(start = true, isDaemon = true) {
-                try {
-                    getRunner(runningStep!!.type)?.run(stepBefore.id!!, runningStep)
-                } catch (e: Exception) {
-                    println("Error in update ${runningStep?.id}")
-                    e.printStackTrace()
-                    analysisStepRepository?.saveAndFlush(
-                        runningStep!!.copy(
-                            status = AnalysisStepStatus.ERROR.value,
-                            error = e.message,
-                            stepHash = Crc32HashComputations().getRandomHash()
-                        )
+            try {
+                getRunner(runningStep!!.type)?.run(stepBefore.id!!, runningStep)
+            } catch (e: Exception) {
+                println("Error in update ${runningStep?.id}")
+                e.printStackTrace()
+                analysisStepRepository?.saveAndFlush(
+                    runningStep!!.copy(
+                        status = AnalysisStepStatus.ERROR.value,
+                        error = e.message,
+                        stepHash = Crc32HashComputations().getRandomHash()
                     )
-                }
+                )
             }
         } else {
             analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.DONE.value))
@@ -223,23 +218,21 @@ open class CommonStep {
     fun updateParams(analysisStep: AnalysisStep, params: String) {
         analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
-        thread(start = true, isDaemon = true) {
-            try {
-                getRunner(analysisStep.type)?.run(
-                    analysisStep.beforeId!!,
-                    analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params))
+        try {
+            getRunner(analysisStep.type)?.run(
+                analysisStep.beforeId!!,
+                analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params))
+            )
+        } catch (e: Exception) {
+            println("Error in updateParams ${analysisStep.id} params: [$params]")
+            e.printStackTrace()
+            analysisStepRepository?.saveAndFlush(
+                analysisStep!!.copy(
+                    status = AnalysisStepStatus.ERROR.value,
+                    error = e.message,
+                    stepHash = Crc32HashComputations().getRandomHash()
                 )
-            } catch (e: Exception) {
-                println("Error in updateParams ${analysisStep.id} params: [$params]")
-                e.printStackTrace()
-                analysisStepRepository?.saveAndFlush(
-                    analysisStep!!.copy(
-                        status = AnalysisStepStatus.ERROR.value,
-                        error = e.message,
-                        stepHash = Crc32HashComputations().getRandomHash()
-                    )
-                )
-            }
+            )
         }
     }
 

@@ -21,7 +21,6 @@ import java.io.FileReader
 import java.lang.reflect.Type
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import kotlin.concurrent.thread
 
 @Service
 class InitialResultRunner() : CommonStep(), CommonRunner {
@@ -45,12 +44,15 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         throw Exception("InitialResultRunner does not implement ordinary run function.")
     }
 
-    fun run(analysisId: Int?, result: Result?): AnalysisStep? {
+    fun prepareRun(analysisId: Int?, result: Result?): AnalysisStep? {
         val analysis =
             analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
         setPathes(analysis)
-        val emptyStep = createEmptyInitialResult(analysis)
-        val stepPath = setMainPaths(analysis, emptyStep)
+        return createEmptyInitialResult(analysis)
+    }
+
+    fun run(emptyStep: AnalysisStep?, result: Result?): AnalysisStep? {
+        val stepPath = setMainPaths(emptyStep?.analysis, emptyStep)
 
         val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath)
         val newTableHash = Crc32HashComputations().computeFileHash(newTable)
@@ -85,22 +87,21 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
-        val runningStep = analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
+        val runningStep =
+            analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
-        thread(start = true, isDaemon = true) {
-            val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
-            val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
-            val newColumnMapping: ColumnMapping? =
-                analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+        val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
+        val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
+        val newColumnMapping: ColumnMapping? =
+            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
 
-            val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
-            val newColumnInfo: ColumnInfo? =
-                analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
-            columnInfoRepository?.saveAndFlush(newColumnInfo!!)
-            analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
+        val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
+        val newColumnInfo: ColumnInfo? =
+            analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
+        columnInfoRepository?.saveAndFlush(newColumnInfo!!)
+        analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
 
-            updateNextStep(analysisStep)
-        }
+        updateNextStep(analysisStep)
 
         return runningStep!!
     }

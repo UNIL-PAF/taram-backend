@@ -8,13 +8,12 @@ import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
 
-@Transactional
 @Service
 class AnalysisStepService {
 
@@ -32,6 +31,9 @@ class AnalysisStepService {
 
     @Autowired
     private var commonStep: CommonStep? = null
+
+    @Autowired
+    private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
 
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
         val step = analysisStepRepo?.findById(stepId)!!
@@ -54,16 +56,18 @@ class AnalysisStepService {
         sortedSteps: List<AnalysisStep>,
         newAnalysis: Analysis,
         copyAllSteps: Boolean
-    ): List<AnalysisStep>? {
+    ) {
         var stepBefore: AnalysisStep? = null
 
-        val fltSteps = sortedSteps.filterIndexed { i: Int, step: AnalysisStep -> i == 0 || copyAllSteps }
+        val fltSteps = sortedSteps.filterIndexed { i: Int, _: AnalysisStep -> i == 0 || copyAllSteps }
+
+        val emptyInitialStep = initialResultRunner?.prepareRun(analysisId = newAnalysis.id, newAnalysis.result)
 
         val copiedSteps = fltSteps.mapIndexed { i: Int, step: AnalysisStep ->
             if (i == 0) {
-                val initialStep = initialResultRunner?.run(analysisId = newAnalysis.id, newAnalysis.result)
+
                 val columnInfo = columnInfoRepository?.saveAndFlush(step.columnInfo!!.copy(id = 0))
-                stepBefore = initialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id)
+                stepBefore = emptyInitialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id)
                 stepBefore
             } else if (copyAllSteps) {
                 stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis)
@@ -74,10 +78,7 @@ class AnalysisStepService {
         }
 
         val analysisSteps = setCorrectNextIds(copiedSteps)
-        if (analysisSteps != null && analysisSteps.size > 1) {
-            commonStep?.updateNextStep(analysisSteps[0]!!)
-        }
-        return analysisSteps
+        asyncAnaysisStepService?.runDuplicatedSteps(emptyInitialStep, analysisSteps, newAnalysis)
     }
 
     fun setCorrectNextIds(copiedSteps: List<AnalysisStep?>): List<AnalysisStep> {
@@ -137,12 +138,12 @@ class AnalysisStepService {
     }
 
     fun deleteDirectory(directory: Path?): List<Boolean> {
-        return if(directory != null && directory?.exists()){
+        return if (directory != null && directory?.exists()) {
             Files.walk(directory)
                 .sorted(Comparator.reverseOrder())
                 .map { it.toFile() }
                 .map { it.delete() }.toList()
-        }else{
+        } else {
             emptyList<Boolean>()
         }
     }
