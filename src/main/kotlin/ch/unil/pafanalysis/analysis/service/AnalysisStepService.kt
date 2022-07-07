@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -44,6 +45,7 @@ class AnalysisStepService {
         return analysisStepRepo?.setStatusById(status.value, id)
     }
 
+    @Transactional
     fun setAllStepsStatus(analysisStep: AnalysisStep?, status: AnalysisStepStatus) {
         setAnalysisStepStatus(analysisStep?.id!!, status)
         if (analysisStep?.nextId != null) {
@@ -65,7 +67,6 @@ class AnalysisStepService {
 
         val copiedSteps = fltSteps.mapIndexed { i: Int, step: AnalysisStep ->
             if (i == 0) {
-
                 val columnInfo = columnInfoRepository?.saveAndFlush(step.columnInfo!!.copy(id = 0))
                 stepBefore = emptyInitialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id)
                 stepBefore

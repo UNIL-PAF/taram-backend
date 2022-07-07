@@ -25,8 +25,8 @@ class AsyncAnalysisStepService {
 
     @Async
     fun runDuplicatedSteps(emptyInitialStep: AnalysisStep?, analysisSteps: List<AnalysisStep>, newAnalysis: Analysis) {
+        initialResultRunner?.run(emptyStep = emptyInitialStep, newAnalysis.result)
         if (analysisSteps != null && analysisSteps.size > 1) {
-            initialResultRunner?.run(emptyStep = emptyInitialStep, newAnalysis.result)
             commonStep?.updateNextStep(analysisSteps[0]!!)
         }
     }
