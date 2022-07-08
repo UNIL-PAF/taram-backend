@@ -55,11 +55,14 @@ open class CommonStep {
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
 
+
     var type: AnalysisStepType? = null
 
+    /*
     var resultType: ResultType? = null
     var outputRoot: String? = null
     var resultPath: String? = null
+    */
 
     fun runCommonStep(
         type: AnalysisStepType,
@@ -80,10 +83,10 @@ open class CommonStep {
         val paramsHash = hashComp.computeStringHash(stepWithParams?.parameters)
         val stepWithHash = stepWithParams?.copy(parametersHash = paramsHash)
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-        setPathes(stepWithDiff?.analysis)
         val stepPath = setMainPaths(oldStep?.analysis, stepWithDiff)
+        val resultType = getResultType(stepWithDiff?.analysis?.result?.type)
         val resultTablePathAndHash =
-            getResultTablePath(modifiesResult, oldStep, stepPath, stepWithDiff?.resultTablePath)
+            getResultTablePath(modifiesResult, oldStep, stepPath, stepWithDiff?.resultTablePath, resultType)
 
         //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
         return updateEmptyStep(stepWithDiff, stepPath, resultTablePathAndHash, oldStep?.commonResult)
@@ -106,11 +109,18 @@ open class CommonStep {
         return getRunner(step.type)?.run(step?.beforeId!!, step)
     }
 
+    /*
     fun setPathes(analysis: Analysis?) {
         resultType = getResultType(analysis?.result?.type)
         outputRoot = getOutputRoot(resultType)
         resultPath =
             env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
+    }
+    */
+
+    fun getResultPath(analysis: Analysis?): String? {
+        val resultType = getResultType(analysis?.result?.type)
+        return env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
     }
 
     fun getResultType(type: String?): ResultType? {
@@ -123,6 +133,7 @@ open class CommonStep {
 
     fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
         val outputPath: String = analysis?.id.toString()
+        val outputRoot = getOutputRoot(getResultType(analysis?.result?.type))
         createResultDir(outputRoot?.plus(outputPath))
 
         val stepPath = "$outputPath/${emptyStep?.id}"
@@ -281,21 +292,22 @@ open class CommonStep {
         modifiesResult: Boolean?,
         oldStep: AnalysisStep?,
         stepPath: String?,
-        oldTablePath: String?
+        oldTablePath: String?,
+        resultType: ResultType?
     ): Pair<String?, Long?> {
         val pathAndHash = if (modifiesResult != null && modifiesResult) {
-            val oldTab = outputRoot?.plus("/") + oldStep?.resultTablePath
+            val oldTab = getOutputRoot(resultType)?.plus("/") + oldStep?.resultTablePath
             val tabName = if (resultType == ResultType.MaxQuant) {
                 "/proteinGroups_"
             } else {
                 "/Report_"
             }
             val newTab = stepPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
-            val newFile = File(outputRoot?.plus(newTab))
+            val newFile = File(getOutputRoot(resultType)?.plus(newTab))
             File(oldTab).copyTo(newFile)
 
             // remove old if exists
-            if (oldTablePath != null) File(outputRoot?.plus("/")?.plus(oldTablePath)).delete()
+            if (oldTablePath != null) File(getOutputRoot(resultType)?.plus("/")?.plus(oldTablePath)).delete()
 
             Pair(newTab, Crc32HashComputations().computeFileHash(newFile))
         } else {

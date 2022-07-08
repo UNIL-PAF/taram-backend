@@ -47,14 +47,16 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     fun prepareRun(analysisId: Int?, result: Result?): AnalysisStep? {
         val analysis =
             analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
-        setPathes(analysis)
         return createEmptyInitialResult(analysis)
     }
 
     fun run(emptyStep: AnalysisStep?, result: Result?): AnalysisStep? {
         val stepPath = setMainPaths(emptyStep?.analysis, emptyStep)
 
-        val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath)
+        val resultType = getResultType(emptyStep?.analysis?.result?.type)
+        val outputRoot = getOutputRoot(resultType)
+        val resultPath = getResultPath(emptyStep?.analysis)
+        val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath, resultType)
         val newTableHash = Crc32HashComputations().computeFileHash(newTable)
 
         val step: AnalysisStep? = try {
@@ -139,13 +141,13 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         )
     }
 
-    private fun copyResultsTable(outputPath: String?, resultFile: String?, resultPath: String?): File {
+    private fun copyResultsTable(outputPath: String?, resultFile: String?, resultPath: String?, resultType: ResultType?): File {
         val timestamp = Timestamp(System.currentTimeMillis())
 
-        if (resultType == ResultType.MaxQuant) {
-            return copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "proteinGroups")
+        return if (resultType == ResultType.MaxQuant) {
+            copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "proteinGroups")
         } else {
-            return copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "Report")
+            copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "Report")
         }
     }
 

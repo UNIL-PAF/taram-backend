@@ -97,6 +97,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
             boxPlotParams.column
         } else null
 
+        val outputRoot = getOutputRoot(getResultType(analysisStep?.analysis?.result?.type))
         val listOfInts = readTableData.getListOfInts(expInfoList, analysisStep, outputRoot, intColumn)
         val listOfBoxplots = listOfInts.map { BoxPlotData(it.first, computeBoxplotData(it.second, logScale)) }
         return BoxPlotGroupData(group = group, data = listOfBoxplots)
