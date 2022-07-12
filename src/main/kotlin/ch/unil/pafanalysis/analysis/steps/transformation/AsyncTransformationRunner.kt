@@ -9,9 +9,12 @@ import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import com.google.common.math.Quantiles
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 import kotlin.math.ln
 
 @Service
@@ -19,6 +22,13 @@ class AsyncTransformationRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
     private val writeTableData = WriteTableData()
+
+    @Autowired
+    val logTransformationRunner: LogTransformationRunner ? = null
+
+    @Autowired
+    val normalizationRunner: NormalizationRunner ? = null
+
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
@@ -60,7 +70,7 @@ class AsyncTransformationRunner() : CommonStep() {
         }
     }
 
-    private fun transformTable(
+    fun transformTable(
         step: AnalysisStep?,
         transformationParams: TransformationParams,
         outputRoot: String?
@@ -71,8 +81,8 @@ class AsyncTransformationRunner() : CommonStep() {
 
         val ints =
             readTableData.getListOfInts(expInfoList = expDetailsTable, analysisStep = step, outputRoot = outputRoot)
-        val transInts = transformation(ints, transformationParams)
-        val normInts: List<Pair<String, List<Double>>> = normalization(transInts, transformationParams)
+        val transInts = logTransformationRunner!!.runTransformation(ints, transformationParams)
+        val normInts: List<Pair<String, List<Double>>> = normalizationRunner!!.runNormalization(transInts, transformationParams)
         val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
 
         val newColName = "trans $intCol"
@@ -83,56 +93,6 @@ class AsyncTransformationRunner() : CommonStep() {
             step?.commonResult?.numericalColumns?.filter { it != step?.commonResult?.intCol }?.plus(newColName)
         val commonRes = step?.commonResult?.copy(intCol = newColName, numericalColumns = numCols)
         return Pair(resTableHash, commonRes)
-    }
-
-    private fun transformation(
-        ints: List<Pair<String, List<Double>>>,
-        transformationParams: TransformationParams
-    ): List<Pair<String, List<Double>>> {
-
-        fun transformList(intList: List<Double>): List<Double> {
-            val a: List<Double> = when (transformationParams.transformationType) {
-                TransformationType.NONE.value -> intList
-                TransformationType.LOG2.value -> {
-                    val newList = intList.map { i ->
-                        if (i == 0.0) {
-                            Double.NaN
-                        } else {
-                            ln(i)// / ln(2.0)
-                        }
-                    }
-                    newList
-                }
-                else -> {
-                    throw StepException("${transformationParams.normalizationType} is not implemented.")
-                }
-            }
-            return a
-        }
-
-        return ints.map { (name, orig: List<Double>) ->
-            Pair(name, transformList(orig))
-        }
-    }
-
-
-    private fun normalization(
-        ints: List<Pair<String, List<Double>>>,
-        transformationParams: TransformationParams
-    ): List<Pair<String, List<Double>>> {
-        val subtract = when (transformationParams.normalizationType) {
-            NormalizationType.MEDIAN.value -> fun(orig: List<Double>): Double {
-                return Quantiles.median().compute(orig)
-            }
-            NormalizationType.MEAN.value -> fun(orig: List<Double>): Double { return orig.average() }
-            else -> {
-                throw StepException("${transformationParams.normalizationType} is not implemented.")
-            }
-        }
-        return ints.map { (name, orig: List<Double>) ->
-            val noNaNs = orig.filter { !it.isNaN() }
-            Pair(name, orig.map { it - subtract(noNaNs) })
-        }
     }
 
 }
