@@ -11,6 +11,8 @@ class NormalizationRunner() {
         ints: List<Pair<String, List<Double>>>,
         transformationParams: TransformationParams
     ): List<Pair<String, List<Double>>> {
+        if(transformationParams.normalizationType == NormalizationType.NONE.value) return ints
+
         val subtract = when (transformationParams.normalizationType) {
             NormalizationType.MEDIAN.value -> fun(orig: List<Double>): Double {
                 return Quantiles.median().compute(orig)
@@ -20,6 +22,7 @@ class NormalizationRunner() {
                 throw StepException("${transformationParams.normalizationType} is not implemented.")
             }
         }
+
         return ints.map { (name, orig: List<Double>) ->
             val noNaNs = orig.filter { !it.isNaN() }
             Pair(name, orig.map { it - subtract(noNaNs) })
