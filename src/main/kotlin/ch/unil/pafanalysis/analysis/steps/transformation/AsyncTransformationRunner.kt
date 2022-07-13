@@ -29,6 +29,8 @@ class AsyncTransformationRunner() : CommonStep() {
     @Autowired
     val normalizationRunner: NormalizationRunner ? = null
 
+    @Autowired
+    val imputationRunner: ImputationRunner ? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
@@ -82,12 +84,13 @@ class AsyncTransformationRunner() : CommonStep() {
         val ints =
             readTableData.getListOfInts(expInfoList = expDetailsTable, analysisStep = step, outputRoot = outputRoot)
         val transInts = logTransformationRunner!!.runTransformation(ints, transformationParams)
-        val normInts: List<Pair<String, List<Double>>> = normalizationRunner!!.runNormalization(transInts, transformationParams)
+        val normInts = normalizationRunner!!.runNormalization(transInts, transformationParams)
+        val impInts = imputationRunner!!.runImputation(normInts, transformationParams)
         val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
 
         val newColName = "trans $intCol"
 
-        val resTable = writeTableData.writeTable(step, normInts, outputRoot = outputRoot, newColName)
+        val resTable = writeTableData.writeTable(step, impInts, outputRoot = outputRoot, newColName)
         val resTableHash = Crc32HashComputations().computeFileHash(File(resTable))
         val numCols =
             step?.commonResult?.numericalColumns?.filter { it != step?.commonResult?.intCol }?.plus(newColName)
