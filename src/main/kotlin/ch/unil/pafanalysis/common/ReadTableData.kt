@@ -5,8 +5,11 @@ import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.results.model.ResultType
 import java.io.BufferedReader
 import java.io.FileReader
+import java.util.*
 
 class ReadTableData {
+
+    val checkTypes = CheckTypes()
 
     fun getListOfInts(
         expInfoList: List<ExpInfo?>?,
@@ -60,5 +63,44 @@ class ReadTableData {
             }
             acc.mapIndexed { index, list -> list + colVals[index] }
         }
+    }
+
+    fun getTable(resultTablePath: String?): Table {
+        val reader = BufferedReader(FileReader(resultTablePath))
+        val headerNames: List<String> = reader.readLine().split("\t")
+        val rowsStrings: List<List<String>> = reader.readLines().fold(mutableListOf()) { acc, r ->
+            val line: List<String> = r.split("\t")
+            acc.add(line)
+            acc
+        }
+
+        val headerTypes: List<ColType> =
+            rowsStrings.fold(Collections.nCopies(headerNames.size, ColType.NUMBER)) { acc, r ->
+                r.mapIndexed { i, s ->
+                    if ((checkTypes.isNumerical(s) || s.isEmpty()) && acc[i] == ColType.NUMBER) {
+                        ColType.NUMBER
+                    } else ColType.CHARACTER
+                }
+            }
+
+        val headers = headerNames.mapIndexed{ i, name -> Header(name, i, headerTypes[i])}
+
+        val rows: List<List<Any>> = rowsStrings.map { r ->
+            r.mapIndexed { i, c ->
+                if (headerTypes[i] == ColType.NUMBER) {
+                    if (c.isNotEmpty()) c.toDouble() else Double.NaN
+                } else c
+            }
+        }
+        return Table(headers, rows)
+    }
+
+    data class Table(val headers: List<Header>, val rows: List<List<Any>>)
+
+    data class Header(val name: String, val idx: Int, val type: ColType)
+
+    enum class ColType(val value: String) {
+        CHARACTER("character"),
+        NUMBER("number")
     }
 }

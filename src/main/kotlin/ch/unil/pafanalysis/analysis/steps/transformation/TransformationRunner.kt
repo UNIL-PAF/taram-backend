@@ -27,7 +27,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncTransformationRunner: AsyncTransformationRunner? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
+    override var type: AnalysisStepType? = AnalysisStepType.TRANSFORMATION
 
     val defaultParams = TransformationParams(
         normalizationType = NormalizationType.MEDIAN.value,
