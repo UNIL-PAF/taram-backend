@@ -69,7 +69,7 @@ class AsyncFilterRunner() : CommonStep() {
         outputRoot: String?
     ): Pair<Filter, Long> {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath)
-        val origSize = table.rows.size
+        val origSize = table.rows?.size
         return Pair(Filter(), 1)
     }
 

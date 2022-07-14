@@ -1,9 +1,9 @@
 package ch.unil.pafanalysis.analysis.steps.filter
 
 data class FilterParams (
-    val removeOnlyIdentifiedBySite: Boolean? = true,
-    val removeReverse: Boolean? = true,
-    val removePotentialContaminant: Boolean? = true,
+    val removeOnlyIdentifiedBySite: Boolean? = null,
+    val removeReverse: Boolean? = null,
+    val removePotentialContaminant: Boolean? = null,
     val colFilters: List<ColFilter>? = null
 )
 

@@ -95,7 +95,7 @@ class ReadTableData {
         return Table(headers, rows)
     }
 
-    data class Table(val headers: List<Header>, val rows: List<List<Any>>)
+    data class Table(val headers: List<Header>?, val rows: List<List<Any>>?)
 
     data class Header(val name: String, val idx: Int, val type: ColType)
 
