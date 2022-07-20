@@ -13,6 +13,34 @@ class ColumnMappingParserTests {
     val colParser: ColumnMappingParser? = null
 
     @Test
+    fun parseMaxQuantGrepper() {
+        val resultPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
+        val resFile = resultPath + "proteinGroups.txt"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, resultPath, ResultType.MaxQuant)
+
+        assert(colMapping.experimentNames?.size == 16)
+        assert(colMapping.experimentNames!!.contains("KO-13703"))
+        assert(colMapping.headers?.size == 219)
+
+        // check first header
+        assert(colMapping.headers?.get(0)?.idx == 0)
+        assert(colMapping.headers?.get(0)?.name == "Protein.IDs")
+        assert(colMapping.headers?.get(0)?.type == ColType.CHARACTER)
+
+        // check header with experiment
+        assert(colMapping.headers?.get(12)?.idx == 12)
+        assert(colMapping.headers?.get(12)?.name == "KO-13704.Mutation.names")
+        assert(colMapping.headers?.get(12)?.type == ColType.NUMBER)
+        assert(colMapping.headers?.get(12)?.experiment?.name == "KO-13704")
+        assert(colMapping.headers?.get(12)?.experiment?.field == "Mutation.names")
+
+        // check commonResults
+        assert(commonResults.intCol == "Intensity")
+        assert(commonResults.numericalColumns?.size == 10)
+        assert(commonResults.numericalColumns!!.contains("LFQ.intensity"))
+    }
+
+    @Test
     fun parseSpectronautFluder() {
         val resFile = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)

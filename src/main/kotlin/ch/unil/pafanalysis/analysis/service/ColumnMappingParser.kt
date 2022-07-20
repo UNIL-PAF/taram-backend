@@ -60,10 +60,10 @@ class ColumnMappingParser {
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
 
-
         val regex1 = Regex(".+_DIA_(\\d+?)_.+\\.(.+?)$")
         val regex2 = Regex(".+_(\\d+?)_DIA_.+\\.(.+?)$")
         val regex3 = Regex(".+_(\\d+?)_\\d+min_DIA_.+\\.(.+?)$")
+
         val cols: ColumnsParsed = columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
             val matchResult = regex1.matchEntire(s) ?: regex2.matchEntire(s) ?: regex3.matchEntire(s)
             val accWithExp = if (matchResult != null) {
@@ -104,7 +104,6 @@ class ColumnMappingParser {
             numericalColumns = cols.headers.filterIndexed{i, c ->
                 colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}.map{it.experiment!!.field}.distinct()
         )
-
         return Pair(colMapping, commonResult)
     }
 
@@ -113,60 +112,48 @@ class ColumnMappingParser {
         summaryTable: String,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
+        val expsParsed = parseMaxQuantExperiments(summaryTable)
+
+        val cols = columns?.foldIndexed(expsParsed){ i, acc, col ->
+            val expName: String? = acc.expNames.find{ col.contains(it) }
+            if(expName != null){
+                val field = col.replace(expName, "").trim().replace(Regex("\\s+"), ".")
+                val expFields = acc.expFields.plus(field)
+                val headers = acc.headers.plus(Header(name = "$expName.$field", idx = i, type = colTypes?.get(i), experiment = Experiment(expName, field)))
+                acc.copy(expFields = expFields, headers = headers)
+            }else{
+                val field = col.trim().replace(Regex("\\s+"), ".")
+                acc.copy(headers = acc.headers.plus(Header(name = field, idx = i, type = colTypes?.get(i))))
+            }
+
+        }
+
+        val colMapping = ColumnMapping(
+            headers = cols?.headers,
+            experimentDetails = cols?.expDetails,
+            experimentNames = cols?.expNames?.toList()
+        )
+
+        val commonResult = CommonResult(
+            intCol = if (cols?.expFields?.contains("Intensity") == true) "Intensity" else null,
+            numericalColumns = cols?.headers?.filterIndexed{i, c ->
+                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}?.map{it.experiment!!.field}?.distinct()
+        )
+        return Pair(colMapping, commonResult)
+    }
+
+    private fun parseMaxQuantExperiments(summaryTable: String): ColumnsParsed{
         val lines: List<String> = File(summaryTable).bufferedReader().readLines()
         val headers: List<String> = lines[0].split("\t")
         val expIdx = headers.indexOf("Experiment")
         val fileIdx = headers.indexOf("Raw file")
 
-        val experiments = lines.subList(1, lines.size - 1)
-            .fold(Pair(HashMap<String, ExpInfo>(), mutableListOf<String>())) { sum, el ->
+        return lines.subList(1, lines.size - 1)
+            .fold(ColumnsParsed()) { sum, el ->
                 val l = el.split("\t")
                 val expName = l[expIdx]
                 val expInfo = ExpInfo(fileName = l[fileIdx], isSelected = true, name = expName, originalName = expName)
-                if (!sum.first.containsKey(expName)) {
-                    sum.first[expName] = expInfo
-                    sum.second.add(expName)
-                }
-                sum
+                sum.copy(expNames = sum.expNames.plus(expName), expDetails = sum.expDetails.plus(Pair(expName, expInfo)))
             }
-
-        val experimentalColumns =
-            parseExperimentalColumns(columns, experiments.first[experiments.second[0]]?.originalName)
-        val numericalColumns = parseNumericalColumns(columns, experimentalColumns, colTypes)
-
-        val colMapping = ColumnMapping(
-            experimentNames = experiments.second,
-            experimentDetails = experiments.first
-        )
-
-        val commonResult = CommonResult(
-            intCol = "Intensity",
-            numericalColumns = numericalColumns
-        )
-
-        return Pair(colMapping, commonResult)
-    }
-
-    private fun parseExperimentalColumns(columns: List<String>?, oneOrigName: String?): List<String>? {
-        return columns?.fold(emptyList<String>()) { sum, col ->
-            if (col.contains(oneOrigName!!)) {
-                sum.plus(col.replace(oneOrigName, "").trim())
-            } else {
-                sum
-            }
-        }
-    }
-
-    private fun parseNumericalColumns(
-        columns: List<String>?,
-        expCols: List<String>?,
-        colTypes: List<ColType>?
-    ): List<String>? {
-        return expCols?.filter { exp ->
-            val validCols: List<String>? = columns?.filterIndexed { i, col ->
-                col.contains(exp) && colTypes!![i] == ColType.NUMBER
-            }
-            validCols?.size!! >= 1
-        }
     }
 }
