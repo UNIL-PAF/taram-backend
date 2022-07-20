@@ -38,4 +38,31 @@ class ColumnMappingParserTests {
         assert(commonResults.numericalColumns?.size == 3)
         assert(commonResults.numericalColumns!!.contains("NrOfPrecursorsIdentified"))
     }
+
+    @Test
+    fun parseSpectronautGutierrez() {
+        val resFile = "./src/test/resources/results/spectronaut/20220225_171348_Gutierrez-14180-204_Report_Copy.txt"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+        assert(colMapping.intColumn == "Quantity")
+        assert(colMapping.experimentNames?.size == 25)
+        assert(colMapping.experimentNames!!.contains("14204"))
+        assert(colMapping.headers?.size == 85)
+
+        // check first header
+        assert(colMapping.headers?.get(0)?.idx == 0)
+        assert(colMapping.headers?.get(0)?.name == "PG.MolecularWeight")
+        assert(colMapping.headers?.get(0)?.type == ColType.CHARACTER)
+
+        // check header with experiment
+        assert(colMapping.headers?.get(11)?.idx == 11)
+        assert(colMapping.headers?.get(11)?.name == "14181.NrOfPrecursorsIdentified")
+        assert(colMapping.headers?.get(11)?.type == ColType.NUMBER)
+        assert(colMapping.headers?.get(11)?.experiment?.name == "14181")
+        assert(colMapping.headers?.get(11)?.experiment?.field == "NrOfPrecursorsIdentified")
+
+        // check commonResults
+        assert(commonResults.intCol == "Quantity")
+        assert(commonResults.numericalColumns?.size == 3)
+        assert(commonResults.numericalColumns!!.contains("NrOfPrecursorsIdentified"))
+    }
 }
