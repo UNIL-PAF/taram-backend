@@ -4,6 +4,7 @@ data class FilterParams (
     val removeOnlyIdentifiedBySite: Boolean? = null,
     val removeReverse: Boolean? = null,
     val removePotentialContaminant: Boolean? = null,
+    val minNrPeptides: Int? = null,
     val colFilters: List<ColFilter>? = null
 )
 

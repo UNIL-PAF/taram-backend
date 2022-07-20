@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.filter
 
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.Table
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,18 +16,18 @@ class FixFilterRunnerTests {
 
     private val readTableData = ReadTableData()
 
-    private var table: ReadTableData.Table? = null
+    private var table: Table? = null
 
     @BeforeEach
     fun init() {
         val filePath = "./src/test/resources/filter/proteinGroups.txt"
-        table = readTableData.getTable(filePath)
+        table = readTableData.getTable(filePath, null)
     }
 
     @Test
     fun removeNothing() {
         val params = FilterParams()
-        val resTable = runner?.run(table, params)
+        val resTable = runner?.run(table, params, null)
         assert(table!!.rows?.size == 5535)
         assert(resTable!!.rows?.size == table!!.rows?.size)
     }
@@ -34,28 +35,28 @@ class FixFilterRunnerTests {
     @Test
     fun removeOnlyIdentifiendBySite() {
         val params = FilterParams(removeOnlyIdentifiedBySite = true)
-        val resTable = runner?.run(table, params)
+        val resTable = runner?.run(table, params, null)
         assert(resTable!!.rows?.size == 5457)
     }
 
     @Test
     fun removeReverse() {
         val params = FilterParams(removeReverse = true)
-        val resTable = runner?.run(table, params)
+        val resTable = runner?.run(table, params, null)
         assert(resTable!!.rows?.size == 5463)
     }
 
     @Test
     fun removePotentialContaminants() {
         val params = FilterParams(removePotentialContaminant = true)
-        val resTable = runner?.run(table, params)
+        val resTable = runner?.run(table, params, null)
         assert(resTable!!.rows?.size == 5515)
     }
 
     @Test
     fun removeAll3() {
         val params = FilterParams(removePotentialContaminant = true, removeReverse = true, removeOnlyIdentifiedBySite = true)
-        val resTable = runner?.run(table, params)
+        val resTable = runner?.run(table, params, null)
         assert(resTable!!.rows?.size == 5385)
     }
 

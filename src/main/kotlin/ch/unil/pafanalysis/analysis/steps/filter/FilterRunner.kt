@@ -29,7 +29,8 @@ class FilterRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.FILTER
 
-    val defaultParams = FilterParams()
+    val defaultParams =
+        FilterParams(removeReverse = true, removePotentialContaminant = true, removeOnlyIdentifiedBySite = true)
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())

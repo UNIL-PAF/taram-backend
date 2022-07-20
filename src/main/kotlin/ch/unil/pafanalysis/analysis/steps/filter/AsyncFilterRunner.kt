@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.transformation.LogTransformationRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
@@ -22,6 +23,9 @@ class AsyncFilterRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
     private val writeTableData = WriteTableData()
+
+    @Autowired
+    val fixFilterRunner: FixFilterRunner? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
@@ -67,10 +71,14 @@ class AsyncFilterRunner() : CommonStep() {
         step: AnalysisStep?,
         params: FilterParams,
         outputRoot: String?
-    ): Pair<Filter, Long> {
-        val table = readTableData.getTable(outputRoot + step?.resultTablePath)
-        val origSize = table.rows?.size
-        return Pair(Filter(), 1)
+    ): Triple<Filter, Long, String> {
+        val table = readTableData.getTable(outputRoot + step?.resultTablePath, null)
+        val fltTable = fixFilterRunner?.run(table, params, step?.columnInfo)
+        val fltSize = fltTable?.rows?.size
+        val nrRowsRemoved = table.rows?.size?.minus(fltSize!!)
+        val resFileHash = (234234).toLong()
+        val resFilePath = "blibla"
+        return Triple(Filter(fltSize, nrRowsRemoved), resFileHash, resFilePath)
     }
 
 }

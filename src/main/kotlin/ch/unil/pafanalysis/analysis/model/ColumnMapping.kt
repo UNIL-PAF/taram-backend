@@ -9,9 +9,17 @@ data class ExpInfo(
 )
 
 data class ColumnMapping (
-    //val columns: List<String>? = null,
+    val headers: List<Header>? = null,
     val intColumn: String? = null,
-    val numericalColumns: List<String>? = null,
-    val experimentDetails: HashMap<String, ExpInfo>? = null,
+    val experimentDetails: Map<String, ExpInfo>? = null,
     val experimentNames: List<String>? = null,
 )
+
+data class Header(val name: String? = null, val idx: Int, val type: ColType? = null, val experiment: Experiment? = null)
+
+data class Experiment(val name: String, val field: String)
+
+enum class ColType(val value: String) {
+    CHARACTER("character"),
+    NUMBER("number")
+}
