@@ -59,10 +59,13 @@ class ColumnMappingParser {
         columns: List<String>?,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-        val regex1 = Regex(".+_DIA_(\\d+?)_.+\\.(\\w+?)$")
-        val regex2 = Regex(".+_(\\d+?)_DIA_.+\\.(\\w+?)$")
+
+
+        val regex1 = Regex(".+_DIA_(\\d+?)_.+\\.(.+?)$")
+        val regex2 = Regex(".+_(\\d+?)_DIA_.+\\.(.+?)$")
+        val regex3 = Regex(".+_(\\d+?)_\\d+min_DIA_.+\\.(.+?)$")
         val cols: ColumnsParsed = columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
-            val matchResult = regex1.matchEntire(s) ?: regex2.matchEntire(s)
+            val matchResult = regex1.matchEntire(s) ?: regex2.matchEntire(s) ?: regex3.matchEntire(s)
             val accWithExp = if (matchResult != null) {
                 acc.copy(
                     expNames = acc.expNames.plus(matchResult.groupValues[1]),
@@ -92,18 +95,15 @@ class ColumnMappingParser {
 
         val colMapping = ColumnMapping(
             headers = cols.headers,
-            intColumn = if (cols.expFields.contains("Quantity")) "Quantity" else null,
             experimentDetails = cols.expDetails,
             experimentNames = cols.expNames.toList()
         )
 
         val commonResult = CommonResult(
-            intCol = "Quantity",
+            intCol = if (cols.expFields.contains("Quantity")) "Quantity" else null,
             numericalColumns = cols.headers.filterIndexed{i, c ->
                 colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}.map{it.experiment!!.field}.distinct()
         )
-
-        println(commonResult.numericalColumns)
 
         return Pair(colMapping, commonResult)
     }
