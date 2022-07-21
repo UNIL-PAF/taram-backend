@@ -39,19 +39,8 @@ class TransformationRunnerTests {
         val filePath = resPath + "proteinGroups.txt"
         val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
         val table = readTableData.getTable(filePath, mqMapping)
-        ints = readTableData.getDoubleMatrix(table, "LFQ.Intensity").second
+        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity").second
     }
-
-    /*
-    private fun writeTable(ints: List<Double>, fileName: String) {
-        val writer = BufferedWriter(FileWriter(fileName))
-        ints.forEach {
-            writer.write(it.toString())
-            writer.newLine()
-        }
-        writer.close()
-    }
-     */
 
     @Test
     fun defaultTransformationChain() {
@@ -65,13 +54,6 @@ class TransformationRunnerTests {
         val res2 = normalization?.runNormalization(res1!!, params)
         val res3 = imputation?.runImputation(res2!!, params)
         val oneRes = BigDecimal(res3!![0][22]).setScale(5, RoundingMode.HALF_EVEN).toDouble()
-
-        /*
-        writeTable(ints!![0].second, "/tmp/orig.txt")
-        writeTable(res1!![0].second, "/tmp/res1.txt")
-        writeTable(res2!![0].second, "/tmp/res2.txt")
-        writeTable(res3!![0].second, "/tmp/res3.txt")
-         */
 
         assert(ints!![0][22] == 0.0)
         assert(oneRes == -4.55469)

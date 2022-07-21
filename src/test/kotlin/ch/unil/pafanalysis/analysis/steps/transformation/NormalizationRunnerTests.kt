@@ -31,7 +31,7 @@ class NormalizationRunnerTests {
         val filePath = resPath + "proteinGroups.txt"
         val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
         val table = readTableData.getTable(filePath, mqMapping)
-        ints = readTableData.getDoubleMatrix(table, "LFQ.Intensity").second
+        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity").second
     }
 
     @Test
