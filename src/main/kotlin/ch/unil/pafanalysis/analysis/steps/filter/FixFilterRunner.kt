@@ -36,8 +36,8 @@ class FixFilterRunner() {
     private fun remove(table: Table?, name: String, match: String): Table? {
         val header: Header? = table?.headers?.find { it.name == name }
         if (header != null) {
-            val fltRows = table?.rows?.filter { it[header.idx] != match }
-            return table?.copy(rows = fltRows)
+            val fltRows = table?.cols?.filter { it[header.idx] != match }
+            return table?.copy(cols = fltRows)
         }
         return table
     }

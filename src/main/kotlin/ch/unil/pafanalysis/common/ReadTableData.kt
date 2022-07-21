@@ -1,14 +1,15 @@
 package ch.unil.pafanalysis.common
 
-import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ColType
+import ch.unil.pafanalysis.analysis.model.ColumnMapping
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.results.model.ResultType
 import java.io.BufferedReader
 import java.io.FileReader
 import java.util.*
 
 class ReadTableData {
-
-    val checkTypes = CheckTypes()
 
     fun getListOfInts(
         expInfoList: List<ExpInfo?>?,
@@ -64,10 +65,10 @@ class ReadTableData {
         }
     }
 
-    fun getTable(resultTablePath: String?, columnInfo: ColumnInfo?): Table {
+    fun getTable(resultTablePath: String?, columnMapping: ColumnMapping?): Table {
         val reader = BufferedReader(FileReader(resultTablePath))
-        val headerOrigNames: List<String> = reader.readLine().split("\t")
-        val headerNames = emptyList<String>()//parseNames(headerOrigNames, columnInfo)
+        // ignore the first line, it is the header
+        reader.readLine()
 
         val rowsStrings: List<List<String>> = reader.readLines().fold(mutableListOf()) { acc, r ->
             val line: List<String> = r.split("\t")
@@ -75,57 +76,14 @@ class ReadTableData {
             acc
         }
 
-        val headerTypes: List<ColType> =
-            rowsStrings.fold(Collections.nCopies(headerNames.size, ColType.NUMBER)) { acc, r ->
-                r.mapIndexed { i, s ->
-                    if ((checkTypes.isNumerical(s) || s.isEmpty()) && acc[i] == ColType.NUMBER) {
-                        ColType.NUMBER
-                    } else ColType.CHARACTER
-                }
-            }
-
-        val nameAndSamples = parseNameAndSample(headerNames)
-
-        //val headers =  //nameAndSamples.mapIndexed{ i, name -> Header(name.first, headerOrigNames[i], i, headerTypes[i], name.second)}
-
-        val rows: List<List<Any>> = rowsStrings.map { r ->
+        val cols: List<List<Any>> = rowsStrings.fold(Collections.nCopies(columnMapping!!.headers!!.size, emptyList<Any>())) { acc, r ->
             r.mapIndexed { i, c ->
-                if (headerTypes[i] == ColType.NUMBER) {
-                    if (c.isNotEmpty()) c.toDouble() else Double.NaN
+                val colVal = if (columnMapping?.headers?.get(i)?.type == ColType.NUMBER) {
+                    if (c.isNotEmpty() && c != "Filtered") c.toDouble() else Double.NaN
                 } else c
+                acc[i].plus(colVal)
             }
         }
-        return Table(emptyList(), rows)
+        return Table(columnMapping?.headers, cols)
     }
-
-
-    fun parseNameAndSample(origNames: List<String>, resultType: ResultType? = null): List<Pair<String, Experiment?>>{
-        return if(resultType == null){
-            origNames.map{ Pair(it, null)}
-        }else{
-            when (resultType){
-                ResultType.MaxQuant -> parseMaxQuant(origNames)
-                ResultType.Spectronaut -> parseSpectronaut(origNames)
-            }
-        }
-    }
-
-    fun parseMaxQuant(origNames: List<String>): List<Pair<String, Experiment?>>{
-        return emptyList()
-    }
-
-    fun parseSpectronaut(origNames: List<String>): List<Pair<String, Experiment?>>{
-        val regex1 = Regex(".+_DIA_(\\d+?)_.+\\.(\\w+)$")
-        val regex2 = Regex(".+(\\d+?)_DIA_.+\\.(\\w+)$")
-        return origNames.map{ s ->
-            val r = s.replace("PG.", "")
-            val matchResult = regex1.matchEntire(r) ?: regex2.matchEntire(r)
-            if (matchResult != null) {
-                Pair(matchResult.groupValues[2], Experiment(matchResult.groupValues[1], matchResult.groupValues[2]))
-            } else {
-                Pair(r, null)
-            }
-        }
-    }
-
 }

@@ -74,8 +74,8 @@ class AsyncFilterRunner() : CommonStep() {
     ): Triple<Filter, Long, String> {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, null)
         val fltTable = fixFilterRunner?.run(table, params, step?.columnInfo)
-        val fltSize = fltTable?.rows?.size
-        val nrRowsRemoved = table.rows?.size?.minus(fltSize!!)
+        val fltSize = fltTable?.cols?.size
+        val nrRowsRemoved = table.cols?.size?.minus(fltSize!!)
         val resFileHash = (234234).toLong()
         val resFilePath = "blibla"
         return Triple(Filter(fltSize, nrRowsRemoved), resFileHash, resFilePath)

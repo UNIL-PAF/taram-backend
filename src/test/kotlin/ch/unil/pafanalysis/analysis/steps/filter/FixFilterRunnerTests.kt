@@ -28,36 +28,36 @@ class FixFilterRunnerTests {
     fun removeNothing() {
         val params = FilterParams()
         val resTable = runner?.run(table, params, null)
-        assert(table!!.rows?.size == 5535)
-        assert(resTable!!.rows?.size == table!!.rows?.size)
+        assert(table!!.cols?.size == 5535)
+        assert(resTable!!.cols?.size == table!!.cols?.size)
     }
 
     @Test
     fun removeOnlyIdentifiendBySite() {
         val params = FilterParams(removeOnlyIdentifiedBySite = true)
         val resTable = runner?.run(table, params, null)
-        assert(resTable!!.rows?.size == 5457)
+        assert(resTable!!.cols?.size == 5457)
     }
 
     @Test
     fun removeReverse() {
         val params = FilterParams(removeReverse = true)
         val resTable = runner?.run(table, params, null)
-        assert(resTable!!.rows?.size == 5463)
+        assert(resTable!!.cols?.size == 5463)
     }
 
     @Test
     fun removePotentialContaminants() {
         val params = FilterParams(removePotentialContaminant = true)
         val resTable = runner?.run(table, params, null)
-        assert(resTable!!.rows?.size == 5515)
+        assert(resTable!!.cols?.size == 5515)
     }
 
     @Test
     fun removeAll3() {
         val params = FilterParams(removePotentialContaminant = true, removeReverse = true, removeOnlyIdentifiedBySite = true)
         val resTable = runner?.run(table, params, null)
-        assert(resTable!!.rows?.size == 5385)
+        assert(resTable!!.cols?.size == 5385)
     }
 
 }
