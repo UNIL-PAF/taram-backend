@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
+import ch.unil.pafanalysis.results.model.ResultType
 import com.google.common.math.Quantiles
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
@@ -81,8 +82,9 @@ class AsyncTransformationRunner() : CommonStep() {
             step?.columnInfo?.columnMapping?.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
 
-        val ints =
-            readTableData.getListOfInts(expInfoList = expDetailsTable, analysisStep = step, outputRoot = outputRoot)
+        val table = readTableData.getTable(step?.resultTablePath, step?.columnInfo?.columnMapping)
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity")
+
         val transInts = logTransformationRunner!!.runTransformation(ints, transformationParams)
         val normInts = normalizationRunner!!.runNormalization(transInts, transformationParams)
         val impInts = imputationRunner!!.runImputation(normInts, transformationParams)

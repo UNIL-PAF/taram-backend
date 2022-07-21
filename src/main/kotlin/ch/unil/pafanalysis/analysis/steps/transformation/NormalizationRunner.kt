@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service
 class NormalizationRunner() {
 
     fun runNormalization(
-        ints: List<Pair<String, List<Double>>>,
+        ints: List<List<Double>>,
         transformationParams: TransformationParams
-    ): List<Pair<String, List<Double>>> {
+    ): List<List<Double>> {
         if(transformationParams.normalizationType == NormalizationType.NONE.value) return ints
 
         val subtract = when (transformationParams.normalizationType) {
@@ -23,9 +23,9 @@ class NormalizationRunner() {
             }
         }
 
-        return ints.map { (name, orig: List<Double>) ->
+        return ints.map { orig: List<Double> ->
             val noNaNs = orig.filter { !it.isNaN() }
-            Pair(name, orig.map { it - subtract(noNaNs) })
+            orig.map { it - subtract(noNaNs) }
         }
     }
 

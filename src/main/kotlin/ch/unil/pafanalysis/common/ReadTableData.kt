@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.common
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.ColType
-import ch.unil.pafanalysis.analysis.model.ColumnMapping
-import ch.unil.pafanalysis.analysis.model.ExpInfo
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.results.model.ResultType
 import java.io.BufferedReader
 import java.io.FileReader
@@ -86,4 +83,14 @@ class ReadTableData {
         }
         return Table(columnMapping?.headers, cols)
     }
+
+    fun getDoubleMatrix(table: Table?, field: String?): Pair<List<Header>, List<List<Double>>> {
+        val headers = table?.headers?.filter { it.experiment?.field == field }
+        if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
+        if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
+
+        return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
+    }
+
+
 }

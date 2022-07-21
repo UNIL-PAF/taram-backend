@@ -20,9 +20,9 @@ class ImputationRunner() {
     val standardDeviation = StandardDeviation()
 
     fun runImputation(
-        ints: List<Pair<String, List<Double>>>,
+        ints: List<List<Double>>,
         transformationParams: TransformationParams
-    ): List<Pair<String, List<Double>>> {
+    ): List<List<Double>> {
         return when (transformationParams.imputationType) {
             ImputationType.NONE.value -> ints
             ImputationType.NAN.value -> replaceMissingBy(ints, Double.NaN)
@@ -35,20 +35,20 @@ class ImputationRunner() {
     }
 
     fun replaceByNormal(
-        ints: List<Pair<String, List<Double>>>,
+        ints: List<List<Double>>,
         params: ImputationParams?
-    ): List<Pair<String, List<Double>>> {
+    ): List<List<Double>> {
         return ints.map { col ->
-            val cleanInts = col.second.filter { !it.isNaN() && !it.isInfinite() }
+            val cleanInts = col.filter { !it.isNaN() && !it.isInfinite() }
             val sd = standardDeviation.evaluate(cleanInts.toDoubleArray())
             val sdCorr = params!!.width!! * sd
             val mean = cleanInts.average() - params!!.downshift!! * sd
             val random: RandomGenerator = Well1024a()
             val normDist = NormalDistribution(random, mean, sdCorr)
             if(params!!.seed != null) random.setSeed(params!!.seed!!)
-            Pair(col.first, col.second.map { i ->
+            col.map { i ->
                 if(i.isNaN() || i == 0.0) normDist.sample() else i
-            })
+            }
         }
     }
 
@@ -61,12 +61,12 @@ class ImputationRunner() {
      */
 
     fun replaceMissingBy(
-        ints: List<Pair<String, List<Double>>>,
+        ints: List<List<Double>>,
         replaceValue: Double?
-    ): List<Pair<String, List<Double>>> {
+    ): List<List<Double>> {
         if (replaceValue == null) return ints
         return ints.map { col ->
-            Pair(col.first, col.second.map { i -> if (i.isNaN() || i == 0.0) replaceValue else i })
+            col.map { i -> if (i.isNaN() || i == 0.0) replaceValue else i }
         }
     }
 

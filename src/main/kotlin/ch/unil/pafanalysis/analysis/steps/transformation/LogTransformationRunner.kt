@@ -8,9 +8,9 @@ import kotlin.math.ln
 class LogTransformationRunner() {
 
     fun runTransformation(
-        ints: List<Pair<String, List<Double>>>,
+        ints: List<List<Double>>,
         transformationParams: TransformationParams
-    ): List<Pair<String, List<Double>>> {
+    ): List<List<Double>> {
 
         fun transformList(intList: List<Double>): List<Double> {
             val a: List<Double> = when (transformationParams.transformationType) {
@@ -32,8 +32,8 @@ class LogTransformationRunner() {
             return a
         }
 
-        return ints.map { (name, orig: List<Double>) ->
-            Pair(name, transformList(orig))
+        return ints.map { orig: List<Double> ->
+            transformList(orig)
         }
     }
 

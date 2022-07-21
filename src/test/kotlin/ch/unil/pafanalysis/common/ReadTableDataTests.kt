@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.common
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
 import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
@@ -20,7 +21,7 @@ class ReadTableDataTests {
         val ints = col?.map { it as? Double ?: Double.NaN }?.filter { !it.isNaN() }
         return ints?.average()
     }
-    
+
     @Test
     fun readFluderTable() {
         val filePath = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"
@@ -56,6 +57,49 @@ class ReadTableDataTests {
         val quants = table.cols?.get(header!!.idx)
         val mean = computeMean(quants)?.toInt()
         assert(mean == 789722858)
+    }
+
+    @Test
+    fun succesfulGetDoubleMatrix() {
+        val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
+        val filePath = resPath + "proteinGroups.txt"
+        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
+        val table = readTableData.getTable(filePath, mqMapping)
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity")
+
+        assert(ints?.size == 16)
+        assert(selHeaders.size == 16)
+        assert(ints[0]?.size == 5535)
+        val mean = computeMean(ints[0])?.toInt()
+        assert(mean == 762055713)
+    }
+
+    @Test
+    fun noEntriesExceptionGetDoubleMatrix() {
+        val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
+        val filePath = resPath + "proteinGroups.txt"
+        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
+        val table = readTableData.getTable(filePath, mqMapping)
+
+        val exception: Exception = assertThrows { readTableData.getDoubleMatrix(table, "blibla") }
+        val expectedMessage = "No entries for [blibla] found."
+        val actualMessage = exception.message
+
+        assert(actualMessage!!.contains(expectedMessage))
+    }
+
+    @Test
+    fun notNumericalExceptionGetDoubleMatrix() {
+        val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
+        val filePath = resPath + "proteinGroups.txt"
+        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
+        val table = readTableData.getTable(filePath, mqMapping)
+
+        val exception: Exception = assertThrows { readTableData.getDoubleMatrix(table, "Identification.type") }
+        val expectedMessage = "Entries for [Identification.type] are not numerical."
+        val actualMessage = exception.message
+
+        assert(actualMessage!!.contains(expectedMessage))
     }
 
 }

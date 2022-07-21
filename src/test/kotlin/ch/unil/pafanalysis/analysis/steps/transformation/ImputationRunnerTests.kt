@@ -1,7 +1,10 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
+import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
+import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,44 +20,35 @@ class ImputationRunnerTests {
     @Autowired
     private val runner: ImputationRunner? = null
 
-    private val readTableData = ReadTableData()
-    private var ints: List<Pair<String, List<Double>>>? = null
+    @Autowired
+    val colParser: ColumnMappingParser? = null
 
+
+    private val readTableData = ReadTableData()
+    private var table: Table? = null
+    //private var ints: List<Pair<String, List<Double>>>? = null
 
     @BeforeEach
     fun init() {
-        val filePath = "./src/test/resources/transformation/proteinGroups_1657194676917.txt"
-        val selCols = listOf(
-            "LFQ intensity KO-13703",
-            "LFQ intensity KO-13704",
-            "LFQ intensity KO-13705",
-            "LFQ intensity KO-13706",
-            "LFQ intensity KO-13707",
-            "LFQ intensity KO-13708",
-            "LFQ intensity KO-13709",
-            "LFQ intensity KO-13710",
-            "LFQ intensity WT-13695",
-            "LFQ intensity WT-13696",
-            "LFQ intensity WT-13697",
-            "LFQ intensity WT-13698",
-            "LFQ intensity WT-13699",
-            "LFQ intensity WT-13700",
-            "LFQ intensity WT-13701",
-            "LFQ intensity WT-13702"
-        )
-        ints = readTableData.getColumnNumbers(filePath, selCols).mapIndexed { i, a -> Pair(selCols[i], a) }
+        val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
+        val filePath = resPath + "proteinGroups.txt"
+        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
+        table = readTableData.getTable(filePath, mqMapping)
     }
 
     @Test
     fun normalImputationDefault() {
+        val ints = readTableData.getDoubleMatrix(table, "LFQ.intensity").second
+
         val imputParams = ImputationParams()
         val params = TransformationParams(imputationType = ImputationType.NORMAL.value, imputationParams = imputParams)
-        val res = runner?.runImputation(ints!!, params)
-        val oneRes = BigDecimal(res!![0].second[22])
-        assert(ints!![0].second[22] == 0.0)
+        val res = runner?.runImputation(ints, params)
+        val oneRes = BigDecimal(res!![0][22])
+        assert(ints!![0][22] == 0.0)
         assert(oneRes == BigDecimal(-1.431590438871017E10))
     }
 
+    /*
     @Test
     fun normalImputationWithParams() {
         val imputParams = ImputationParams(width = 0.5, downshift = 2.0, seed = 10)
@@ -83,4 +77,7 @@ class ImputationRunnerTests {
         assert(ints!![0].second[22] == 0.0)
         assert(oneRes.isNaN())
     }
+
+     */
+
 }

@@ -7,7 +7,7 @@ class WriteTableData {
 
     fun writeTable(
         step: AnalysisStep?,
-        newInts: List<Pair<String, List<Double>>>,
+        newInts: List<List<Double>>,
         outputRoot: String?,
         colName: String
     ): String {
@@ -23,10 +23,9 @@ class WriteTableData {
         writer.write(newHeader.joinToString(separator = "\t"))
         writer.newLine()
 
-        val initialList: List<List<Double>> = newInts[0].second.map { emptyList<Double>() }
-        val intMatrix: List<List<Double>> = newInts.fold(initialList) { sum, (name, ints) ->
-            val myInts: List<Double> = ints
-            myInts.mapIndexed { i, int ->
+        val initialList: List<List<Double>> = newInts[0].map { emptyList<Double>() }
+        val intMatrix: List<List<Double>> = newInts.fold(initialList) { sum, ints ->
+            ints.mapIndexed { i, int ->
                 sum[i].plus(int)
             }
         }
