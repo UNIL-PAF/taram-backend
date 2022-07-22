@@ -23,6 +23,7 @@ import java.io.FileReader
 import java.lang.reflect.Type
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import kotlin.math.exp
 
 @Service
 class InitialResultRunner() : CommonStep(), CommonRunner {
@@ -59,7 +60,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val stepPath = setMainPaths(emptyStep?.analysis, emptyStep)
 
         val resultType = getResultType(emptyStep?.analysis?.result?.type)
-        val outputRoot = getOutputRoot(resultType)
+        val outputRoot = getOutputRoot()
         val resultPath = getResultPath(emptyStep?.analysis)
         val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath, resultType)
 
@@ -101,8 +102,10 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
         val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
+        val headers: List<Header>? = updateHeaders(experimentDetails, analysisStep.columnInfo?.columnMapping?.headers)
+
         val newColumnMapping: ColumnMapping? =
-            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails, headers = headers)
 
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
         val newColumnInfo: ColumnInfo? =
@@ -113,6 +116,14 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         updateNextStep(analysisStep)
 
         return runningStep!!
+    }
+
+    private fun updateHeaders(experimentDetails: HashMap<String, ExpInfo>, headers: List<Header>?): List<Header>? {
+        return headers?.map{ h ->
+            val expInfo = experimentDetails[h.experiment?.initialName]
+            val exp = h.experiment?.copy(name = expInfo?.name, group = expInfo?.group)
+            h.copy(experiment = exp)
+        }
     }
 
     private fun createEmptyInitialResult(analysis: Analysis?): AnalysisStep? {

@@ -84,8 +84,8 @@ class ReadTableData {
         return Table(columnMapping?.headers, cols)
     }
 
-    fun getDoubleMatrix(table: Table?, field: String?): Pair<List<Header>, List<List<Double>>> {
-        val headers = table?.headers?.filter { it.experiment?.field == field }
+    fun getDoubleMatrix(table: Table?, field: String?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
+        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || it.experiment?.group == group)}
         if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
         if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
 

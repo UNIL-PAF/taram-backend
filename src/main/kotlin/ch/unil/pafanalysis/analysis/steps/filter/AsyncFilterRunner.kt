@@ -35,7 +35,7 @@ class AsyncFilterRunner() : CommonStep() {
             val (filterRes, resultTableHash) = filterTable(
                 newStep,
                 gson.fromJson(paramsString, FilterParams().javaClass),
-                getOutputRoot(getResultType(newStep?.analysis?.result?.type))
+                getOutputRoot()
             )
             val stepWithRes = newStep?.copy(
                 parameters = paramsString,

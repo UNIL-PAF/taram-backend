@@ -15,6 +15,7 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
 import kotlin.concurrent.thread
+import kotlin.math.log
 import kotlin.math.log2
 
 
@@ -77,14 +78,13 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
         val experimentNames = expDetailsTable?.map { it?.name!! }
         val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
-        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, it.value, analysisStep) }
+        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, analysisStep) }
 
         return BoxPlot(experimentNames = experimentNames, data = boxplotGroupData?.keys?.toList())
     }
 
     private fun createBoxplotGroupData(
         group: String?,
-        expInfoList: List<ExpInfo?>?,
         analysisStep: AnalysisStep?
     ): BoxPlotGroupData {
         val logScale = if (analysisStep?.parameters != null) {
@@ -95,11 +95,12 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         val intColumn = if (analysisStep?.parameters != null) {
             val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
             boxPlotParams.column
-        } else null
+        } else null ?: analysisStep?.commonResult?.intCol
 
-        val outputRoot = getOutputRoot(getResultType(analysisStep?.analysis?.result?.type))
-        val listOfInts = readTableData.getListOfInts(expInfoList, analysisStep, outputRoot, intColumn)
-        val listOfBoxplots = listOfInts.map { BoxPlotData(it.first, computeBoxplotData(it.second, logScale)) }
+        val table = readTableData.getTable(getOutputRoot().plus(analysisStep?.resultTablePath), analysisStep?.columnInfo?.columnMapping)
+        val (headers, ints) = readTableData.getDoubleMatrix(table, intColumn, group)
+        val listOfBoxplots = headers.mapIndexed{i, h -> BoxPlotData(h.experiment?.name, computeBoxplotData(ints[i], logScale))}
+
         return BoxPlotGroupData(group = group, data = listOfBoxplots)
     }
 

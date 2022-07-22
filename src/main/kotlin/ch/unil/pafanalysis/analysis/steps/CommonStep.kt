@@ -127,13 +127,13 @@ open class CommonStep {
         return if (type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
     }
 
-    fun getOutputRoot(resultType: ResultType?): String? {
+    fun getOutputRoot(): String? {
         return env?.getProperty("output.path")
     }
 
     fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
         val outputPath: String = analysis?.id.toString()
-        val outputRoot = getOutputRoot(getResultType(analysis?.result?.type))
+        val outputRoot = getOutputRoot()
         createResultDir(outputRoot?.plus(outputPath))
 
         val stepPath = "$outputPath/${emptyStep?.id}"
@@ -194,7 +194,7 @@ open class CommonStep {
             .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
             .build();
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        val outputRoot = getOutputRoot(getResultType(step?.analysis?.result?.type))
+        val outputRoot = getOutputRoot()
 
         val pdfPath: String = outputRoot + response.body()
         val sourcePdf = PdfDocument(PdfReader(pdfPath))
@@ -296,18 +296,18 @@ open class CommonStep {
         resultType: ResultType?
     ): Pair<String?, Long?> {
         val pathAndHash = if (modifiesResult != null && modifiesResult) {
-            val oldTab = getOutputRoot(resultType)?.plus("/") + oldStep?.resultTablePath
+            val oldTab = getOutputRoot()?.plus("/") + oldStep?.resultTablePath
             val tabName = if (resultType == ResultType.MaxQuant) {
                 "/proteinGroups_"
             } else {
                 "/Report_"
             }
             val newTab = stepPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
-            val newFile = File(getOutputRoot(resultType)?.plus(newTab))
+            val newFile = File(getOutputRoot()?.plus(newTab))
             File(oldTab).copyTo(newFile)
 
             // remove old if exists
-            if (oldTablePath != null) File(getOutputRoot(resultType)?.plus("/")?.plus(oldTablePath)).delete()
+            if (oldTablePath != null) File(getOutputRoot()?.plus("/")?.plus(oldTablePath)).delete()
 
             Pair(newTab, Crc32HashComputations().computeFileHash(newFile))
         } else {
