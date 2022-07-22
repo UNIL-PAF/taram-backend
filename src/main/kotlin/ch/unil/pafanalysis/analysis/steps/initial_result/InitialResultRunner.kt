@@ -6,6 +6,8 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Crc32HashComputations
+import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.WriteTableData
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.reflect.TypeToken
@@ -29,6 +31,9 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     private var columnInfoService: ColumnInfoService? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
+
+    private val readTable = ReadTableData()
+    private val writeTable = WriteTableData()
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
@@ -57,12 +62,14 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val outputRoot = getOutputRoot(resultType)
         val resultPath = getResultPath(emptyStep?.analysis)
         val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath, resultType)
-        val newTableHash = Crc32HashComputations().computeFileHash(newTable)
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
             val columnParseRes =
                 columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)
+            val table = readTable.getTable(newTable.path, columnParseRes?.first?.columnMapping)
+            writeTable.write(newTable.path, table)
+            val newTableHash = Crc32HashComputations().computeFileHash(newTable)
 
             emptyStep?.copy(
                 resultPath = stepPath,
