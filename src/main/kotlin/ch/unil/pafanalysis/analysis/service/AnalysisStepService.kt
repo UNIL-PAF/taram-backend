@@ -102,7 +102,8 @@ class AnalysisStepService {
                 analysis = newAnalysis,
                 beforeId = stepBefore?.id,
                 copyFromId = analysisStep.id,
-                status = AnalysisStepStatus.IDLE.value
+                status = AnalysisStepStatus.IDLE.value,
+                stepHash = null
             )
         )
     }
