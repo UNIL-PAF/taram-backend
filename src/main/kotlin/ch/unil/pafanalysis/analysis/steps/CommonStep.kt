@@ -109,15 +109,6 @@ open class CommonStep {
         return getRunner(step.type)?.run(step?.beforeId!!, step)
     }
 
-    /*
-    fun setPathes(analysis: Analysis?) {
-        resultType = getResultType(analysis?.result?.type)
-        outputRoot = getOutputRoot(resultType)
-        resultPath =
-            env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
-    }
-    */
-
     fun getResultPath(analysis: Analysis?): String? {
         val resultType = getResultType(analysis?.result?.type)
         return env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
@@ -201,6 +192,33 @@ open class CommonStep {
         val pdfPlot = sourcePdf.getPage(1)
         val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
         return Image(pdfPlotCopy)
+    }
+
+    fun tryToRun(runFun: () -> AnalysisStep?, step: AnalysisStep?) {
+        try {
+            val step = runFun()
+
+            val stepBefore = analysisStepRepository?.findById(step!!.beforeId!!)
+            val newHash = computeStepHash(step, stepBefore)
+
+            val updatedStep =
+                step?.copy(
+                    status = AnalysisStepStatus.DONE.value,
+                    stepHash = newHash,
+                )
+            analysisStepRepository?.saveAndFlush(updatedStep!!)!!
+            updateNextStep(updatedStep!!)
+        } catch (e: Exception) {
+            println("Error in transformation asyncRun ${step?.id}")
+            e.printStackTrace()
+            analysisStepRepository?.saveAndFlush(
+                step!!.copy(
+                    status = AnalysisStepStatus.ERROR.value,
+                    error = e.message,
+                    stepHash = Crc32HashComputations().getRandomHash()
+                )
+            )
+        }
     }
 
     fun update(step: AnalysisStep, stepBefore: AnalysisStep) {

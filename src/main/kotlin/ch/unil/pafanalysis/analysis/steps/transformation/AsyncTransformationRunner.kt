@@ -25,79 +25,61 @@ class AsyncTransformationRunner() : CommonStep() {
     private val writeTableData = WriteTableData()
 
     @Autowired
-    val logTransformationRunner: LogTransformationRunner ? = null
+    val logTransformationRunner: LogTransformationRunner? = null
 
     @Autowired
-    val normalizationRunner: NormalizationRunner ? = null
+    val normalizationRunner: NormalizationRunner? = null
 
     @Autowired
-    val imputationRunner: ImputationRunner ? = null
+    val imputationRunner: ImputationRunner? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
-        try {
+        val funToRun: () -> AnalysisStep? = {
             val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
 
-            val (resultTableHash, commonResult) = transformTable(
+            val resultTableHash = transformTable(
                 newStep,
                 gson.fromJson(paramsString, TransformationParams().javaClass),
                 getOutputRoot()
             )
-            val stepWithRes = newStep?.copy(
+
+            newStep?.copy(
                 parameters = paramsString,
                 parametersHash = hashComp.computeStringHash(paramsString),
                 resultTableHash = resultTableHash,
-                results = gson.toJson(defaultResult)
-            )
-            val oldStep = analysisStepRepository?.findById(oldStepId)
-            val newHash = computeStepHash(stepWithRes, oldStep)
-
-            val updatedStep =
-                stepWithRes?.copy(
-                    status = AnalysisStepStatus.DONE.value,
-                    stepHash = newHash,
-                    commonResult = commonResult
-                )
-            analysisStepRepository?.saveAndFlush(updatedStep!!)!!
-            updateNextStep(updatedStep!!)
-        } catch (e: Exception) {
-            println("Error in transformation asyncRun ${newStep?.id}")
-            e.printStackTrace()
-            analysisStepRepository?.saveAndFlush(
-                newStep!!.copy(
-                    status = AnalysisStepStatus.ERROR.value,
-                    error = e.message,
-                    stepHash = Crc32HashComputations().getRandomHash()
-                )
+                results = gson.toJson(defaultResult),
             )
         }
+
+        tryToRun(funToRun, newStep)
     }
 
     fun transformTable(
         step: AnalysisStep?,
         transformationParams: TransformationParams,
         outputRoot: String?
-    ): Pair<Long, CommonResult?> {
-        val expDetailsTable = step?.columnInfo?.columnMapping?.experimentNames?.map { name ->
-            step?.columnInfo?.columnMapping?.experimentDetails?.get(name)
-        }?.filter { it?.isSelected ?: false }
+    ): Long {
+        transformationParams.intCol
 
-        val table = readTableData.getTable(step?.resultTablePath, step?.columnInfo?.columnMapping)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity")
+        val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
+        val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.columnInfo?.columnMapping)
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
 
         val transInts = logTransformationRunner!!.runTransformation(ints, transformationParams)
         val normInts = normalizationRunner!!.runNormalization(transInts, transformationParams)
         val impInts = imputationRunner!!.runImputation(normInts, transformationParams)
-        val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
 
-        val newColName = "trans $intCol"
+        val newCols: List<List<Any>>? = table.cols?.mapIndexed{ i, c ->
+            val selHeader = selHeaders.withIndex().find{ it.value.idx == i }
+            if (selHeader != null) {
+                impInts[selHeader.index]
+            }else c
 
-        val resTable = writeTableData.writeTable(step, impInts, outputRoot = outputRoot, newColName)
-        val resTableHash = Crc32HashComputations().computeFileHash(File(resTable))
-        val numCols =
-            step?.commonResult?.numericalColumns?.filter { it != step?.commonResult?.intCol }?.plus(newColName)
-        val commonRes = step?.commonResult?.copy(intCol = newColName, numericalColumns = numCols)
-        return Pair(resTableHash, commonRes)
+        }
+
+        val resTable = writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
+        return Crc32HashComputations().computeFileHash(File(resTable))
     }
 
 }
