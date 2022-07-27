@@ -43,23 +43,15 @@ class AsyncBoxPlotRunner() : CommonStep() {
         group: String?,
         analysisStep: AnalysisStep?
     ): BoxPlotGroupData {
-        val logScale = if (analysisStep?.parameters != null) {
-            val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
-            boxPlotParams.logScale
-        } else false
-
-        val intColumn = if (analysisStep?.parameters != null) {
-            val boxPlotParams: BoxPlotParams = gson.fromJson(analysisStep.parameters, BoxPlotParams().javaClass)
-            boxPlotParams.column
-        } else null ?: analysisStep?.commonResult?.intCol
+        val params = gson.fromJson(analysisStep?.parameters, BoxPlotParams().javaClass)
 
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.columnInfo?.columnMapping
         )
-        val (headers, ints) = readTableData.getDoubleMatrix(table, intColumn, group)
+        val (headers, ints) = readTableData.getDoubleMatrix(table, params?.column, group)
         val listOfBoxplots =
-            headers.mapIndexed { i, h -> BoxPlotData(h.experiment?.name, computeBoxplotData(ints[i], logScale)) }
+            headers.mapIndexed { i, h -> BoxPlotData(h.experiment?.name, computeBoxplotData(ints[i], params?.logScale)) }
 
         return BoxPlotGroupData(group = group, data = listOfBoxplots)
     }

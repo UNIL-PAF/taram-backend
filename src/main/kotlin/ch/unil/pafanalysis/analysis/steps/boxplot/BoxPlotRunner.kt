@@ -5,13 +5,17 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.transformation.ImputationType
+import ch.unil.pafanalysis.analysis.steps.transformation.NormalizationType
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
+import ch.unil.pafanalysis.analysis.steps.transformation.TransformationType
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import javax.swing.Box
 
 
 @Service
@@ -21,6 +25,13 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     @Autowired
     var asyncBoxplotRunner: AsyncBoxPlotRunner? = null
+
+    private fun getParams(step: AnalysisStep?): BoxPlotParams {
+        val boxplotParams = if(step?.parameters != null) gson.fromJson(step?.parameters, BoxPlotParams().javaClass) else null
+        val intColumn = boxplotParams?.column ?: step?.commonResult?.intCol
+        val logScale = boxplotParams?.logScale ?: false
+        return BoxPlotParams(logScale = logScale, column = intColumn)
+    }
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
@@ -37,14 +48,14 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
+        val boxplotParams: BoxPlotParams? = gson.fromJson(params, BoxPlotParams::class.java) ?: getParams(newStep)
 
-        val boxplotParams: BoxPlotParams? = gson.fromJson(params, BoxPlotParams::class.java)
         val paramsHash = hashComp.computeStringHash(boxplotParams?.toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = params)
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(boxplotParams))
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
 
         asyncBoxplotRunner?.runAsync(oldStepId, stepWithDiff, params)
-        return newStep!!
+        return stepWithDiff!!
     }
 
     override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {

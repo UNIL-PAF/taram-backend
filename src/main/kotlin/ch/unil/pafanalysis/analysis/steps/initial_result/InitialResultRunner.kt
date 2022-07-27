@@ -139,10 +139,10 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
 
     private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType?): InitialResult {
-        if (type == ResultType.MaxQuant) {
-            return createInitialMaxQuantResult(resultPath, resultFilename)
+        return if (type == ResultType.MaxQuant) {
+            createInitialMaxQuantResult(resultPath, resultFilename)
         } else {
-            return createInitialSpectronautResult(resultPath, resultFilename)
+            createInitialSpectronautResult(resultPath, resultFilename)
         }
     }
 
