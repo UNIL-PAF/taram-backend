@@ -82,7 +82,7 @@ class ColumnMappingParser {
                         Pair(
                             matchResult.groupValues[1],
                             ExpInfo(
-                                isSelected = false,
+                                isSelected = true,
                                 name = matchResult.groupValues[1],
                                 originalName = s.replace(matchResult.groupValues[2], "")
                             )

@@ -74,6 +74,7 @@ class AnalysisService {
         } else {
             return oldList
         }
+
         var nextEl: AnalysisStep? = first
 
         while (nextEl?.nextId != null && emergencyBreak > 0) {

@@ -82,6 +82,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 commonResult = columnParseRes?.second
             )
         } catch (e: StepException) {
+            e.printStackTrace()
             emptyStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
         }
 
