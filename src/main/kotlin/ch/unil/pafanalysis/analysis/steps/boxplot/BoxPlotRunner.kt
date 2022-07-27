@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -36,7 +37,13 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
-        asyncBoxplotRunner?.runAsync(oldStepId, newStep, params)
+
+        val boxplotParams: BoxPlotParams? = gson.fromJson(params, BoxPlotParams::class.java)
+        val paramsHash = hashComp.computeStringHash(boxplotParams?.toString())
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = params)
+        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
+
+        asyncBoxplotRunner?.runAsync(oldStepId, stepWithDiff, params)
         return newStep!!
     }
 

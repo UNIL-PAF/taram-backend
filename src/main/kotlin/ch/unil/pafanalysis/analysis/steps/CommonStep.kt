@@ -55,14 +55,7 @@ open class CommonStep {
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
 
-
     var type: AnalysisStepType? = null
-
-    /*
-    var resultType: ResultType? = null
-    var outputRoot: String? = null
-    var resultPath: String? = null
-    */
 
     fun runCommonStep(
         type: AnalysisStepType,
@@ -80,16 +73,13 @@ open class CommonStep {
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
         val stepWithParams =
             if (currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
-        val paramsHash = hashComp.computeStringHash(stepWithParams?.parameters)
-        val stepWithHash = stepWithParams?.copy(parametersHash = paramsHash)
-        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-        val stepPath = setMainPaths(oldStep?.analysis, stepWithDiff)
-        val resultType = getResultType(stepWithDiff?.analysis?.result?.type)
-        val resultTablePathAndHash =
-            getResultTablePath(modifiesResult, oldStep, stepPath, stepWithDiff?.resultTablePath, resultType)
 
-        //val stepHash: Long = computeStepHash(step = currentStep, resultTableHash = resultTablePathAndHash.second)
-        return updateEmptyStep(stepWithDiff, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+        val stepPath = setMainPaths(oldStep?.analysis, stepWithParams)
+        val resultType = getResultType(stepWithParams?.analysis?.result?.type)
+        val resultTablePathAndHash =
+            getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath, resultType)
+
+        return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
     }
 
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
@@ -241,27 +231,6 @@ open class CommonStep {
             }
         } else {
             analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.DONE.value))
-        }
-    }
-
-    fun updateParams(analysisStep: AnalysisStep, params: String) {
-        analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
-
-        try {
-            getRunner(analysisStep.type)?.run(
-                analysisStep.beforeId!!,
-                analysisStep.copy(parameters = params, parametersHash = hashComp.computeStringHash(params))
-            )
-        } catch (e: Exception) {
-            println("Error in updateParams ${analysisStep.id} params: [$params]")
-            e.printStackTrace()
-            analysisStepRepository?.saveAndFlush(
-                analysisStep!!.copy(
-                    status = AnalysisStepStatus.ERROR.value,
-                    error = e.message,
-                    stepHash = Crc32HashComputations().getRandomHash()
-                )
-            )
         }
     }
 

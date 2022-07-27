@@ -49,7 +49,11 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
         val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, paramsString)
 
-        asyncTransformationRunner?.runAsync(oldStepId, newStep, paramsString)
+        val paramsHash = hashComp.computeStringHash(gson.fromJson(paramsString, TransformationParams::class.java).toString())
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = paramsString)
+        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
+
+        asyncTransformationRunner?.runAsync(oldStepId, stepWithDiff, paramsString)
         return newStep!!
     }
 

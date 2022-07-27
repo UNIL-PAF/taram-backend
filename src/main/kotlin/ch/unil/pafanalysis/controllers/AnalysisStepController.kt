@@ -29,19 +29,10 @@ class AnalysisStepController {
     private var analysisStepService: AnalysisStepService? = null
 
     @Autowired
-    private var qualityControlRunner: QualityControlRunner? = null
-
-    @Autowired
-    private var boxPlotRunner: BoxPlotRunner? = null
-
-    @Autowired
     private var initialResult: InitialResultRunner? = null
 
     @Autowired
     private var commonStep: CommonStep? = null
-
-    @Autowired
-    private var transformationRunner: TransformationRunner? = null
 
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
@@ -70,11 +61,14 @@ class AnalysisStepController {
         analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
         try {
-            when (analysisStep?.type) {
-                INITIAL_RESULT.value -> initialResult?.updateColumnParams(analysisStep, stepParams)
-                BOXPLOT.value -> boxPlotRunner?.updateParams(analysisStep, stepParams)
-                TRANSFORMATION.value -> transformationRunner?.updateParams(analysisStep, stepParams)
-                else -> throw RuntimeException("Analysis step [" + analysisStep?.type + "] not found.")
+            if(analysisStep?.type == INITIAL_RESULT.value){
+                initialResult?.updateColumnParams(analysisStep, stepParams)
+            }else{
+                commonStep?.getRunner(analysisStep?.type)?.run(
+                    analysisStep?.beforeId!!,
+                    analysisStep,
+                    stepParams
+                )
             }
         } catch (e: Exception) {
             e.printStackTrace()

@@ -37,16 +37,15 @@ class AsyncTransformationRunner() : CommonStep() {
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
         val funToRun: () -> AnalysisStep? = {
             val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
+            val transformationParams = gson.fromJson(paramsString, TransformationParams().javaClass)
 
             val resultTableHash = transformTable(
                 newStep,
-                gson.fromJson(paramsString, TransformationParams().javaClass),
+                transformationParams,
                 getOutputRoot()
             )
 
             newStep?.copy(
-                parameters = paramsString,
-                parametersHash = hashComp.computeStringHash(paramsString),
                 resultTableHash = resultTableHash,
                 results = gson.toJson(defaultResult),
             )
