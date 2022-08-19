@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
+import ch.unil.pafanalysis.analysis.steps.filter.FilterRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -51,6 +52,9 @@ open class CommonStep {
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null
 
+    @Autowired
+    private var filterRunner: FilterRunner? = null
+
     val gson = Gson()
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
@@ -91,6 +95,7 @@ open class CommonStep {
             AnalysisStepType.INITIAL_RESULT.value -> initialResultRunner
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner
             AnalysisStepType.TRANSFORMATION.value -> transformationRunner
+            AnalysisStepType.FILTER.value -> filterRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }

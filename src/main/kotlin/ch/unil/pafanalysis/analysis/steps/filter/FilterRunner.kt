@@ -1,25 +1,15 @@
 package ch.unil.pafanalysis.analysis.steps.filter
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
-import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
-import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.common.Crc32HashComputations
-import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.WriteTableData
-import com.google.common.math.Quantiles
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.io.File
-import kotlin.math.ln
 
 @Service
 class FilterRunner() : CommonStep(), CommonRunner {
@@ -42,7 +32,7 @@ class FilterRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, paramsString)
+        val newStep = runCommonStep(AnalysisStepType.FILTER, oldStepId, true, step, paramsString)
 
         asyncRunner?.runAsync(oldStepId, newStep, paramsString)
         return newStep!!
