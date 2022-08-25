@@ -2,7 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.group_filter
 
 data class GroupFilterParams (
     val minNrValid: Int? = null,
-    val filterInGroup: FilterInGroup? = null,
+    val filterInGroup: String? = null,
     val field: String? = null
 )
 

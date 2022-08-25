@@ -51,7 +51,7 @@ class FixFilterRunnerTests {
 
     @Test
     fun checkUndefinedGroupException() {
-        val params = GroupFilterParams(8, FilterInGroup.ONE_GROUP, "Intensity")
+        val params = GroupFilterParams(8, FilterInGroup.ONE_GROUP.value, "Intensity")
 
         val exception: Exception = assertThrows { runner?.run(table, params, colInfoWithoutGroups) }
         val expectedMessage = "Please specify your groups in the 'Initial result' parameters."
@@ -64,7 +64,7 @@ class FixFilterRunnerTests {
 
     @Test
     fun checkOneGroup() {
-        val params = GroupFilterParams(5, FilterInGroup.ONE_GROUP, "LFQ.intensity")
+        val params = GroupFilterParams(5, FilterInGroup.ONE_GROUP.value, "LFQ.intensity")
         val resTable = runner?.run(table, params, colInfo)
         assert(table!!.cols?.get(0)?.size == 5535)
         assert(resTable!!.cols?.get(0)?.size == 5074)
@@ -73,7 +73,7 @@ class FixFilterRunnerTests {
 
     @Test
     fun checkAllGroups() {
-        val params = GroupFilterParams(5, FilterInGroup.ALL_GROUPS, "LFQ.intensity")
+        val params = GroupFilterParams(5, FilterInGroup.ALL_GROUPS.value, "LFQ.intensity")
         val resTable = runner?.run(table, params, colInfo)
         assert(table!!.cols?.get(0)?.size == 5535)
         assert(resTable!!.cols?.get(0)?.size == 4761)

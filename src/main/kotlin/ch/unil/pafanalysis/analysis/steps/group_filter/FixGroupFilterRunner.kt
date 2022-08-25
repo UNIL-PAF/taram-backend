@@ -16,8 +16,8 @@ class FixGroupFilterRunner() {
         val validGroups = getValidGroups(table, params.field)
 
         val validRows: List<Boolean>? = when (params.filterInGroup) {
-            FilterInGroup.ONE_GROUP -> checkOneGroup(validGroups, params.minNrValid)
-            FilterInGroup.ALL_GROUPS -> checkAllGroups(validGroups, params.minNrValid)
+            FilterInGroup.ONE_GROUP.value -> checkOneGroup(validGroups, params.minNrValid)
+            FilterInGroup.ALL_GROUPS.value -> checkAllGroups(validGroups, params.minNrValid)
             else -> throw Exception("FilterInGroup parameter must be defined.")
         }
 

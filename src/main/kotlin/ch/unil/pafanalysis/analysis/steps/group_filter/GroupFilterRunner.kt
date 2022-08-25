@@ -20,7 +20,7 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
     override var type: AnalysisStepType? = AnalysisStepType.GROUP_FILTER
 
     val defaultParams =
-        GroupFilterParams(minNrValid = 0, filterInGroup = FilterInGroup.ONE_GROUP)
+        GroupFilterParams(minNrValid = 0, filterInGroup = FilterInGroup.ONE_GROUP.value)
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
@@ -32,7 +32,7 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(AnalysisStepType.FILTER, oldStepId, true, step, paramsString)
+        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
 
         asyncRunner?.runAsync(oldStepId, newStep, paramsString)
         return newStep!!
@@ -45,9 +45,15 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
             GroupFilterParams::class.java
         ) else null
 
+        val filterInGroupText = when(params.filterInGroup ) {
+            FilterInGroup.ONE_GROUP.value -> FilterInGroup.ONE_GROUP.text
+            FilterInGroup.ALL_GROUPS.value -> FilterInGroup.ALL_GROUPS.text
+            else -> "NONE"
+        }
+
         return "Parameter(s) changed:"
             .plus(if (params.minNrValid != origParams?.minNrValid) " [Minimal number of valid: ${params.minNrValid}]" else "")
-            .plus(if (params.filterInGroup != origParams?.filterInGroup) " [Number of valid entries required in: ${params.filterInGroup?.text}]" else "")
+            .plus(if (params.filterInGroup != origParams?.filterInGroup) " [Number of valid entries required in: ${filterInGroupText}]" else "")
     }
 
 }
