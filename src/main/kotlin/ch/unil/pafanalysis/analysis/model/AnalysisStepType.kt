@@ -5,5 +5,6 @@ enum class AnalysisStepType(val value: String) {
     QUALITY_CONTROL("quality-control"),
     BOXPLOT("boxplot"),
     TRANSFORMATION("transformation"),
-    FILTER("filter")
+    FILTER("filter"),
+    GROUP_FILTER("group_filter")
 }
