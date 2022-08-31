@@ -53,29 +53,13 @@ class TTestComputationTests {
         colInfo = ColumnInfo(columnMapping = mqMappingWithGroups, columnMappingHash = null)
     }
 
-    /*
-    @Test
-    fun checkUndefinedGroupException() {
-        val params = GroupFilterParams(8, FilterInGroup.ONE_GROUP.value, "Intensity")
-
-        val exception: Exception = assertThrows { runner?.run(table, params, colInfoWithoutGroups) }
-        val expectedMessage = "Please specify your groups in the 'Initial result' parameters."
-        val actualMessage = exception.message
-
-        println(actualMessage)
-
-        assert(actualMessage!!.contains(expectedMessage))
-    }
-
-     */
-
     @Test
     fun compute2SidedTTest() {
         val params = TTestParams(".LFQ.intensity")
         val resTable = runner?.run(table, params, colInfo)
-        val nrNewCols = 4
 
         // check if headers are added
+        val nrNewCols = 4
         assert(table?.headers?.size?.plus(nrNewCols) == resTable?.first?.headers?.size)
         // check if columns are added
         assert(table?.cols?.size?.plus(nrNewCols) == resTable?.first?.cols?.size)
@@ -116,6 +100,13 @@ class TTestComputationTests {
                 listOf<Double>(-0.6753862, -0.0937025,  0.1106688, -0.5716700, -2.3772725)
             )
         )
+
+        // verify significant indexes
+        val isSignHeader = resTable?.first?.headers?.find { it.name == "is.significant" }
+        val isSign = resTable?.first?.cols?.get(isSignHeader?.idx!!)
+            ?.map { if (isSignHeader.type == ColType.CHARACTER) it as? String ?: "" else "" }
+        val validIdx = isSign?.foldIndexed(emptyList<Int>()){i, acc, v -> if(v == "true") acc.plus(i+1) else acc }
+        assert(validIdx == listOf<Int>(299, 346, 1057, 1977, 2430, 3138, 4153, 4411, 4885))
 
     }
 
