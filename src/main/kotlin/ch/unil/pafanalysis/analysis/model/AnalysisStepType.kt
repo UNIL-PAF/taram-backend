@@ -6,5 +6,6 @@ enum class AnalysisStepType(val value: String) {
     BOXPLOT("boxplot"),
     TRANSFORMATION("transformation"),
     FILTER("filter"),
-    GROUP_FILTER("group-filter")
+    GROUP_FILTER("group-filter"),
+    T_TEST("t-test")
 }

@@ -17,7 +17,7 @@ class TTestRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncRunner: AsyncTTestRunner? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.FILTER
+    override var type: AnalysisStepType? = AnalysisStepType.T_TEST
 
     val defaultParams =
         TTestParams()
@@ -32,7 +32,7 @@ class TTestRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(AnalysisStepType.FILTER, oldStepId, true, step, paramsString)
+        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
 
         asyncRunner?.runAsync(oldStepId, newStep, paramsString)
         return newStep!!

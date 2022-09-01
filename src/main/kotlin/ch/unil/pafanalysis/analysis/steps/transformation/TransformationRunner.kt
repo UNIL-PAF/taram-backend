@@ -47,7 +47,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(AnalysisStepType.TRANSFORMATION, oldStepId, true, step, paramsString)
+        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
 
         val paramsHash = hashComp.computeStringHash(gson.fromJson(paramsString, TransformationParams::class.java).toString())
         val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = paramsString)

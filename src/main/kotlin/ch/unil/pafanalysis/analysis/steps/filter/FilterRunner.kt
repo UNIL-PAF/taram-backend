@@ -32,7 +32,7 @@ class FilterRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(AnalysisStepType.FILTER, oldStepId, true, step, paramsString)
+        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
 
         asyncRunner?.runAsync(oldStepId, newStep, paramsString)
         return newStep!!

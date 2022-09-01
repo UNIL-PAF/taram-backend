@@ -47,7 +47,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(AnalysisStepType.BOXPLOT, oldStepId, false, step, params)
+        val newStep = runCommonStep(type!!, oldStepId, false, step, params)
         val boxplotParams: BoxPlotParams? = gson.fromJson(params, BoxPlotParams::class.java) ?: getParams(newStep)
 
         val paramsHash = hashComp.computeStringHash(boxplotParams?.toString())

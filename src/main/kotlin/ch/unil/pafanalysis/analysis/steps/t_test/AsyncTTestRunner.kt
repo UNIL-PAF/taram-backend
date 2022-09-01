@@ -66,7 +66,8 @@ class AsyncTTestRunner() : CommonStep() {
         outputRoot: String?
     ): Triple<TTest, Long, String> {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.columnInfo?.columnMapping)
-        val (resTable, nrSign) = tTestComputation?.run(table, params, step?.columnInfo)!!
+        val paramWithField = if(params.field == null) params.copy(field = step?.commonResult?.intCol) else params
+        val (resTable, nrSign) = tTestComputation?.run(table, paramWithField, step?.columnInfo)!!
         writeTableData?.write(outputRoot + step?.resultTablePath!!, resTable!!)
         val resFileHash = Crc32HashComputations().computeFileHash(File(outputRoot + step?.resultTablePath))
         val resFilePath = step?.resultTablePath!!
