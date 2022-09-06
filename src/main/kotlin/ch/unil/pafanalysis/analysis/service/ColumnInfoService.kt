@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.service
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.model.ExpInfo
+import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.CheckTypes
@@ -24,7 +25,7 @@ class ColumnInfoService {
     @Autowired
     private var columnParser: ColumnMappingParser? = null
 
-    fun createAndSaveColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo?, CommonResult> ? {
+    fun createAndSaveColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo?, CommonResult?> ? {
         val (columnInfo, commonResult) = createColumnInfo(filePath, resultPath, type)
         return Pair(columnInfoRepository?.saveAndFlush(columnInfo), commonResult)
     }

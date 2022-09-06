@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.t_test
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnMapping
+import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
@@ -38,7 +39,8 @@ class AsyncTTestRunner() : CommonStep() {
                 parameters = gson.toJson(paramWithField),
                 parametersHash = hashComp.computeStringHash(paramWithField.toString()),
                 resultTableHash = tTestRes.resFileHash,
-                results = gson.toJson(defaultResult)
+                results = gson.toJson(defaultResult),
+                commonResult = newStep?.commonResult?.copy(headers = tTestRes.headers)
             )
 
             val oldStep = analysisStepRepository?.findById(oldStepId)
@@ -66,18 +68,18 @@ class AsyncTTestRunner() : CommonStep() {
         }
     }
 
-    data class TTestRes(val tTest: TTest?, val resFileHash: Long?, val resFilePath: String?, val colMapping: ColumnMapping?)
+    data class TTestRes(val tTest: TTest?, val resFileHash: Long?, val resFilePath: String?, val headers: List<Header>?)
 
     fun computeTTest(
         step: AnalysisStep?,
         params: TTestParams,
         outputRoot: String?
     ): TTestRes {
-        val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.columnInfo?.columnMapping)
-        val (resTable, nrSign, colMapping) = tTestComputation?.run(table, params, step?.columnInfo)!!
+        val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
+        val (resTable, nrSign, headers) = tTestComputation?.run(table, params, step?.columnInfo)!!
         writeTableData?.write(outputRoot + step?.resultTablePath!!, resTable!!)
         val resFileHash = Crc32HashComputations().computeFileHash(File(outputRoot + step?.resultTablePath))
         val resFilePath = step?.resultTablePath!!
-        return TTestRes(TTest(nrSign), resFileHash, resFilePath, colMapping)
+        return TTestRes(TTest(nrSign), resFileHash, resFilePath, headers)
     }
 }

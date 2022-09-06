@@ -9,7 +9,7 @@ data class ExpInfo(
 )
 
 data class ColumnMapping(
-    val headers: List<Header>? = null,
+//    val headers: List<Header>? = null,
     val experimentDetails: Map<String, ExpInfo>? = null,
     val experimentNames: List<String>? = null,
 )

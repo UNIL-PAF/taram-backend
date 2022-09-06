@@ -24,8 +24,8 @@ class WriteTableDataTests {
     @Test
     fun readAndWriteFluderTable() {
         val filePath = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"
-        val spectronautColMapping = colParser!!.parse(filePath, null, ResultType.Spectronaut).first
-        val table = readTableData.getTable(filePath, spectronautColMapping)
+        val commonRes = colParser!!.parse(filePath, null, ResultType.Spectronaut).second
+        val table = readTableData.getTable(filePath, commonRes.headers)
 
         assert(table!!.cols?.size == 26)
         assert(table!!.cols?.get(0)?.size == 5763)
@@ -41,8 +41,8 @@ class WriteTableDataTests {
     fun readAndWriteMQTable() {
         val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val filePath = resPath + "proteinGroups.txt"
-        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
-        val table = readTableData.getTable(filePath, mqMapping)
+        val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
+        val table = readTableData.getTable(filePath, commonRes.headers)
 
         assert(table!!.cols?.size == 219)
         assert(table!!.headers!!.isNotEmpty())

@@ -62,7 +62,7 @@ class AsyncTransformationRunner() : CommonStep() {
         transformationParams.intCol
 
         val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
-        val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.columnInfo?.columnMapping)
+        val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
 
         val transInts = logTransformationRunner!!.runTransformation(ints, transformationParams)

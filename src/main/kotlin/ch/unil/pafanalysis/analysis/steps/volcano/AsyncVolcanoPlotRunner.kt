@@ -37,7 +37,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     private fun createVolcanoObj(analysisStep: AnalysisStep?, params: VolcanoPlotParams?): VolcanoPlot {
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
-            analysisStep?.columnInfo?.columnMapping
+            analysisStep?.commonResult?.headers
         )
 
         val pValHeaderName = if(params?.useAdjustedPVal == true) "q.value" else "p.value"

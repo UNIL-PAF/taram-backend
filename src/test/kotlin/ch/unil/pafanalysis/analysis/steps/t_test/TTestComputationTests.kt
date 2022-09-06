@@ -35,8 +35,8 @@ class TTestComputationTests {
     fun init() {
         val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val filePath = "./src/test/resources/results/maxquant/Grepper_preprocessed.txt"
-        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
-        val tableWithoutGroups = readTableData.getTable(filePath, mqMapping)
+        val (mqMapping, commonRes) = colParser!!.parse(filePath, resPath, ResultType.MaxQuant)
+        val tableWithoutGroups = readTableData.getTable(filePath, commonRes.headers)
 
         val mqMappingWithGroups = mqMapping.copy(experimentDetails = mqMapping.experimentDetails?.mapValues { (k, v) ->
             if (v.name?.contains("WT") == true) v.copy(group = "WT")

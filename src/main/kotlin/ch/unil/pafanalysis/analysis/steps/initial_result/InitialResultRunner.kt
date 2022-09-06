@@ -66,9 +66,9 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
         val step: AnalysisStep? = try {
             val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
-            val columnParseRes =
-                columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)
-            val table = readTable.getTable(newTable.path, columnParseRes?.first?.columnMapping)
+            val (columnInfo, commonRes) =
+                columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)!!
+            val table = readTable.getTable(newTable.path, commonRes?.headers)
             writeTable.write(newTable.path, table)
             val newTableHash = Crc32HashComputations().computeFileHash(newTable)
 
@@ -78,8 +78,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
-                columnInfo = columnParseRes?.first,
-                commonResult = columnParseRes?.second
+                columnInfo = columnInfo,
+                commonResult = commonRes
             )
         } catch (e: StepException) {
             e.printStackTrace()
@@ -103,16 +103,17 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
         val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
-        val headers: List<Header>? = updateHeaders(experimentDetails, analysisStep.columnInfo?.columnMapping?.headers)
+        val headers: List<Header>? = updateHeaders(experimentDetails, analysisStep.commonResult?.headers)
 
         val newColumnMapping: ColumnMapping? =
-            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails, headers = headers)
+            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
 
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
         val newColumnInfo: ColumnInfo? =
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.saveAndFlush(newColumnInfo!!)
-        analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.DONE.value))
+        val newCommonRes = analysisStep.commonResult?.copy(headers = headers)
+        analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.DONE.value, commonResult = newCommonRes))
 
         updateNextStep(analysisStep)
 

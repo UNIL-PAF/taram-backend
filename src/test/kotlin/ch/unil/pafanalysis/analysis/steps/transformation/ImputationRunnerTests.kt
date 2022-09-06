@@ -31,8 +31,8 @@ class ImputationRunnerTests {
     fun init() {
         val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val filePath = resPath + "proteinGroups.txt"
-        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
-        val table = readTableData.getTable(filePath, mqMapping)
+        val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
+        val table = readTableData.getTable(filePath, commonRes.headers)
         ints = readTableData.getDoubleMatrix(table, "LFQ.intensity").second
     }
 

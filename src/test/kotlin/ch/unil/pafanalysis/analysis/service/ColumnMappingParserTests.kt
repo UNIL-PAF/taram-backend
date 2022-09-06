@@ -20,19 +20,19 @@ class ColumnMappingParserTests {
 
         assert(colMapping.experimentNames?.size == 16)
         assert(colMapping.experimentNames!!.contains("KO-13703"))
-        assert(colMapping.headers?.size == 219)
+        assert(commonResults.headers?.size == 219)
 
         // check first header
-        assert(colMapping.headers?.get(0)?.idx == 0)
-        assert(colMapping.headers?.get(0)?.name == "Protein.IDs")
-        assert(colMapping.headers?.get(0)?.type == ColType.CHARACTER)
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "Protein.IDs")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
 
         // check header with experiment
-        assert(colMapping.headers?.get(12)?.idx == 12)
-        assert(colMapping.headers?.get(12)?.name == "KO-13704.Mutation.names")
-        assert(colMapping.headers?.get(12)?.type == ColType.NUMBER)
-        assert(colMapping.headers?.get(12)?.experiment?.name == "KO-13704")
-        assert(colMapping.headers?.get(12)?.experiment?.field == "Mutation.names")
+        assert(commonResults.headers?.get(12)?.idx == 12)
+        assert(commonResults.headers?.get(12)?.name == "KO-13704.Mutation.names")
+        assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(12)?.experiment?.name == "KO-13704")
+        assert(commonResults.headers?.get(12)?.experiment?.field == "Mutation.names")
 
         // check commonResults
         assert(commonResults.intCol == "Intensity")
@@ -46,19 +46,19 @@ class ColumnMappingParserTests {
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
         assert(colMapping.experimentNames?.size == 4)
         assert(colMapping.experimentNames!!.contains("14650"))
-        assert(colMapping.headers?.size == 26)
+        assert(commonResults.headers?.size == 26)
 
         // check first header
-        assert(colMapping.headers?.get(0)?.idx == 0)
-        assert(colMapping.headers?.get(0)?.name == "PG.ProteinGroups")
-        assert(colMapping.headers?.get(0)?.type == ColType.CHARACTER)
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "PG.ProteinGroups")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
 
         // check header with experiment
-        assert(colMapping.headers?.get(12)?.idx == 12)
-        assert(colMapping.headers?.get(12)?.name == "14652.NrOfPrecursorsIdentified")
-        assert(colMapping.headers?.get(12)?.type == ColType.NUMBER)
-        assert(colMapping.headers?.get(12)?.experiment?.name == "14652")
-        assert(colMapping.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(12)?.idx == 12)
+        assert(commonResults.headers?.get(12)?.name == "14652.NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(12)?.experiment?.name == "14652")
+        assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
 
         // check commonResults
         assert(commonResults.intCol == "Quantity")
@@ -72,19 +72,19 @@ class ColumnMappingParserTests {
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
         assert(colMapping.experimentNames?.size == 25)
         assert(colMapping.experimentNames!!.contains("14204"))
-        assert(colMapping.headers?.size == 85)
+        assert(commonResults.headers?.size == 85)
 
         // check first header
-        assert(colMapping.headers?.get(0)?.idx == 0)
-        assert(colMapping.headers?.get(0)?.name == "PG.MolecularWeight")
-        assert(colMapping.headers?.get(0)?.type == ColType.CHARACTER)
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "PG.MolecularWeight")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
 
         // check header with experiment
-        assert(colMapping.headers?.get(11)?.idx == 11)
-        assert(colMapping.headers?.get(11)?.name == "14181.NrOfPrecursorsIdentified")
-        assert(colMapping.headers?.get(11)?.type == ColType.NUMBER)
-        assert(colMapping.headers?.get(11)?.experiment?.name == "14181")
-        assert(colMapping.headers?.get(11)?.experiment?.field == "NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(11)?.idx == 11)
+        assert(commonResults.headers?.get(11)?.name == "14181.NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(11)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(11)?.experiment?.name == "14181")
+        assert(commonResults.headers?.get(11)?.experiment?.field == "NrOfPrecursorsIdentified")
 
         // check commonResults
         assert(commonResults.intCol == "Quantity")
@@ -99,19 +99,19 @@ class ColumnMappingParserTests {
 
         assert(colMapping.experimentNames?.size == 12)
         assert(colMapping.experimentNames!!.contains("12817"))
-        assert(colMapping.headers?.size == 19)
+        assert(commonResults.headers?.size == 19)
 
         // check first header
-        assert(colMapping.headers?.get(0)?.idx == 0)
-        assert(colMapping.headers?.get(0)?.name == "PG.Qvalue")
-        assert(colMapping.headers?.get(0)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "PG.Qvalue")
+        assert(commonResults.headers?.get(0)?.type == ColType.NUMBER)
 
         // check header with experiment
-        assert(colMapping.headers?.get(11)?.idx == 11)
-        assert(colMapping.headers?.get(11)?.name == "12818.TotalQuantity (Settings)")
-        assert(colMapping.headers?.get(11)?.type == ColType.NUMBER)
-        assert(colMapping.headers?.get(11)?.experiment?.name == "12818")
-        assert(colMapping.headers?.get(11)?.experiment?.field == "TotalQuantity (Settings)")
+        assert(commonResults.headers?.get(11)?.idx == 11)
+        assert(commonResults.headers?.get(11)?.name == "12818.TotalQuantity (Settings)")
+        assert(commonResults.headers?.get(11)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(11)?.experiment?.name == "12818")
+        assert(commonResults.headers?.get(11)?.experiment?.field == "TotalQuantity (Settings)")
 
         // check commonResults
         assert(commonResults.intCol == null)

@@ -47,7 +47,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
-            analysisStep?.columnInfo?.columnMapping
+            analysisStep?.commonResult?.headers
         )
         val (headers, ints) = readTableData.getDoubleMatrix(table, params?.column, group)
         val listOfBoxplots =

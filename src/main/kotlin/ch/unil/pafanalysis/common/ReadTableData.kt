@@ -62,7 +62,7 @@ class ReadTableData {
         }
     }
 
-    fun getTable(resultTablePath: String?, columnMapping: ColumnMapping?): Table {
+    fun getTable(resultTablePath: String?, headers: List<Header>?): Table {
         val reader = BufferedReader(FileReader(resultTablePath))
         // ignore the first line, it is the header
         reader.readLine()
@@ -73,15 +73,15 @@ class ReadTableData {
             acc
         }
 
-        val cols: List<List<Any>> = rowsStrings.fold(Collections.nCopies(columnMapping!!.headers!!.size, emptyList<Any>())) { acc, r ->
+        val cols: List<List<Any>> = rowsStrings.fold(Collections.nCopies(headers!!.size, emptyList<Any>())) { acc, r ->
             r.mapIndexed { i, c ->
-                val colVal = if (columnMapping?.headers?.get(i)?.type == ColType.NUMBER) {
+                val colVal = if (headers?.get(i)?.type == ColType.NUMBER) {
                     if (c.isNotEmpty() && c != "Filtered") c.toDouble() else Double.NaN
                 } else c
                 acc[i].plus(colVal)
             }
         }
-        return Table(columnMapping?.headers, cols)
+        return Table(headers, cols)
     }
 
     fun getDoubleMatrix(table: Table?, field: String?, group: String? = null): Pair<List<Header>, List<List<Double>>> {

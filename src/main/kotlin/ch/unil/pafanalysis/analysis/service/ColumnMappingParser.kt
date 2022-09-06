@@ -94,7 +94,6 @@ class ColumnMappingParser {
         }
 
         val colMapping = ColumnMapping(
-            headers = cols.headers,
             experimentDetails = cols.expDetails,
             experimentNames = cols.expNames.toList()
         )
@@ -102,7 +101,8 @@ class ColumnMappingParser {
         val commonResult = CommonResult(
             intCol = if (cols.expFields.contains("Quantity")) "Quantity" else null,
             numericalColumns = cols.headers.filterIndexed{i, c ->
-                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}.map{it.experiment!!.field}.distinct()
+                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}.map{it.experiment!!.field}.distinct(),
+            headers = cols.headers
         )
         return Pair(colMapping, commonResult)
     }
@@ -129,7 +129,6 @@ class ColumnMappingParser {
         }
 
         val colMapping = ColumnMapping(
-            headers = cols?.headers,
             experimentDetails = cols?.expDetails,
             experimentNames = cols?.expNames?.toList()
         )
@@ -137,7 +136,8 @@ class ColumnMappingParser {
         val commonResult = CommonResult(
             intCol = if (cols?.expFields?.contains("Intensity") == true) "Intensity" else null,
             numericalColumns = cols?.headers?.filterIndexed{i, c ->
-                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}?.map{it.experiment!!.field}?.distinct()
+                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}?.map{it.experiment!!.field}?.distinct(),
+            headers = cols?.headers
         )
         return Pair(colMapping, commonResult)
     }

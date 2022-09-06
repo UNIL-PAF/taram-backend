@@ -27,8 +27,8 @@ class FixFilterRunnerTests {
     fun init() {
         val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val filePath = resPath + "proteinGroups.txt"
-        val mqMapping = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).first
-        table = readTableData.getTable(filePath, mqMapping)
+        val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
+        table = readTableData.getTable(filePath, commonRes.headers)
     }
 
     @Test

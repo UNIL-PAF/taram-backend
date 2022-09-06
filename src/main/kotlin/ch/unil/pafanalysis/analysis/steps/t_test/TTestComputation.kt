@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class TTestComputation {
 
-    fun run(table: Table?, params: TTestParams?, columnInfo: ColumnInfo?): Triple<Table?, Int, ColumnMapping?> {
+    fun run(table: Table?, params: TTestParams?, columnInfo: ColumnInfo?): Triple<Table?, Int, List<Header>?> {
 
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
             "Please specify your groups in the 'Initial result' parameters."
@@ -35,9 +35,9 @@ class TTestComputation {
         val signGroups = qVals.map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
 
-        val (newTable, colMapping) = addResults(table, pVals, qVals, foldChanges, signGroups, columnInfo?.columnMapping)
+        val (newTable, headers) = addResults(table, pVals, qVals, foldChanges, signGroups)
 
-        return Triple(newTable, nrSign, colMapping)
+        return Triple(newTable, nrSign, headers)
     }
 
     private fun addResults(
@@ -45,9 +45,8 @@ class TTestComputation {
         pVals: List<Double>,
         qVals: List<Double>,
         foldChanges: List<Double>,
-        signGroups: List<Boolean>,
-        colMapping: ColumnMapping?
-    ): Pair<Table?, ColumnMapping?> {
+        signGroups: List<Boolean>
+    ): Pair<Table?, List<Header>?> {
         val nrHeaders = table?.headers?.size!!
         val addHeaders: List<Header> = listOf(
             Header(name = "p.value", idx = nrHeaders, ColType.NUMBER),
@@ -59,7 +58,7 @@ class TTestComputation {
 
         val addCols = listOf<List<Any>>(pVals, qVals, foldChanges, signGroups.map{it.toString()})
         val newCols = table.cols?.plus(addCols)
-        return Pair(Table(newHeaders, newCols), colMapping?.copy(headers = colMapping?.headers?.plus(addHeaders)))
+        return Pair(Table(newHeaders, newCols), newHeaders?.plus(addHeaders))
     }
 
     private fun computeFoldChanges(groupVals: List<List<List<Double>>?>, params: TTestParams?): List<Double> {
