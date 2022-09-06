@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.t_test
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
@@ -24,18 +25,22 @@ class AsyncTTestRunner() : CommonStep() {
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
         try {
             val defaultResult = TTest()
+            val params = gson.fromJson(paramsString, TTestParams().javaClass)
+            val paramWithField = if(params.field == null) params.copy(field = newStep?.commonResult?.intCol) else params
 
-            val (tTestRes, resultTableHash) = computeTTest(
+            val tTestRes = computeTTest(
                 newStep,
-                gson.fromJson(paramsString, TTestParams().javaClass),
+                paramWithField,
                 getOutputRoot()
             )
+
             val stepWithRes = newStep?.copy(
-                parameters = paramsString,
-                parametersHash = hashComp.computeStringHash(paramsString),
-                resultTableHash = resultTableHash,
+                parameters = gson.toJson(paramWithField),
+                parametersHash = hashComp.computeStringHash(paramWithField.toString()),
+                resultTableHash = tTestRes.resFileHash,
                 results = gson.toJson(defaultResult)
             )
+
             val oldStep = analysisStepRepository?.findById(oldStepId)
             val newHash = computeStepHash(stepWithRes, oldStep)
 
@@ -43,8 +48,9 @@ class AsyncTTestRunner() : CommonStep() {
                 stepWithRes?.copy(
                     status = AnalysisStepStatus.DONE.value,
                     stepHash = newHash,
-                    results = gson.toJson(tTestRes)
+                    results = gson.toJson(tTestRes.tTest)
                 )
+
             analysisStepRepository?.saveAndFlush(updatedStep!!)!!
             updateNextStep(updatedStep!!)
         } catch (e: Exception) {
@@ -60,17 +66,18 @@ class AsyncTTestRunner() : CommonStep() {
         }
     }
 
+    data class TTestRes(val tTest: TTest?, val resFileHash: Long?, val resFilePath: String?, val colMapping: ColumnMapping?)
+
     fun computeTTest(
         step: AnalysisStep?,
         params: TTestParams,
         outputRoot: String?
-    ): Triple<TTest, Long, String> {
+    ): TTestRes {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.columnInfo?.columnMapping)
-        val paramWithField = if(params.field == null) params.copy(field = step?.commonResult?.intCol) else params
-        val (resTable, nrSign) = tTestComputation?.run(table, paramWithField, step?.columnInfo)!!
+        val (resTable, nrSign, colMapping) = tTestComputation?.run(table, params, step?.columnInfo)!!
         writeTableData?.write(outputRoot + step?.resultTablePath!!, resTable!!)
         val resFileHash = Crc32HashComputations().computeFileHash(File(outputRoot + step?.resultTablePath))
         val resFilePath = step?.resultTablePath!!
-        return Triple(TTest(nrSign), resFileHash, resFilePath)
+        return TTestRes(TTest(nrSign), resFileHash, resFilePath, colMapping)
     }
 }

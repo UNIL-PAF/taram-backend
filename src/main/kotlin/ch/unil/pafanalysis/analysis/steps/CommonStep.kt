@@ -11,6 +11,7 @@ import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
+import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
@@ -63,6 +64,9 @@ open class CommonStep {
     @Autowired
     private var tTestRunner: TTestRunner? = null
 
+    @Autowired
+    private var volcanoPlotRunner: VolcanoPlotRunner? = null
+
     val gson = Gson()
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
@@ -106,6 +110,7 @@ open class CommonStep {
             AnalysisStepType.FILTER.value -> filterRunner
             AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner
             AnalysisStepType.T_TEST.value -> tTestRunner
+            AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }

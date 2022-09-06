@@ -93,4 +93,16 @@ class ReadTableData {
     }
 
 
+    fun getDoubleColumn(table: Table?, headerName: String): List<Double>? {
+        val header = table?.headers?.find { it.name == headerName } ?: return null
+        if(header.type != ColType.NUMBER) throw Exception("Cannot extract double from non-numeric column.")
+        return table?.cols?.get(header.idx)?.map { it as? Double ?: Double.NaN }
+    }
+
+    fun getStringColumn(table: Table?, headerName: String): List<String>? {
+        val header = table?.headers?.find { it.name == headerName } ?: return null
+        if(header.type != ColType.CHARACTER) throw Exception("Cannot extract string from non-character column.")
+        return table?.cols?.get(header.idx)?.map { it as? String ?: "" }
+    }
+
 }

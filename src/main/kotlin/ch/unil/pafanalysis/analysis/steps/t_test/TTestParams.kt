@@ -5,7 +5,7 @@ data class TTestParams (
     val s0: Double? = null,
     val firstGroup: String? = null,
     val twoSided: Boolean? = null,
-    val multiTestCorr: String? = MulitTestCorr.HOCHBERG.value,
+    val multiTestCorr: String? = MulitTestCorr.BH.value,
     val signThres: Double? = 0.05,
     val altHypothesis: String? = AltHypothesis.TWO_SIDED.value,
     val valuesAreLog: Boolean = true
@@ -18,6 +18,7 @@ enum class AltHypothesis(val value: String) {
 }
 
 enum class MulitTestCorr(val value: String) {
-    FDR("fdr"),
-    HOCHBERG("hochberg")
+    BONFERRONI("bonferroni"),
+    BH("BH"),
+    BY("BY")
 }

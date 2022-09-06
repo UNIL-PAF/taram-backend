@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.t_test
 
 import ch.unil.pafanalysis.analysis.model.ColType
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
+import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Table
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class TTestComputation {
 
-    fun run(table: Table?, params: TTestParams?, columnInfo: ColumnInfo?): Pair<Table?, Int> {
+    fun run(table: Table?, params: TTestParams?, columnInfo: ColumnInfo?): Triple<Table?, Int, ColumnMapping?> {
 
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
             "Please specify your groups in the 'Initial result' parameters."
@@ -34,9 +35,9 @@ class TTestComputation {
         val signGroups = qVals.map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
 
-        val newTable = addResults(table, pVals, qVals, foldChanges, signGroups)
+        val (newTable, colMapping) = addResults(table, pVals, qVals, foldChanges, signGroups, columnInfo?.columnMapping)
 
-        return Pair(newTable, nrSign)
+        return Triple(newTable, nrSign, colMapping)
     }
 
     private fun addResults(
@@ -44,8 +45,9 @@ class TTestComputation {
         pVals: List<Double>,
         qVals: List<Double>,
         foldChanges: List<Double>,
-        signGroups: List<Boolean>
-    ): Table? {
+        signGroups: List<Boolean>,
+        colMapping: ColumnMapping?
+    ): Pair<Table?, ColumnMapping?> {
         val nrHeaders = table?.headers?.size!!
         val addHeaders: List<Header> = listOf(
             Header(name = "p.value", idx = nrHeaders, ColType.NUMBER),
@@ -57,7 +59,7 @@ class TTestComputation {
 
         val addCols = listOf<List<Any>>(pVals, qVals, foldChanges, signGroups.map{it.toString()})
         val newCols = table.cols?.plus(addCols)
-        return Table(newHeaders, newCols)
+        return Pair(Table(newHeaders, newCols), colMapping?.copy(headers = colMapping?.headers?.plus(addHeaders)))
     }
 
     private fun computeFoldChanges(groupVals: List<List<List<Double>>?>, params: TTestParams?): List<Double> {
