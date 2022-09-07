@@ -20,7 +20,6 @@ class WriteTableDataTests {
     private val readTableData = ReadTableData()
     private val writeTableData = WriteTableData()
 
-
     @Test
     fun readAndWriteFluderTable() {
         val filePath = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"

@@ -8,7 +8,8 @@ data class VolcanoPlot(
 )
 
 data class VolcanoPoint(
-    val name: String? = null,
+    val prot: String? = null,
+    val gene: String? = null,
     val fc: Double? = null,
     val pVal: Double? = null,
     val isSign: Boolean? = null

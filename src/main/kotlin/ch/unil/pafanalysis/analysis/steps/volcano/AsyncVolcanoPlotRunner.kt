@@ -11,6 +11,7 @@ import ch.unil.pafanalysis.common.Table
 import com.google.common.math.Quantiles
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import kotlin.math.log10
 import kotlin.math.log2
 
 @Service
@@ -44,10 +45,17 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val pVals = readTableData.getDoubleColumn(table, pValHeaderName)
         val foldChanges = readTableData.getDoubleColumn(table, "fold.change")
         val proteinName = readTableData.getStringColumn(table, "Majority.protein.IDs")
+        val geneName = readTableData.getStringColumn(table, "Gene.names")
 
         if(pVals == null || foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 
-        val volcanoData = pVals.mapIndexed{ i, pVal -> VolcanoPoint(proteinName?.get(i), foldChanges?.get(i), pVal, null)}
+        val volcanoData = pVals.mapIndexed{ i, pVal -> VolcanoPoint(
+            prot = proteinName?.get(i),
+            gene = geneName?.get(i),
+            fc = foldChanges?.get(i),
+            pVal = log10(pVal) * -1,
+            isSign = null
+        )}
         return VolcanoPlot(data = volcanoData)
     }
 
