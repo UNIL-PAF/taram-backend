@@ -12,6 +12,7 @@ data class ColumnMapping(
 //    val headers: List<Header>? = null,
     val experimentDetails: Map<String, ExpInfo>? = null,
     val experimentNames: List<String>? = null,
+    val intCol: String? = null
 )
 
 data class Header(

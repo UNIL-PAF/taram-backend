@@ -101,12 +101,12 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val runningStep =
             analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
-        val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
-        val experimentDetails: HashMap<String, ExpInfo> = gson.fromJson(params, expDetailsType)
-        val headers: List<Header>? = updateHeaders(experimentDetails, analysisStep.commonResult?.headers)
+        //val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
+        val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
+        val headers: List<Header>? = updateHeaders(colMapping.experimentDetails, analysisStep.commonResult?.headers)
 
         val newColumnMapping: ColumnMapping? =
-            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = experimentDetails)
+            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = colMapping.experimentDetails, intCol = colMapping.intCol)
 
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
         val newColumnInfo: ColumnInfo? =
@@ -120,9 +120,9 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         return runningStep!!
     }
 
-    private fun updateHeaders(experimentDetails: HashMap<String, ExpInfo>, headers: List<Header>?): List<Header>? {
+    private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Header>? {
         return headers?.map{ h ->
-            val expInfo = experimentDetails[h.experiment?.initialName]
+            val expInfo = experimentDetails?.get(h.experiment?.initialName)
             val exp = h.experiment?.copy(name = expInfo?.name, group = expInfo?.group)
             h.copy(experiment = exp)
         }
