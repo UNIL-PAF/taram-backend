@@ -1,18 +1,16 @@
 package ch.unil.pafanalysis.controllers
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType.INITIAL_RESULT
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType.VOLCANO_PLOT
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
-import ch.unil.pafanalysis.analysis.steps.quality_control.QualityControlRunner
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
+import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -34,6 +32,10 @@ class AnalysisStepController {
     @Autowired
     private var commonStep: CommonStep? = null
 
+    @Autowired
+    private var volcanoPlotRunner: VolcanoPlotRunner? = null
+
+
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
@@ -51,6 +53,17 @@ class AnalysisStepController {
     @ResponseBody
     fun deleteStep(@PathVariable(value = "stepId") stepId: Int): Int? {
         return analysisStepService?.deleteStep(stepId)
+    }
+
+    @PostMapping(path = ["/switch-sel-protein-ac/{proteinAc}/step-id/{stepId}"])
+    @ResponseBody
+    fun switchSelProt(@PathVariable(value = "proteinAc") proteinAc: String, @PathVariable(value = "stepId") stepId: Int): String? {
+        val step = analysisStepRepository?.findById(stepId)
+        val selProts = when (step?.type) {
+            VOLCANO_PLOT.value -> volcanoPlotRunner?.switchSelProt(step, proteinAc)
+            else -> throw StepException("Cannot select proteins for [$step?.type].")
+        }
+        return selProts?.joinToString(", ")
     }
 
     @PostMapping(path = ["/parameters/{stepId}"])

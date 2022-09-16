@@ -68,4 +68,13 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
             .plus(if (params.pValThresh != origParams?.pValThresh) " [P-value threshold: ${params.pValThresh}]" else "")
     }
 
+    fun switchSelProt(step: AnalysisStep?, proteinAc: String): List<String>? {
+        val origParams = gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass)
+        val origList = origParams.selProteins ?: emptyList()
+        val newList = if(origList.contains(proteinAc)) origList.filter{it != proteinAc} else origList.plus(proteinAc)
+        val newParams = origParams.copy(selProteins = newList)
+        analysisStepRepository?.saveAndFlush(step?.copy(parameters = gson.toJson(newParams))!!)
+        return newList
+    }
+
 }
