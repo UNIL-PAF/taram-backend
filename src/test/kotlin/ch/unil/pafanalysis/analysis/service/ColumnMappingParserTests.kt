@@ -20,6 +20,7 @@ class ColumnMappingParserTests {
 
         assert(colMapping.experimentNames?.size == 16)
         assert(colMapping.experimentNames!!.contains("KO-13703"))
+        assert(colMapping.intCol == "Intensity")
         assert(commonResults.headers?.size == 219)
 
         // check first header
@@ -35,7 +36,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.experiment?.field == "Mutation.names")
 
         // check commonResults
-        assert(commonResults.intCol == "Intensity")
         assert(commonResults.numericalColumns?.size == 10)
         assert(commonResults.numericalColumns!!.contains("LFQ.intensity"))
     }
@@ -46,6 +46,7 @@ class ColumnMappingParserTests {
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
         assert(colMapping.experimentNames?.size == 4)
         assert(colMapping.experimentNames!!.contains("14650"))
+        assert(colMapping.intCol == "Quantity")
         assert(commonResults.headers?.size == 26)
 
         // check first header
@@ -61,7 +62,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
 
         // check commonResults
-        assert(commonResults.intCol == "Quantity")
         assert(commonResults.numericalColumns?.size == 3)
         assert(commonResults.numericalColumns!!.contains("NrOfPrecursorsIdentified"))
     }
@@ -72,6 +72,7 @@ class ColumnMappingParserTests {
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
         assert(colMapping.experimentNames?.size == 25)
         assert(colMapping.experimentNames!!.contains("14204"))
+        assert(colMapping.intCol == "Quantity")
         assert(commonResults.headers?.size == 85)
 
         // check first header
@@ -87,7 +88,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(11)?.experiment?.field == "NrOfPrecursorsIdentified")
 
         // check commonResults
-        assert(commonResults.intCol == "Quantity")
         assert(commonResults.numericalColumns?.size == 3)
         assert(commonResults.numericalColumns!!.contains("NrOfPrecursorsIdentified"))
     }
@@ -99,6 +99,7 @@ class ColumnMappingParserTests {
 
         assert(colMapping.experimentNames?.size == 12)
         assert(colMapping.experimentNames!!.contains("12817"))
+        assert(colMapping.intCol == null)
         assert(commonResults.headers?.size == 19)
 
         // check first header
@@ -114,7 +115,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(11)?.experiment?.field == "TotalQuantity (Settings)")
 
         // check commonResults
-        assert(commonResults.intCol == null)
         assert(commonResults.numericalColumns?.size == 1)
         assert(commonResults.numericalColumns!!.contains("TotalQuantity (Settings)"))
     }

@@ -36,7 +36,7 @@ class AsyncTransformationRunner() : CommonStep() {
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
         val funToRun: () -> AnalysisStep? = {
-            val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.commonResult?.intCol)
+            val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.columnInfo?.columnMapping?.intCol)
             val transformationParams = gson.fromJson(paramsString, TransformationParams().javaClass)
 
             val resultTableHash = transformTable(
@@ -61,7 +61,7 @@ class AsyncTransformationRunner() : CommonStep() {
     ): Long {
         transformationParams.intCol
 
-        val intCol = transformationParams.intCol ?: step?.commonResult?.intCol
+        val intCol = transformationParams.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
 

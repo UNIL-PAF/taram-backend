@@ -27,7 +27,7 @@ class AsyncTTestRunner() : CommonStep() {
         try {
             val defaultResult = TTest()
             val params = gson.fromJson(paramsString, TTestParams().javaClass)
-            val paramWithField = if(params.field == null) params.copy(field = newStep?.commonResult?.intCol) else params
+            val paramWithField = if(params.field == null) params.copy(field = newStep?.columnInfo?.columnMapping?.intCol) else params
 
             val tTestRes = computeTTest(
                 newStep,

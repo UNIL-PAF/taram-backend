@@ -28,7 +28,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     private fun getParams(step: AnalysisStep?): BoxPlotParams {
         val boxplotParams = if(step?.parameters != null) gson.fromJson(step?.parameters, BoxPlotParams().javaClass) else null
-        val intColumn = boxplotParams?.column ?: step?.commonResult?.intCol
+        val intColumn = boxplotParams?.column ?: step?.columnInfo?.columnMapping?.intCol
         val logScale = boxplotParams?.logScale ?: false
         return BoxPlotParams(logScale = logScale, column = intColumn)
     }

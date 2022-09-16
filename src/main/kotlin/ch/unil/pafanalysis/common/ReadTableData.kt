@@ -14,7 +14,7 @@ class ReadTableData {
         outputRoot: String?,
         intColumn: String? = null
     ): List<Pair<String, List<Double>>> {
-        val intColumn = intColumn ?: analysisStep?.commonResult?.intCol
+        val intColumn = intColumn ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
         val intColumnNames = expInfoList?.map { exp ->
             if (analysisStep?.analysis?.result?.type == ResultType.MaxQuant.value) {
