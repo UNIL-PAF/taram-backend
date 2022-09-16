@@ -12,5 +12,6 @@ data class VolcanoPoint(
     val gene: String? = null,
     val fc: Double? = null,
     val pVal: Double? = null,
+    val plotPVal: Double? = null,
     val isSign: Boolean? = null
 )
