@@ -12,8 +12,6 @@ class FixGroupFilterRunner() {
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw Exception(
             "Please specify your groups in the Analysis parameters."
         )
-
-        println(params?.field)
         val validGroups = getValidGroups(table, params?.field)
 
         val validRows: List<Boolean>? = when (params?.filterInGroup) {
