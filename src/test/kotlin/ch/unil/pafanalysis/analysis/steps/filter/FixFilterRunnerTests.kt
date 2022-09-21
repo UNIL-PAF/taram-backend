@@ -34,7 +34,7 @@ class FixFilterRunnerTests {
     @Test
     fun removeNothing() {
         val params = FilterParams()
-        val resTable = runner?.run(table, params, null)
+        val resTable = runner?.run(table, params)
         assert(table!!.cols?.get(0)?.size == 5535)
         assert(resTable!!.cols?.size == table!!.cols?.size)
     }
@@ -42,28 +42,28 @@ class FixFilterRunnerTests {
     @Test
     fun removeOnlyIdentifiendBySite() {
         val params = FilterParams(removeOnlyIdentifiedBySite = true)
-        val resTable = runner?.run(table, params, null)
+        val resTable = runner?.run(table, params)
         assert(resTable!!.cols?.get(0)?.size == 5457)
     }
 
     @Test
     fun removeReverse() {
         val params = FilterParams(removeReverse = true)
-        val resTable = runner?.run(table, params, null)
+        val resTable = runner?.run(table, params)
         assert(resTable!!.cols?.get(0)?.size == 5463)
     }
 
     @Test
     fun removePotentialContaminants() {
         val params = FilterParams(removePotentialContaminant = true)
-        val resTable = runner?.run(table, params, null)
+        val resTable = runner?.run(table, params)
         assert(resTable!!.cols?.get(0)?.size == 5515)
     }
 
     @Test
     fun removeAll3() {
         val params = FilterParams(removePotentialContaminant = true, removeReverse = true, removeOnlyIdentifiedBySite = true)
-        val resTable = runner?.run(table, params, null)
+        val resTable = runner?.run(table, params)
         assert(resTable!!.cols?.get(0)?.size == 5385)
     }
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class FixFilterRunner() {
 
-    fun run(table: Table?, params: FilterParams, columnInfo: ColumnInfo?): Table? {
+    fun run(table: Table?, params: FilterParams): Table? {
         val table1 = removeContaminants(table, params)
         val table2 = removeReverse(table1, params)
         return removeOnlyIdentifiedBySite(table2, params)
