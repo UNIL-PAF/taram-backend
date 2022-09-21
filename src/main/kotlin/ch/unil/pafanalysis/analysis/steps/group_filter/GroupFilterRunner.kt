@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -19,8 +20,13 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.GROUP_FILTER
 
-    val defaultParams =
-        GroupFilterParams(minNrValid = 0, filterInGroup = FilterInGroup.ONE_GROUP.value)
+    private fun getParams(step: AnalysisStep?): GroupFilterParams {
+        val params = if(step?.parameters != null) gson.fromJson(step?.parameters, GroupFilterParams().javaClass) else null
+        val field = params?.field ?: step?.columnInfo?.columnMapping?.intCol
+        val minNrValid = params?.minNrValid ?: 0
+        val filterInGroup = params?.filterInGroup ?: FilterInGroup.ONE_GROUP.value
+        return GroupFilterParams(minNrValid = minNrValid, filterInGroup = filterInGroup, field = field)
+    }
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
@@ -31,10 +37,12 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
-
-        asyncRunner?.runAsync(oldStepId, newStep, paramsString)
+        val newStep = runCommonStep(type!!, oldStepId, true, step, params)
+        val groupParams: GroupFilterParams? = getParams(newStep)
+        val paramsHash = hashComp.computeStringHash(groupParams?.toString())
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(groupParams))
+        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
+        asyncRunner?.runAsync(oldStepId, stepWithDiff, groupParams)
         return newStep!!
     }
 

@@ -8,16 +8,17 @@ import org.springframework.stereotype.Service
 @Service
 class FixGroupFilterRunner() {
 
-    fun run(table: Table?, params: GroupFilterParams, columnInfo: ColumnInfo?): Table? {
+    fun run(table: Table?, params: GroupFilterParams?, columnInfo: ColumnInfo?): Table? {
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw Exception(
-            "Please specify your groups in the 'Initial result' parameters."
+            "Please specify your groups in the Analysis parameters."
         )
 
-        val validGroups = getValidGroups(table, params.field)
+        println(params?.field)
+        val validGroups = getValidGroups(table, params?.field)
 
-        val validRows: List<Boolean>? = when (params.filterInGroup) {
-            FilterInGroup.ONE_GROUP.value -> checkOneGroup(validGroups, params.minNrValid)
-            FilterInGroup.ALL_GROUPS.value -> checkAllGroups(validGroups, params.minNrValid)
+        val validRows: List<Boolean>? = when (params?.filterInGroup) {
+            FilterInGroup.ONE_GROUP.value -> checkOneGroup(validGroups, params?.minNrValid)
+            FilterInGroup.ALL_GROUPS.value -> checkAllGroups(validGroups, params?.minNrValid)
             else -> throw Exception("FilterInGroup parameter must be defined.")
         }
 

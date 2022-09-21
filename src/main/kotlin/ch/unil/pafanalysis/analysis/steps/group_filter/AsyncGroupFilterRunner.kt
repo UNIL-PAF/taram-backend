@@ -21,18 +21,16 @@ class AsyncGroupFilterRunner() : CommonStep() {
     val fixFilterRunner: FixGroupFilterRunner? = null
 
     @Async
-    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
+    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, params: GroupFilterParams?) {
         try {
             val defaultResult = GroupFilter()
 
             val (filterRes, resultTableHash) = filterTable(
                 newStep,
-                gson.fromJson(paramsString, GroupFilterParams().javaClass),
+                params,
                 getOutputRoot()
             )
             val stepWithRes = newStep?.copy(
-                parameters = paramsString,
-                parametersHash = hashComp.computeStringHash(paramsString),
                 resultTableHash = resultTableHash,
                 results = gson.toJson(defaultResult)
             )
@@ -62,7 +60,7 @@ class AsyncGroupFilterRunner() : CommonStep() {
 
     fun filterTable(
         step: AnalysisStep?,
-        params: GroupFilterParams,
+        params: GroupFilterParams?,
         outputRoot: String?,
     ): Triple<GroupFilter, Long, String> {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)

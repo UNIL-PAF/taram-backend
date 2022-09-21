@@ -54,7 +54,7 @@ class FixFilterRunnerTests {
         val params = GroupFilterParams(8, FilterInGroup.ONE_GROUP.value, "Intensity")
 
         val exception: Exception = assertThrows { runner?.run(table, params, colInfoWithoutGroups) }
-        val expectedMessage = "Please specify your groups in the 'Initial result' parameters."
+        val expectedMessage = "Please specify your groups in the Analysis parameters."
         val actualMessage = exception.message
 
         assert(actualMessage!!.contains(expectedMessage))
