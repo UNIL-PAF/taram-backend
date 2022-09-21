@@ -69,9 +69,8 @@ class AsyncFilterRunner() : CommonStep() {
         outputRoot: String?
     ): Triple<Filter, Long, String> {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
-        val fltTable = fixFilterRunner?.run(table, params)
-        println("and here ???")
-        customFilterRunner?.run(table, params)
+        val fltTableFix = fixFilterRunner?.run(table, params)
+        val fltTable = customFilterRunner?.run(fltTableFix, params)
         val fltSize = fltTable?.cols?.get(0)?.size
         val nrRowsRemoved = table.cols?.get(0)?.size?.minus(fltSize ?: 0)
         writeTableData?.write(outputRoot + step?.resultTablePath!!, fltTable!!)
