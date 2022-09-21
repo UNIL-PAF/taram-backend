@@ -57,8 +57,6 @@ class FixFilterRunnerTests {
         val expectedMessage = "Please specify your groups in the 'Initial result' parameters."
         val actualMessage = exception.message
 
-        println(actualMessage)
-
         assert(actualMessage!!.contains(expectedMessage))
     }
 
