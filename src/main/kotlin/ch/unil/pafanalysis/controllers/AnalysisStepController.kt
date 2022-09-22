@@ -1,16 +1,20 @@
 package ch.unil.pafanalysis.controllers
 
+import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.INITIAL_RESULT
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.VOLCANO_PLOT
+import ch.unil.pafanalysis.analysis.model.ProteinTable
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
+import ch.unil.pafanalysis.analysis.service.ProteinTableService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
+import ch.unil.pafanalysis.common.ReadTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -35,6 +39,14 @@ class AnalysisStepController {
     @Autowired
     private var volcanoPlotRunner: VolcanoPlotRunner? = null
 
+    @Autowired
+    private var proteinTableService: ProteinTableService? = null
+
+    @GetMapping(path = ["/protein-table/{stepId}"])
+    fun getProteinTable(@PathVariable(value = "stepId") stepId: Int): ProteinTable? {
+        val step = analysisStepRepository?.findById(stepId)
+        return proteinTableService?.getProteinTable(step)
+    }
 
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
