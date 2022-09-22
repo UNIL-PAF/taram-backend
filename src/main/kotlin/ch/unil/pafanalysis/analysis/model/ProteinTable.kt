@@ -12,6 +12,6 @@ data class ProteinGroup (
     val prot: String? = null,
     val gene: String? = null,
     val desc: String? = null,
-    val intensity: Double? = null,
+    val int: Double? = null,
     val ibaq: Double? = null,
 )
