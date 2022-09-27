@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.Table
 import com.google.common.math.Quantiles
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -34,28 +35,50 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         val experimentNames = expDetailsTable?.map { it?.name!! }
         val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
-        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, analysisStep) }
 
-        return BoxPlot(experimentNames = experimentNames, data = boxplotGroupData?.keys?.toList())
-    }
-
-    private fun createBoxplotGroupData(
-        group: String?,
-        analysisStep: AnalysisStep?
-    ): BoxPlotGroupData {
         val params = gson.fromJson(analysisStep?.parameters, BoxPlotParams().javaClass)
-
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers
         )
+        val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
-        val (headers, ints) = readTableData.getDoubleMatrix(table, params?.column?:analysisStep?.columnInfo?.columnMapping?.intCol, group)
+        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
+        val selProtData = getSelProtData(table, intCol, params)
+
+
+        return BoxPlot(experimentNames = experimentNames, boxPlotData = boxplotGroupData?.keys?.toList(), selProtData = selProtData)
+    }
+
+    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?): List<SelProtData>? {
+        if(params?.selProts == null) return null
+        val intMatrix = readTableData.getDoubleMatrix(table, intCol).second
+
+        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")
+        return params?.selProts.map{ p ->
+            val i = protGroup?.indexOf(p)
+            val ints = intMatrix.map{ if(i == null) Double.NaN else it[i]}
+            val normInts = if (params?.logScale != false) {
+                ints.filter { it != 0.0 && !it.isNaN() }.map { log2(it) }
+            } else {
+                ints
+            }
+            SelProtData(prot = p, ints = normInts)
+        }
+    }
+
+    private fun createBoxplotGroupData(
+        group: String?,
+        params: BoxPlotParams?,
+        table: Table?,
+        intCol: String?
+    ): BoxPlotGroupData {
+        val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, group)
 
         val listOfBoxplots =
             headers.mapIndexed { i, h -> BoxPlotData(h.experiment?.name, computeBoxplotData(ints[i], params?.logScale)) }
 
-        return BoxPlotGroupData(group = group, data = listOfBoxplots)
+        return BoxPlotGroupData(group = group, groupData = listOfBoxplots)
     }
 
 

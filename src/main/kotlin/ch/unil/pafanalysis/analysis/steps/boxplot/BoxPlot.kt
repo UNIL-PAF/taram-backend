@@ -4,13 +4,19 @@ import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 
 data class BoxPlot(
     val experimentNames: List<String>? = null,
-    val data: List<BoxPlotGroupData>? = null,
+    val boxPlotData: List<BoxPlotGroupData>? = null,
+    val selProtData: List<SelProtData>? = null,
     val plot: EchartsPlot? = null
+)
+
+data class SelProtData(
+    val prot: String? = null,
+    val ints: List<Double>? = null
 )
 
 data class BoxPlotGroupData(
     val group: String? = null,
-    val data: List<BoxPlotData>? = null,
+    val groupData: List<BoxPlotData>? = null,
 )
 
 data class BoxPlotData(

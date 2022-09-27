@@ -88,7 +88,6 @@ class ReadTableData {
         val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || it.experiment?.group == group)}
         if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
         if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
-
         return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
     }
 

@@ -8,7 +8,7 @@ data class ProteinTable (
 )
 
 data class ProteinGroup (
-    val id: String? = null,
+    val key: Int? = null,
     val prot: String? = null,
     val gene: String? = null,
     val desc: String? = null,

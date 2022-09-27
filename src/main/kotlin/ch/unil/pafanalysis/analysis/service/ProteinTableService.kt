@@ -18,7 +18,7 @@ class ProteinTableService {
     private var commonStep: CommonStep? = null
 
     val headerMap = mapOf(
-        "id" to "Protein.IDs",
+        "id" to "id",
         "prot" to "Majority.protein.IDs",
         "gene" to "Gene.names",
         "desc" to "Protein.names",
@@ -32,7 +32,7 @@ class ProteinTableService {
     }
 
     private fun tableToProteinTable(table: Table?, resultType: String?): ProteinTable {
-        val ids = readTable.getStringColumn(table, headerMap["id"]!!)
+        val ids = readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)
         val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
