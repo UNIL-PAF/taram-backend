@@ -55,7 +55,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
             val isSign = pVal <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh ?: 10000.0)
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
-                gene = geneName?.get(i),
+                gene = geneName?.get(i)?.split(";")?.get(0),
                 fc = foldChanges?.get(i),
                 pVal = pVal,
                 plotPVal = plotPVal,
