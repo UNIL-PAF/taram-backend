@@ -54,7 +54,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
         if(params?.selProts == null) return null
         val intMatrix = readTableData.getDoubleMatrix(table, intCol).second
 
-        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")
+        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")?.map{it.split(";")?.get(0)}
+        val genes = readTableData.getStringColumn(table, "Gene.names")?.map{it.split(";")?.get(0)}
+
         return params?.selProts.map{ p ->
             val i = protGroup?.indexOf(p)
             val ints = intMatrix.map{ if(i == null) Double.NaN else it[i]}
@@ -63,7 +65,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
             } else {
                 ints
             }
-            SelProtData(prot = p, ints = normInts)
+            val gene = if(i == null) "" else genes?.get(i)
+            SelProtData(prot = p, ints = normInts, gene = gene)
         }
     }
 

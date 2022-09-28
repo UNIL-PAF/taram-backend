@@ -33,7 +33,7 @@ class ProteinTableService {
 
     private fun tableToProteinTable(table: Table?, resultType: String?): ProteinTable {
         val ids = readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
-        val prots = readTable.getStringColumn(table, headerMap["prot"]!!)
+        val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map{it.split(";")?.get(0)}
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)
         val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
         val int = readTable.getDoubleColumn(table, headerMap["int"]!!)

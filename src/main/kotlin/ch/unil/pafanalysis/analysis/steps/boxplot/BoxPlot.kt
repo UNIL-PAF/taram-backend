@@ -11,6 +11,7 @@ data class BoxPlot(
 
 data class SelProtData(
     val prot: String? = null,
+    val gene: String? = null,
     val ints: List<Double>? = null
 )
 
