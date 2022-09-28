@@ -59,9 +59,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         return params?.selProts.map{ p ->
             val i = protGroup?.indexOf(p)
-            val ints = intMatrix.map{ if(i == null) Double.NaN else it[i]}
+            val ints = intMatrix.map{ if(i == null) null else it[i]}
             val normInts = if (params?.logScale != false) {
-                ints.filter { it != 0.0 && !it.isNaN() }.map { log2(it) }
+                ints.map { if(it != 0.0 && it != null) log2(it) else null }
             } else {
                 ints
             }
