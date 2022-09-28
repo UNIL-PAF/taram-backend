@@ -251,6 +251,7 @@ open class CommonStep {
             }
         } else {
             analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.DONE.value))
+            updateNextStep(step!!)
         }
     }
 
