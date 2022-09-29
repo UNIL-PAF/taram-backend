@@ -10,7 +10,6 @@ import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
-import com.google.gson.reflect.TypeToken
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -20,10 +19,8 @@ import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.lang.reflect.Type
 import java.sql.Timestamp
 import java.time.LocalDateTime
-import kotlin.math.exp
 
 @Service
 class InitialResultRunner() : CommonStep(), CommonRunner {

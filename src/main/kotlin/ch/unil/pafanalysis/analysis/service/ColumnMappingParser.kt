@@ -117,12 +117,12 @@ class ColumnMappingParser {
         val cols = columns?.foldIndexed(expsParsed){ i, acc, col ->
             val expName: String? = acc.expNames.find{ col.contains(it) }
             if(expName != null){
-                val field = col.replace(expName, "").trim().replace(Regex("\\s+"), ".")
+                val field = col.replace(expName, "").trim().replace(Regex("[^A-Za-z0-9]+"), ".").replace(Regex("^\\.*|\\.*\$"), "")
                 val expFields = acc.expFields.plus(field)
                 val headers = acc.headers.plus(Header(name = "$expName.$field", idx = i, type = colTypes?.get(i), experiment = Experiment(expName, field, initialName = expName)))
                 acc.copy(expFields = expFields, headers = headers)
             }else{
-                val field = col.trim().replace(Regex("\\s+"), ".")
+                val field = col.trim().replace(Regex("[^A-Za-z0-9]+"), ".").replace(Regex("^\\.*|\\.*\$"), "")
                 acc.copy(headers = acc.headers.plus(Header(name = field, idx = i, type = colTypes?.get(i))))
             }
 
