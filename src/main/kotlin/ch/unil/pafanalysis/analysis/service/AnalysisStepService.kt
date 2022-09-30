@@ -8,7 +8,6 @@ import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
@@ -70,7 +69,7 @@ class AnalysisStepService {
         val copiedSteps = fltSteps.mapIndexed { i: Int, step: AnalysisStep ->
             if (i == 0) {
                 val columnInfo = columnInfoRepository?.saveAndFlush(step.columnInfo!!.copy(id = 0))
-                stepBefore = emptyInitialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id)
+                stepBefore = emptyInitialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id, commonResult = step.commonResult)
                 stepBefore
             } else if (copyAllSteps) {
                 stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis)

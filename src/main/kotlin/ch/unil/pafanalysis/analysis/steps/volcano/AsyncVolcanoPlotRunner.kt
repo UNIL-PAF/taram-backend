@@ -23,10 +23,8 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
 
-        val params = gson.fromJson(paramsString, VolcanoPlotParams().javaClass)
-
         val funToRun: () -> AnalysisStep? = {
-            val volcano = createVolcanoObj(newStep, params)
+            val volcano = createVolcanoObj(newStep)
 
             newStep?.copy(
                 results = gson.toJson(volcano),
@@ -36,11 +34,13 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         tryToRun(funToRun, newStep)
     }
 
-    private fun createVolcanoObj(analysisStep: AnalysisStep?, params: VolcanoPlotParams?): VolcanoPlot {
+    private fun createVolcanoObj(analysisStep: AnalysisStep?): VolcanoPlot {
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers
         )
+
+        val params = gson.fromJson(analysisStep?.parameters, VolcanoPlotParams().javaClass)
 
         val pValHeaderName = if(params?.useAdjustedPVal == true) "q.value" else "p.value"
         val pVals = readTableData.getDoubleColumn(table, pValHeaderName)

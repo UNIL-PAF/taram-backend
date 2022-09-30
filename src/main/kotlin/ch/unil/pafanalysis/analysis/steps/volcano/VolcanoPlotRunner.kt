@@ -21,12 +21,6 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncRunner: AsyncVolcanoPlotRunner? = null
 
-    private fun getParams(step: AnalysisStep?): VolcanoPlotParams {
-        val params = if(step?.parameters != null) gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass) else null
-        val pValThresh = params?.pValThresh
-        return VolcanoPlotParams(pValThresh = pValThresh)
-    }
-
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, VolcanoPlotParams::class.java)
@@ -42,7 +36,7 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, false, step, params)
-        val parsedParams: VolcanoPlotParams? = gson.fromJson(params, VolcanoPlotParams::class.java) ?: getParams(newStep)
+        val parsedParams: VolcanoPlotParams? = gson.fromJson(params ?: step?.parameters, VolcanoPlotParams::class.java)
 
         val paramsHash = hashComp.computeStringHash(parsedParams?.toString())
         val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(parsedParams))

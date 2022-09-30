@@ -75,8 +75,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
-                columnInfo = columnInfo,
-                commonResult = commonRes
+                columnInfo = emptyStep?.columnInfo ?: columnInfo,
+                commonResult = emptyStep?.commonResult ?:commonRes
             )
         } catch (e: StepException) {
             e.printStackTrace()
