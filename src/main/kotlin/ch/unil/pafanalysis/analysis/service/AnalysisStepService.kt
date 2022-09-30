@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.service
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -65,14 +66,14 @@ class AnalysisStepService {
         val fltSteps = sortedSteps.filterIndexed { i: Int, _: AnalysisStep -> i == 0 || copyAllSteps }
 
         val emptyInitialStep = initialResultRunner?.prepareRun(analysisId = newAnalysis.id, newAnalysis.result)
+        val columnInfo = columnInfoRepository?.saveAndFlush(fltSteps.first().columnInfo!!.copy(id = 0))
 
         val copiedSteps = fltSteps.mapIndexed { i: Int, step: AnalysisStep ->
             if (i == 0) {
-                val columnInfo = columnInfoRepository?.saveAndFlush(step.columnInfo!!.copy(id = 0))
                 stepBefore = emptyInitialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id, commonResult = step.commonResult)
                 stepBefore
             } else if (copyAllSteps) {
-                stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis)
+                stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis = newAnalysis, columnInfo = columnInfo)
                 stepBefore
             } else {
                 null
@@ -94,7 +95,7 @@ class AnalysisStepService {
         }
     }
 
-    fun copyAnalysisStep(analysisStep: AnalysisStep, stepBefore: AnalysisStep?, newAnalysis: Analysis): AnalysisStep? {
+    fun copyAnalysisStep(analysisStep: AnalysisStep, stepBefore: AnalysisStep?, newAnalysis: Analysis, columnInfo: ColumnInfo?): AnalysisStep? {
         return analysisStepRepo?.saveAndFlush(
             analysisStep.copy(
                 id = 0,
@@ -102,7 +103,8 @@ class AnalysisStepService {
                 beforeId = stepBefore?.id,
                 copyFromId = analysisStep.id,
                 status = AnalysisStepStatus.IDLE.value,
-                stepHash = null
+                stepHash = null,
+                columnInfo = columnInfo
             )
         )
     }
