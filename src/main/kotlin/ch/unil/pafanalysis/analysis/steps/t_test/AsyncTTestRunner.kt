@@ -23,21 +23,17 @@ class AsyncTTestRunner() : CommonStep() {
     val tTestComputation: TTestComputation? = null
 
     @Async
-    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
+    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, params: TTestParams?) {
         try {
             val defaultResult = TTest()
-            val params = gson.fromJson(paramsString, TTestParams().javaClass)
-            val paramWithField = if(params.field == null) params.copy(field = newStep?.columnInfo?.columnMapping?.intCol) else params
 
             val tTestRes = computeTTest(
                 newStep,
-                paramWithField,
+                params,
                 getOutputRoot()
             )
 
             val stepWithRes = newStep?.copy(
-                parameters = gson.toJson(paramWithField),
-                parametersHash = hashComp.computeStringHash(paramWithField.toString()),
                 resultTableHash = tTestRes.resFileHash,
                 results = gson.toJson(defaultResult),
                 commonResult = newStep?.commonResult?.copy(headers = tTestRes.headers)
@@ -72,7 +68,7 @@ class AsyncTTestRunner() : CommonStep() {
 
     fun computeTTest(
         step: AnalysisStep?,
-        params: TTestParams,
+        params: TTestParams?,
         outputRoot: String?
     ): TTestRes {
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)

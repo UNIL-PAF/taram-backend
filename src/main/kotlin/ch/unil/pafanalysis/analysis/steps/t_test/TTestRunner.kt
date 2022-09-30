@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -31,11 +32,13 @@ class TTestRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
-
-        asyncRunner?.runAsync(oldStepId, newStep, paramsString)
-        return newStep!!
+        val newStep = runCommonStep(type!!, oldStepId, true, step, params)
+        val tTestParams: TTestParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, TTestParams().javaClass) else null
+        val paramsHash = hashComp.computeStringHash(tTestParams?.toString())
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(tTestParams))
+        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
+        asyncRunner?.runAsync(oldStepId, stepWithDiff, tTestParams)
+        return stepWithDiff!!
     }
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {

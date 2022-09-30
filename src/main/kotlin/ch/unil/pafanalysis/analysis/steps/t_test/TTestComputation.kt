@@ -25,10 +25,7 @@ class TTestComputation {
             "You must have exactly 2 groups."
         )
 
-        if (params?.field == null) throw StepException("No intensity value was selected.")
-        //if(params?.firstGroup == null) throw StepException("Please choose a group as the first group.")
-
-        val groupVals = getGroupValues(table, params?.field)
+        val groupVals = getGroupValues(table, params?.field ?: columnInfo?.columnMapping?.intCol)
         val pVals = computeTTest(groupVals, params)
         val qVals = multiTestCorr(pVals)
         val foldChanges = computeFoldChanges(groupVals, params)
