@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -18,17 +19,32 @@ import kotlin.io.path.exists
 class AsyncAnalysisStepService {
 
     @Autowired
-    private var initialResultRunner: InitialResultRunner? = null
+    private var env: Environment? = null
 
     @Autowired
-    private var commonStep: CommonStep? = null
+    private var analysisStepRepository: AnalysisStepRepository? = null
 
     @Async
-    fun runDuplicatedSteps(emptyInitialStep: AnalysisStep?, analysisSteps: List<AnalysisStep>, newAnalysis: Analysis) {
-        initialResultRunner?.run(emptyStep = emptyInitialStep, newAnalysis.result)
-        if (analysisSteps != null && analysisSteps.size > 1) {
-            commonStep?.updateNextStep(analysisSteps[0]!!)
+    fun copyDuplicatedStepFiles(newSteps: List<AnalysisStep>, analysisId: Int?) {
+        val outputRoot = env?.getProperty("output.path")
+
+        newSteps.forEach { newStep ->
+            val resultPath = "$analysisId/${newStep.id}"
+            val newFile: String? = if(newStep.modifiesResult == true){
+                copyFile(newStep, resultPath, outputRoot)
+            }else{
+                if(newStep.beforeId != null) analysisStepRepository?.findById(newStep.beforeId!!)?.resultTablePath else null
+            }
+            analysisStepRepository?.saveAndFlush(newStep.copy(resultPath = resultPath, resultTablePath = newFile))
         }
+    }
+
+    private fun copyFile(newStep: AnalysisStep, resultPath: String, outputRoot: String?): String {
+        val oldStep = analysisStepRepository?.findById(newStep.id!!)
+        val oldFile = File(outputRoot + oldStep?.resultTablePath)
+        val newFile = resultPath + "/" + oldFile.name
+        oldFile.copyTo(File(outputRoot + newFile ))
+        return newFile
     }
 
 

@@ -65,23 +65,16 @@ class AnalysisStepService {
 
         val fltSteps = sortedSteps.filterIndexed { i: Int, _: AnalysisStep -> i == 0 || copyAllSteps }
 
-        val emptyInitialStep = initialResultRunner?.prepareRun(analysisId = newAnalysis.id, newAnalysis.result)
+        //val emptyInitialStep = initialResultRunner?.prepareRun(analysisId = newAnalysis.id, newAnalysis.result)
         val columnInfo = columnInfoRepository?.saveAndFlush(fltSteps.first().columnInfo!!.copy(id = 0))
 
-        val copiedSteps = fltSteps.mapIndexed { i: Int, step: AnalysisStep ->
-            if (i == 0) {
-                stepBefore = emptyInitialStep!!.copy(columnInfo = columnInfo, copyFromId = step.id, commonResult = step.commonResult)
-                stepBefore
-            } else if (copyAllSteps) {
+        val copiedSteps = fltSteps.map { step: AnalysisStep ->
                 stepBefore = copyAnalysisStep(analysisStep = step, stepBefore = stepBefore, newAnalysis = newAnalysis, columnInfo = columnInfo)
                 stepBefore
-            } else {
-                null
-            }
         }
 
         val analysisSteps = setCorrectNextIds(copiedSteps)
-        asyncAnaysisStepService?.runDuplicatedSteps(emptyInitialStep, analysisSteps, newAnalysis)
+        asyncAnaysisStepService?.copyDuplicatedStepFiles(analysisSteps, newAnalysis?.id)
     }
 
     fun setCorrectNextIds(copiedSteps: List<AnalysisStep?>): List<AnalysisStep> {
@@ -102,7 +95,6 @@ class AnalysisStepService {
                 analysis = newAnalysis,
                 beforeId = stepBefore?.id,
                 copyFromId = analysisStep.id,
-                status = AnalysisStepStatus.IDLE.value,
                 stepHash = null,
                 columnInfo = columnInfo
             )
