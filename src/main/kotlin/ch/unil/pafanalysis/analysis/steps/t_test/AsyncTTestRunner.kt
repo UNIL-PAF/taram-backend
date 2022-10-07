@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
@@ -23,59 +24,28 @@ class AsyncTTestRunner() : CommonStep() {
     val tTestComputation: TTestComputation? = null
 
     @Async
-    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, params: TTestParams?) {
-        try {
-            val defaultResult = TTest()
+    fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
+        val funToRun: () -> AnalysisStep? = {
+            val res = computeTTest(newStep)
 
-            val tTestRes = computeTTest(
-                newStep,
-                params,
-                getOutputRoot()
-            )
-
-            val stepWithRes = newStep?.copy(
-                resultTableHash = tTestRes.resFileHash,
-                results = gson.toJson(defaultResult),
-                commonResult = newStep?.commonResult?.copy(headers = tTestRes.headers)
-            )
-
-            val oldStep = analysisStepRepository?.findById(oldStepId)
-            val newHash = computeStepHash(stepWithRes, oldStep)
-
-            val updatedStep =
-                stepWithRes?.copy(
-                    status = AnalysisStepStatus.DONE.value,
-                    stepHash = newHash,
-                    results = gson.toJson(tTestRes.tTest)
-                )
-
-            analysisStepRepository?.saveAndFlush(updatedStep!!)!!
-            updateNextStep(updatedStep!!)
-        } catch (e: Exception) {
-            println("Error in filter asyncRun ${newStep?.id}")
-            e.printStackTrace()
-            analysisStepRepository?.saveAndFlush(
-                newStep!!.copy(
-                    status = AnalysisStepStatus.ERROR.value,
-                    error = e.message,
-                    stepHash = Crc32HashComputations().getRandomHash()
-                )
+            newStep?.copy(
+                results = gson.toJson(res.tTest),
+                commonResult = newStep?.commonResult?.copy(headers = res.headers)
             )
         }
+        tryToRun(funToRun, newStep)
     }
 
-    data class TTestRes(val tTest: TTest?, val resFileHash: Long?, val resFilePath: String?, val headers: List<Header>?)
+    data class TTestRes(val tTest: TTest?, val headers: List<Header>?)
 
     fun computeTTest(
-        step: AnalysisStep?,
-        params: TTestParams?,
-        outputRoot: String?
+        step: AnalysisStep?
     ): TTestRes {
+        val outputRoot = getOutputRoot()
+        val params = gson.fromJson(step?.parameters, TTestParams().javaClass)
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
         val (resTable, nrSign, headers) = tTestComputation?.run(table, params, step?.columnInfo)!!
         writeTableData?.write(outputRoot + step?.resultTablePath!!, resTable!!)
-        val resFileHash = Crc32HashComputations().computeFileHash(File(outputRoot + step?.resultTablePath))
-        val resFilePath = step?.resultTablePath!!
-        return TTestRes(TTest(nrSign), resFileHash, resFilePath, headers)
+        return TTestRes(TTest(nrSign), headers)
     }
 }

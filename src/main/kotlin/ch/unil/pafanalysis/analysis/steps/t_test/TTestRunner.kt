@@ -16,12 +16,9 @@ import org.springframework.stereotype.Service
 class TTestRunner() : CommonStep(), CommonRunner {
 
     @Autowired
-    var asyncRunner: AsyncTTestRunner? = null
+    var asyncTTestRunner: AsyncTTestRunner? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.T_TEST
-
-    val defaultParams =
-        TTestParams()
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
@@ -37,7 +34,7 @@ class TTestRunner() : CommonStep(), CommonRunner {
         val paramsHash = hashComp.computeStringHash(tTestParams?.toString())
         val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(tTestParams))
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-        asyncRunner?.runAsync(oldStepId, stepWithDiff, tTestParams)
+        asyncTTestRunner?.runAsync(oldStepId, stepWithDiff)
         return stepWithDiff!!
     }
 

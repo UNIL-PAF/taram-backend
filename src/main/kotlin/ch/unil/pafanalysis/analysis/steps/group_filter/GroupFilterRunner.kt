@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 class GroupFilterRunner() : CommonStep(), CommonRunner {
 
     @Autowired
-    var asyncRunner: AsyncGroupFilterRunner? = null
+    var asyncGroupFilterRunner: AsyncGroupFilterRunner? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.GROUP_FILTER
 
@@ -30,11 +30,11 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, true, step, params)
-        val groupParams: GroupFilterParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, GroupFilterParams().javaClass) else null
+        val groupParams: GroupFilterParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, GroupFilterParams().javaClass) else GroupFilterParams()
         val paramsHash = hashComp.computeStringHash(groupParams?.toString())
         val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(groupParams))
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-        asyncRunner?.runAsync(oldStepId, stepWithDiff, groupParams)
+        asyncGroupFilterRunner?.runAsync(oldStepId, stepWithDiff)
         return newStep!!
     }
 

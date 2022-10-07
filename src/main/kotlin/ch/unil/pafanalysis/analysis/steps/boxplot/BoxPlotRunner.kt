@@ -26,13 +26,6 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncBoxplotRunner: AsyncBoxPlotRunner? = null
 
-    private fun getParams(step: AnalysisStep?): BoxPlotParams {
-        val boxplotParams = if(step?.parameters != null) gson.fromJson(step?.parameters, BoxPlotParams().javaClass) else null
-        val intColumn = boxplotParams?.column ?: step?.columnInfo?.columnMapping?.intCol
-        val logScale = boxplotParams?.logScale ?: false
-        return BoxPlotParams(logScale = logScale, column = intColumn)
-    }
-
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, BoxPlotParams::class.java)
@@ -48,13 +41,13 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, false, step, params)
-        val boxplotParams: BoxPlotParams? = gson.fromJson(params, BoxPlotParams::class.java) ?: getParams(newStep)
+        val boxplotParams: BoxPlotParams? = if(step?.parameters != null) gson.fromJson(step?.parameters, BoxPlotParams().javaClass) else BoxPlotParams()
 
         val paramsHash = hashComp.computeStringHash(boxplotParams?.toString())
         val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(boxplotParams))
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
 
-        asyncBoxplotRunner?.runAsync(oldStepId, stepWithDiff, params)
+        asyncBoxplotRunner?.runAsync(oldStepId, stepWithDiff)
         return stepWithDiff!!
     }
 

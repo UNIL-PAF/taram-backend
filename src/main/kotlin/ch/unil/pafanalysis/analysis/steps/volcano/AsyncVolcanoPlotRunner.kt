@@ -21,7 +21,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     private val readTableData = ReadTableData()
 
     @Async
-    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
+    fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
 
         val funToRun: () -> AnalysisStep? = {
             val volcano = createVolcanoObj(newStep)

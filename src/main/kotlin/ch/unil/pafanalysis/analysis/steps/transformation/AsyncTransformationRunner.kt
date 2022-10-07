@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.t_test.TTestParams
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
@@ -34,21 +35,19 @@ class AsyncTransformationRunner() : CommonStep() {
     val imputationRunner: ImputationRunner? = null
 
     @Async
-    fun runAsync(oldStepId: Int, newStep: AnalysisStep?, paramsString: String?) {
+    fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
             val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.columnInfo?.columnMapping?.intCol)
-            val transformationParams = gson.fromJson(paramsString, TransformationParams().javaClass)
+            val transformationParams = gson.fromJson(newStep?.parameters, TransformationParams().javaClass)
 
-            val resultTableHash = transformTable(
+            transformTable(
                 newStep,
-                transformationParams,
-                getOutputRoot()
+                transformationParams
             )
 
             val commonResult = newStep?.commonResult?.copy(intColIsLog = transformationParams.transformationType == TransformationType.LOG2.value)
 
             newStep?.copy(
-                resultTableHash = resultTableHash,
                 results = gson.toJson(defaultResult),
                 commonResult = commonResult
             )
@@ -60,10 +59,7 @@ class AsyncTransformationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         transformationParams: TransformationParams,
-        outputRoot: String?
     ): Long {
-        transformationParams.intCol
-
         val intCol = transformationParams.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)

@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.t_test.TTestParams
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
@@ -29,12 +30,6 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.TRANSFORMATION
 
-    val defaultParams = TransformationParams(
-        normalizationType = NormalizationType.MEDIAN.value,
-        transformationType = TransformationType.NONE.value,
-        imputationType = ImputationType.NAN.value
-    )
-
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val transParams = gson.fromJson(step.parameters, TransformationParams::class.java)
@@ -46,14 +41,13 @@ class TransformationRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val paramsString: String = params ?: ((step?.parameters) ?: gson.toJson(defaultParams))
-        val newStep = runCommonStep(type!!, oldStepId, true, step, paramsString)
-
-        val paramsHash = hashComp.computeStringHash(gson.fromJson(paramsString, TransformationParams::class.java).toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = paramsString)
+        val newStep = runCommonStep(type!!, oldStepId, true, step, params)
+        val transformationParams: TransformationParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, TransformationParams().javaClass) else null
+        val paramsHash = hashComp.computeStringHash(transformationParams.toString())
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(transformationParams))
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
 
-        asyncTransformationRunner?.runAsync(oldStepId, stepWithDiff, paramsString)
+        asyncTransformationRunner?.runAsync(oldStepId, stepWithDiff)
         return newStep!!
     }
 

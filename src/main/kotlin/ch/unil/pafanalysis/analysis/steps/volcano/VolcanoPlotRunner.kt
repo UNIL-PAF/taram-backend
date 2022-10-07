@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -19,7 +20,7 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     override var type: AnalysisStepType? = AnalysisStepType.VOLCANO_PLOT
 
     @Autowired
-    var asyncRunner: AsyncVolcanoPlotRunner? = null
+    var asyncVolcanoPlotRunner: AsyncVolcanoPlotRunner? = null
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
@@ -36,13 +37,13 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, false, step, params)
-        val parsedParams: VolcanoPlotParams? = gson.fromJson(params ?: step?.parameters, VolcanoPlotParams::class.java)
+        val volcanoPlotParams: VolcanoPlotParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, VolcanoPlotParams().javaClass) else VolcanoPlotParams()
 
-        val paramsHash = hashComp.computeStringHash(parsedParams?.toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(parsedParams))
+        val paramsHash = hashComp.computeStringHash(volcanoPlotParams?.toString())
+        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(volcanoPlotParams))
         val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
 
-        asyncRunner?.runAsync(oldStepId, stepWithDiff, params)
+        asyncVolcanoPlotRunner?.runAsync(oldStepId, stepWithDiff)
         return stepWithDiff!!
     }
 
