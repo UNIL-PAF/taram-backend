@@ -45,9 +45,12 @@ class AsyncTransformationRunner() : CommonStep() {
                 getOutputRoot()
             )
 
+            val commonResult = newStep?.commonResult?.copy(intColIsLog = transformationParams.transformationType == TransformationType.LOG2.value)
+
             newStep?.copy(
                 resultTableHash = resultTableHash,
                 results = gson.toJson(defaultResult),
+                commonResult = commonResult
             )
         }
 
