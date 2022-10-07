@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.quality_control
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
+import ch.unil.pafanalysis.analysis.service.AsyncAnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.results.model.ResultType
 import com.github.rcaller.rstuff.RCaller
@@ -21,7 +22,7 @@ import kotlin.concurrent.thread
 @Service
 class QualityControlR {
     @Autowired
-    private var analysisStepService: AnalysisStepService? = null
+    private var asyncAnalysisStepService: AsyncAnalysisStepService? = null
 
     @Autowired
     private var env: Environment? = null
@@ -51,7 +52,7 @@ class QualityControlR {
             //Thread.sleep(3_000)
 
             // update analysisStep status to Done
-            analysisStepService?.setAnalysisStepStatus(analysisStep.id!!, AnalysisStepStatus.DONE)
+            asyncAnalysisStepService?.setAnalysisStepStatus(analysisStep.id!!, AnalysisStepStatus.DONE)
         }
 
     }

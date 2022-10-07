@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -46,6 +47,20 @@ class AsyncAnalysisStepService {
         oldFile.copyTo(File(outputRoot + newFile ))
         return newFile
     }
+
+    @Transactional
+    fun setAllStepsStatus(analysisStep: AnalysisStep?, status: AnalysisStepStatus) {
+        setAnalysisStepStatus(analysisStep?.id!!, status)
+        if (analysisStep?.nextId != null) {
+            val nextStep = analysisStepRepository?.findById(analysisStep?.nextId)
+            setAllStepsStatus(nextStep, status)
+        }
+    }
+
+    fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
+        return analysisStepRepository?.setStatusById(status.value, id)
+    }
+
 
 
 }

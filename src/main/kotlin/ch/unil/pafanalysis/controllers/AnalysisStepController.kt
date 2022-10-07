@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType.VOLCANO_PLOT
 import ch.unil.pafanalysis.analysis.model.ProteinTable
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
+import ch.unil.pafanalysis.analysis.service.AsyncAnalysisStepService
 import ch.unil.pafanalysis.analysis.service.ProteinTableService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
@@ -29,6 +30,9 @@ class AnalysisStepController {
 
     @Autowired
     private var analysisStepService: AnalysisStepService? = null
+
+    @Autowired
+    private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
 
     @Autowired
     private var initialResult: InitialResultRunner? = null
@@ -83,7 +87,7 @@ class AnalysisStepController {
     fun parameters(@RequestBody stepParams: String, @PathVariable(value = "stepId") stepId: Int): String? {
         val analysisStep = analysisStepRepository?.findById(stepId)
 
-        analysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
+        asyncAnaysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
         try {
             if(analysisStep?.type == INITIAL_RESULT.value){

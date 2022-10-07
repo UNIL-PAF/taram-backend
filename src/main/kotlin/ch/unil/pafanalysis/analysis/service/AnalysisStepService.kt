@@ -25,9 +25,6 @@ class AnalysisStepService {
     private var analysisStepRepo: AnalysisStepRepository? = null
 
     @Autowired
-    private var initialResultRunner: InitialResultRunner? = null
-
-    @Autowired
     private var env: Environment? = null
 
     @Autowired
@@ -43,18 +40,12 @@ class AnalysisStepService {
         }else null
     }
 
+    /*
     fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
         return analysisStepRepo?.setStatusById(status.value, id)
     }
 
-    @Transactional
-    fun setAllStepsStatus(analysisStep: AnalysisStep?, status: AnalysisStepStatus) {
-        setAnalysisStepStatus(analysisStep?.id!!, status)
-        if (analysisStep?.nextId != null) {
-            val nextStep = analysisStepRepo?.findById(analysisStep?.nextId)
-            setAllStepsStatus(nextStep, status)
-        }
-    }
+     */
 
     fun duplicateAnalysisSteps(
         sortedSteps: List<AnalysisStep>,
@@ -107,7 +98,7 @@ class AnalysisStepService {
 
         if (relinkRemaining == true) {
             val before: AnalysisStep? = if (step.beforeId != null) analysisStepRepo?.findById(step.beforeId) else null
-            val after: AnalysisStep? = if (step.nextId != null) analysisStepRepo?.findById(step.nextId) else null
+            after = if (step.nextId != null) analysisStepRepo?.findById(step.nextId) else null
 
             if (before != null) {
                 if (after != null) {
@@ -122,9 +113,13 @@ class AnalysisStepService {
         deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
         val res: Int? = analysisStepRepo?.deleteById(stepId)
 
+        asyncAnaysisStepService?.setAllStepsStatus(after, AnalysisStepStatus.IDLE)
+
         if (relinkRemaining == true && after !== null) {
-            commonStep?.runStep(after)
-            commonStep?.updateNextStep(after)
+            commonStep?.getRunner(after?.type)?.run(
+                after?.beforeId!!,
+                after
+            )
         }
 
         return res
