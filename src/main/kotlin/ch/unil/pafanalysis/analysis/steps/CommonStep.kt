@@ -87,15 +87,27 @@ open class CommonStep {
         }
 
         val currentStep = step ?: createEmptyAnalysisStep(oldStep, type, modifiesResult)
-        val stepWithParams =
-            if (currentStep?.parameters == null) currentStep?.copy(parameters = params) else currentStep
 
-        val stepPath = setMainPaths(oldStep?.analysis, stepWithParams)
-        val resultType = getResultType(stepWithParams?.analysis?.result?.type)
-        val resultTablePathAndHash =
-            getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath, resultType)
+        try {
+            val stepWithParams =
+                if (params != null) currentStep?.copy(parameters = params) else currentStep
 
-        return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+            val stepPath = setMainPaths(oldStep?.analysis, stepWithParams)
+            val resultType = getResultType(stepWithParams?.analysis?.result?.type)
+            val resultTablePathAndHash =
+                getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath, resultType)
+            return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+        } catch(e: Exception){
+            println("Error in runCommonStep ${currentStep?.id}")
+            e.printStackTrace()
+            return analysisStepRepository?.saveAndFlush(
+                currentStep!!.copy(
+                    status = AnalysisStepStatus.ERROR.value,
+                    error = e.message,
+                    stepHash = Crc32HashComputations().getRandomHash()
+                )
+            )
+        }
     }
 
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
