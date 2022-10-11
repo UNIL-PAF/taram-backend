@@ -29,7 +29,6 @@ class AsyncFilterRunner() : CommonStep() {
                 results = gson.toJson(filterRes),
             )
         }
-
         tryToRun(funToRun, newStep)
     }
 

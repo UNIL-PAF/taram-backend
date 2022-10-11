@@ -96,6 +96,7 @@ open class CommonStep {
             val resultType = getResultType(stepWithParams?.analysis?.result?.type)
             val resultTablePathAndHash =
                 getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath, resultType)
+
             return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
         } catch(e: Exception){
             println("Error in runCommonStep ${currentStep?.id}")
@@ -125,10 +126,6 @@ open class CommonStep {
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
-    }
-
-    fun runStep(step: AnalysisStep): AnalysisStep? {
-        return getRunner(step.type)?.run(step?.beforeId!!, step)
     }
 
     fun getResultPath(analysis: Analysis?): String? {
@@ -221,10 +218,11 @@ open class CommonStep {
             val step = runFun()
 
             val stepBefore = analysisStepRepository?.findById(step!!.beforeId!!)
-            val newHash = computeStepHash(step, stepBefore)
+            val stepWithFileHash = step?.copy(resultTableHash = hashComp.computeFileHash(File(getOutputRoot() + step.resultTablePath)))
+            val newHash = computeStepHash(stepWithFileHash, stepBefore)
 
             val updatedStep =
-                step?.copy(
+                stepWithFileHash?.copy(
                     status = AnalysisStepStatus.DONE.value,
                     stepHash = newHash,
                 )
@@ -244,7 +242,7 @@ open class CommonStep {
     }
 
     fun update(step: AnalysisStep, stepBefore: AnalysisStep) {
-        val newHash = computeStepHash(step, stepBefore)
+        val newHash = computeStepHash(step, stepBefore, stepBefore.resultTableHash)
 
         if (newHash != step.stepHash) {
             val runningStep = analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.RUNNING.value))
