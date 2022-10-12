@@ -10,6 +10,7 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import kotlin.math.max
 
 @Service
 class FilterRunner() : CommonStep(), CommonRunner {
@@ -39,17 +40,29 @@ class FilterRunner() : CommonStep(), CommonRunner {
         return newStep!!
     }
 
+    fun colFilterToString(colFilter: ColFilter): String {
+        return if(colFilter.removeSelected) "remove " else "keep "
+            .plus(colFilter.colName)
+            .plus(" ${colFilter.comparator.symbol} ")
+            .plus(colFilter.compareToValue)
+    }
+
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
-        val params = gson.fromJson(step.parameters, FilterParams::class.java)
-        val origParams = if (origStep?.parameters != null) gson.fromJson(
-            origStep.parameters,
-            FilterParams::class.java
-        ) else null
+        val params = getParameters(step)
+        val origParams = getParameters(origStep)
+
+        val customs = params.colFilters?.map{ colFilterToString(it) }?.toSet() ?: emptySet()
+        val origCustoms = origParams.colFilters?.map{ colFilterToString(it) }?.toSet() ?: emptySet()
+
+        val customMessages = customs.subtract(customs.intersect(origCustoms)).map{ c -> " [${c}]"}.joinToString()
+        val customRemoved = if(origCustoms.size > customs.size) " [Custom filter(s) removed.]" else ""
 
         return "Parameter(s) changed:"
+            .plus(customRemoved)
             .plus(if (params.removeOnlyIdentifiedBySite != origParams?.removeOnlyIdentifiedBySite) " [Remove only identified by site: ${params.removeOnlyIdentifiedBySite}]" else "")
             .plus(if (params.removePotentialContaminant != origParams?.removePotentialContaminant) " [Remove potential contaminants: ${params.removePotentialContaminant}]" else "")
             .plus(if (params.removeReverse != origParams?.removeReverse) " [Remove reverse: ${params.removeReverse}]" else "")
+            .plus(customMessages)
     }
 
 }
