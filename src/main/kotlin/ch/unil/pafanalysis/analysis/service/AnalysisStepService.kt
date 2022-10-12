@@ -109,9 +109,9 @@ class AnalysisStepService {
         deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
         val res: Int? = analysisStepRepo?.deleteById(stepId)
 
-        asyncAnaysisStepService?.setAllStepsStatus(after, AnalysisStepStatus.IDLE)
-
         if (relinkRemaining == true && after !== null) {
+            asyncAnaysisStepService?.setAllStepsStatus(after, AnalysisStepStatus.IDLE)
+
             commonStep?.getRunner(after?.type)?.run(
                 after?.beforeId!!,
                 after

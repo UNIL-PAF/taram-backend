@@ -45,7 +45,7 @@ class AnalysisService {
     fun delete(analysisId: Int): Int? {
         val analysis = analysisRepo?.findById(analysisId)
         val steps: List<AnalysisStep>? = sortAnalysisSteps(analysis?.analysisSteps)?.asReversed()
-        steps?.map { analysisStepService?.deleteStep(it.id!!, relinkRemaining = false) }
+        steps?.forEach { analysisStepService?.deleteStep(it.id!!, relinkRemaining = false) }
         return analysisRepo?.deleteById(analysisId)
     }
 
