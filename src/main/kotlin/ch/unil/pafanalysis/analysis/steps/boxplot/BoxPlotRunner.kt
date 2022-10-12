@@ -58,13 +58,14 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     }
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
-        val params = gson.fromJson(step.parameters, BoxPlotParams().javaClass)
-        val origParams =
-            if (origStep?.parameters != null) gson.fromJson(origStep?.parameters, BoxPlotParams().javaClass) else null
+        val params = getParameters(step)
+        val origParams = getParameters(origStep)
 
-        return "Parameter(s) changed:"
-            .plus(if (params.column != origParams?.column) " [Column: ${params.column}]" else "")
+        // there might be differences in selected proteins, which we ignore
+        val message = (if (params.column != origParams?.column) " [Column: ${params.column}]" else "")
             .plus(if (params.logScale != origParams?.logScale) " [Log scale: ${params.logScale}]" else "")
+
+        return if(message != "") "Parameter(s) changed:".plus(message) else null
     }
 
 }

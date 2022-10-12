@@ -54,12 +54,16 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     }
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
-        val params = gson.fromJson(step.parameters, VolcanoPlotParams().javaClass)
-        val origParams =
-            if (origStep?.parameters != null) gson.fromJson(origStep?.parameters, VolcanoPlotParams().javaClass) else null
+        val params = getParameters(step)
+        val origParams = getParameters(origStep)
 
-        return "Parameter(s) changed:"
-            .plus(if (params.pValThresh != origParams?.pValThresh) " [P-value threshold: ${params.pValThresh}]" else "")
+        // there might be differences in selected proteins, which we ignore
+        val message = (if (params.pValThresh != origParams?.pValThresh) " [P-value threshold: ${params.pValThresh}]" else "")
+            .plus(if (params.fcThresh != origParams?.fcThresh) " [Significance threshold: ${params.fcThresh}]" else "")
+            .plus(if (params.useAdjustedPVal != origParams?.useAdjustedPVal) " [Use adjusted p-value: ${params.useAdjustedPVal}]" else "")
+            .plus(if (params.log10PVal != origParams?.log10PVal) " [Use log10 p-value: ${params.log10PVal}]" else "")
+
+        return if(message != "") "Parameter(s) changed:".plus(message) else null
     }
 
     fun switchSelProt(step: AnalysisStep?, proteinAc: String): List<String>? {
