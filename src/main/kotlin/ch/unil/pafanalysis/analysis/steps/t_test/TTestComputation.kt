@@ -18,7 +18,7 @@ class TTestComputation {
     fun run(table: Table?, params: TTestParams?, columnInfo: ColumnInfo?): Triple<Table?, Int, List<Header>?> {
 
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
-            "Please specify your groups in the 'Initial result' parameters."
+            "Please specify your groups in the Analysis parameters."
         )
 
         if (columnInfo?.columnMapping?.experimentDetails.values.groupBy { it.group }.keys.size != 2) throw StepException(
