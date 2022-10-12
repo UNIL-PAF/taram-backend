@@ -14,4 +14,5 @@ data class ProteinGroup (
     val desc: String? = null,
     val int: Double? = null,
     val ibaq: Double? = null,
+    val sel: Boolean? = null
 )

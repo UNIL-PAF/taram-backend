@@ -26,21 +26,23 @@ class ProteinTableService {
         "ibaq" to "iBAQ"
     )
 
-    fun getProteinTable(step: AnalysisStep?): ProteinTable {
+    fun getProteinTable(step: AnalysisStep?, selProteins: List<String>?): ProteinTable {
         val table = readTable.getTable(commonStep?.getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        return tableToProteinTable(table, step?.analysis?.result?.type)
+        val protTable = tableToProteinTable(table = table, resultType = step?.analysis?.result?.type, selProteins = selProteins)
+        return protTable.copy(table = protTable.table?.sortedByDescending{ it.sel })
     }
 
-    private fun tableToProteinTable(table: Table?, resultType: String?): ProteinTable {
+    private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?): ProteinTable {
         val ids = readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
-        val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map{it.split(";")?.get(0)}
+        val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)
         val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
         val int = readTable.getDoubleColumn(table, headerMap["int"]!!)
         val ibaq = readTable.getDoubleColumn(table, headerMap["ibaq"]!!)
+        val sel = prots?.map{ selProteins?.contains(it) ?: false }
 
-        val proteinRows: List<ProteinGroup>? = ids?.mapIndexed{ i, id ->
-            ProteinGroup(id, prots?.get(i), genes?.get(i), descs?.get(i), int?.get(i), ibaq?.get(i))
+        val proteinRows: List<ProteinGroup>? = ids?.mapIndexed { i, id ->
+            ProteinGroup(id, prots?.get(i), genes?.get(i), descs?.get(i), int?.get(i), ibaq?.get(i), sel?.get(i))
         }
 
         return ProteinTable(table = proteinRows, resultType = resultType)

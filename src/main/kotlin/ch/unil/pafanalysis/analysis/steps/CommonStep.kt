@@ -214,6 +214,14 @@ open class CommonStep {
         return Image(pdfPlotCopy)
     }
 
+    fun getSelProts(step: AnalysisStep?): List<String>? {
+        return when (step?.type) {
+            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step)?.selProts
+            AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step)?.selProteins
+            else -> null
+        }
+    }
+
     private fun paramToHash(step: AnalysisStep?): Long? {
         val filterParams = when (step?.type) {
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step).toString()
