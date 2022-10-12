@@ -1,19 +1,12 @@
 package ch.unil.pafanalysis.analysis.steps.volcano
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.ExpInfo
-import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.Table
-import com.google.common.math.Quantiles
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.lang.Math.abs
 import kotlin.math.log10
-import kotlin.math.log2
 
 @Service
 class AsyncVolcanoPlotRunner() : CommonStep() {
@@ -25,12 +18,10 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
 
         val funToRun: () -> AnalysisStep? = {
             val volcano = createVolcanoObj(newStep)
-
             newStep?.copy(
                 results = gson.toJson(volcano),
             )
         }
-
         tryToRun(funToRun, newStep)
     }
 

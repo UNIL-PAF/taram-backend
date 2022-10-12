@@ -1,23 +1,14 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.t_test.TTestParams
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
-import ch.unil.pafanalysis.results.model.ResultType
-import com.google.common.math.Quantiles
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.io.File
-import java.io.FileOutputStream
-import java.io.ObjectOutputStream
-import kotlin.math.ln
 
 @Service
 class AsyncTransformationRunner() : CommonStep() {

@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
+import ch.unil.pafanalysis.analysis.steps.filter.FilterParams
 import ch.unil.pafanalysis.analysis.steps.filter.FilterRunner
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -151,8 +152,8 @@ open class CommonStep {
         return stepPath
     }
 
-    fun getCopyDifference(step: AnalysisStep): String? {
-        return if (step.parametersHash != null && step.copyFromId != null) {
+    fun getCopyDifference(step: AnalysisStep?): String? {
+        return if (step?.parametersHash != null && step?.copyFromId != null) {
             val origStep = analysisStepRepository?.findById(step.copyFromId)
             if (step.parametersHash != origStep?.parametersHash) {
                 getRunner(step.type)?.getCopyDifference(step, origStep)
@@ -213,18 +214,37 @@ open class CommonStep {
         return Image(pdfPlotCopy)
     }
 
+    private fun paramToHash(step: AnalysisStep?): Long? {
+        val filterParams = when (step?.type) {
+            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step).toString()
+            AnalysisStepType.FILTER.value -> filterRunner?.getParameters(step).toString()
+            AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner?.getParameters(step).toString()
+            AnalysisStepType.T_TEST.value -> tTestRunner?.getParameters(step).toString()
+            AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.getParameters(step).toString()
+            AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step).toString()
+            else -> throw RuntimeException("Cannot parse parameters for type [${step?.type}]")
+        }
+        return hashComp.computeStringHash(filterParams)
+    }
+
     fun tryToRun(runFun: () -> AnalysisStep?, step: AnalysisStep?) {
         try {
             val step = runFun()
 
             val stepBefore = analysisStepRepository?.findById(step!!.beforeId!!)
-            val stepWithFileHash = step?.copy(resultTableHash = hashComp.computeFileHash(File(getOutputRoot() + step.resultTablePath)))
+
+            val stepWithFileHash = step?.copy(
+                resultTableHash = hashComp.computeFileHash(File(getOutputRoot() + step.resultTablePath)),
+                parametersHash =  paramToHash(step)
+            )
+
             val newHash = computeStepHash(stepWithFileHash, stepBefore)
 
             val updatedStep =
                 stepWithFileHash?.copy(
                     status = AnalysisStepStatus.DONE.value,
                     stepHash = newHash,
+                    copyDifference = getCopyDifference(stepWithFileHash)
                 )
             analysisStepRepository?.saveAndFlush(updatedStep!!)!!
             updateNextStep(updatedStep!!)

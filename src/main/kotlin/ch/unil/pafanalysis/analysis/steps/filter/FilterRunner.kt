@@ -4,7 +4,6 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -20,9 +19,15 @@ class FilterRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.FILTER
 
+    fun getParameters(step: AnalysisStep?): FilterParams {
+        return if (step?.parameters != null) gson.fromJson(
+            step?.parameters,
+            FilterParams().javaClass
+        ) else FilterParams()
+    }
+
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
-        //val params = gson.fromJson(step.parameters, FilterParams::class.java)
         document?.add(title)
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
         return document
@@ -30,13 +35,7 @@ class FilterRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, true, step, params)
-        val filterParams: FilterParams? = if(newStep?.parameters != null) gson.fromJson(step?.parameters, FilterParams().javaClass) else FilterParams()
-
-        val paramsHash = hashComp.computeStringHash(filterParams?.toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash)
-        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-
-        asyncFilterRunner?.runAsync(oldStepId, stepWithDiff)
+        asyncFilterRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
 

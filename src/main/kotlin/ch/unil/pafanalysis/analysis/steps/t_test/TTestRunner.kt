@@ -20,6 +20,10 @@ class TTestRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.T_TEST
 
+    fun getParameters(step: AnalysisStep?): TTestParams {
+        return if(step?.parameters != null) gson.fromJson(step?.parameters, TTestParams().javaClass) else TTestParams()
+    }
+
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         //val params = gson.fromJson(step.parameters, FilterParams::class.java)
@@ -30,12 +34,8 @@ class TTestRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, true, step, params)
-        val tTestParams: TTestParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, TTestParams().javaClass) else null
-        val paramsHash = hashComp.computeStringHash(tTestParams?.toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(tTestParams))
-        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-        asyncTTestRunner?.runAsync(oldStepId, stepWithDiff)
-        return stepWithDiff!!
+           asyncTTestRunner?.runAsync(oldStepId, newStep)
+        return newStep!!
     }
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {

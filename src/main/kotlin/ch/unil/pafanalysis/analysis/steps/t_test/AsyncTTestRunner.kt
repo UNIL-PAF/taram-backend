@@ -1,18 +1,13 @@
 package ch.unil.pafanalysis.analysis.steps.t_test
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
-import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.io.File
 
 @Service
 class AsyncTTestRunner() : CommonStep() {

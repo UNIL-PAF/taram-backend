@@ -19,12 +19,10 @@ class AsyncBoxPlotRunner() : CommonStep() {
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
             val boxplot = createBoxplotObj(newStep)
-
             newStep?.copy(
                 results = gson.toJson(boxplot),
             )
         }
-
         tryToRun(funToRun, newStep)
     }
 
@@ -47,26 +45,29 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
         val selProtData = getSelProtData(table, intCol, params)
 
-
-        return BoxPlot(experimentNames = experimentNames, boxPlotData = boxplotGroupData?.keys?.toList(), selProtData = selProtData)
+        return BoxPlot(
+            experimentNames = experimentNames,
+            boxPlotData = boxplotGroupData?.keys?.toList(),
+            selProtData = selProtData
+        )
     }
 
     private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?): List<SelProtData>? {
-        if(params?.selProts == null) return null
+        if (params?.selProts == null) return null
         val intMatrix = readTableData.getDoubleMatrix(table, intCol).second
 
-        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")?.map{it.split(";")?.get(0)}
-        val genes = readTableData.getStringColumn(table, "Gene.names")?.map{it.split(";")?.get(0)}
+        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")?.map { it.split(";")?.get(0) }
+        val genes = readTableData.getStringColumn(table, "Gene.names")?.map { it.split(";")?.get(0) }
 
-        return params?.selProts.map{ p ->
+        return params?.selProts.map { p ->
             val i = protGroup?.indexOf(p)
-            val ints = intMatrix.map{ if(i == null) null else it[i]}
+            val ints = intMatrix.map { if (i == null) null else it[i] }
             val normInts = if (params?.logScale != false) {
-                ints.map { if(it != 0.0 && it != null) log2(it) else null }
+                ints.map { if (it != 0.0 && it != null) log2(it) else null }
             } else {
                 ints
             }
-            val gene = if(i == null) "" else genes?.get(i)
+            val gene = if (i == null) "" else genes?.get(i)
             SelProtData(prot = p, ints = normInts, gene = gene)
         }
     }
@@ -80,7 +81,12 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, group)
 
         val listOfBoxplots =
-            headers.mapIndexed { i, h -> BoxPlotData(h.experiment?.name, computeBoxplotData(ints[i], params?.logScale)) }
+            headers.mapIndexed { i, h ->
+                BoxPlotData(
+                    h.experiment?.name,
+                    computeBoxplotData(ints[i], params?.logScale)
+                )
+            }
 
         return BoxPlotGroupData(group = group, groupData = listOfBoxplots)
     }

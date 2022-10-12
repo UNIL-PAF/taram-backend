@@ -1,16 +1,12 @@
 package ch.unil.pafanalysis.analysis.steps.group_filter
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.analysis.steps.filter.FilterParams
-import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.io.File
 
 @Service
 class AsyncGroupFilterRunner() : CommonStep() {
@@ -25,7 +21,6 @@ class AsyncGroupFilterRunner() : CommonStep() {
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
             val filterRes = filterTable(newStep)
-
             newStep?.copy(
                 results = gson.toJson(filterRes),
             )

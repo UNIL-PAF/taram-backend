@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
+import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -22,6 +23,10 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncVolcanoPlotRunner: AsyncVolcanoPlotRunner? = null
 
+    fun getParameters(step: AnalysisStep?): VolcanoPlotParams {
+        return if(step?.parameters != null) gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass) else VolcanoPlotParams()
+    }
+
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, VolcanoPlotParams::class.java)
@@ -37,14 +42,8 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, false, step, params)
-        val volcanoPlotParams: VolcanoPlotParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, VolcanoPlotParams().javaClass) else VolcanoPlotParams()
-
-        val paramsHash = hashComp.computeStringHash(volcanoPlotParams?.toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(volcanoPlotParams))
-        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-
-        asyncVolcanoPlotRunner?.runAsync(oldStepId, stepWithDiff)
-        return stepWithDiff!!
+        asyncVolcanoPlotRunner?.runAsync(oldStepId, newStep)
+        return newStep!!
     }
 
     override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {

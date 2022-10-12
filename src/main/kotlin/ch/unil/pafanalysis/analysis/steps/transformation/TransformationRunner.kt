@@ -30,6 +30,10 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
     override var type: AnalysisStepType? = AnalysisStepType.TRANSFORMATION
 
+    fun getParameters(step: AnalysisStep?): TransformationParams {
+        return if(step?.parameters != null) gson.fromJson(step?.parameters, TransformationParams().javaClass) else TransformationParams()
+    }
+
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val transParams = gson.fromJson(step.parameters, TransformationParams::class.java)
@@ -42,12 +46,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, true, step, params)
-        val transformationParams: TransformationParams? = if(newStep?.parameters != null) gson.fromJson(newStep?.parameters, TransformationParams().javaClass) else null
-        val paramsHash = hashComp.computeStringHash(transformationParams.toString())
-        val stepWithHash = newStep?.copy(parametersHash = paramsHash, parameters = gson.toJson(transformationParams))
-        val stepWithDiff = stepWithHash?.copy(copyDifference = getCopyDifference(stepWithHash))
-
-        asyncTransformationRunner?.runAsync(oldStepId, stepWithDiff)
+        asyncTransformationRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
 
