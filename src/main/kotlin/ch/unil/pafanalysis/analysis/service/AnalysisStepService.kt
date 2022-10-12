@@ -6,11 +6,9 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -53,10 +51,8 @@ class AnalysisStepService {
         copyAllSteps: Boolean
     ) {
         var stepBefore: AnalysisStep? = null
-
         val fltSteps = sortedSteps.filterIndexed { i: Int, _: AnalysisStep -> i == 0 || copyAllSteps }
 
-        //val emptyInitialStep = initialResultRunner?.prepareRun(analysisId = newAnalysis.id, newAnalysis.result)
         val columnInfo = columnInfoRepository?.saveAndFlush(fltSteps.first().columnInfo!!.copy(id = 0))
 
         val copiedSteps = fltSteps.map { step: AnalysisStep ->

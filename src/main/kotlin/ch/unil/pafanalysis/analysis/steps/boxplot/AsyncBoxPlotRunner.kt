@@ -37,6 +37,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
 
         val params = gson.fromJson(analysisStep?.parameters, BoxPlotParams().javaClass)
+
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers

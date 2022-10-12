@@ -108,7 +108,7 @@ class AnalysisService {
 
         val newAnalysis = analysisRepo?.saveAndFlush(analysis!!.copy(id = 0, idx = maxIdx.plus(1)))
 
-        val sortedSteps = analysis!!.analysisSteps!!
+        val sortedSteps = sortAnalysisSteps(analysis?.analysisSteps)!!
 
         analysisStepService?.duplicateAnalysisSteps(sortedSteps, newAnalysis!!, copyAllSteps)
         return newAnalysis!!
