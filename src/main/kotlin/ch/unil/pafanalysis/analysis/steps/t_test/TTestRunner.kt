@@ -39,14 +39,13 @@ class TTestRunner() : CommonStep(), CommonRunner {
     }
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
-        val params = gson.fromJson(step.parameters, TTestParams::class.java)
-        val origParams = if (origStep?.parameters != null) gson.fromJson(
-            origStep.parameters,
-            TTestParams::class.java
-        ) else null
+        val params = getParameters(step)
+        val origParams = getParameters(origStep)
 
         return "Parameter(s) changed:"
-            .plus(if (params.field != origParams?.field) " [Remove only identified by site: ${params.field}]" else "")
+            .plus(if (params.field != origParams?.field) " [Use intensity column: ${params.field}]" else "")
+            .plus(if (params.signThres != origParams?.signThres) " [Significance threshold: ${params.field}]" else "")
+            .plus(if (params.multiTestCorr != origParams?.multiTestCorr) " [Multiple testing correction: ${params.multiTestCorr}]" else "")
     }
 
 }
