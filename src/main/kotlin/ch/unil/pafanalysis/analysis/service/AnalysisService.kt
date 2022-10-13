@@ -42,6 +42,12 @@ class AnalysisService {
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>
     }
 
+    fun setName(analysisId: Int, analysisName: String): String {
+        val analysis = analysisRepo?.findById(analysisId)
+        analysisRepo?.saveAndFlush(analysis?.copy(name = analysisName)!!)
+        return analysisName
+    }
+
     fun delete(analysisId: Int): Int? {
         val analysis = analysisRepo?.findById(analysisId)
         val steps: List<AnalysisStep>? = sortAnalysisSteps(analysis?.analysisSteps)?.asReversed()
@@ -106,7 +112,13 @@ class AnalysisService {
         val allAnalysisIdx: List<Int?>? = analysisRepo?.findByResultId(analysis!!.result!!.id!!)?.map { it.idx }
         val maxIdx = allAnalysisIdx?.maxOfOrNull { it ?: 0 } ?: 0
 
-        val newAnalysis = analysisRepo?.saveAndFlush(analysis!!.copy(id = 0, idx = maxIdx.plus(1)))
+        val newAnalysis =
+            analysisRepo?.saveAndFlush(analysis!!.copy(
+                id = 0,
+                idx = maxIdx.plus(1),
+                copyFromIdx = analysis?.idx,
+                name = null
+            ))
 
         val sortedSteps = sortAnalysisSteps(analysis?.analysisSteps)!!
 

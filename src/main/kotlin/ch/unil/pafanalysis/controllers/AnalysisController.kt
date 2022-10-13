@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.analysis.model.Analysis
+import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.pdf.PdfService
 import org.apache.commons.io.IOUtils
@@ -45,6 +46,11 @@ class AnalysisController {
     @PostMapping(path = ["/copy/{analysisId}"])
     fun copyAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Analysis? {
         return analysisService?.duplicateAnalysis(analysisId = analysisId, copyAllSteps = false)
+    }
+
+    @PostMapping(path = ["/set-name/{analysisId}"])
+    fun copyAnalysis(@PathVariable(value = "analysisId") analysisId: Int, @RequestBody analysisName: String): String? {
+        return analysisService?.setName(analysisId, analysisName.drop(1).dropLast(1))
     }
 
     @GetMapping(path = ["/pdf/{analysisId}"])

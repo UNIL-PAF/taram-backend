@@ -14,9 +14,8 @@ data class Analysis (
     val idx: Int? = null,
     val name: String? = null,
     val status: String? = null,
+    val copyFromIdx: Int? =  null,
     val lastModifDate: LocalDateTime? = null,
-
-    //val resultId: Int? = null,
 
     @OneToMany(mappedBy="analysis", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JsonManagedReference
