@@ -44,15 +44,17 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val volcanoData = pVals.mapIndexed{ i, pVal ->
             val plotPVal = if(params?.log10PVal == true) log10(pVal) * -1 else pVal
             val isSign = pVal <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh ?: 10000.0)
+
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
                 gene = geneName?.get(i)?.split(";")?.get(0),
-                fc = foldChanges?.get(i),
-                pVal = pVal,
-                plotPVal = plotPVal,
+                fc = if(foldChanges?.get(i).isNaN()) null else foldChanges?.get(i),
+                pVal = if(pVal.isNaN()) null else pVal,
+                plotPVal = if(plotPVal.isNaN()) null else plotPVal,
                 isSign = isSign
             )
         }
+
         return VolcanoPlot(data = volcanoData)
     }
 
