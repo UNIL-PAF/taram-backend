@@ -52,7 +52,7 @@ class CustomFilterRunnerTests {
 
     @Test
     fun illegalParams2() {
-        val colFilter = ColFilter(colName = "Razor.+.unique.peptides", comparator = Comparator.GE, removeSelected = true, compareToValue = "xxx")
+        val colFilter = ColFilter(colName = "Razor.unique.peptides", comparator = Comparator.GE, removeSelected = true, compareToValue = "xxx")
         val params = FilterParams(colFilters = listOf(colFilter))
         val exception: Exception = assertThrows { runner?.run(table, params) }
         val expectedMessage = "You cannot use >= with a non-numeric value."
@@ -62,7 +62,7 @@ class CustomFilterRunnerTests {
 
     @Test
     fun FilterUniqePeptides() {
-        val colFilter = ColFilter(colName = "Razor.+.unique.peptides", comparator = Comparator.GT, removeSelected = false, compareToValue = "1")
+        val colFilter = ColFilter(colName = "Razor.unique.peptides", comparator = Comparator.GT, removeSelected = false, compareToValue = "1")
         val params = FilterParams(colFilters = listOf(colFilter))
         val resTable = runner?.run(table, params)
         assert(resTable!!.cols?.get(0)?.size == 4648)
@@ -78,7 +78,7 @@ class CustomFilterRunnerTests {
 
     @Test
     fun FilterUniqePeptidesAndContaminants() {
-        val colFilter = ColFilter(colName = "Razor.+.unique.peptides", comparator = Comparator.GT, removeSelected = false, compareToValue = "1")
+        val colFilter = ColFilter(colName = "Razor.unique.peptides", comparator = Comparator.GT, removeSelected = false, compareToValue = "1")
         val colFilter2 = ColFilter(colName = "Potential.contaminant", comparator = Comparator.EQ, removeSelected = true, compareToValue = "+")
         val params = FilterParams(colFilters = listOf(colFilter, colFilter2))
         val resTable = runner?.run(table, params)

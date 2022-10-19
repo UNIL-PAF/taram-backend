@@ -55,7 +55,7 @@ class TTestComputationTests {
 
     @Test
     fun compute2SidedTTest() {
-        val params = TTestParams(".LFQ.intensity")
+        val params = TTestParams("LFQ.intensity")
         val resTable = runner?.run(table, params, colInfo)
 
         // check if headers are added

@@ -50,7 +50,8 @@ class WriteTableDataTests {
         val filename = writeTableData.write(tempFile.pathString, table)
         assert(File(filename).exists())
         val fileHash = Crc32HashComputations().computeFileHash(File(filename))
-        assert(fileHash == (315907541).toLong())
+        println(fileHash)
+        assert(fileHash == (2818018004).toLong())
     }
 
 }
