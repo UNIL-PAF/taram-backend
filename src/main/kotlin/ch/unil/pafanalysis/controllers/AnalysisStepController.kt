@@ -55,6 +55,8 @@ class AnalysisStepController {
     @PostMapping(path = ["/add-to/{stepId}"])
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
+        val step = analysisStepRepository?.findById(stepId)
+        asyncAnaysisStepService?.setAllStepsStatus(step, AnalysisStepStatus.IDLE)
         return commonStep?.addStep(stepId, stepParams)?.status
     }
 
