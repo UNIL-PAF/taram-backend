@@ -18,6 +18,7 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.io.File
 import kotlin.math.ln
@@ -25,6 +26,7 @@ import kotlin.math.ln
 @Service
 class TransformationRunner() : CommonStep(), CommonRunner {
 
+    @Lazy
     @Autowired
     var asyncTransformationRunner: AsyncTransformationRunner? = null
 
