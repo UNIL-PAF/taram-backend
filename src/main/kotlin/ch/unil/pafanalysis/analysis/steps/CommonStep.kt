@@ -98,7 +98,16 @@ open class CommonStep {
             val resultTablePathAndHash =
                 getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath, resultType)
 
-            return updateEmptyStep(stepWithParams, stepPath, resultTablePathAndHash, oldStep?.commonResult)
+            val newStep =
+                stepWithParams?.copy(
+                    resultPath = stepPath,
+                    resultTablePath = resultTablePathAndHash.first,
+                    resultTableHash = resultTablePathAndHash.second,
+                    status = AnalysisStepStatus.RUNNING.value,
+                    commonResult = oldStep?.commonResult,
+                    tableNr = if(stepWithParams?.modifiesResult == true){ oldStep?.tableNr?.plus(1)} else oldStep?.tableNr
+                )
+            return analysisStepRepository?.saveAndFlush(newStep!!)
         } catch(e: Exception){
             println("Error in runCommonStep ${currentStep?.id}")
             e.printStackTrace()
@@ -304,23 +313,6 @@ open class CommonStep {
         val commonHash = (step?.commonResult ?: 0).toString()
         val combinedHashString = "$paramsHash:$columnsMappingHash:$resultTableHash:$commonHash"
         return hashComp.computeStringHash(combinedHashString)
-    }
-
-    private fun updateEmptyStep(
-        emptyStep: AnalysisStep?,
-        stepPath: String?,
-        resultTablePath: Pair<String?, Long?>,
-        commonResult: CommonResult?
-    ): AnalysisStep? {
-        val newStep =
-            emptyStep?.copy(
-                resultPath = stepPath,
-                resultTablePath = resultTablePath.first,
-                resultTableHash = resultTablePath.second,
-                status = AnalysisStepStatus.RUNNING.value,
-                commonResult = commonResult
-            )
-        return analysisStepRepository?.saveAndFlush(newStep!!)
     }
 
     private fun updateOldStep(oldStep: AnalysisStep?, newNextId: Int?) {
