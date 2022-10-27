@@ -142,4 +142,9 @@ class AnalysisStepService {
         return step != null
     }
 
+    fun getTable(analysisStepId: Int): String? {
+        val analysisStep = analysisStepRepo?.findById(analysisStepId)
+        return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
+    }
+
 }

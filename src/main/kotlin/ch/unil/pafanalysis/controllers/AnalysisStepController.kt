@@ -17,7 +17,13 @@ import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import ch.unil.pafanalysis.common.ReadTableData
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.FileInputStream
+import java.io.InputStream
 
 @CrossOrigin(origins = ["http://localhost:3000"], maxAge = 3600)
 @RestController
@@ -124,6 +130,21 @@ class AnalysisStepController {
     @ResponseBody
     fun deleteComment(@PathVariable(value = "stepId") stepId: Int): Boolean? {
         return analysisStepService?.updateComment(stepId, null)
+    }
+
+    @GetMapping(path = ["/table/{stepId}"])
+    fun getTable(@PathVariable(value = "stepId") stepId: Int): ResponseEntity<ByteArray>? {
+        val tableFile =  analysisStepService?.getTable(stepId)
+        val inputStream: InputStream = FileInputStream(tableFile)
+        val contents = inputStream.readAllBytes()
+
+        val headers = HttpHeaders();
+        headers.contentType = MediaType.TEXT_PLAIN;
+        val filename = "output.txt";
+        headers.setContentDispositionFormData(filename, filename);
+        headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
+        val response = ResponseEntity(contents, headers, HttpStatus.OK);
+        return response;
     }
 
 }
