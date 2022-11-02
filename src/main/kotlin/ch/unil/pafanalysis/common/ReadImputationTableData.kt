@@ -6,7 +6,7 @@ import java.io.FileReader
 
 class ReadImputationTableData {
 
-    fun getTable(fileName: String?, allHeaders: List<Header>?): Table {
+    fun getTable(fileName: String?, allHeaders: List<Header>?): ImputationTable {
         val reader = BufferedReader(FileReader(fileName))
         val sep = "\t"
 
@@ -17,6 +17,6 @@ class ReadImputationTableData {
             line.split(sep).map{ it == "1" }
         }
 
-        return Table(headers, rows)
+        return ImputationTable(headers, rows)
     }
 }

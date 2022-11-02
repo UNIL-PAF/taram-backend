@@ -53,7 +53,7 @@ class TransformationRunnerTests {
         val res1 = transformation?.runTransformation(ints!!, params)
         val res2 = normalization?.runNormalization(res1!!, params)
         val res3 = imputation?.runImputation(res2!!, params)
-        val oneRes = BigDecimal(res3!![0][22]).setScale(5, RoundingMode.HALF_EVEN).toDouble()
+        val oneRes = BigDecimal(res3!!.first[0][22]).setScale(5, RoundingMode.HALF_EVEN).toDouble()
 
         assert(ints!![0][22] == 0.0)
         assert(oneRes == -4.55469)

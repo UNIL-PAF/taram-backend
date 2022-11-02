@@ -2,9 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.transformation
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.common.Crc32HashComputations
-import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.WriteTableData
+import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -15,6 +13,7 @@ class AsyncTransformationRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
     private val writeTableData = WriteTableData()
+    private val writeImputation = WriteImputationTableData()
 
     @Autowired
     val logTransformationRunner: LogTransformationRunner? = null
@@ -57,16 +56,18 @@ class AsyncTransformationRunner() : CommonStep() {
 
         val transInts = logTransformationRunner!!.runTransformation(ints, transformationParams)
         val normInts = normalizationRunner!!.runNormalization(transInts, transformationParams)
-        val impInts = imputationRunner!!.runImputation(normInts, transformationParams)
+        val (impInts, imputedRows) = imputationRunner!!.runImputation(normInts, transformationParams)
 
         val newCols: List<List<Any>>? = table.cols?.mapIndexed{ i, c ->
             val selHeader = selHeaders.withIndex().find{ it.value.idx == i }
             if (selHeader != null) {
                 impInts[selHeader.index]
             }else c
-
         }
 
+        val imputationTable = ImputationTable(selHeaders, imputedRows)
+        val imputationFileName = (getOutputRoot() + step?.resultTablePath).replace(".txt", "_imputation.txt")
+        writeImputation.write(imputationFileName, imputationTable)
         val resTable = writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
         return Crc32HashComputations().computeFileHash(File(resTable))
     }

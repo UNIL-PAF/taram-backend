@@ -22,14 +22,28 @@ class ImputationRunner() {
     fun runImputation(
         ints: List<List<Double>>,
         transformationParams: TransformationParams
-    ): List<List<Double>> {
-        return when (transformationParams.imputationType) {
+    ): Pair<List<List<Double>>, List<List<Boolean>>> {
+        val imputedRows = getImputedPos(ints)
+
+        val newInts =  when (transformationParams.imputationType) {
             ImputationType.NONE.value -> ints
             ImputationType.NAN.value -> replaceMissingBy(ints, Double.NaN)
             ImputationType.VALUE.value -> replaceMissingBy(ints, transformationParams.imputationParams?.replaceValue)
             ImputationType.NORMAL.value -> replaceByNormal(ints, transformationParams.imputationParams)
             else -> {
                 throw StepException("${transformationParams.imputationType} is not implemented.")
+            }
+        }
+
+        return Pair(newInts, imputedRows)
+    }
+
+    fun getImputedPos(cols: List<List<Double>>): List<List<Boolean>> {
+        return cols.fold(emptyList()){ acc, col ->
+            if(acc.isEmpty()){
+                col.map{ listOf((it.isNaN() || it == 0.0))}
+            }else{
+                col.mapIndexed{ i, c -> acc[i].plus( c.isNaN() || c == 0.0) }
             }
         }
     }

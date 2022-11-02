@@ -41,7 +41,7 @@ class ImputationRunnerTests {
         val imputParams = ImputationParams()
         val params = TransformationParams(imputationType = ImputationType.NORMAL.value, imputationParams = imputParams)
         val res = runner?.runImputation(ints!!, params)
-        val oneRes = BigDecimal(res!![0][22])
+        val oneRes = BigDecimal(res!!.first[0][22])
         assert(ints!![0][22] == 0.0)
         assert(oneRes == BigDecimal(-1.431590438871017E10))
     }
@@ -51,7 +51,7 @@ class ImputationRunnerTests {
         val imputParams = ImputationParams(width = 0.5, downshift = 2.0, seed = 10)
         val params = TransformationParams(imputationType = ImputationType.NORMAL.value, imputationParams = imputParams)
         val res = runner?.runImputation(ints!!, params)
-        val oneRes = BigDecimal(res!![0][22])
+        val oneRes = BigDecimal(res!!.first[0][22])
         assert(ints!![0][22] == 0.0)
         assert(oneRes == BigDecimal(-1.4063169578049812E10))
     }
@@ -61,7 +61,7 @@ class ImputationRunnerTests {
         val imputParams = ImputationParams(replaceValue = 0.5)
         val params = TransformationParams(imputationType = ImputationType.VALUE.value, imputationParams = imputParams)
         val res = runner?.runImputation(ints!!, params)
-        val oneRes = BigDecimal(res!![0][22])
+        val oneRes = BigDecimal(res!!.first[0][22])
         assert(ints!![0][22] == 0.0)
         assert(oneRes == BigDecimal(0.5))
     }
@@ -70,7 +70,7 @@ class ImputationRunnerTests {
     fun normalImputationWithNan() {
         val params = TransformationParams(imputationType = ImputationType.NAN.value)
         val res = runner?.runImputation(ints!!, params)
-        val oneRes = res!![0][22]
+        val oneRes = res!!.first[0][22]
         assert(ints!![0][22] == 0.0)
         assert(oneRes.isNaN())
     }
