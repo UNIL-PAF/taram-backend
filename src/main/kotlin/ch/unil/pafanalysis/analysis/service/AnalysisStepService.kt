@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.common.ReadImputationTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -145,6 +146,12 @@ class AnalysisStepService {
     fun getTable(analysisStepId: Int): String? {
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
+    }
+
+    fun getTempTableNotImputed(analysisStepId: Int): String? {
+        val analysisStep = analysisStepRepo?.findById(analysisStepId)
+        //ReadImputationTableData().getTable()
+        return null
     }
 
 }

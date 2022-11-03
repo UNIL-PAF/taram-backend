@@ -22,9 +22,7 @@ class ImputationRunner() {
     fun runImputation(
         ints: List<List<Double>>,
         transformationParams: TransformationParams
-    ): Pair<List<List<Double>>, List<List<Boolean>>> {
-        val imputedRows = getImputedPos(ints)
-
+    ): Pair<List<List<Double>>, List<List<Boolean>>?> {
         val newInts =  when (transformationParams.imputationType) {
             ImputationType.NONE.value -> ints
             ImputationType.NAN.value -> replaceMissingBy(ints, Double.NaN)
@@ -35,6 +33,7 @@ class ImputationRunner() {
             }
         }
 
+        val imputedRows = if(transformationParams.imputationType != ImputationType.NONE.value) getImputedPos(ints) else null
         return Pair(newInts, imputedRows)
     }
 

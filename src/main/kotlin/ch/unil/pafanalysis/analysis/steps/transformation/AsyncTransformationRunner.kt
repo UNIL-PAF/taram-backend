@@ -30,7 +30,7 @@ class AsyncTransformationRunner() : CommonStep() {
             val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.columnInfo?.columnMapping?.intCol)
             val transformationParams = gson.fromJson(newStep?.parameters, TransformationParams().javaClass)
 
-            transformTable(
+            val imputationFile = transformTable(
                 newStep,
                 transformationParams
             )
@@ -39,7 +39,8 @@ class AsyncTransformationRunner() : CommonStep() {
 
             newStep?.copy(
                 results = gson.toJson(defaultResult),
-                commonResult = commonResult
+                commonResult = commonResult,
+                imputationTablePath = imputationFile
             )
         }
 
@@ -49,7 +50,7 @@ class AsyncTransformationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         transformationParams: TransformationParams,
-    ): Long {
+    ): String? {
         val intCol = transformationParams.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
@@ -65,11 +66,15 @@ class AsyncTransformationRunner() : CommonStep() {
             }else c
         }
 
-        val imputationTable = ImputationTable(selHeaders, imputedRows)
-        val imputationFileName = (getOutputRoot() + step?.resultTablePath).replace(".txt", "_imputation.txt")
-        writeImputation.write(imputationFileName, imputationTable)
-        val resTable = writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
-        return Crc32HashComputations().computeFileHash(File(resTable))
+        writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
+
+        return  if(imputedRows != null){
+            val imputationTable = ImputationTable(selHeaders, imputedRows)
+            val imputationFileName = step?.resultTablePath?.replace(".txt", "_imputation.txt")
+            writeImputation.write(getOutputRoot() + imputationFileName, imputationTable)
+            imputationFileName
+        }else null
+
     }
 
 }

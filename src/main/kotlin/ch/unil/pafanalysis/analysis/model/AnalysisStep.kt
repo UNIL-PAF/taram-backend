@@ -26,6 +26,7 @@ data class AnalysisStep (
 
     val resultPath: String? = null,
     val resultTablePath: String? = null,
+    val imputationTablePath: String? = null,
     val resultTableHash: Long? = null,
     val tableNr: Int? = null,
 

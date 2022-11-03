@@ -103,7 +103,6 @@ class AnalysisService {
         val sortedList = analysisList?.map { a ->
             a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
         }
-
         return getAnalysisWithStatus(sortedList)
     }
 

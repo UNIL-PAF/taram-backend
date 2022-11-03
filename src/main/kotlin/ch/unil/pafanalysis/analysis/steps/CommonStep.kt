@@ -105,6 +105,7 @@ open class CommonStep {
                     resultTableHash = resultTablePathAndHash.second,
                     status = AnalysisStepStatus.RUNNING.value,
                     commonResult = oldStep?.commonResult,
+                    imputationTablePath = oldStep?.imputationTablePath,
                     tableNr = if(stepWithParams?.modifiesResult == true){ oldStep?.tableNr?.plus(1)} else oldStep?.tableNr
                 )
             return analysisStepRepository?.saveAndFlush(newStep!!)
