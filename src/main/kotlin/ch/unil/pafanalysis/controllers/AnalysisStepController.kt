@@ -134,10 +134,11 @@ class AnalysisStepController {
 
     @GetMapping(path = ["/table/{stepId}"])
     fun getTable(@PathVariable(value = "stepId") stepId: Int, @RequestParam imputed: Boolean = true): ResponseEntity<ByteArray>? {
-        println(imputed)
-        val tableFile =  analysisStepService?.getTable(stepId)
-
-
+        val tableFile =  if(!imputed){
+            analysisStepService?.getTempTableNotImputed(stepId)
+        }else{
+            analysisStepService?.getTable(stepId)
+        }
 
         val inputStream: InputStream = FileInputStream(tableFile)
         val contents = inputStream.readAllBytes()

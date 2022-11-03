@@ -7,12 +7,15 @@ import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.ReadImputationTableData
+import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
+import kotlin.io.path.pathString
 
 @Service
 class AnalysisStepService {
@@ -31,6 +34,9 @@ class AnalysisStepService {
 
     @Autowired
     private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
+
+    @Autowired
+    private var tableService: TableService? = null
 
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
         return if(analysisStepRepo?.existsById(stepId) == true){
@@ -149,9 +155,22 @@ class AnalysisStepService {
     }
 
     fun getTempTableNotImputed(analysisStepId: Int): String? {
+        println("getTempTableNotImputed")
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
-        //ReadImputationTableData().getTable()
-        return null
+
+        val table = ReadTableData().getTable(
+            env?.getProperty("output.path").plus(analysisStep?.resultTablePath),
+            analysisStep?.commonResult?.headers)
+
+        val imputed = ReadImputationTableData().getTable(env?.getProperty("output.path").plus(analysisStep?.imputationTablePath),
+            analysisStep?.commonResult?.headers)
+
+        val newTable = tableService?.replaceImputedVals(table, imputed, Double.NaN)
+        val tempFile = kotlin.io.path.createTempFile().pathString
+        println(tempFile)
+        WriteTableData().write(tempFile, newTable!!)
+
+        return tempFile
     }
 
 }
