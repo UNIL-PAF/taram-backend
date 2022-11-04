@@ -9,11 +9,14 @@ import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.ReadImputationTableData
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.WriteTableData
+import ch.unil.pafanalysis.common.ZipTool
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.pathString
 
@@ -154,8 +157,7 @@ class AnalysisStepService {
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
     }
 
-    fun getTempTableNotImputed(analysisStepId: Int): String? {
-        println("getTempTableNotImputed")
+    fun getTempTableNotImputed(analysisStepId: Int, path: String? = null): String? {
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
 
         val table = ReadTableData().getTable(
@@ -166,11 +168,28 @@ class AnalysisStepService {
             analysisStep?.commonResult?.headers)
 
         val newTable = tableService?.replaceImputedVals(table, imputed, Double.NaN)
-        val tempFile = kotlin.io.path.createTempFile().pathString
-        println(tempFile)
-        WriteTableData().write(tempFile, newTable!!)
+        val filePath = path ?: kotlin.io.path.createTempFile().pathString
+        WriteTableData().write(filePath, newTable!!)
 
-        return tempFile
+        return filePath
+    }
+
+    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, table: Boolean?, notimputed: Boolean?): String? {
+        val step = analysisStepRepo?.findById(stepId)
+        val name = step?.id.toString()?.plus("-")?.plus(step?.type)
+        val tempDir = kotlin.io.path.createTempDirectory().pathString
+        val dataDir: Path = Files.createDirectories(Path("$tempDir/$name"))
+
+        if(table == true){
+            val tableFile = File(env?.getProperty("output.path").plus(step?.resultTablePath))
+            tableFile.copyTo(File(dataDir.pathString + "/M${step?.tableNr}.txt"))
+        }
+
+        if(notimputed == true){
+            getTempTableNotImputed(stepId,  "$dataDir/M${step?.tableNr}_no_imputed.txt")
+        }
+
+        return ZipTool().zipDir(dataDir.pathString)
     }
 
 }

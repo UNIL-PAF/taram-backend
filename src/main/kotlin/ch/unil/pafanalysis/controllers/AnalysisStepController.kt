@@ -152,4 +152,25 @@ class AnalysisStepController {
         return response;
     }
 
+    @GetMapping(path = ["/zip/{stepId}"])
+    fun getTable(@PathVariable(value = "stepId") stepId: Int,
+                 @RequestParam svg: Boolean? = null,
+                 @RequestParam png: Boolean? = null,
+                 @RequestParam table: Boolean? = null,
+                 @RequestParam notimputed: Boolean? = null,
+    ): ResponseEntity<ByteArray>? {
+        val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table, notimputed)
+
+        val inputStream: InputStream = FileInputStream(zipFile)
+        val contents = inputStream.readAllBytes()
+
+        val headers = HttpHeaders();
+        //headers.contentType = MediaType.ALL;
+        val filename = "output.zip";
+        headers.setContentDispositionFormData(filename, filename);
+        headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
+        val response = ResponseEntity(contents, headers, HttpStatus.OK);
+        return response;
+    }
+
 }
