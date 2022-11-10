@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
+import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -23,6 +24,9 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncVolcanoPlotRunner: AsyncVolcanoPlotRunner? = null
 
+    @Autowired
+    private var echartsServer: EchartsServer? = null
+
     fun getParameters(step: AnalysisStep?): VolcanoPlotParams {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass) else VolcanoPlotParams()
     }
@@ -34,7 +38,7 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(makeEchartsPlot(step, pdf))
+        document?.add(echartsServer?.makeEchartsPlot(step, pdf))
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
 
         return document

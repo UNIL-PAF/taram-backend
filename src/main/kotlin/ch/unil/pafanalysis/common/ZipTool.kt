@@ -11,17 +11,24 @@ class ZipTool {
 
     fun zipDir(
         dir: String,
-        fileName: String? = null
+        fileName: String,
+        outPath: String,
+        removeDir: Boolean = true
     ): String {
-        val zipFile = "/tmp/a.zip"
-        val fos = FileOutputStream(zipFile)
+        val zipFilePath = "$outPath/$fileName"
+        val fos = FileOutputStream(zipFilePath)
         val zipOut = ZipOutputStream(fos)
         val fileToZip = File(dir)
 
         zipFile(fileToZip, fileToZip.name, zipOut)
         zipOut.close()
         fos.close()
-        return zipFile
+
+        if(removeDir){
+            File(dir).deleteRecursively()
+        }
+
+        return zipFilePath
     }
 
     private fun zipFile(fileToZip: File, fileName: String, zipOut: ZipOutputStream) {

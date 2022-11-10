@@ -10,6 +10,7 @@ import ch.unil.pafanalysis.analysis.steps.transformation.ImputationType
 import ch.unil.pafanalysis.analysis.steps.transformation.NormalizationType
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationType
+import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -25,6 +26,9 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
     @Autowired
+    private var echartsServer: EchartsServer? = null
+
+    @Autowired
     var asyncBoxplotRunner: AsyncBoxPlotRunner? = null
 
     fun getParameters(step: AnalysisStep?): BoxPlotParams {
@@ -38,7 +42,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(makeEchartsPlot(step, pdf))
+        document?.add(echartsServer?.makeEchartsPlot(step, pdf))
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
 
         return document

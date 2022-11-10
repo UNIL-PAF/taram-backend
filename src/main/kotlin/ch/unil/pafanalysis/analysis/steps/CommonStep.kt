@@ -14,6 +14,7 @@ import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
+import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -198,30 +199,6 @@ open class CommonStep {
             val nextStep = analysisStepRepository?.findById(step.nextId!!)
             update(nextStep!!, step)
         }
-    }
-
-    fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument): Image? {
-
-        val results = gson.fromJson(step.results, BoxPlot::class.java)
-        val echartsPlot = results.plot?.copy(outputPath = step.resultPath)
-
-        val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
-
-        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create(echartsServerUrl))
-            .timeout(Duration.ofSeconds(5))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
-            .build();
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        val outputRoot = getOutputRoot()
-
-        val pdfPath: String = outputRoot + response.body()
-        val sourcePdf = PdfDocument(PdfReader(pdfPath))
-        val pdfPlot = sourcePdf.getPage(1)
-        val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
-        return Image(pdfPlotCopy)
     }
 
     fun getSelProts(step: AnalysisStep?): List<String>? {

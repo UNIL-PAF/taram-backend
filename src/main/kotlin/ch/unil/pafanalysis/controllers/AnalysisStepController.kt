@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 
@@ -133,8 +134,8 @@ class AnalysisStepController {
     }
 
     @GetMapping(path = ["/table/{stepId}"])
-    fun getTable(@PathVariable(value = "stepId") stepId: Int, @RequestParam imputed: Boolean = true): ResponseEntity<ByteArray>? {
-        val tableFile =  if(!imputed){
+    fun getTable(@PathVariable(value = "stepId") stepId: Int, @RequestParam noImputed: Boolean = false): ResponseEntity<ByteArray>? {
+        val tableFile =  if(noImputed){
             analysisStepService?.getTempTableNotImputed(stepId)
         }else{
             analysisStepService?.getTable(stepId)
@@ -153,19 +154,21 @@ class AnalysisStepController {
     }
 
     @GetMapping(path = ["/zip/{stepId}"])
-    fun getTable(@PathVariable(value = "stepId") stepId: Int,
+    fun getZip(@PathVariable(value = "stepId") stepId: Int,
                  @RequestParam svg: Boolean? = null,
                  @RequestParam png: Boolean? = null,
                  @RequestParam table: Boolean? = null,
-                 @RequestParam notimputed: Boolean? = null,
+                 @RequestParam noImputed: Boolean? = null,
     ): ResponseEntity<ByteArray>? {
-        val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table, notimputed)
+        val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table, noImputed)
 
         val inputStream: InputStream = FileInputStream(zipFile)
         val contents = inputStream.readAllBytes()
+        inputStream.close()
+        File(zipFile).delete()
 
         val headers = HttpHeaders();
-        //headers.contentType = MediaType.ALL;
+        headers.contentType = MediaType.MULTIPART_MIXED;
         val filename = "output.zip";
         headers.setContentDispositionFormData(filename, filename);
         headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";

@@ -6,10 +6,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.common.ReadImputationTableData
-import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.WriteTableData
-import ch.unil.pafanalysis.common.ZipTool
+import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -40,6 +37,9 @@ class AnalysisStepService {
 
     @Autowired
     private var tableService: TableService? = null
+
+    @Autowired
+    private var echartsServer: EchartsServer? = null
 
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
         return if(analysisStepRepo?.existsById(stepId) == true){
@@ -157,6 +157,11 @@ class AnalysisStepService {
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
     }
 
+    fun getSvg(stepId: Int, path: String): String? {
+        val analysisStep = analysisStepRepo?.findById(stepId)
+        return echartsServer?.getSvgPlot(analysisStep, path)
+    }
+
     fun getTempTableNotImputed(analysisStepId: Int, path: String? = null): String? {
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
 
@@ -174,22 +179,26 @@ class AnalysisStepService {
         return filePath
     }
 
-    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, table: Boolean?, notimputed: Boolean?): String? {
+    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, table: Boolean?, noImputed: Boolean?): String? {
         val step = analysisStepRepo?.findById(stepId)
+        val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
         val name = step?.id.toString()?.plus("-")?.plus(step?.type)
-        val tempDir = kotlin.io.path.createTempDirectory().pathString
-        val dataDir: Path = Files.createDirectories(Path("$tempDir/$name"))
+        val dataDir: Path = Files.createDirectories(Path("$resultDir/$name"))
 
         if(table == true){
             val tableFile = File(env?.getProperty("output.path").plus(step?.resultTablePath))
             tableFile.copyTo(File(dataDir.pathString + "/M${step?.tableNr}.txt"))
         }
 
-        if(notimputed == true){
+        if(noImputed == true){
             getTempTableNotImputed(stepId,  "$dataDir/M${step?.tableNr}_no_imputed.txt")
         }
 
-        return ZipTool().zipDir(dataDir.pathString)
+        if(svg == true){
+            getSvg(stepId, "${step?.resultPath}/$name/$name.svg")
+        }
+
+        return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, true)
     }
 
 }
