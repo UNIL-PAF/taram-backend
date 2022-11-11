@@ -67,4 +67,25 @@ class EchartsServer {
 
         return env?.getProperty("output.path") + response.body()
     }
+
+    fun getPngPlot(step: AnalysisStep?, svgPath: String): String? {
+        val results = gson.fromJson(step?.results, BoxPlot::class.java)
+
+        val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/svg?path=$svgPath")
+        val a = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5))
+
+        val client = a.build();
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create(echartsServerUrl))
+            .timeout(Duration.ofSeconds(5))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(results.plot)))
+            .build();
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        return env?.getProperty("output.path") + response.body()
+    }
+
 }

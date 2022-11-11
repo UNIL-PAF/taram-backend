@@ -157,11 +157,6 @@ class AnalysisStepService {
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
     }
 
-    fun getSvg(stepId: Int, path: String): String? {
-        val analysisStep = analysisStepRepo?.findById(stepId)
-        return echartsServer?.getSvgPlot(analysisStep, path)
-    }
-
     fun getTempTableNotImputed(analysisStepId: Int, path: String? = null): String? {
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
 
@@ -195,7 +190,11 @@ class AnalysisStepService {
         }
 
         if(svg == true){
-            getSvg(stepId, "${step?.resultPath}/$name/$name.svg")
+            echartsServer?.getSvgPlot(step, "${step?.resultPath}/$name/$name.svg")
+        }
+
+        if(png == true){
+            echartsServer?.getPngPlot(step, "${step?.resultPath}/$name/$name.png")
         }
 
         return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, true)
