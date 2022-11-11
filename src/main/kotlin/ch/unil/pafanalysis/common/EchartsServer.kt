@@ -52,9 +52,7 @@ class EchartsServer {
         val results = gson.fromJson(step?.results, BoxPlot::class.java)
 
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/svg?path=$svgPath")
-        val a = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5))
-
-        val client = a.build();
+        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
         val request = HttpRequest.newBuilder()
             .uri(URI.create(echartsServerUrl))
@@ -64,6 +62,10 @@ class EchartsServer {
             .build();
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        if (response.statusCode() != 200) {
+            throw Exception("Could not get the svg from service: Error code [${response.statusCode()}].")
+        }
 
         return env?.getProperty("output.path") + response.body()
     }
@@ -71,10 +73,8 @@ class EchartsServer {
     fun getPngPlot(step: AnalysisStep?, svgPath: String): String? {
         val results = gson.fromJson(step?.results, BoxPlot::class.java)
 
-        val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/svg?path=$svgPath")
-        val a = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5))
-
-        val client = a.build();
+        val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/png?path=$svgPath")
+        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
         val request = HttpRequest.newBuilder()
             .uri(URI.create(echartsServerUrl))
@@ -84,6 +84,9 @@ class EchartsServer {
             .build();
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        if (response.statusCode() != 200) {
+            throw Exception("Could not get the png from service: Error code [${response.statusCode()}].")
+        }
 
         return env?.getProperty("output.path") + response.body()
     }

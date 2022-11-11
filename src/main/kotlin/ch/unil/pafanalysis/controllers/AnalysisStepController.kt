@@ -160,19 +160,25 @@ class AnalysisStepController {
                  @RequestParam table: Boolean? = null,
                  @RequestParam noImputed: Boolean? = null,
     ): ResponseEntity<ByteArray>? {
-        val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table, noImputed)
+        var response: ResponseEntity<ByteArray>? = null
+        try {
+            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table, noImputed)
 
-        val inputStream: InputStream = FileInputStream(zipFile)
-        val contents = inputStream.readAllBytes()
-        inputStream.close()
-        File(zipFile).delete()
+            val inputStream: InputStream = FileInputStream(zipFile)
+            val contents = inputStream.readAllBytes()
+            inputStream.close()
+            File(zipFile).delete()
 
-        val headers = HttpHeaders();
-        headers.contentType = MediaType.MULTIPART_MIXED;
-        val filename = "output.zip";
-        headers.setContentDispositionFormData(filename, filename);
-        headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
-        val response = ResponseEntity(contents, headers, HttpStatus.OK);
+            val headers = HttpHeaders();
+            headers.contentType = MediaType.MULTIPART_MIXED;
+            val filename = "output.zip";
+            headers.setContentDispositionFormData(filename, filename);
+            headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
+            response = ResponseEntity(contents, headers, HttpStatus.OK);
+        }catch(e: Exception){
+            e.printStackTrace()
+        }
+
         return response;
     }
 
