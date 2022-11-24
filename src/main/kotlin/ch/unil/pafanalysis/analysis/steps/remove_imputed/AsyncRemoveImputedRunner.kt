@@ -41,7 +41,9 @@ class AsyncRemoveImputedRunner() : CommonStep() {
                     env?.getProperty("output.path").plus(stepBefore?.imputationTablePath),
                     stepBefore?.commonResult?.headers
                 )
+
                 val imputedRepl = tableService?.replaceImputedVals(table, imputed, params.replaceBy?.value!!)
+
                 WriteTableData().write(
                     env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
                     imputedRepl?.first!!
@@ -55,7 +57,6 @@ class AsyncRemoveImputedRunner() : CommonStep() {
                 results = gson.toJson(RemoveImputed(nrImputed, nrImputedRows)),
                 imputationTablePath = null
             )
-            newStep
         }
 
         tryToRun(funToRun, newStep)
