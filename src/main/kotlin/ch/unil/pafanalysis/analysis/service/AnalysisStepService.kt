@@ -48,13 +48,6 @@ class AnalysisStepService {
         }else null
     }
 
-    /*
-    fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
-        return analysisStepRepo?.setStatusById(status.value, id)
-    }
-
-     */
-
     fun duplicateAnalysisSteps(
         sortedSteps: List<AnalysisStep>,
         newAnalysis: Analysis,
@@ -157,24 +150,7 @@ class AnalysisStepService {
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
     }
 
-    fun getTempTableNotImputed(analysisStepId: Int, path: String? = null): String? {
-        val analysisStep = analysisStepRepo?.findById(analysisStepId)
-
-        val table = ReadTableData().getTable(
-            env?.getProperty("output.path").plus(analysisStep?.resultTablePath),
-            analysisStep?.commonResult?.headers)
-
-        val imputed = ReadImputationTableData().getTable(env?.getProperty("output.path").plus(analysisStep?.imputationTablePath),
-            analysisStep?.commonResult?.headers)
-
-        val newTable = tableService?.replaceImputedVals(table, imputed, Double.NaN)
-        val filePath = path ?: kotlin.io.path.createTempFile().pathString
-        WriteTableData().write(filePath, newTable!!)
-
-        return filePath
-    }
-
-    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, table: Boolean?, noImputed: Boolean?): String? {
+    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, table: Boolean?): String? {
         val step = analysisStepRepo?.findById(stepId)
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
         val name = step?.id.toString()?.plus("-")?.plus(step?.type)
@@ -183,10 +159,6 @@ class AnalysisStepService {
         if(table == true){
             val tableFile = File(env?.getProperty("output.path").plus(step?.resultTablePath))
             tableFile.copyTo(File(dataDir.pathString + "/M${step?.tableNr}.txt"))
-        }
-
-        if(noImputed == true){
-            getTempTableNotImputed(stepId,  "$dataDir/M${step?.tableNr}_no_imputed.txt")
         }
 
         if(svg == true){

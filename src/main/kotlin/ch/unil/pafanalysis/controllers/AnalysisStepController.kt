@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.controllers
 
-import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.INITIAL_RESULT
@@ -15,7 +14,6 @@ import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
-import ch.unil.pafanalysis.common.ReadTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -134,13 +132,8 @@ class AnalysisStepController {
     }
 
     @GetMapping(path = ["/table/{stepId}"])
-    fun getTable(@PathVariable(value = "stepId") stepId: Int, @RequestParam noImputed: Boolean = false): ResponseEntity<ByteArray>? {
-        val tableFile =  if(noImputed){
-            analysisStepService?.getTempTableNotImputed(stepId)
-        }else{
-            analysisStepService?.getTable(stepId)
-        }
-
+    fun getTable(@PathVariable(value = "stepId") stepId: Int): ResponseEntity<ByteArray>? {
+        val tableFile = analysisStepService?.getTable(stepId)
         val inputStream: InputStream = FileInputStream(tableFile)
         val contents = inputStream.readAllBytes()
 
@@ -162,7 +155,7 @@ class AnalysisStepController {
     ): ResponseEntity<ByteArray>? {
         var response: ResponseEntity<ByteArray>? = null
         try {
-            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table, noImputed)
+            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table)
 
             val inputStream: InputStream = FileInputStream(zipFile)
             val contents = inputStream.readAllBytes()

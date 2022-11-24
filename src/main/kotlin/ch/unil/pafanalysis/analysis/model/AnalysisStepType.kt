@@ -8,5 +8,6 @@ enum class AnalysisStepType(val value: String) {
     FILTER("filter"),
     GROUP_FILTER("group-filter"),
     T_TEST("t-test"),
-    VOLCANO_PLOT("volcano-plot")
+    VOLCANO_PLOT("volcano-plot"),
+    REMOVE_IMPUTED("remove-imputed")
 }
