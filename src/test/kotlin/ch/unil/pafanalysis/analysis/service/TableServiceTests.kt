@@ -37,7 +37,9 @@ class TableServiceTests {
         val tempFile = kotlin.io.path.createTempFile()
         writeTableData.write(tempFile.pathString, newTable!!)
         val fileHash = Crc32HashComputations().computeFileHash(File(fileName))
-        
+
+        println(tempFile.pathString)
+
         assert(fileHash == (1653853479).toLong())
         assert(nrReplaced == 10231)
         assert(nrRowsReplaced == 1779)
