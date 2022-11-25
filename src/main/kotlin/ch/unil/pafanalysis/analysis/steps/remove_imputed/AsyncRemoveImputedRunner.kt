@@ -6,7 +6,6 @@ import ch.unil.pafanalysis.analysis.service.TableService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadImputationTableData
 import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.WriteImputationTableData
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment

@@ -1,4 +1,4 @@
-package ch.unil.pafanalysis.analysis.steps.remove_imputed
+package ch.unil.pafanalysis.analysis.steps.remove_columns
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
@@ -13,25 +13,25 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
-class RemoveImputedRunner() : CommonStep(), CommonRunner {
+class RemoveColumnsRunner() : CommonStep(), CommonRunner {
 
     @Lazy
     @Autowired
-    var asyncRemoveImputedRunner: AsyncRemoveImputedRunner? = null
+    var asyncRemoveColumnsRunner: AsyncRemoveColumnsRunner? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.REMOVE_IMPUTED
+    override var type: AnalysisStepType? = AnalysisStepType.REMOVE_COLUMNS
 
-    fun getParameters(step: AnalysisStep?): RemoveImputedParams {
+    fun getParameters(step: AnalysisStep?): RemoveColumnsParams {
         return if (step?.parameters != null) gson.fromJson(
             step?.parameters,
-            RemoveImputedParams().javaClass
-        ) else RemoveImputedParams()
+            RemoveColumnsParams().javaClass
+        ) else RemoveColumnsParams()
     }
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
-        val transParams = gson.fromJson(step.parameters, RemoveImputedParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${transParams.replaceBy}"))
+        val transParams = gson.fromJson(step.parameters, RemoveColumnsParams::class.java)
+        val selCol = Paragraph().add(Text("Selected column: ${transParams.keepIdxs?.joinToString(separator = ",")}"))
         document?.add(title)
         document?.add(selCol)
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
@@ -40,7 +40,7 @@ class RemoveImputedRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, true, step, params)
-        asyncRemoveImputedRunner?.runAsync(oldStepId, newStep)
+        asyncRemoveColumnsRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
 
@@ -49,7 +49,13 @@ class RemoveImputedRunner() : CommonStep(), CommonRunner {
         val origParams = getParameters(origStep)
 
         return "Parameter(s) changed:"
-            .plus(if (params.replaceBy != origParams?.replaceBy) " [Replace by: ${params.replaceBy}]" else "")
+            .plus(
+                if (params.keepIdxs?.joinToString(",") != origParams?.keepIdxs?.joinToString(",")) " [Replace by: ${
+                    params.keepIdxs?.joinToString(
+                        separator = ","
+                    )
+                }]" else ""
+            )
     }
 
 }
