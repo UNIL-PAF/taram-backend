@@ -150,12 +150,10 @@ class AnalysisStepController {
     fun getZip(@PathVariable(value = "stepId") stepId: Int,
                  @RequestParam svg: Boolean? = null,
                  @RequestParam png: Boolean? = null,
-                 @RequestParam table: Boolean? = null,
-                 @RequestParam noImputed: Boolean? = null,
     ): ResponseEntity<ByteArray>? {
         var response: ResponseEntity<ByteArray>? = null
         try {
-            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, table)
+            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png)
 
             val inputStream: InputStream = FileInputStream(zipFile)
             val contents = inputStream.readAllBytes()

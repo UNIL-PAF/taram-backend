@@ -150,16 +150,11 @@ class AnalysisStepService {
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
     }
 
-    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, table: Boolean?): String? {
+    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?): String? {
         val step = analysisStepRepo?.findById(stepId)
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
         val name = step?.id.toString()?.plus("-")?.plus(step?.type)
         val dataDir: Path = Files.createDirectories(Path("$resultDir/$name"))
-
-        if(table == true){
-            val tableFile = File(env?.getProperty("output.path").plus(step?.resultTablePath))
-            tableFile.copyTo(File(dataDir.pathString + "/M${step?.tableNr}.txt"))
-        }
 
         if(svg == true){
             echartsServer?.getSvgPlot(step, "${step?.resultPath}/$name/$name.svg")
