@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.service.TableService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadImputationTableData
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -32,15 +33,28 @@ class AsyncRemoveColumnsRunner() : CommonStep() {
 
             val headersFiltered = filterHeaders(newStep?.commonResult?.headers, params.keepIdxs)
             val numColsFiltered = filterNumCols(newStep?.commonResult?.numericalColumns, headersFiltered)
+            val newHeaders = headersFiltered?.mapIndexed{ i, h -> h.copy(idx = i) }
+
+            val oldTable = ReadTableData().getTable(
+                env?.getProperty("output.path").plus(newStep?.resultTablePath),
+                newStep?.commonResult?.headers
+            )
+
+            val newTable = Table(headers = newHeaders, cols = oldTable.cols?.filterIndexed{ i, _ -> params.keepIdxs?.contains(i) ?: false})
+
+            WriteTableData().write(
+                env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
+                newTable
+            )
 
             newStep?.copy(
                 results = gson.toJson(
                     RemoveColumns(
-                        headersFiltered?.size,
-                        newStep?.commonResult?.headers?.size?.minus(headersFiltered?.size ?: 0)
+                        newHeaders?.size,
+                        newStep?.commonResult?.headers?.size?.minus(newHeaders?.size ?: 0)
                     )
                 ),
-                commonResult = newStep?.commonResult?.copy(headers = headersFiltered, numericalColumns = numColsFiltered)
+                commonResult = newStep?.commonResult?.copy(headers = newHeaders, numericalColumns = numColsFiltered)
             )
         }
 
