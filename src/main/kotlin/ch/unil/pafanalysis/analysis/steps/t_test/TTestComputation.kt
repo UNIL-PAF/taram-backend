@@ -55,7 +55,7 @@ class TTestComputation {
 
         val addCols = listOf<List<Any>>(pVals, qVals, foldChanges, signGroups.map{it.toString()})
         val newCols = table.cols?.plus(addCols)
-        return Pair(Table(newHeaders, newCols), newHeaders?.plus(addHeaders))
+        return Pair(Table(newHeaders, newCols), newHeaders)
     }
 
     private fun computeFoldChanges(groupVals: List<List<List<Double>>?>, params: TTestParams?): List<Double> {
