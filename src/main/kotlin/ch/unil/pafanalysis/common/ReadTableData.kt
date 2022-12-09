@@ -91,6 +91,17 @@ class ReadTableData {
         return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
     }
 
+    fun getDoubleMatrixByRow(table: Table?, field: String?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
+        val matrix = getDoubleMatrix(table, field, group)
+        val initialList: List<List<Double>> = emptyList()
+        val rowNr = matrix.second[0].size - 1
+        val byRow = (0..rowNr).fold(initialList){ acc, i ->
+            val row: List<Double> = matrix.second.map{it[i]}
+            acc.plusElement(row)
+        }
+        return Pair(matrix.first, byRow)
+    }
+
 
     fun getDoubleColumn(table: Table?, headerName: String): List<Double>? {
         val header = table?.headers?.find { it.name == headerName } ?: return null

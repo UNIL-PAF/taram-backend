@@ -1,40 +1,54 @@
 package ch.unil.pafanalysis.analysis.steps.t_test
 
-import ch.unil.pafanalysis.analysis.model.ColType
-import ch.unil.pafanalysis.analysis.model.ColumnInfo
-import ch.unil.pafanalysis.analysis.model.ColumnMapping
-import ch.unil.pafanalysis.analysis.model.Header
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import com.github.rcaller.rstuff.RCaller
 import com.github.rcaller.rstuff.RCallerOptions
 import com.github.rcaller.rstuff.RCode
-import org.apache.commons.math3.stat.inference.TTest
 import org.springframework.stereotype.Service
 
 @Service
 class TTestComputation {
 
-    fun run(table: Table?, params: TTestParams?, columnInfo: ColumnInfo?): Triple<Table?, Int, List<Header>?> {
+    fun run(table: Table?, params: TTestParams?, step: AnalysisStep?): Triple<Table?, List<Header>?, TTest> {
 
-        if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
+        if (step?.columnInfo?.columnMapping?.experimentDetails == null || step?.columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
             "Please specify your groups in the Analysis parameters."
         )
 
-        if (columnInfo?.columnMapping?.experimentDetails.values.groupBy { it.group }.keys.size != 2) throw StepException(
-            "You must have exactly 2 groups."
-        )
+        if(((params?.firstGroup?.size?:0)  == 0) || (params?.firstGroup?.size != params?.secondGroup?.size)){
+            throw StepException("You must at least chose one valid pair of groups in first and second group.")
+        }
 
-        val groupVals = getGroupValues(table, params?.field ?: columnInfo?.columnMapping?.intCol)
-        val pVals = computeTTest(groupVals, params)
+        val comparisions: List<Pair<String, String>>? = params?.firstGroup?.zip(params?.secondGroup ?: emptyList())
+
+        val isLogVal = step?.commonResult?.intColIsLog
+        val field = params?.field ?: step?.columnInfo?.columnMapping?.intCol
+
+        val initialRes: Triple<Table?, List<Header>?, TTest> = Triple(table, table?.headers, TTest(comparisions = emptyList()))
+
+        val res: Triple<Table?, List<Header>?, TTest> = comparisions?.fold(initialRes){ acc, comp ->
+            return computeComparision(comp, acc.first, field, acc.third, isLogVal, params)
+        } ?: initialRes
+
+        return res
+    }
+
+    private val readTableData = ReadTableData()
+
+    private fun computeComparision(comp: Pair<String, String>, table:Table?, field: String?, ttest: TTest, isLogVal: Boolean?, params: TTestParams?): Triple<Table?, List<Header>?, TTest>{
+        val ints: Pair<List<List<Double>>, List<List<Double>>> = comp.toList().map{ c -> readTableData.getDoubleMatrixByRow(table, field, c).second }.zipWithNext().single()
+        val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
+        val pVals = computeTTest(rowInts)
         val qVals = multiTestCorr(pVals)
-        val foldChanges = computeFoldChanges(groupVals, params)
+        val foldChanges = computeFoldChanges(rowInts, isLogVal)
         val signGroups = qVals.map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
-
         val (newTable, headers) = addResults(table, pVals, qVals, foldChanges, signGroups)
-
-        return Triple(newTable, nrSign, headers)
+        val newTtest = ttest.copy(comparisions = ttest.comparisions?.plusElement(TTestComparision(comp.first, comp.second, nrSign)))
+        return Triple(newTable, headers, newTtest)
     }
 
     private fun addResults(
@@ -58,12 +72,12 @@ class TTestComputation {
         return Pair(Table(newHeaders, newCols), newHeaders)
     }
 
-    private fun computeFoldChanges(groupVals: List<List<List<Double>>?>, params: TTestParams?): List<Double> {
-        return groupVals.map { row ->
-            if (params?.valuesAreLog == true) {
-                row!![0].average() - row!![1].average()
+    private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?): List<Double> {
+        return ints.map { row ->
+            if (isLogVal == true) {
+                row.first.average() - row.second.average()
             } else {
-                row!![0].average() / row!![1].average()
+                row.first.average() / row.second.average()
             }
         }
     }
@@ -77,29 +91,12 @@ class TTestComputation {
         return caller.parser.getAsDoubleArray("corr_p_vals").toList()
     }
 
-    private fun computeTTest(groupVals: List<List<List<Double>>?>, params: TTestParams?): List<Double> {
-        val apacheTTest = TTest()
+    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>): List<Double> {
+        val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
 
-        return groupVals.map { row ->
-            val pVal = apacheTTest.homoscedasticTTest(row!![0].toDoubleArray(), row!![1].toDoubleArray())
-            //val pVal = apacheTTest.tTest(row!![0].toDoubleArray(), row!![1].toDoubleArray())
+        return ints.map { row ->
+            val pVal = apacheTTest.homoscedasticTTest(row.first.toDoubleArray(), row.second.toDoubleArray())
             pVal
-        }
-    }
-
-    private fun getGroupValues(table: Table?, field: String?): List<List<List<Double>>?> {
-        val headerGroups: Map<String?, List<Header>>? =
-            table?.headers?.filter { it.experiment?.field == field }?.groupBy { it.experiment?.group }
-
-        val nrRows = table?.cols?.get(0)?.size
-
-        return (0 until nrRows!!).map { i ->
-            headerGroups?.mapValues { headerList ->
-
-                headerList.value.map { header ->
-                    table.cols[header.idx][i] as Double
-                }
-            }?.toList()?.map { it.second }
         }
     }
 }

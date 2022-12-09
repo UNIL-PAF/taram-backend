@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
@@ -39,8 +40,8 @@ class AsyncTTestRunner() : CommonStep() {
         val outputRoot = getOutputRoot()
         val params = gson.fromJson(step?.parameters, TTestParams().javaClass)
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
-        val (resTable, nrSign, headers) = tTestComputation?.run(table, params, step?.columnInfo)!!
+        val (resTable, headers, tTestRes) = tTestComputation?.run(table, params, step)!!
         writeTableData?.write(outputRoot + step?.resultTablePath!!, resTable!!)
-        return TTestRes(TTest(nrSign), headers)
+        return TTestRes(tTestRes, headers)
     }
 }
