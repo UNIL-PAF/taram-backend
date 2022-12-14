@@ -22,7 +22,15 @@ data class Header(
     val experiment: Experiment? = null
 )
 
-data class Experiment(val name: String?, val field: String, val group: String? = null, val initialName: String)
+data class Experiment(
+    val name: String? = null,
+    val field: String? = null,
+    val group: String? = null,
+    val initialName: String? = null,
+    val comp: GroupComp? = null
+    )
+
+data class GroupComp(val group1: String, val group2: String)
 
 enum class ColType(val value: String) {
     CHARACTER("character"),

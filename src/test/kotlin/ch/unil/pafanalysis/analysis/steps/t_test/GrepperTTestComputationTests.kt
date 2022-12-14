@@ -16,10 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-const val ROUNDING_PRECISION = 4
-
 @SpringBootTest
-class TTestComputationTests {
+class GrepperTTestComputationTests {
+
+    private val ROUNDING_PRECISION = 4
 
     @Autowired
     private val runner: TTestComputation? = null

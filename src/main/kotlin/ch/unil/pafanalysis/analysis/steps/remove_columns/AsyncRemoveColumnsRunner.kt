@@ -18,13 +18,7 @@ import org.springframework.stereotype.Service
 class AsyncRemoveColumnsRunner() : CommonStep() {
 
     @Autowired
-    private val analysisStepRepo: AnalysisStepRepository? = null
-
-    @Autowired
     private var env: Environment? = null
-
-    @Autowired
-    private var tableService: TableService? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
@@ -61,7 +55,7 @@ class AsyncRemoveColumnsRunner() : CommonStep() {
         tryToRun(funToRun, newStep)
     }
 
-    private fun filterNumCols(numCols: List<String>?, headersFiltered: List<Header>?): List<String>? {
+    private fun filterNumCols(numCols: List<String?>?, headersFiltered: List<Header>?): List<String?>? {
         val expCols = headersFiltered?.filter{ it.experiment != null}?.map{ it.experiment?.field }?.distinct()
         return numCols?.filter{ expCols?.contains(it) ?: false }
     }
