@@ -72,7 +72,7 @@ class GrepperTTestComputationTests {
         assert(table?.cols?.get(0)?.size == resTable?.cols?.get(0)?.size)
 
         // verify p-values
-        val pValHeader = resTable?.headers?.find { it.name == "p.value" }
+        val pValHeader = resTable?.headers?.find { it.name?.contains("p.value")?:false }
         val pVals = resTable?.cols?.get(pValHeader?.idx!!)
             ?.map { if (pValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
 
@@ -85,7 +85,7 @@ class GrepperTTestComputationTests {
         assert(roundNumber(pVals?.average()!!) == roundNumber(0.3466965))
 
         // verify q-values
-        val qValHeader = resTable?.headers?.find { it.name == "q.value" }
+        val qValHeader = resTable?.headers?.find { it.name?.contains("q.value")?:false }
         val qVals = resTable?.cols?.get(qValHeader?.idx!!)
             ?.map { if (qValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
 
@@ -96,7 +96,7 @@ class GrepperTTestComputationTests {
         )
 
         // verify fold changes
-        val foldChangeHeader = resTable?.headers?.find { it.name == "fold.change" }
+        val foldChangeHeader = resTable?.headers?.find { it.name?.contains("fold.change")?:false }
         val foldChange = resTable?.cols?.get(foldChangeHeader?.idx!!)
             ?.map { if (foldChangeHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
 
@@ -107,7 +107,7 @@ class GrepperTTestComputationTests {
         )
 
         // verify significant indexes
-        val isSignHeader = resTable?.headers?.find { it.name == "is.significant" }
+        val isSignHeader = resTable?.headers?.find { it.name?.contains("is.significant")?:false }
         val isSign = resTable?.cols?.get(isSignHeader?.idx!!)
             ?.map { if (isSignHeader.type == ColType.CHARACTER) it as? String ?: "" else "" }
         val validIdx = isSign?.foldIndexed(emptyList<Int>()){i, acc, v -> if(v == "true") acc.plus(i+1) else acc }

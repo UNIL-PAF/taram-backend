@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.ColType
 import ch.unil.pafanalysis.common.*
 import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.Test
