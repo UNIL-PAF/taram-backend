@@ -5,5 +5,8 @@ data class VolcanoPlotParams(
     val fcThresh: Double? = null,
     val useAdjustedPVal: Boolean? = true,
     val log10PVal: Boolean = true,
-    val selProteins: List<String>? = null
+    val selProteins: List<String>? = null,
+    val comparison: ComparisonParams? = null
 )
+
+data class ComparisonParams (val group1: String, val group2: String)
