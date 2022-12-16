@@ -1,10 +1,12 @@
 package ch.unil.pafanalysis.controllers
 
+import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.results.model.AvailableDir
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultPaths
 import ch.unil.pafanalysis.results.service.CheckForNewDirs
 import ch.unil.pafanalysis.results.service.ResultRepository
+import ch.unil.pafanalysis.results.service.ResultService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.web.bind.annotation.*
@@ -18,6 +20,9 @@ class ResultController {
 
     @Autowired
     private var resultRepository: ResultRepository? = null
+
+    @Autowired
+    private var resultService: ResultService? = null
 
     @Autowired
     private var env: Environment? = null
@@ -43,6 +48,11 @@ class ResultController {
     fun availableDirs(): Iterable<AvailableDir>? {
         val existingRes = resultRepository?.findAll()
         return CheckForNewDirs.checkAll(existingRes?.asSequence(), getResultPaths())
+    }
+
+    @DeleteMapping("/{resultId}")
+    fun deleteResult(@PathVariable(value = "resultId") resultId: Int): Int? {
+        return resultService?.delete(resultId)
     }
 
 }
