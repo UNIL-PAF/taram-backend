@@ -21,31 +21,29 @@ class ProteinTableService {
         "id" to "id",
         "prot" to "Majority.protein.IDs",
         "gene" to "Gene.names",
-        "desc" to "Protein.names",
-        "int" to "Intensity",
-        "ibaq" to "iBAQ"
+        "desc" to "Protein.names"
     )
 
     fun getProteinTable(step: AnalysisStep?, selProteins: List<String>?): ProteinTable {
         val table = readTable.getTable(commonStep?.getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        val protTable = tableToProteinTable(table = table, resultType = step?.analysis?.result?.type, selProteins = selProteins)
+        val defaultInt = step?.columnInfo?.columnMapping?.intCol
+        val protTable = tableToProteinTable(table = table, resultType = step?.analysis?.result?.type, selProteins = selProteins, defaultInt = defaultInt)
         return protTable.copy(table = protTable.table?.sortedByDescending{ it.sel })
     }
 
-    private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?): ProteinTable {
+    private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?, defaultInt: String?): ProteinTable {
         val ids = readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)
         val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
-        val int = readTable.getDoubleColumn(table, headerMap["int"]!!)
-        val ibaq = readTable.getDoubleColumn(table, headerMap["ibaq"]!!)
+        val int = readTable.getDoubleColumn(table, defaultInt!!)
         val sel = prots?.map{ selProteins?.contains(it) ?: false }
 
         val proteinRows: List<ProteinGroup>? = ids?.mapIndexed { i, id ->
-            ProteinGroup(id, prots?.get(i), genes?.get(i), descs?.get(i), int?.get(i), ibaq?.get(i), sel?.get(i))
+            ProteinGroup(id, prots?.get(i), genes?.get(i), descs?.get(i), int?.get(i), sel?.get(i))
         }
 
-        return ProteinTable(table = proteinRows, resultType = resultType)
+        return ProteinTable(table = proteinRows, resultType = resultType, intField = defaultInt)
     }
 
 }
