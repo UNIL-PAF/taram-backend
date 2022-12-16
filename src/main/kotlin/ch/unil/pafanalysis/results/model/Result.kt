@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class Result (
+data class Result (
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,

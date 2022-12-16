@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @CrossOrigin(origins = ["http://localhost:3000", "https://paf-analysis.dcsr.unil.ch"], maxAge = 3600)
 @RestController
@@ -29,7 +30,8 @@ class ResultController {
     @PostMapping("/add")
     @ResponseBody
     fun addResult(@RequestBody res: Result){
-        resultRepository?.save(res)
+        val newRes = res.copy(lastModifDate = LocalDateTime.now())
+        resultRepository?.save(newRes)
     }
 
     @GetMapping("/list")
