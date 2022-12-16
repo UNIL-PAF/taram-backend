@@ -32,10 +32,11 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         )
 
         val params = gson.fromJson(analysisStep?.parameters, VolcanoPlotParams().javaClass)
+        val compName = "." + params.comparison?.group1?.plus("-" + params.comparison?.group2)
 
-        val pValHeaderName = if(params?.useAdjustedPVal == true) "q.value" else "p.value"
+        val pValHeaderName = (if(params?.useAdjustedPVal == true) "q.value" else "p.value") + compName
         val pVals = readTableData.getDoubleColumn(table, pValHeaderName)
-        val foldChanges = readTableData.getDoubleColumn(table, "fold.change")
+        val foldChanges = readTableData.getDoubleColumn(table, "fold.change$compName")
         val proteinName = readTableData.getStringColumn(table, "Majority.protein.IDs")
         val geneName = readTableData.getStringColumn(table, "Gene.names")
 
