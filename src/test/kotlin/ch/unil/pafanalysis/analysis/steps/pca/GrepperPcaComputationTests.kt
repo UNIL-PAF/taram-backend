@@ -63,8 +63,12 @@ class GrepperPcaComputationTests {
     fun computePcaWithGroupsTest() {
         val params = PcaParams("LFQ.intensity")
         val pcaRes = runner?.run(table, params, step)!!
-        println(pcaRes)
         assert(pcaRes.groups?.size == 2)
+        assert(pcaRes.nrPc == 16)
+        assert(pcaRes.groups?.get(0)?.pcList?.size ?: 0  == 16)
+        assert(pcaRes.groups?.get(1)?.expIdxs?.size ?: 0 == 8)
+        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.pcVals?.get(0) ?: 0.0) == roundNumber(-10.8710122574903))
+        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.explVar ?: 0.0) == roundNumber(62.0371376168281))
     }
 
 
@@ -72,8 +76,12 @@ class GrepperPcaComputationTests {
     fun computePcaWithoutGroupsTest() {
         val params = PcaParams("LFQ.intensity")
         val pcaRes = runner?.run(tableWithoutGroups, params, step!!.copy(columnInfo = colInfoWithoutGroups))!!
-        println(pcaRes)
+        assert(pcaRes.groups?.get(0)?.expIdxs?.size ?: 0 == 16)
         assert(pcaRes.groups?.size == 1)
+        assert(pcaRes.nrPc == 16)
+        assert(pcaRes.groups?.get(0)?.pcList?.size ?: 0  == 16)
+        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.pcVals?.get(0) ?: 0.0) == roundNumber(-10.8710122574903))
+        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.explVar ?: 0.0) == roundNumber(62.0371376168281))
     }
 
 
