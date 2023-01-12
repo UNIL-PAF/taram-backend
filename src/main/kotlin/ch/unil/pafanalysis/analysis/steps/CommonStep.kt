@@ -10,6 +10,7 @@ import ch.unil.pafanalysis.analysis.steps.filter.FilterParams
 import ch.unil.pafanalysis.analysis.steps.filter.FilterRunner
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
+import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
 import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.remove_imputed.RemoveImputedRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
@@ -52,6 +53,9 @@ open class CommonStep {
 
     @Autowired
     private var boxPlotRunner: BoxPlotRunner? = null
+
+    @Autowired
+    private var pcaRunner: PcaRunner? = null
 
     @Autowired
     private var transformationRunner: TransformationRunner? = null
@@ -139,6 +143,7 @@ open class CommonStep {
         return when (type) {
             AnalysisStepType.INITIAL_RESULT.value -> initialResultRunner
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner
+            AnalysisStepType.PCA.value -> pcaRunner
             AnalysisStepType.TRANSFORMATION.value -> transformationRunner
             AnalysisStepType.FILTER.value -> filterRunner
             AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner
@@ -222,6 +227,7 @@ open class CommonStep {
     private fun paramToHash(step: AnalysisStep?): Long? {
         val filterParams = when (step?.type) {
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step).toString()
+            AnalysisStepType.PCA.value -> pcaRunner?.getParameters(step).toString()
             AnalysisStepType.FILTER.value -> filterRunner?.getParameters(step).toString()
             AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner?.getParameters(step).toString()
             AnalysisStepType.T_TEST.value -> tTestRunner?.getParameters(step).toString()

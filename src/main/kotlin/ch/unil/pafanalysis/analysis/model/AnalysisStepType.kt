@@ -10,5 +10,6 @@ enum class AnalysisStepType(val value: String) {
     T_TEST("t-test"),
     VOLCANO_PLOT("volcano-plot"),
     REMOVE_IMPUTED("remove-imputed"),
-    REMOVE_COLUMNS("remove-columns")
+    REMOVE_COLUMNS("remove-columns"),
+    PCA("pca")
 }

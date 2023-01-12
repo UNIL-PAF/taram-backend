@@ -27,7 +27,7 @@ class PcaComputation {
     data class ExpIdx(val colIdx: Int?, val expNameIdx: Int)
 
     fun run(table: Table?, params: PcaParams?, step: AnalysisStep?): PcaRes {
-        val field = params?.field ?: step?.columnInfo?.columnMapping?.intCol
+        val field = params?.column ?: step?.columnInfo?.columnMapping?.intCol
         //val m: Pair<List<Header>, List<List<Double>>> = readTableData.getDoubleMatrix(table, field)
         val (headers, table) = readTableData.getDoubleMatrix(table, field)
         val (pcs, explVar) = rComputePc(table)
