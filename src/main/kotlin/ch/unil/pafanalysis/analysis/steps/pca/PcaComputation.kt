@@ -63,7 +63,7 @@ class PcaComputation {
     private fun rComputePc(ints: List<List<Double>>): Pair<List<List<Double>>, List<Double>> {
         val code = RCode.create()
         code.addDoubleMatrix("m", ints.map{it.toDoubleArray()}.toTypedArray())
-        code.addRCode("pr_res <- prcomp(t(m))")
+        code.addRCode("pr_res <- prcomp(m)")
         code.addRCode("sdev_sum <- 100/sum(pr_res\$sdev^2)")
         code.addRCode("expl_var <- pr_res\$sdev^2*sdev_sum")
         code.addRCode("res <- list(pcs=t(predict(pr_res)), expl_var=expl_var)")
