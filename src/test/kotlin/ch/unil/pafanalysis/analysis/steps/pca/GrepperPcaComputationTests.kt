@@ -63,29 +63,30 @@ class GrepperPcaComputationTests {
     fun computePcaWithGroupsTest() {
         val params = PcaParams("LFQ.intensity")
         val pcaRes = runner?.run(table, params, step)!!
-        println(pcaRes)
         assert(pcaRes.groups?.size == 2)
         assert(pcaRes.nrPc == 16)
-        assert(pcaRes.groups?.get(0)?.pcList?.size ?: 0  == 16)
-        assert(pcaRes.groups?.get(1)?.expIdxs?.size ?: 0 == 8)
-        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.pcVals?.get(0) ?: 0.0) == roundNumber(-63.790049948674))
-        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.explVar ?: 0.0) == roundNumber(16.1294570663228))
+        assert(pcaRes.explVars?.size == 16)
+        assert(pcaRes.pcList?.size == 16)
+        assert(pcaRes.pcList?.get(0)?.expName == "KO-13703")
+        assert(pcaRes.pcList?.get(0)?.groupName == "KO")
+        assert(roundNumber(pcaRes.pcList?.get(0)?.pcVals?.get(0) ?: 0.0) == roundNumber(-63.790049948674))
+        assert(roundNumber(pcaRes.pcList?.get(0)?.pcVals?.get(1) ?: 0.0) == roundNumber(126.092964549002))
+        assert(roundNumber(pcaRes.explVars?.get(0) ?: 0.0) == roundNumber(16.1294570663228))
     }
 
     @Test
     fun computePcaWithoutGroupsTest() {
         val params = PcaParams("LFQ.intensity")
         val pcaRes = runner?.run(tableWithoutGroups, params, step!!.copy(columnInfo = colInfoWithoutGroups))!!
-        assert(pcaRes.groups?.get(0)?.expIdxs?.size ?: 0 == 16)
-        assert(pcaRes.groups?.size == 1)
+        assert(pcaRes.groups.isNullOrEmpty())
         assert(pcaRes.nrPc == 16)
-        assert(pcaRes.groups?.get(0)?.pcList?.size ?: 0  == 16)
-        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.pcVals?.get(0) ?: 0.0) == roundNumber(-63.790049948674))
-        assert(roundNumber(pcaRes.groups?.get(0)?.pcList?.get(0)?.explVar ?: 0.0) == roundNumber(16.1294570663228))
-    }
-
-    private fun roundNumbers(list: List<Double>?): List<BigDecimal>? {
-        return list?.map { roundNumber(it) }
+        assert(pcaRes.explVars?.size == 16)
+        assert(pcaRes.pcList?.size == 16)
+        assert(pcaRes.pcList?.get(0)?.expName == "KO-13703")
+        assert(pcaRes.pcList?.get(0)?.groupName == null)
+        assert(roundNumber(pcaRes.pcList?.get(0)?.pcVals?.get(0) ?: 0.0) == roundNumber(-63.790049948674))
+        assert(roundNumber(pcaRes.pcList?.get(0)?.pcVals?.get(1) ?: 0.0) == roundNumber(126.092964549002))
+        assert(roundNumber(pcaRes.explVars?.get(0) ?: 0.0) == roundNumber(16.1294570663228))
     }
 
     private fun roundNumber(n: Double): BigDecimal {
