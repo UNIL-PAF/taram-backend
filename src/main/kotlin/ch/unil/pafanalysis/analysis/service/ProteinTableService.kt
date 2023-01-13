@@ -36,11 +36,12 @@ class ProteinTableService {
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)
         val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
-        val int = readTable.getDoubleColumn(table, defaultInt!!)
+        val intCol = readTable.getDoubleColumn(table, defaultInt!!)
+        val colOrMeans = intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!).second.map{ it.average() }
         val sel = prots?.map{ selProteins?.contains(it) ?: false }
 
-        val proteinRows: List<ProteinGroup>? = ids?.mapIndexed { i, id ->
-            ProteinGroup(id, prots?.get(i), genes?.get(i), descs?.get(i), int?.get(i), sel?.get(i))
+        val proteinRows: List<ProteinGroup>? = colOrMeans?.mapIndexed { i, colOrMean ->
+            ProteinGroup(ids?.get(i) ?: i, prots?.get(i), genes?.get(i), descs?.get(i), colOrMean, sel?.get(i))
         }
 
         return ProteinTable(table = proteinRows, resultType = resultType, intField = defaultInt)
