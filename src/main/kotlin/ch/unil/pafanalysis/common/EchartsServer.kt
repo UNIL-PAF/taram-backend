@@ -9,9 +9,8 @@ import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.element.Image
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.util.UriBuilder
-import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -42,10 +41,13 @@ class EchartsServer {
             .build();
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
+        if(response.statusCode() != HttpStatus.OK.value()) throw Exception("Could not generate eCharts pdf graph: " + response.body())
+
         val pdfPath: String = env?.getProperty("output.path") + response.body()
         val sourcePdf = PdfDocument(PdfReader(pdfPath))
         val pdfPlot = sourcePdf.getPage(1)
         val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
+        sourcePdf.close()
         return Image(pdfPlotCopy)
     }
 
