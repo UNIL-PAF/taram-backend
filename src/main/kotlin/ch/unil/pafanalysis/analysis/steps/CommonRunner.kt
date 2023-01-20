@@ -8,7 +8,7 @@ interface CommonRunner {
     fun run(oldStepId: Int, step: AnalysisStep? = null, params: String? = null): AnalysisStep
 
     fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {
-        throw Exception("'updatePlotOptions' is not implemented for this Runner.")
+        throw Exception("'updatePlotOptions' is not implemented for this Runner [${step?.type}].")
     }
 
     fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?

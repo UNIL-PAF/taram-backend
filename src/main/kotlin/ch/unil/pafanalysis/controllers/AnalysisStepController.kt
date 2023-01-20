@@ -80,7 +80,10 @@ class AnalysisStepController {
 
     @PostMapping(path = ["/switch-sel-protein-ac/{proteinAc}/step-id/{stepId}"])
     @ResponseBody
-    fun switchSelProt(@PathVariable(value = "proteinAc") proteinAc: String, @PathVariable(value = "stepId") stepId: Int): String? {
+    fun switchSelProt(
+        @PathVariable(value = "proteinAc") proteinAc: String,
+        @PathVariable(value = "stepId") stepId: Int
+    ): String? {
         val step = analysisStepRepository?.findById(stepId)
         val selProts = when (step?.type) {
             VOLCANO_PLOT.value -> volcanoPlotRunner?.switchSelProt(step, proteinAc)
@@ -91,26 +94,35 @@ class AnalysisStepController {
 
     @PostMapping(path = ["/parameters/{stepId}"])
     @ResponseBody
-    fun parameters(@RequestBody stepParams: String, @PathVariable(value = "stepId") stepId: Int): String? {
+    fun parameters(
+        @RequestBody stepParams: String,
+        @PathVariable(value = "stepId") stepId: Int,
+        @RequestParam doNotRun: Boolean? = null,
+    ): String? {
         val analysisStep = analysisStepRepository?.findById(stepId)
 
-        asyncAnaysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
+        if(doNotRun == true){
+            // we don't have to recompute the parameter hash in this case
+            analysisStepRepository?.saveAndFlush(analysisStep?.copy(parameters = stepParams)!!)
+        }else{
+            asyncAnaysisStepService?.setAllStepsStatus(analysisStep, AnalysisStepStatus.IDLE)
 
-        try {
-            if(analysisStep?.type == INITIAL_RESULT.value){
-                initialResult?.updateColumnParams(analysisStep, stepParams)
-            }else{
-                commonStep?.getRunner(analysisStep?.type)?.run(
-                    analysisStep?.beforeId!!,
-                    analysisStep,
-                    stepParams
-                )
+            try {
+                if (analysisStep?.type == INITIAL_RESULT.value) {
+                    initialResult?.updateColumnParams(analysisStep, stepParams)
+                } else {
+                    commonStep?.getRunner(analysisStep?.type)?.run(
+                        analysisStep?.beforeId!!,
+                        analysisStep,
+                        stepParams
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                val errorStep = analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
+                analysisStepRepository?.saveAndFlush(errorStep!!)
+                errorStep
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            val errorStep = analysisStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
-            analysisStepRepository?.saveAndFlush(errorStep!!)
-            errorStep
         }
 
         return analysisStep?.status
@@ -147,9 +159,10 @@ class AnalysisStepController {
     }
 
     @GetMapping(path = ["/zip/{stepId}"])
-    fun getZip(@PathVariable(value = "stepId") stepId: Int,
-                 @RequestParam svg: Boolean? = null,
-                 @RequestParam png: Boolean? = null,
+    fun getZip(
+        @PathVariable(value = "stepId") stepId: Int,
+        @RequestParam svg: Boolean? = null,
+        @RequestParam png: Boolean? = null,
     ): ResponseEntity<ByteArray>? {
         var response: ResponseEntity<ByteArray>? = null
         try {
@@ -166,7 +179,7 @@ class AnalysisStepController {
             headers.setContentDispositionFormData(filename, filename);
             headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
             response = ResponseEntity(contents, headers, HttpStatus.OK);
-        }catch(e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
