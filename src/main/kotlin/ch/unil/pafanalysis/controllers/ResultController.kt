@@ -34,9 +34,9 @@ class ResultController {
 
     @PostMapping("/add")
     @ResponseBody
-    fun addResult(@RequestBody res: Result){
+    fun addResult(@RequestBody res: Result): Int?{
         val newRes = res.copy(lastModifDate = LocalDateTime.now())
-        resultRepository?.save(newRes)
+        return resultRepository?.save(newRes)?.id
     }
 
     @GetMapping("/list")
