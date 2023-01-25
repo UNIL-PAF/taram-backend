@@ -13,6 +13,7 @@ import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
 import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.remove_imputed.RemoveImputedRunner
+import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
 import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
@@ -80,6 +81,9 @@ open class CommonStep {
 
     @Autowired
     private var removeColumnsRunner: RemoveColumnsRunner? = null
+
+    @Autowired
+    private var scatterPlotRunner: ScatterPlotRunner? = null
 
     val gson = Gson()
 
@@ -151,6 +155,7 @@ open class CommonStep {
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner
             AnalysisStepType.REMOVE_IMPUTED.value -> removeImputedRunner
             AnalysisStepType.REMOVE_COLUMNS.value -> removeColumnsRunner
+            AnalysisStepType.SCATTER_PLOT.value -> scatterPlotRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }
@@ -235,6 +240,7 @@ open class CommonStep {
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step).toString()
             AnalysisStepType.REMOVE_IMPUTED.value -> removeImputedRunner?.getParameters(step).toString()
             AnalysisStepType.REMOVE_COLUMNS.value -> removeColumnsRunner?.getParameters(step).toString()
+            AnalysisStepType.SCATTER_PLOT.value -> scatterPlotRunner?.getParameters(step).toString()
             else -> throw RuntimeException("Cannot parse parameters for type [${step?.type}]")
         }
         return hashComp.computeStringHash(filterParams)

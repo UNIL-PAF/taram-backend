@@ -11,5 +11,6 @@ enum class AnalysisStepType(val value: String) {
     VOLCANO_PLOT("volcano-plot"),
     REMOVE_IMPUTED("remove-imputed"),
     REMOVE_COLUMNS("remove-columns"),
-    PCA("pca")
+    PCA("pca"),
+    SCATTER_PLOT("scatter-plot")
 }
