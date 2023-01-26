@@ -7,4 +7,4 @@ data class ScatterPlot(
     val plot: EchartsPlot? = null,
 )
 
-data class ScatterPoint(val x: Double?, val y: Double?, val d: Double? = null)
+data class ScatterPoint(val x: Double?, val y: Double?, val d: Double? = null, val n: String?)
