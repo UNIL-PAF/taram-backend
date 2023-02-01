@@ -19,7 +19,6 @@ enum class AltHypothesis(val value: String) {
 }
 
 enum class MulitTestCorr(val value: String) {
-    BONFERRONI("bonferroni"),
-    BH("BH"),
-    BY("BY")
+    NONE("none"),
+    BH("BH")
 }

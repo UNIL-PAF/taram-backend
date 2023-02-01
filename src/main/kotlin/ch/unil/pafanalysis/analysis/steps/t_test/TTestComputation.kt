@@ -52,7 +52,7 @@ class TTestComputation {
             listOf(comp.group1, comp.group2).map { c -> readTableData.getDoubleMatrixByRow(table, field, c).second }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
         val pVals = computeTTest(rowInts)
-        val qVals = multiTestCorr(pVals)
+        val qVals = multiTestCorr(pVals, params)
         val foldChanges = computeFoldChanges(rowInts, isLogVal)
         val signGroups = qVals.map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
@@ -102,10 +102,10 @@ class TTestComputation {
         }
     }
 
-    private fun multiTestCorr(pVals: List<Double>): List<Double> {
+    private fun multiTestCorr(pVals: List<Double>, params: TTestParams?): List<Double> {
         val code = RCode.create()
         code.addDoubleArray("p_vals", pVals.toDoubleArray())
-        code.addRCode("corr_p_vals <- p.adjust(p_vals, method='hochberg')")
+        code.addRCode("corr_p_vals <- p.adjust(p_vals, method='${params?.multiTestCorr}')")
         val caller = RCaller.create(code, RCallerOptions.create())
         caller.runAndReturnResult("corr_p_vals")
         return caller.parser.getAsDoubleArray("corr_p_vals").toList()

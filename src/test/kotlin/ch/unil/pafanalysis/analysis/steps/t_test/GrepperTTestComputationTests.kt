@@ -91,7 +91,7 @@ class GrepperTTestComputationTests {
 
         assert(
             roundNumbers(qVals?.subList(345, 350)) == roundNumbers(
-                listOf<Double>(5.308474e-05, 9.999684e-01, 9.999684e-01, 9.999684e-01, 9.999684e-01)
+                listOf<Double>(1.7703663447954E-5, 0.42081689973052, 0.764246735264101, 0.104041923799453, 0.566431416453898)
             )
         )
 
@@ -111,13 +111,14 @@ class GrepperTTestComputationTests {
         val isSign = resTable?.cols?.get(isSignHeader?.idx!!)
             ?.map { if (isSignHeader.type == ColType.CHARACTER) it as? String ?: "" else "" }
         val validIdx = isSign?.foldIndexed(emptyList<Int>()){i, acc, v -> if(v == "true") acc.plus(i+1) else acc }
-        assert(validIdx == listOf<Int>(299, 346, 1057, 1977, 2430, 3138, 4153, 4411, 4885))
+
+        assert(validIdx == listOf<Int>(34, 143, 216, 221, 297, 299, 300, 304, 340, 346, 369, 371, 396, 405, 407, 426, 490, 538, 724, 906, 1035, 1057, 1092, 1127, 1136, 1140, 1147, 1148, 1161, 1176, 1177, 1222, 1229, 1338, 1428, 1586, 1588, 1614, 1622, 1809, 1824, 1838, 1954, 1977, 2034, 2062, 2093, 2095, 2348, 2388, 2430, 2472, 2478, 2491, 2537, 2640, 2649, 2671, 2779, 2848, 2912, 2917, 2943, 3012, 3095, 3133, 3138, 3209, 3261, 3263, 3317, 3368, 3408, 3470, 3472, 3516, 3542, 3549, 3575, 3594, 3606, 3623, 3682, 3719, 3726, 3743, 3799, 3861, 3878, 3879, 3884, 3940, 4024, 4067, 4069, 4120, 4153, 4253, 4310, 4333, 4340, 4411, 4472, 4482, 4540, 4549, 4578, 4674, 4705, 4720, 4730, 4823, 4862, 4885, 4925, 4961, 4968, 4992, 5003))
 
         // verify t-test result
         assert(tTestRes.comparisions?.size == 1)
         assert(tTestRes.comparisions?.get(0)?.firstGroup == "KO")
         assert(tTestRes.comparisions?.get(0)?.secondGroup == "WT")
-        assert(tTestRes.comparisions?.get(0)?.numberOfSignificant == 9)
+        assert(tTestRes.comparisions?.get(0)?.numberOfSignificant == 119)
     }
 
     private fun roundNumbers(list: List<Double>?): List<BigDecimal>? {
