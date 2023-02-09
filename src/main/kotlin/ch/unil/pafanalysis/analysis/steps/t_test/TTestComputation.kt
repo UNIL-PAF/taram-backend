@@ -52,7 +52,7 @@ class TTestComputation {
             listOf(comp.group1, comp.group2).map { c -> readTableData.getDoubleMatrixByRow(table, field, c).second }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
         val pVals = computeTTest(rowInts)
-        val qVals = multiTestCorr(pVals, params)
+        val qVals = if(params?.multiTestCorr == MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else pVals
         val foldChanges = computeFoldChanges(rowInts, isLogVal)
         val signGroups = qVals.map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
