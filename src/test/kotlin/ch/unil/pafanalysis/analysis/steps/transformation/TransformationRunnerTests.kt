@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
-import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
 import ch.unil.pafanalysis.common.*
 import ch.unil.pafanalysis.results.model.ResultType
@@ -8,9 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileWriter
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.io.path.pathString

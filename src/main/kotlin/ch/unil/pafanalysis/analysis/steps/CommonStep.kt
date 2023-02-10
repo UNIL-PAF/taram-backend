@@ -4,9 +4,7 @@ import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
-import ch.unil.pafanalysis.analysis.steps.filter.FilterParams
 import ch.unil.pafanalysis.analysis.steps.filter.FilterRunner
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -15,26 +13,16 @@ import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.remove_imputed.RemoveImputedRunner
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationRunner
+import ch.unil.pafanalysis.analysis.steps.transformation.ImputationRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
-import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.results.model.ResultType
 import com.google.gson.Gson
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfReader
-import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
-import com.itextpdf.layout.element.Image
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 import java.io.File
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.sql.Timestamp
-import java.time.Duration
 import java.time.LocalDateTime
 
 @Service
@@ -59,7 +47,7 @@ open class CommonStep {
     private var pcaRunner: PcaRunner? = null
 
     @Autowired
-    private var transformationRunner: TransformationRunner? = null
+    private var transformationRunner: ImputationRunner? = null
 
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null

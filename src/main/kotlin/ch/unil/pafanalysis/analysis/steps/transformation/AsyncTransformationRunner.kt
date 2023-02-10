@@ -6,7 +6,6 @@ import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.io.File
 
 @Service
 class AsyncTransformationRunner() : CommonStep() {
@@ -27,7 +26,7 @@ class AsyncTransformationRunner() : CommonStep() {
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
-            val defaultResult = Transformation(newStep?.commonResult?.numericalColumns, newStep?.columnInfo?.columnMapping?.intCol)
+            val defaultResult = Imputation(newStep?.commonResult?.numericalColumns, newStep?.columnInfo?.columnMapping?.intCol)
             val transformationParams = gson.fromJson(newStep?.parameters, TransformationParams().javaClass)
 
             val imputationFile = transformTable(
