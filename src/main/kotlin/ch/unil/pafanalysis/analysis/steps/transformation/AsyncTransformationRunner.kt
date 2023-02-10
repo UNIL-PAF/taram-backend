@@ -15,7 +15,7 @@ class AsyncTransformationRunner() : CommonStep() {
     private val writeImputation = WriteImputationTableData()
 
     @Autowired
-    val logTransformationRunner: LogTransformationRunner? = null
+    val logTransformationRunner: LogTransformationComputation? = null
 
     @Autowired
     val normalizationRunner: NormalizationRunner? = null

@@ -23,7 +23,7 @@ class TransformationRunnerTests {
     private val normalization: NormalizationRunner? = null
 
     @Autowired
-    private val transformation: LogTransformationRunner? = null
+    private val transformation: LogTransformationComputation? = null
 
     @Autowired
     val colParser: ColumnMappingParser? = null

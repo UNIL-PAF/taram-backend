@@ -16,7 +16,7 @@ import java.math.RoundingMode
 class LogTransformationRunnerTests {
 
     @Autowired
-    private val runner: LogTransformationRunner? = null
+    private val runner: LogTransformationComputation? = null
 
     @Autowired
     val colParser: ColumnMappingParser? = null
