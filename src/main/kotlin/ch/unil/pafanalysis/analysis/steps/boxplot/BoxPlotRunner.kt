@@ -5,11 +5,6 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.filter.FilterParams
-import ch.unil.pafanalysis.analysis.steps.transformation.ImputationType
-import ch.unil.pafanalysis.analysis.steps.transformation.NormalizationType
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationType
 import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
@@ -17,7 +12,6 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import javax.swing.Box
 
 
 @Service

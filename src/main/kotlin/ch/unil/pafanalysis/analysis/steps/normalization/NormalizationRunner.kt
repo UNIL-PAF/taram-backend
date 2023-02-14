@@ -1,4 +1,4 @@
-package ch.unil.pafanalysis.analysis.steps.transformation
+package ch.unil.pafanalysis.analysis.steps.normalization
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
@@ -13,21 +13,24 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
-class TransformationRunner() : CommonStep(), CommonRunner {
+class NormalizationRunner() : CommonStep(), CommonRunner {
 
     @Lazy
     @Autowired
-    var asyncTransformationRunner: AsyncImputationRunner? = null
+    var asyncRunner: AsyncNormalizationRunner? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.TRANSFORMATION
+    override var type: AnalysisStepType? = AnalysisStepType.NORMALIZATION
 
-    fun getParameters(step: AnalysisStep?): TransformationParams {
-        return if(step?.parameters != null) gson.fromJson(step?.parameters, TransformationParams().javaClass) else TransformationParams()
+    fun getParameters(step: AnalysisStep?): NormalizationParams {
+        return if (step?.parameters != null) gson.fromJson(
+            step?.parameters,
+            NormalizationParams().javaClass
+        ) else NormalizationParams()
     }
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
-        val transParams = gson.fromJson(step.parameters, TransformationParams::class.java)
+        val transParams = gson.fromJson(step.parameters, NormalizationParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
         document?.add(title)
         document?.add(selCol)
@@ -37,7 +40,7 @@ class TransformationRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, oldStepId, true, step, params)
-        asyncTransformationRunner?.runAsync(oldStepId, newStep)
+        asyncRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
 
@@ -48,7 +51,6 @@ class TransformationRunner() : CommonStep(), CommonRunner {
         return "Parameter(s) changed:"
             .plus(if (params.intCol != origParams?.intCol) " [Column: ${params.intCol}]" else "")
             .plus(if (params.normalizationType != origParams?.normalizationType) " [Normalization: ${params.normalizationType}]" else "")
-            .plus(if (params.transformationType != origParams?.transformationType) " [Transformation: ${params.transformationType}]" else "")
     }
 
 }

@@ -1,6 +1,16 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationComputation
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationParams
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationType
+import ch.unil.pafanalysis.analysis.steps.imputation.NormImputationParams
+import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationComputation
+import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationParams
+import ch.unil.pafanalysis.analysis.steps.log_transformation.TransformationType
+import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationComputation
+import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationParams
+import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationType
 import ch.unil.pafanalysis.common.*
 import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.BeforeEach
@@ -17,10 +27,10 @@ import kotlin.io.path.pathString
 class TransformationRunnerTests {
 
     @Autowired
-    private val imputation: ImputationRunner? = null
+    private val imputation: ImputationComputation? = null
 
     @Autowired
-    private val normalization: NormalizationRunner? = null
+    private val normalization: NormalizationComputation? = null
 
     @Autowired
     private val transformation: LogTransformationComputation? = null
@@ -45,15 +55,14 @@ class TransformationRunnerTests {
 
     @Test
     fun defaultTransformationChain() {
-        val params = TransformationParams(
-            transformationType = TransformationType.LOG2.value,
-            normalizationType = NormalizationType.MEDIAN.value,
-            imputationType = ImputationType.NORMAL.value,
-            imputationParams = ImputationParams()
-        )
-        val res1 = transformation?.runTransformation(ints!!, params)
-        val res2 = normalization?.runNormalization(res1!!, params)
-        val res3 = imputation?.runImputation(res2!!, params)
+        val transParams = LogTransformationParams(transformationType = TransformationType.LOG2.value)
+        val res1 = transformation?.runTransformation(ints!!, transParams)
+
+        val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value)
+        val res2 = normalization?.runNormalization(res1!!, normParams)
+
+        val imputParams = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())
+        val res3 = imputation?.runImputation(res2!!, imputParams)
         val oneRes = BigDecimal(res3!!.first[0][22]).setScale(5, RoundingMode.HALF_EVEN).toDouble()
 
         assert(ints!![0][22] == 0.0)
@@ -62,15 +71,15 @@ class TransformationRunnerTests {
 
     @Test
     fun writeTransformationChain(){
-        val params = TransformationParams(
-            transformationType = TransformationType.LOG2.value,
-            normalizationType = NormalizationType.MEDIAN.value,
-            imputationType = ImputationType.NORMAL.value,
-            imputationParams = ImputationParams()
-        )
-        val res1 = transformation?.runTransformation(ints!!, params)
-        val res2 = normalization?.runNormalization(res1!!, params)
-        val res3 = imputation?.runImputation(res2!!, params)?.first
+        val transParams = LogTransformationParams(transformationType = TransformationType.LOG2.value)
+        val res1 = transformation?.runTransformation(ints!!, transParams)
+
+        val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value)
+        val res2 = normalization?.runNormalization(res1!!, normParams)
+
+        val imputParams = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())
+        val res3 = imputation?.runImputation(res2!!, imputParams)?.first
+        val oneRes = BigDecimal(res3!![0][22]).setScale(5, RoundingMode.HALF_EVEN).toDouble()
 
         val selHeaders = readTableData.getDoubleMatrix(table, "LFQ.intensity").first
 

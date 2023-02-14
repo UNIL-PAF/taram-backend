@@ -7,13 +7,15 @@ import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
 import ch.unil.pafanalysis.analysis.steps.filter.FilterRunner
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterRunner
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
+import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationRunner
+import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationRunner
 import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
 import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.remove_imputed.RemoveImputedRunner
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
-import ch.unil.pafanalysis.analysis.steps.transformation.ImputationRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
@@ -47,7 +49,13 @@ open class CommonStep {
     private var pcaRunner: PcaRunner? = null
 
     @Autowired
-    private var transformationRunner: ImputationRunner? = null
+    private var normalizationRunner: NormalizationRunner? = null
+
+    @Autowired
+    private var logTransRunner: LogTransformationRunner? = null
+
+    @Autowired
+    private var imputedRunner: ImputationRunner? = null
 
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null
@@ -111,10 +119,12 @@ open class CommonStep {
                     status = AnalysisStepStatus.RUNNING.value,
                     commonResult = oldStep?.commonResult,
                     imputationTablePath = oldStep?.imputationTablePath,
-                    tableNr = if(stepWithParams?.modifiesResult == true){ oldStep?.tableNr?.plus(1)} else oldStep?.tableNr
+                    tableNr = if (stepWithParams?.modifiesResult == true) {
+                        oldStep?.tableNr?.plus(1)
+                    } else oldStep?.tableNr
                 )
             return analysisStepRepository?.saveAndFlush(newStep!!)
-        } catch(e: Exception){
+        } catch (e: Exception) {
             println("Error in runCommonStep ${currentStep?.id}")
             e.printStackTrace()
             return analysisStepRepository?.saveAndFlush(
@@ -136,7 +146,9 @@ open class CommonStep {
             AnalysisStepType.INITIAL_RESULT.value -> initialResultRunner
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner
             AnalysisStepType.PCA.value -> pcaRunner
-            AnalysisStepType.TRANSFORMATION.value -> transformationRunner
+            AnalysisStepType.NORMALIZATION.value -> normalizationRunner
+            AnalysisStepType.LOG_TRANSFORMATION.value -> logTransRunner
+            AnalysisStepType.IMPUTATION.value -> imputedRunner
             AnalysisStepType.FILTER.value -> filterRunner
             AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner
             AnalysisStepType.T_TEST.value -> tTestRunner
@@ -224,7 +236,9 @@ open class CommonStep {
             AnalysisStepType.FILTER.value -> filterRunner?.getParameters(step).toString()
             AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner?.getParameters(step).toString()
             AnalysisStepType.T_TEST.value -> tTestRunner?.getParameters(step).toString()
-            AnalysisStepType.TRANSFORMATION.value -> transformationRunner?.getParameters(step).toString()
+            AnalysisStepType.NORMALIZATION.value -> normalizationRunner?.getParameters(step).toString()
+            AnalysisStepType.LOG_TRANSFORMATION.value -> logTransRunner?.getParameters(step).toString()
+            AnalysisStepType.IMPUTATION.value -> imputedRunner?.getParameters(step).toString()
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step).toString()
             AnalysisStepType.REMOVE_IMPUTED.value -> removeImputedRunner?.getParameters(step).toString()
             AnalysisStepType.REMOVE_COLUMNS.value -> removeColumnsRunner?.getParameters(step).toString()
@@ -242,7 +256,7 @@ open class CommonStep {
 
             val stepWithFileHash = step?.copy(
                 resultTableHash = hashComp.computeFileHash(File(getOutputRoot() + step.resultTablePath)),
-                parametersHash =  paramToHash(step)
+                parametersHash = paramToHash(step)
             )
 
             val newHash = computeStepHash(stepWithFileHash, stepBefore)

@@ -13,5 +13,6 @@ enum class AnalysisStepType(val value: String) {
     REMOVE_IMPUTED("remove-imputed"),
     REMOVE_COLUMNS("remove-columns"),
     PCA("pca"),
-    SCATTER_PLOT("scatter-plot")
+    SCATTER_PLOT("scatter-plot"),
+    NORMALIZATION("normalization")
 }

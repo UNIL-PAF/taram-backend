@@ -5,8 +5,6 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
 import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document

@@ -1,25 +1,25 @@
-package ch.unil.pafanalysis.analysis.steps.transformation
+package ch.unil.pafanalysis.analysis.steps.normalization
 
 import ch.unil.pafanalysis.analysis.steps.StepException
 import com.google.common.math.Quantiles
 import org.springframework.stereotype.Service
 
 @Service
-class NormalizationRunner() {
+class NormalizationComputation() {
 
     fun runNormalization(
         ints: List<List<Double>>,
-        transformationParams: TransformationParams
+        params: NormalizationParams
     ): List<List<Double>> {
-        if(transformationParams.normalizationType == NormalizationType.NONE.value) return ints
+        if (params.normalizationType == NormalizationType.NONE.value) return ints
 
-        val subtract = when (transformationParams.normalizationType) {
+        val subtract = when (params.normalizationType) {
             NormalizationType.MEDIAN.value -> fun(orig: List<Double>): Double {
                 return Quantiles.median().compute(orig)
             }
             NormalizationType.MEAN.value -> fun(orig: List<Double>): Double { return orig.average() }
             else -> {
-                throw StepException("${transformationParams.normalizationType} is not implemented.")
+                throw StepException("${params.normalizationType} is not implemented.")
             }
         }
 

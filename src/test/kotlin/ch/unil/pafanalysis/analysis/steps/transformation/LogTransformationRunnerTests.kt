@@ -1,6 +1,9 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
+import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationComputation
+import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationParams
+import ch.unil.pafanalysis.analysis.steps.log_transformation.TransformationType
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.results.model.ResultType
@@ -35,7 +38,7 @@ class LogTransformationRunnerTests {
 
     @Test
     fun log2Transformation() {
-        val params = TransformationParams(transformationType = TransformationType.LOG2.value)
+        val params = LogTransformationParams(transformationType = TransformationType.LOG2.value)
         val ints = readTableData.getDoubleMatrix(table, "Intensity").second
 
         val res = runner?.runTransformation(ints!!, params)
@@ -45,7 +48,7 @@ class LogTransformationRunnerTests {
 
     @Test
     fun noneTransformation() {
-        val params = TransformationParams(transformationType = TransformationType.NONE.value)
+        val params = LogTransformationParams(transformationType = TransformationType.NONE.value)
         val ints = readTableData.getDoubleMatrix(table, "Intensity").second
         val res = runner?.runTransformation(ints!!, params)
         val oneRes = res!![0][0]

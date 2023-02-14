@@ -2,19 +2,17 @@ package ch.unil.pafanalysis.common
 
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
-import ch.unil.pafanalysis.analysis.steps.transformation.ImputationParams
-import ch.unil.pafanalysis.analysis.steps.transformation.ImputationRunner
-import ch.unil.pafanalysis.analysis.steps.transformation.ImputationType
-import ch.unil.pafanalysis.analysis.steps.transformation.TransformationParams
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationComputation
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationParams
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationType
+import ch.unil.pafanalysis.analysis.steps.imputation.NormImputationParams
 import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.io.File
 import kotlin.io.path.createTempFile
-import java.math.BigDecimal
 import kotlin.io.path.pathString
 
 
@@ -24,7 +22,7 @@ class WriteImputationTableDataTests {
     val colParser: ColumnMappingParser? = null
 
     @Autowired
-    val imputationRunner: ImputationRunner? = null
+    val imputationRunner: ImputationComputation? = null
 
     private val readTableData = ReadTableData()
     private val writeImputationTable = WriteImputationTableData()
@@ -50,8 +48,8 @@ class WriteImputationTableDataTests {
         assert(table!!.cols?.size == 219)
         assert(table!!.headers!!.isNotEmpty())
 
-        val imputParams = ImputationParams(width = 0.5, downshift = 2.0, seed = 10)
-        val params = TransformationParams(imputationType = ImputationType.NORMAL.value, imputationParams = imputParams)
+        val imputParams = NormImputationParams(width = 0.5, downshift = 2.0, seed = 10)
+        val params = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = imputParams)
         val imputationMatrix = imputationRunner?.runImputation(ints, params)?.second
         val imputationTable = ImputationTable(cols, imputationMatrix)
 
@@ -67,7 +65,24 @@ class WriteImputationTableDataTests {
         val fileName = "./src/test/resources/results/maxquant/Grepper_imputation.txt"
         val imputationTable = readImputationTable.getTable(fileName, headers)
         assert(imputationTable.headers?.size == 16)
-        val expectedRow = listOf(false, false, true, true, false, true, false, false, false, true, false, false, false, false, false, false)
+        val expectedRow = listOf(
+            false,
+            false,
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        )
         assert(imputationTable.rows?.get(1) == expectedRow)
     }
 

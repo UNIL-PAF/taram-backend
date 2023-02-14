@@ -1,6 +1,10 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationComputation
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationParams
+import ch.unil.pafanalysis.analysis.steps.imputation.ImputationType
+import ch.unil.pafanalysis.analysis.steps.imputation.NormImputationParams
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.BeforeEach
@@ -14,7 +18,7 @@ import java.math.BigDecimal
 class ImputationRunnerTests {
 
     @Autowired
-    private val runner: ImputationRunner? = null
+    private val runner: ImputationComputation? = null
 
     @Autowired
     val colParser: ColumnMappingParser? = null
@@ -34,8 +38,7 @@ class ImputationRunnerTests {
 
     @Test
     fun normalImputationDefault() {
-        val imputParams = ImputationParams()
-        val params = TransformationParams(imputationType = ImputationType.NORMAL.value, imputationParams = imputParams)
+        val params = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())
         val res = runner?.runImputation(ints!!, params)
         val oneRes = BigDecimal(res!!.first[0][22])
         assert(ints!![0][22] == 0.0)
@@ -44,8 +47,8 @@ class ImputationRunnerTests {
 
     @Test
     fun normalImputationWithParams() {
-        val imputParams = ImputationParams(width = 0.5, downshift = 2.0, seed = 10)
-        val params = TransformationParams(imputationType = ImputationType.NORMAL.value, imputationParams = imputParams)
+        val imputParams = NormImputationParams(width = 0.5, downshift = 2.0, seed = 10)
+        val params = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = imputParams)
         val res = runner?.runImputation(ints!!, params)
         val oneRes = BigDecimal(res!!.first[0][22])
         assert(ints!![0][22] == 0.0)
@@ -54,8 +57,7 @@ class ImputationRunnerTests {
 
     @Test
     fun normalImputationWithValue() {
-        val imputParams = ImputationParams(replaceValue = 0.5)
-        val params = TransformationParams(imputationType = ImputationType.VALUE.value, imputationParams = imputParams)
+        val params = ImputationParams(imputationType = ImputationType.VALUE.value, replaceValue = 0.5)
         val res = runner?.runImputation(ints!!, params)
         val oneRes = BigDecimal(res!!.first[0][22])
         assert(ints!![0][22] == 0.0)
@@ -64,7 +66,7 @@ class ImputationRunnerTests {
 
     @Test
     fun normalImputationWithNan() {
-        val params = TransformationParams(imputationType = ImputationType.NAN.value)
+        val params = ImputationParams(imputationType = ImputationType.NAN.value)
         val res = runner?.runImputation(ints!!, params)
         val oneRes = res!!.first[0][22]
         assert(ints!![0][22] == 0.0)
