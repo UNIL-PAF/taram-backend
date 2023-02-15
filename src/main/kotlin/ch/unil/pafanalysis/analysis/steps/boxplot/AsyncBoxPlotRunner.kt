@@ -67,6 +67,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             } else {
                 ints
             }
+
             val gene = if (i == null) "" else genes?.get(i)
             SelProtData(prot = p, ints = normInts, gene = gene)
         }

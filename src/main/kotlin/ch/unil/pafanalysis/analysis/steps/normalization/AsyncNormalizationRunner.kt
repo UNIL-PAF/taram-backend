@@ -2,8 +2,8 @@ package ch.unil.pafanalysis.analysis.steps.normalization
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.common.MinMaxMeanComputation
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.SummaryStatComputation
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
@@ -55,10 +55,10 @@ class AsyncNormalizationRunner() : CommonStep() {
 
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
-        val minMaxMeanComp = MinMaxMeanComputation()
-        val minMaxMean = minMaxMeanComp.getMinMaxMean(normInts)
+        val summaryStatComp = SummaryStatComputation()
+        val summaryStat = summaryStatComp.getSummaryStat(normInts)
 
-        return Normalization(minMaxMean.min, minMaxMean.max, minMaxMean.mean)
+        return Normalization(summaryStat.min, summaryStat.max, summaryStat.mean, summaryStat.median, summaryStat.nrNans)
     }
 
 }

@@ -2,13 +2,12 @@ package ch.unil.pafanalysis.analysis.steps.log_transformation
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.common.MinMaxMeanComputation
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.SummaryStatComputation
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import kotlin.math.min
 
 @Service
 class AsyncLogTransformationRunner() : CommonStep() {
@@ -60,10 +59,10 @@ class AsyncLogTransformationRunner() : CommonStep() {
 
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
-        val minMaxMeanComp = MinMaxMeanComputation()
-        val minMaxMean = minMaxMeanComp.getMinMaxMean(transInts)
+        val summaryComp = SummaryStatComputation()
+        val summaryStat = summaryComp.getSummaryStat(transInts)
 
-        return LogTransformation(minMaxMean.min, minMaxMean.max, minMaxMean.mean)
+        return LogTransformation(summaryStat.min, summaryStat.max, summaryStat.mean, summaryStat.median, summaryStat.nrNans)
     }
 
 }
