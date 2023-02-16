@@ -12,6 +12,7 @@ class SummaryStatComputation {
         val max = fltInts.maxOrNull()
         val mean = fltInts.average()
         val median = Quantiles.median().compute(fltInts)
-        return SummaryStat(min, max, mean, median, nrNans)
+        val sum = fltInts.sum()
+        return SummaryStat(min, max, mean, median, nrNans, sum)
     }
 }

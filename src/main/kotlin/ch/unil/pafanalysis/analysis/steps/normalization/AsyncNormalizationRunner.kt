@@ -46,11 +46,11 @@ class AsyncNormalizationRunner() : CommonStep() {
 
         val normInts = normComp!!.runNormalization(ints, params)
 
-        val newCols: List<List<Any>>? = table.cols?.mapIndexed{ i, c ->
-            val selHeader = selHeaders.withIndex().find{ it.value.idx == i }
+        val newCols: List<List<Any>>? = table.cols?.mapIndexed { i, c ->
+            val selHeader = selHeaders.withIndex().find { it.value.idx == i }
             if (selHeader != null) {
                 normInts[selHeader.index]
-            }else c
+            } else c
         }
 
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
@@ -58,7 +58,14 @@ class AsyncNormalizationRunner() : CommonStep() {
         val summaryStatComp = SummaryStatComputation()
         val summaryStat = summaryStatComp.getSummaryStat(normInts)
 
-        return Normalization(summaryStat.min, summaryStat.max, summaryStat.mean, summaryStat.median, summaryStat.nrNans)
+        return Normalization(
+            summaryStat.min,
+            summaryStat.max,
+            summaryStat.mean,
+            summaryStat.median,
+            summaryStat.nrNans,
+            summaryStat.sum
+        )
     }
 
 }

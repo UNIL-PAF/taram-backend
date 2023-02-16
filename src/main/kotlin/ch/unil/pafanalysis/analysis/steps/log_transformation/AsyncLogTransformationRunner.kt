@@ -62,7 +62,14 @@ class AsyncLogTransformationRunner() : CommonStep() {
         val summaryComp = SummaryStatComputation()
         val summaryStat = summaryComp.getSummaryStat(transInts)
 
-        return LogTransformation(summaryStat.min, summaryStat.max, summaryStat.mean, summaryStat.median, summaryStat.nrNans)
+        return LogTransformation(
+            summaryStat.min,
+            summaryStat.max,
+            summaryStat.mean,
+            summaryStat.median,
+            summaryStat.nrNans,
+            summaryStat.sum
+        )
     }
 
 }
