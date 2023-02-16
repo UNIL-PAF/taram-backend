@@ -1,11 +1,9 @@
 package ch.unil.pafanalysis.common
 
+import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import com.google.common.math.Quantiles
 
 class SummaryStatComputation {
-
-    data class SummaryStat(val min: Double?, val max: Double?, val mean: Double?, val median: Double?, val nrNans: Int?)
-
     fun getSummaryStat(ints: List<List<Double>>): SummaryStat {
         val flatInts = ints.flatten()
         val nrNans = flatInts.filter{it.isNaN()}.size

@@ -14,5 +14,6 @@ enum class AnalysisStepType(val value: String) {
     REMOVE_COLUMNS("remove-columns"),
     PCA("pca"),
     SCATTER_PLOT("scatter-plot"),
-    NORMALIZATION("normalization")
+    NORMALIZATION("normalization"),
+    SUMMARY_STAT("summary-stat")
 }
