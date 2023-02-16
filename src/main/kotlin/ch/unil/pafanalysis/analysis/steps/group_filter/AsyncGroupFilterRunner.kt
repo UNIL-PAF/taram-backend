@@ -15,7 +15,7 @@ class AsyncGroupFilterRunner() : CommonStep() {
     private val writeTableData = WriteTableData()
 
     @Autowired
-    val fixFilterRunner: FixGroupFilterRunner? = null
+    val fixFilterRunner: FixGroupFilterComputation? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {

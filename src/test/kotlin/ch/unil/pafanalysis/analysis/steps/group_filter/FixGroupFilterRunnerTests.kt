@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class FixFilterRunnerTests {
 
     @Autowired
-    private val runner: FixGroupFilterRunner? = null
+    private val runner: FixGroupFilterComputation? = null
 
     @Autowired
     val colParser: ColumnMappingParser? = null

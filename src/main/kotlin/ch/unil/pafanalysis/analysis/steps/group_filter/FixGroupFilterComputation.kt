@@ -6,13 +6,13 @@ import ch.unil.pafanalysis.common.Table
 import org.springframework.stereotype.Service
 
 @Service
-class FixGroupFilterRunner() {
+class FixGroupFilterComputation() {
 
     fun run(table: Table?, params: GroupFilterParams?, columnInfo: ColumnInfo?): Table? {
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw Exception(
             "Please specify your groups in the Analysis parameters."
         )
-        val validGroups = getValidGroups(table, params?.field ?: columnInfo?.columnMapping?.intCol)
+        val validGroups = getValidGroups(table, params?.field ?: columnInfo?.columnMapping?.intCol, params?.zeroIsInvalid)
 
         val validRows: List<Boolean>? = when (params?.filterInGroup) {
             FilterInGroup.ONE_GROUP.value -> checkOneGroup(validGroups, params?.minNrValid)
@@ -48,22 +48,22 @@ class FixGroupFilterRunner() {
         }
     }
 
-    private fun getValidGroups(table: Table?, field: String?): List<List<Int>>? {
+    private fun getValidGroups(table: Table?, field: String?, zeroIsInvalid: Boolean?): List<List<Int>>? {
         val headerGroups: Map<String?, List<Header>>? =
             table?.headers?.filter { it.experiment?.field == field }?.groupBy { it.experiment?.group }
 
         return headerGroups?.mapValues { it ->
             it.value.fold(emptyList<Int>()) { acc, el ->
                 val col = table?.cols?.get(el.idx)
-                val l: List<Int> = col?.map { a ->
+                val l: List<Boolean> = col?.map { a ->
                     val r = a as? Double
-                    if (r != Double.NaN && r != 0.0) 1 else 0
+                    (r?.isNaN() == false && (zeroIsInvalid != true || r != 0.0))
                 }!!
 
                 if (acc.isEmpty()) {
-                    l
+                    l.map{ if(it) 1 else 0 }
                 } else {
-                    acc.zip(l).map { it.first + it.second }
+                    acc.zip(l).map { if(it.second) it.first + 1 else it.first }
                 }
             }
         }?.toList()?.map { it.second }
