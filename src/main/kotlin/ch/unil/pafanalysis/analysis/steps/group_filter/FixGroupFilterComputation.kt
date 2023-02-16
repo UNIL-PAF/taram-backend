@@ -17,10 +17,19 @@ class FixGroupFilterComputation() {
         val validRows: List<Boolean>? = when (params?.filterInGroup) {
             FilterInGroup.ONE_GROUP.value -> checkOneGroup(validGroups, params?.minNrValid)
             FilterInGroup.ALL_GROUPS.value -> checkAllGroups(validGroups, params?.minNrValid)
+            FilterInGroup.TOTAL.value -> checkTotal(validGroups, params?.minNrValid)
             else -> throw Exception("FilterInGroup parameter must be defined.")
         }
 
         return remove(table, validRows)
+    }
+
+    private fun checkTotal(validGroups: List<List<Int>>?, minNrValid: Int?): List<Boolean>? {
+        val validCounts =  validGroups?.fold(emptyList<Int>()) { acc, group ->
+            if (acc.isEmpty()) group
+            else acc.mapIndexed{ i, a -> a + group[i]}
+        }
+        return validCounts?.map{ it >= minNrValid!! }
     }
 
     private fun checkAllGroups(validGroups: List<List<Int>>?, minNrValid: Int?): List<Boolean>? {
