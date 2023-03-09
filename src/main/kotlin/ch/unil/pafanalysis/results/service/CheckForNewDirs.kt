@@ -21,8 +21,8 @@ class CheckForNewDirs {
 
     companion object {
         // the filename and a boolean indicating weither it is an exact match or a pattern
-        private val maxQuantResName = Pair("proteinGroups.txt", true)
-        private val spectronautResName = Pair("_Report[^\\.].+\\.txt", false)
+        private val maxQuantResName = listOf(Pair("proteinGroups.txt", true))
+        private val spectronautResName = listOf(Pair("_Report\\.txt", false), Pair("_Report[^\\.].*\\.txt", false))
 
         private var localResultPaths: ResultPaths? = null
 
@@ -44,18 +44,22 @@ class CheckForNewDirs {
             return checkCommon(spectronautRes, localResultPaths!!.spectronautPath!!, spectronautResName, ResultType.Spectronaut)
         }
 
-        private fun checkCommon(usedDirs: Sequence<Result>?, path: String, resFileName: Pair<String, Boolean>, resType: ResultType): List<AvailableDir>{
+        private fun checkCommon(usedDirs: Sequence<Result>?, path: String, resFileNames: List<Pair<String, Boolean>>, resType: ResultType): List<AvailableDir>{
             val usedDirsPath = if(usedDirs == null) emptySequence<String>() else usedDirs!!.map { it.path }
+
+            fun isFileValid(fileName: String?, resFileName: Pair<String, Boolean>): Boolean{
+                return if(resFileName.second){
+                    fileName == resFileName.first
+                }else{
+                    Regex(resFileName.first).containsMatchIn(fileName!!)
+                }
+            }
 
             val availableDirs = Files.walk(Paths.get(path))
                 .filter(Files::isRegularFile)
                 .filter{file ->
                     val fileName: String? = file?.fileName?.name
-                    if(resFileName.second){
-                        fileName == resFileName.first
-                    }else{
-                        Regex(resFileName.first).containsMatchIn(fileName!!)
-                    }
+                    resFileNames.find{resFile -> isFileValid(fileName, resFile)} != null
                 }
 
             val newResults = availableDirs.map{
