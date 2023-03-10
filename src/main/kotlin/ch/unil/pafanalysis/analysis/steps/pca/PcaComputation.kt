@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.pca
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.Header
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import com.github.rcaller.rstuff.RCaller
@@ -15,10 +16,15 @@ class PcaComputation {
 
     fun run(table: Table?, params: PcaParams?, step: AnalysisStep?): PcaRes {
         val field = params?.column ?: step?.columnInfo?.columnMapping?.intCol
-        val (headers, table) = readTableData.getDoubleMatrix(table, field)
-        val (pcs, explVar) = rComputePc(table)
+        val (headers, intTable) = readTableData.getDoubleMatrix(table, field)
+        if(checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
+        val (pcs, explVar) = rComputePc(intTable)
 
         return createPcaRes(pcs, explVar, headers)
+    }
+
+    private fun checkIfMissingVals(intTable: List<List<Double>>?): Boolean {
+        return intTable?.find { it.find{ it.isNaN()} == null } == null
     }
 
     private fun createPcaRes(pcs: List<List<Double>>, explVar: List<Double>, headers: List<Header>): PcaRes {

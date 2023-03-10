@@ -276,12 +276,12 @@ open class CommonStep {
             analysisStepRepository?.saveAndFlush(updatedStep!!)!!
             updateNextStep(updatedStep!!)
         } catch (e: Exception) {
-            println("Error in transformation asyncRun ${step?.id}")
+            println("Error in asyncRun ${step?.id}")
             e.printStackTrace()
             analysisStepRepository?.saveAndFlush(
                 step!!.copy(
                     status = AnalysisStepStatus.ERROR.value,
-                    error = e.message,
+                    error = e.message?.take(255),
                     stepHash = Crc32HashComputations().getRandomHash()
                 )
             )
