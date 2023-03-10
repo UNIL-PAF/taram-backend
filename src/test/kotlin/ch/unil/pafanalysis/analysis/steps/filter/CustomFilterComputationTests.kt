@@ -12,10 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest
 
 
 @SpringBootTest
-class CustomFilterRunnerTests {
+class CustomFilterComputationTests {
 
     @Autowired
-    private val runner: CustomFilterRunner? = null
+    private val runner: CustomFilterComputation? = null
 
     @Autowired
     val colParser: ColumnMappingParser? = null

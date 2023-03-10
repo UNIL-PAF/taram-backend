@@ -15,10 +15,10 @@ class AsyncFilterRunner() : CommonStep() {
     private val writeTableData = WriteTableData()
 
     @Autowired
-    val fixFilterRunner: FixFilterRunner? = null
+    val fixFilterRunner: FixFilterComputation? = null
 
     @Autowired
-    val customFilterRunner: CustomFilterRunner? = null
+    val customFilterRunner: CustomFilterComputation? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
@@ -35,10 +35,12 @@ class AsyncFilterRunner() : CommonStep() {
     fun filterTable(
         step: AnalysisStep?
     ): Filter {
+
+        val resType = step?.analysis?.result?.type
         val outputRoot = getOutputRoot()
         val params = gson.fromJson(step?.parameters, FilterParams().javaClass)
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
-        val fltTableFix = fixFilterRunner?.run(table, params)
+        val fltTableFix = fixFilterRunner?.run(table, params, resType)
         val fltTable = customFilterRunner?.run(fltTableFix, params)
         val fltSize = fltTable?.cols?.get(0)?.size
         val nrRowsRemoved = table.cols?.get(0)?.size?.minus(fltSize ?: 0)
