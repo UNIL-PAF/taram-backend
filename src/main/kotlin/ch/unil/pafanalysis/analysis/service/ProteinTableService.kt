@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ProteinGroup
 import ch.unil.pafanalysis.analysis.model.ProteinTable
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.common.HeaderMaps
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.results.model.ResultType
@@ -18,21 +19,6 @@ class ProteinTableService {
     @Autowired
     private var commonStep: CommonStep? = null
 
-    val headerMapMQ = mapOf(
-        "id" to "id",
-        "prot" to "Majority.protein.IDs",
-        "gene" to "Gene.names",
-        "desc" to "Protein.names"
-    )
-
-    val headerMapSN = mapOf(
-        "id" to "PG.ProteinGroups",
-        "prot" to "PG.ProteinGroups",
-        "gene" to "PG.Genes",
-        "desc" to "PG.FASTAHeader"
-    )
-
-
     fun getProteinTable(step: AnalysisStep?, selProteins: List<String>?, resType: String?): ProteinTable {
         val table = readTable.getTable(commonStep?.getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val defaultInt = step?.columnInfo?.columnMapping?.intCol
@@ -41,7 +27,7 @@ class ProteinTableService {
     }
 
     private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?, defaultInt: String?, resType: String?): ProteinTable {
-        val headerMap = if(resType == ResultType.MaxQuant.value) headerMapMQ else headerMapSN
+        val headerMap = if(resType == ResultType.MaxQuant.value) HeaderMaps.maxQuant else HeaderMaps.spectronaut
 
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)?.map { it.split(";")?.get(0) }

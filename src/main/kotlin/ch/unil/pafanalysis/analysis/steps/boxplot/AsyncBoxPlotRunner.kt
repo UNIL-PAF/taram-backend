@@ -3,8 +3,10 @@ package ch.unil.pafanalysis.analysis.steps.boxplot
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.common.HeaderMaps
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
+import ch.unil.pafanalysis.results.model.ResultType
 import com.google.common.math.Quantiles
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -43,7 +45,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
         val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
-        val selProtData = getSelProtData(table, intCol, params)
+        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type)
 
         return BoxPlot(
             experimentNames = experimentNames,
@@ -52,12 +54,14 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
     }
 
-    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?): List<SelProtData>? {
+    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?, resType: String?): List<SelProtData>? {
         if (params?.selProts == null) return null
         val intMatrix = readTableData.getDoubleMatrix(table, intCol).second
 
-        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")?.map { it.split(";")?.get(0) }
-        val genes = readTableData.getStringColumn(table, "Gene.names")?.map { it.split(";")?.get(0) }
+        val headerMap = if(resType == ResultType.MaxQuant.value) HeaderMaps.maxQuant else HeaderMaps.spectronaut
+
+        val protGroup = readTableData.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
+        val genes = readTableData.getStringColumn(table, headerMap["gene"]!!)?.map { it.split(";")?.get(0) }
 
         return params?.selProts.map { p ->
             val i = protGroup?.indexOf(p)
