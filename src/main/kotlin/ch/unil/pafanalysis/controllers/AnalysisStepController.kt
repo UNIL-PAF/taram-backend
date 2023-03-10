@@ -54,7 +54,7 @@ class AnalysisStepController {
     @GetMapping(path = ["/protein-table/{stepId}"])
     fun getProteinTable(@PathVariable(value = "stepId") stepId: Int): ProteinTable? {
         val step = analysisStepRepository?.findById(stepId)
-        return proteinTableService?.getProteinTable(step, commonStep?.getSelProts(step))
+        return proteinTableService?.getProteinTable(step, commonStep?.getSelProts(step), step?.analysis?.result?.type)
     }
 
     @PostMapping(path = ["/add-to/{stepId}"])
