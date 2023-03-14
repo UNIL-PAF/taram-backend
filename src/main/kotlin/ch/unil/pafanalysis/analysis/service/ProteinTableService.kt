@@ -27,7 +27,7 @@ class ProteinTableService {
     }
 
     private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?, defaultInt: String?, resType: String?): ProteinTable {
-        val headerMap = if(resType == ResultType.MaxQuant.value) HeaderMaps.maxQuant else HeaderMaps.spectronaut
+        val headerMap = HeaderMaps.getHeaderMap(resType)
 
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)?.map { it.split(";")?.get(0) }

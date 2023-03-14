@@ -1,5 +1,7 @@
 package ch.unil.pafanalysis.common
 
+import ch.unil.pafanalysis.results.model.ResultType
+
 object HeaderMaps {
     val maxQuant = mapOf(
         "id" to "id",
@@ -14,4 +16,7 @@ object HeaderMaps {
         "desc" to "PG.FASTAHeader"
     )
 
+    fun getHeaderMap(resType: String?): Map<String, String> {
+        return if(resType == ResultType.MaxQuant.value) maxQuant else spectronaut
+    }
 }

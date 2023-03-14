@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.volcano
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.HeaderMaps
 import ch.unil.pafanalysis.common.ReadTableData
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -26,6 +27,8 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     }
 
     private fun createVolcanoObj(analysisStep: AnalysisStep?): VolcanoPlot {
+        val headerMap = HeaderMaps.getHeaderMap(analysisStep?.analysis?.result?.type)
+
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers
@@ -37,8 +40,8 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val pValHeaderName = (if(params?.useAdjustedPVal == true) "q.value" else "p.value") + compName
         val pVals = readTableData.getDoubleColumn(table, pValHeaderName)
         val foldChanges = readTableData.getDoubleColumn(table, "fold.change$compName")
-        val proteinName = readTableData.getStringColumn(table, "Majority.protein.IDs")
-        val geneName = readTableData.getStringColumn(table, "Gene.names")
+        val proteinName = readTableData.getStringColumn(table, headerMap.get("prot")!!)
+        val geneName = readTableData.getStringColumn(table, headerMap.get("gene")!!)
 
         if(pVals == null || foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 
