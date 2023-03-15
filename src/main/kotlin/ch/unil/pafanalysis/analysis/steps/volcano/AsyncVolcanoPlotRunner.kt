@@ -43,9 +43,10 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val proteinName = readTableData.getStringColumn(table, headerMap.get("prot")!!)
         val geneName = readTableData.getStringColumn(table, headerMap.get("gene")!!)
 
-        if(pVals == null || foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
+        if(foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
+        if(params?.useAdjustedPVal == true && pVals == null) throw StepException("There are no q-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
 
-        val volcanoData = pVals.mapIndexed{ i, pVal ->
+        val volcanoData = pVals?.mapIndexed{ i, pVal ->
             val plotPVal = if(params?.log10PVal == true) log10(pVal) * -1 else pVal
             val isSign = pVal <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh ?: 10000.0)
 
