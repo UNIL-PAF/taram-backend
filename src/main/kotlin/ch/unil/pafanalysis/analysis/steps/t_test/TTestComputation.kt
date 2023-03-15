@@ -52,9 +52,9 @@ class TTestComputation {
             listOf(comp.group1, comp.group2).map { c -> readTableData.getDoubleMatrixByRow(table, field, c).second }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
         val pVals = computeTTest(rowInts)
-        val qVals = if(params?.multiTestCorr == MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else pVals
+        val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
         val foldChanges = computeFoldChanges(rowInts, isLogVal)
-        val signGroups = qVals.map { it <= params?.signThres!! }
+        val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
         val (newTable, headers) = addResults(table, pVals, qVals, foldChanges, signGroups, comp)
         val newTtest = ttest.copy(
@@ -72,22 +72,27 @@ class TTestComputation {
     private fun addResults(
         table: Table?,
         pVals: List<Double>,
-        qVals: List<Double>,
+        qVals: List<Double>?,
         foldChanges: List<Double>,
         signGroups: List<Boolean>,
         comp: GroupComp
     ): Pair<Table?, List<Header>?> {
         val nrHeaders = table?.headers?.size!!
         val compName = "${comp.group1}-${comp.group2}"
-        val addHeaders: List<Header> = listOf(
-            Header(name = "p.value.$compName", idx = nrHeaders, ColType.NUMBER, Experiment(comp = comp)),
-            Header(name = "q.value.$compName", idx = nrHeaders + 1, ColType.NUMBER, Experiment(comp = comp)),
-            Header(name = "fold.change.$compName", idx = nrHeaders + 2, ColType.NUMBER, Experiment(comp = comp)),
-            Header(name = "is.significant.$compName", idx = nrHeaders + 3, ColType.CHARACTER, Experiment(comp = comp)),
+        val pValHeader = listOf(Header(name = "p.value.$compName", idx = nrHeaders, ColType.NUMBER, Experiment(comp = comp)))
+        val idxOffset = if(qVals == null) 0 else 1
+        val foldHeader = listOf(
+            Header(name = "fold.change.$compName", idx = nrHeaders + 1 + idxOffset, ColType.NUMBER, Experiment(comp = comp)),
+            Header(name = "is.significant.$compName", idx = nrHeaders + 2 + idxOffset, ColType.CHARACTER, Experiment(comp = comp))
         )
-        val newHeaders: List<Header>? = table?.headers.plus(addHeaders)
+        val qValHeader = if(qVals == null) emptyList() else listOf(Header(name = "q.value.$compName", idx = nrHeaders + 1, ColType.NUMBER, Experiment(comp = comp)))
+        val newHeaders: List<Header>? = table?.headers.plus(pValHeader).plus(qValHeader).plus(foldHeader)
 
-        val addCols = listOf<List<Any>>(pVals, qVals, foldChanges, signGroups.map { it.toString() })
+        val pValCol = listOf<List<Any>>(pVals)
+        val qValCol = if(qVals == null) emptyList<List<Any>>() else listOf(qVals)
+        val foldCols = listOf<List<Any>>(foldChanges, signGroups.map { it.toString() })
+        val addCols = pValCol.plus(qValCol).plus(foldCols)
+
         val newCols = table.cols?.plus(addCols)
         return Pair(Table(newHeaders, newCols), newHeaders)
     }
