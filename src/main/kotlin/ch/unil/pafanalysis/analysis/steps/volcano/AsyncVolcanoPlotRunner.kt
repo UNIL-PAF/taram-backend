@@ -37,26 +37,35 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val params = gson.fromJson(analysisStep?.parameters, VolcanoPlotParams().javaClass)
         val compName = "." + params.comparison?.group1?.plus("-" + params.comparison?.group2)
 
-        val pValHeaderName = (if(params?.useAdjustedPVal == true) "q.value" else "p.value") + compName
-        val pVals = readTableData.getDoubleColumn(table, pValHeaderName)
+        val hasQVal: Boolean = (table.headers?.find { it.name == "q.value$compName" }) != null
+        if (params?.useAdjustedPVal == true && !hasQVal) throw StepException("There are no q-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
+
+        val value = readTableData.getDoubleColumn(table, "p.value$compName")
         val foldChanges = readTableData.getDoubleColumn(table, "fold.change$compName")
         val proteinName = readTableData.getStringColumn(table, headerMap.get("prot")!!)
         val geneName = readTableData.getStringColumn(table, headerMap.get("gene")!!)
+        val qVals = if(hasQVal) readTableData.getDoubleColumn(table, "q.value$compName") else null
 
-        if(foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
-        if(params?.useAdjustedPVal == true && pVals == null) throw StepException("There are no q-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
+        if (foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 
-        val volcanoData = pVals?.mapIndexed{ i, pVal ->
-            val plotPVal = if(params?.log10PVal == true) log10(pVal) * -1 else pVal
-            val isSign = pVal <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh ?: 10000.0)
+        val volcanoData = value?.mapIndexed { i, v ->
+            val plotPVal = if (params?.log10PVal == true) log10(v) * -1 else v
+            val isSign = v <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh
+                ?: 10000.0)
+            val qIsSign = if(qVals != null && foldChanges != null) qVals[i] <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(
+                foldChanges[i]
+            ) >= (params?.fcThresh
+                ?: 10000.0) else null
 
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
                 gene = geneName?.get(i)?.split(";")?.get(0),
-                fc = if(foldChanges?.get(i).isNaN()) null else foldChanges?.get(i),
-                pVal = if(pVal.isNaN()) null else pVal,
-                plotPVal = if(plotPVal.isNaN()) null else plotPVal,
-                isSign = isSign
+                fc = if (foldChanges?.get(i).isNaN()) null else foldChanges?.get(i),
+                pVal = if (v.isNaN()) null else v,
+                qVal = qVals?.get(i),
+                plotVal = if (plotPVal.isNaN()) null else plotPVal,
+                isSign = isSign,
+                qIsSign = qIsSign
             )
         }
 
