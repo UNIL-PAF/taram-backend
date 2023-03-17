@@ -62,6 +62,24 @@ class ReadTableData {
         }
     }
 
+    fun getRows(resultTablePath: String?, headers: List<Header>?): List<List<Any>>? {
+        val reader = BufferedReader(FileReader(resultTablePath))
+        // ignore the first line, it is the header
+        reader.readLine()
+
+        val rowsStrings: List<List<String>> = reader.readLines().fold(mutableListOf()) { acc, r ->
+            val line: List<String> = r.split("\t")
+            acc.add(line)
+            acc
+        }
+
+        return rowsStrings.map{ row -> row.mapIndexed{ i, col ->
+            if (headers?.get(i)?.type == ColType.NUMBER) {
+                if (col.isNotEmpty() && col != "Filtered") col.toDouble() else Double.NaN
+            } else col
+        }}
+    }
+
     fun getTable(resultTablePath: String?, headers: List<Header>?): Table {
         val reader = BufferedReader(FileReader(resultTablePath))
         // ignore the first line, it is the header

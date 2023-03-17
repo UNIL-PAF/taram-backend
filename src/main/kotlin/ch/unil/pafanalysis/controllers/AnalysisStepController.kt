@@ -4,11 +4,9 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.INITIAL_RESULT
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.VOLCANO_PLOT
+import ch.unil.pafanalysis.analysis.model.FullProteinTable
 import ch.unil.pafanalysis.analysis.model.ProteinTable
-import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
-import ch.unil.pafanalysis.analysis.service.AnalysisStepService
-import ch.unil.pafanalysis.analysis.service.AsyncAnalysisStepService
-import ch.unil.pafanalysis.analysis.service.ProteinTableService
+import ch.unil.pafanalysis.analysis.service.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
@@ -51,10 +49,19 @@ class AnalysisStepController {
     @Autowired
     private var proteinTableService: ProteinTableService? = null
 
+    @Autowired
+    private var fullProtTableService: FullProteinTableService? = null
+
     @GetMapping(path = ["/protein-table/{stepId}"])
     fun getProteinTable(@PathVariable(value = "stepId") stepId: Int): ProteinTable? {
         val step = analysisStepRepository?.findById(stepId)
         return proteinTableService?.getProteinTable(step, commonStep?.getSelProts(step), step?.analysis?.result?.type)
+    }
+
+    @GetMapping(path = ["/full-protein-table/{stepId}"])
+    fun getFullProteinTable(@PathVariable(value = "stepId") stepId: Int): FullProteinTable? {
+        val step = analysisStepRepository?.findById(stepId)
+        return fullProtTableService?.getTable(step)
     }
 
     @PostMapping(path = ["/add-to/{stepId}"])
