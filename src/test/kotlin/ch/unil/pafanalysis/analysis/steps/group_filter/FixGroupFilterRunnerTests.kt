@@ -62,16 +62,15 @@ class FixFilterRunnerTests {
 
     @Test
     fun checkOneGroup() {
-        val params = GroupFilterParams(5, FilterInGroup.ONE_GROUP.value, "LFQ.intensity")
+        val params = GroupFilterParams(5, FilterInGroup.ONE_GROUP.value, "LFQ.intensity", zeroIsInvalid = true)
         val resTable = runner?.run(table, params, colInfo)
         assert(table!!.cols?.get(0)?.size == 5535)
         assert(resTable!!.cols?.get(0)?.size == 5074)
     }
 
-
     @Test
     fun checkAllGroups() {
-        val params = GroupFilterParams(5, FilterInGroup.ALL_GROUPS.value, "LFQ.intensity")
+        val params = GroupFilterParams(5, FilterInGroup.ALL_GROUPS.value, "LFQ.intensity", zeroIsInvalid = true)
         val resTable = runner?.run(table, params, colInfo)
         assert(table!!.cols?.get(0)?.size == 5535)
         assert(resTable!!.cols?.get(0)?.size == 4761)
