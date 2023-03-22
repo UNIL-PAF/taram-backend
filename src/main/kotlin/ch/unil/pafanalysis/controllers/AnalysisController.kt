@@ -16,7 +16,7 @@ import java.io.FileInputStream
 import java.io.InputStream
 
 
-@CrossOrigin(origins = ["http://localhost:3000", "https://paf-analysis.dcsr.unil.ch"], maxAge = 3600)
+@CrossOrigin(origins = ["http://localhost:3000", "http://taram-dev.dcsr.unil.ch", "http://taram.dcsr.unil.ch"], maxAge = 3600)
 @RestController
 // This means that this class is a Controller
 @RequestMapping(path = ["/analysis"])
