@@ -32,7 +32,7 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, ScatterPlotParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
+        val selCol = Paragraph().add(Text("Selected x-axis: ${params?.xAxis}"))
 
         document?.add(title)
         document?.add(selCol)
@@ -60,7 +60,8 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
         val origParams = getParameters(origStep)
 
         // there might be differences in selected proteins, which we ignore
-        val message = (if (params.column != origParams?.column) " [Column: ${params.column}]" else "")
+        val message = (if (params.xAxis != origParams?.xAxis) " [x-axis: ${params.xAxis}]" else "") +
+                (if (params.yAxis != origParams?.yAxis) " [y-axis: ${params.yAxis}]" else "")
 
         return if(message != "") "Parameter(s) changed:".plus(message) else null
     }

@@ -27,17 +27,14 @@ class AsyncScatterPlotRunner() : CommonStep() {
 
     private fun createScatterPlot(analysisStep: AnalysisStep?): ScatterPlot? {
         val params = gson.fromJson(analysisStep?.parameters, ScatterPlotParams().javaClass)
-        val field = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers
         )
 
-        val xId =
-            table.headers?.find { h -> h.experiment?.field == field && h.experiment?.name?.contains(params.xAxis!!) ?: false }
-        val yId =
-            table.headers?.find { h -> h.experiment?.field == field && h.experiment?.name?.contains(params.yAxis!!) ?: false }
+        val xId = table.headers?.find { h -> h.name == params.xAxis!! }
+        val yId = table.headers?.find { h -> h.name == params.yAxis!! }
         val xList = readTableData.getDoubleColumn(table, xId?.name!!)
         val yList = readTableData.getDoubleColumn(table, yId?.name!!)
 
