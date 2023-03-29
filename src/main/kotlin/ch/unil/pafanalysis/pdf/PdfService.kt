@@ -36,6 +36,7 @@ class PdfService {
         }
 
         document?.close()
+        pdf.close()
 
         return filePath
     }

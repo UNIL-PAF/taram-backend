@@ -7,7 +7,10 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +39,9 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(echartsServer?.makeEchartsPlot(step, pdf))
+        val plot = echartsServer?.makeEchartsPlot(step, pdf)
+        document?.add(plot)
+
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
 
         return document

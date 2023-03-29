@@ -36,7 +36,8 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(echartsServer?.makeEchartsPlot(step, pdf))
+        val plot = echartsServer?.makeEchartsPlot(step, pdf)
+        document?.add(plot)
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
 
         return document
