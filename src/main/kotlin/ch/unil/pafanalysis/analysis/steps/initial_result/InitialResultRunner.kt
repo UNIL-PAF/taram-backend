@@ -154,7 +154,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         table: Table?
     ): InitialResult {
         return if (type == ResultType.MaxQuant) {
-            createInitialMaxQuantResult(resultPath, resultFilename)
+            createInitialMaxQuantResult(resultPath, "parameters.txt")
         } else {
             createInitialSpectronautResult(resultPath, resultFilename, table)
         }
