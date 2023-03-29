@@ -152,7 +152,8 @@ class ColumnMappingParser {
             .fold(ColumnsParsed()) { sum, el ->
                 val l = el.split("\t")
                 val expName = l[expIdx]
-                val expInfo = ExpInfo(fileName = l[fileIdx], isSelected = true, name = expName, originalName = expName)
+                val fileName = if(fileIdx > -1) l[fileIdx] else null
+                val expInfo = ExpInfo(fileName = fileName, isSelected = true, name = expName, originalName = expName)
                 sum.copy(expNames = sum.expNames.plus(expName), expDetails = sum.expDetails.plus(Pair(expName, expInfo)))
             }
     }

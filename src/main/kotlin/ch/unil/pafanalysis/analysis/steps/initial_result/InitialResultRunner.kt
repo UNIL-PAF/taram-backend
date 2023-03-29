@@ -77,7 +77,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
                 columnInfo = emptyStep?.columnInfo ?: columnInfo,
-                commonResult = emptyStep?.commonResult ?:commonRes,
+                commonResult = emptyStep?.commonResult ?: commonRes,
                 tableNr = 1
             )
         } catch (e: StepException) {
@@ -105,14 +105,22 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val headers: List<Header>? = updateHeaders(colMapping.experimentDetails, analysisStep.commonResult?.headers)
 
         val newColumnMapping: ColumnMapping? =
-            analysisStep.columnInfo?.columnMapping?.copy(experimentDetails = colMapping.experimentDetails, intCol = colMapping.intCol)
+            analysisStep.columnInfo?.columnMapping?.copy(
+                experimentDetails = colMapping.experimentDetails,
+                intCol = colMapping.intCol
+            )
 
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
         val newColumnInfo: ColumnInfo? =
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.saveAndFlush(newColumnInfo!!)
         val newCommonRes = analysisStep.commonResult?.copy(headers = headers)
-        analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.DONE.value, commonResult = newCommonRes))
+        analysisStepRepository?.saveAndFlush(
+            analysisStep.copy(
+                status = AnalysisStepStatus.DONE.value,
+                commonResult = newCommonRes
+            )
+        )
 
         updateNextStep(analysisStep)
 
@@ -120,7 +128,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
     private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Header>? {
-        return headers?.map{ h ->
+        return headers?.map { h ->
             val expInfo = experimentDetails?.get(h.experiment?.initialName)
             val exp = h.experiment?.copy(name = expInfo?.name, group = expInfo?.group)
             h.copy(experiment = exp)
@@ -139,7 +147,12 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
 
-    private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType?, table: Table?): InitialResult {
+    private fun createInitialResult(
+        resultPath: String?,
+        resultFilename: String?,
+        type: ResultType?,
+        table: Table?
+    ): InitialResult {
         return if (type == ResultType.MaxQuant) {
             createInitialMaxQuantResult(resultPath, resultFilename)
         } else {
@@ -147,9 +160,14 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         }
     }
 
-    private fun createInitialSpectronautResult(spectronautPath: String?, fileName: String?, table: Table?): InitialResult {
-        val fastaFileCol = table?.headers?.find{ it.name?.contains("fastafile", ignoreCase = true) ?: false }
-        val fastaFiles: List<String>? = if(fastaFileCol != null) ReadTableData().getStringColumn(table, fastaFileCol.name!!)?.distinct() else null
+    private fun createInitialSpectronautResult(
+        spectronautPath: String?,
+        fileName: String?,
+        table: Table?
+    ): InitialResult {
+        val fastaFileCol = table?.headers?.find { it.name?.contains("fastafile", ignoreCase = true) ?: false }
+        val fastaFiles: List<String>? =
+            if (fastaFileCol != null) ReadTableData().getStringColumn(table, fastaFileCol.name!!)?.distinct() else null
         return InitialResult(
             nrProteinGroups = getNrProteinGroups(spectronautPath.plus(fileName)),
             fastaFiles = fastaFiles
@@ -157,13 +175,20 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
     private fun createInitialMaxQuantResult(maxQuantPath: String?, fileName: String?): InitialResult {
+        val (mqParams, fastaFiles) = parseMaxquantParameters(maxQuantPath.plus(fileName))
         return InitialResult(
-            maxQuantParameters = parseMaxquantParameters(maxQuantPath.plus(fileName)),
-            nrProteinGroups = getNrProteinGroups(maxQuantPath + "proteinGroups.txt")
+            maxQuantParameters = mqParams,
+            nrProteinGroups = getNrProteinGroups(maxQuantPath + "proteinGroups.txt"),
+            fastaFiles = fastaFiles
         )
     }
 
-    private fun copyResultsTable(outputPath: String?, resultFile: String?, resultPath: String?, resultType: ResultType?): File {
+    private fun copyResultsTable(
+        outputPath: String?,
+        resultFile: String?,
+        resultPath: String?,
+        resultType: ResultType?
+    ): File {
         val timestamp = Timestamp(System.currentTimeMillis())
 
         return if (resultType == ResultType.MaxQuant) {
@@ -196,7 +221,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         return lines
     }
 
-    private fun parseMaxquantParameters(parametersTable: String): MaxQuantParameters {
+    private fun parseMaxquantParameters(parametersTable: String): Pair<MaxQuantParameters, List<String>?> {
         val paramsFile = File(parametersTable)
         if (!paramsFile.exists()) throw StepException("Could not find parameters.txt in the results directory.")
         val pMap: HashMap<String, String> = HashMap<String, String>()
@@ -208,7 +233,9 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         }
 
         val matchBetweenRuns = pMap["Match between runs"] == "True"
-        return MaxQuantParameters(version = pMap["Version"], matchBetweenRuns = matchBetweenRuns)
+        val fastaFiles = pMap["Fasta file"]?.split(";")?.map { it.replace(Regex(".+\\\\(.+)\\.fasta"), "$1") }
+        val mqParams = MaxQuantParameters(version = pMap["Version"], matchBetweenRuns = matchBetweenRuns)
+        return Pair(mqParams, fastaFiles)
     }
 
 

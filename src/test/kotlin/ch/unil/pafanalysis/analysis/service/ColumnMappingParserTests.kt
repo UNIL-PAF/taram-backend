@@ -13,6 +13,27 @@ class ColumnMappingParserTests {
     val colParser: ColumnMappingParser? = null
 
     @Test
+    fun parseMaxQuantBernard() {
+        val resultPath = "./src/test/resources/results/maxquant/Bernard_exp_2617/"
+        val resFile = resultPath + "proteinGroups.txt"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, resultPath, ResultType.MaxQuant)
+
+        assert(colMapping.experimentNames?.size == 4)
+        assert(colMapping.experimentNames!!.contains("15628"))
+        assert(colMapping.intCol == "Intensity")
+        assert(commonResults.headers?.size == 64)
+
+        // check first header
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "Protein.IDs")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
+
+        // check commonResults
+        assert(commonResults.numericalColumns?.size == 6)
+        assert(commonResults.numericalColumns!!.contains("iBAQ"))
+    }
+
+    @Test
     fun parseMaxQuantGrepper() {
         val resultPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val resFile = resultPath + "proteinGroups.txt"
