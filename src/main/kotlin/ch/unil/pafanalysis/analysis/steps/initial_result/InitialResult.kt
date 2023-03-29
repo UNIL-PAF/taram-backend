@@ -9,5 +9,6 @@ data class InitialResult(
     val proteinGroupsTable: String? = null,
     val parametersTable: String? = null,
     val maxQuantParameters: MaxQuantParameters? = null,
-    val nrProteinGroups: Int? = null
+    val nrProteinGroups: Int? = null,
+    val fastaFiles: List<String>? = null
 )

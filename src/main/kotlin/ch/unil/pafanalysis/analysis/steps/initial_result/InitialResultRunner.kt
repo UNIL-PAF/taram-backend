@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
@@ -62,12 +63,12 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath, resultType)
 
         val step: AnalysisStep? = try {
-            val initialResult = createInitialResult(resultPath, result?.resFile, resultType)
             val (columnInfo, commonRes) =
                 columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)!!
             val table = readTable.getTable(newTable.path, commonRes?.headers)
             writeTable.write(newTable.path, table)
             val newTableHash = Crc32HashComputations().computeFileHash(newTable)
+            val initialResult = createInitialResult(resultPath, result?.resFile, resultType, table)
 
             emptyStep?.copy(
                 resultPath = stepPath,
@@ -138,17 +139,20 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
 
-    private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType?): InitialResult {
+    private fun createInitialResult(resultPath: String?, resultFilename: String?, type: ResultType?, table: Table?): InitialResult {
         return if (type == ResultType.MaxQuant) {
             createInitialMaxQuantResult(resultPath, resultFilename)
         } else {
-            createInitialSpectronautResult(resultPath, resultFilename)
+            createInitialSpectronautResult(resultPath, resultFilename, table)
         }
     }
 
-    private fun createInitialSpectronautResult(spectronautPath: String?, fileName: String?): InitialResult {
+    private fun createInitialSpectronautResult(spectronautPath: String?, fileName: String?, table: Table?): InitialResult {
+        val fastaFileCol = table?.headers?.find{ it.name?.contains("fastafile", ignoreCase = true) ?: false }
+        val fastaFiles: List<String>? = if(fastaFileCol != null) ReadTableData().getStringColumn(table, fastaFileCol.name!!)?.distinct() else null
         return InitialResult(
-            nrProteinGroups = getNrProteinGroups(spectronautPath.plus(fileName))
+            nrProteinGroups = getNrProteinGroups(spectronautPath.plus(fileName)),
+            fastaFiles = fastaFiles
         )
     }
 
