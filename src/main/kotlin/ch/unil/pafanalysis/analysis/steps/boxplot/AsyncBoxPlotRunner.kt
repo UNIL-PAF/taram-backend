@@ -45,7 +45,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
         val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
-        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type)
+        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames)
 
         return BoxPlot(
             experimentNames = experimentNames,
@@ -54,10 +54,13 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
     }
 
-    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?, resType: String?): List<SelProtData>? {
+    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?, resType: String?, expNames: List<String>?): List<SelProtData>? {
         if (params?.selProts == null) return null
-        val intMatrix = readTableData.getDoubleMatrix(table, intCol).second
+        val (headers, intMatrix) = readTableData.getDoubleMatrix(table, intCol)
 
+        val colOrder = expNames?.map{ n -> headers.indexOf(headers.find{it.experiment?.name == n}) }
+        val orderById = colOrder?.withIndex()?.associate { (index, it) -> it to index }
+        val sortedIntMatrix = intMatrix.withIndex().sortedBy { (index, _) -> orderById?.get(index) }.map{it.value}
         val headerMap = if(resType == ResultType.MaxQuant.value) HeaderMaps.maxQuant else HeaderMaps.spectronaut
 
         val protGroup = readTableData.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
@@ -65,7 +68,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         return params?.selProts.map { p ->
             val i = protGroup?.indexOf(p)
-            val ints = intMatrix.map { if (i == null) null else it[i] }
+            val ints = sortedIntMatrix.map { if (i == null) null else it[i] }
             val normInts = if (params?.logScale != false) {
                 ints.map { if (it != 0.0 && it != null) log2(it) else null }
             } else {

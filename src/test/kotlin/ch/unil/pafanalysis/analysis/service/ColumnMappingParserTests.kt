@@ -13,6 +13,15 @@ class ColumnMappingParserTests {
     val colParser: ColumnMappingParser? = null
 
     @Test
+    fun parseMaxQuantPaterek() {
+        val resultPath = "./src/test/resources/results/maxquant/Patarek_14610-15/"
+        val resFile = resultPath + "proteinGroups.txt"
+        val colMapping = colParser!!.parse(resFile, resultPath, ResultType.MaxQuant).first
+
+        assert(colMapping.experimentNames == listOf("14611", "14613", "14615", "14610", "14612", "14614"))
+    }
+
+    @Test
     fun parseMaxQuantBernard() {
         val resultPath = "./src/test/resources/results/maxquant/Bernard_exp_2617/"
         val resFile = resultPath + "proteinGroups.txt"
