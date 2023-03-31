@@ -47,6 +47,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames)
 
+        println(selProtData)
+
         return BoxPlot(
             experimentNames = experimentNames,
             boxPlotData = boxplotGroupData?.keys?.toList(),
@@ -72,7 +74,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             val normInts = if (params?.logScale != false) {
                 ints.map { if (it != 0.0 && it != null) log2(it) else null }
             } else {
-                ints
+                ints.map{ if(it?.isNaN() == true) null else it}
             }
 
             val gene = if (i == null) "" else genes?.get(i)
