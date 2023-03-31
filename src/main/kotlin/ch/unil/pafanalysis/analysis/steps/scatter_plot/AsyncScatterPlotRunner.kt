@@ -56,22 +56,27 @@ class AsyncScatterPlotRunner() : CommonStep() {
 
         val doLog = params.logTrans == true
 
+
+
         val data: List<ScatterPoint>? =
             xList?.mapIndexed { i, x ->
                 val y = yList?.get(i)
+
+                val tmpX = if (doLog) computeLog(x) else x
+                val tmpY = if (doLog) computeLog(y) else y
+                val tmpCol = colData?.get(i)
+
                 ScatterPoint(
-                    x = if (doLog) {
-                        computeLog(x)
-                    } else x,
-                    y = if (doLog) {
-                        computeLog(y)
-                    } else y,
-                    d = colData?.get(i),
+                    x = if(tmpX?.isNaN() == true) null else tmpX,
+                    y = if(tmpY?.isNaN() == true) null else tmpY,
+                    d = if(tmpCol?.isNaN() == true) null else tmpCol,
                     n = names?.get(i)
                 )
             }
 
-        return ScatterPlot(data)
+        val sortedData = data?.sortedBy { it.d }
+
+        return ScatterPlot(sortedData)
     }
 
     private fun computeLog(d: Double?): Double? {
