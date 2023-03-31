@@ -49,7 +49,8 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         if (foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 
         val volcanoData = value?.mapIndexed { i, v ->
-            val plotPVal = if (params?.log10PVal == true) log10(v) * -1 else v
+            val plotValTarget = if(params?.useAdjustedPVal == true) qVals?.get(i) ?: Double.NaN else v
+            val plotPVal = if (params?.log10PVal == true) log10(plotValTarget) * -1 else plotValTarget
             val isSign = v <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh
                 ?: 10000.0)
             val qIsSign = if(qVals != null && foldChanges != null) qVals[i] <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(
@@ -57,12 +58,14 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
             ) >= (params?.fcThresh
                 ?: 10000.0) else null
 
+            val qVal = qVals?.get(i)
+
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
                 gene = geneName?.get(i)?.split(";")?.get(0),
                 fc = if (foldChanges?.get(i).isNaN()) null else foldChanges?.get(i),
                 pVal = if (v.isNaN()) null else v,
-                qVal = qVals?.get(i),
+                qVal = if (qVal != null && qVal?.isNaN()) null else qVal,
                 plotVal = if (plotPVal.isNaN()) null else plotPVal,
                 isSign = isSign,
                 qIsSign = qIsSign

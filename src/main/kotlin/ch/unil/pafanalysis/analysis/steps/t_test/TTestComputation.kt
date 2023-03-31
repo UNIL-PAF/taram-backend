@@ -99,10 +99,12 @@ class TTestComputation {
 
     private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?): List<Double> {
         return ints.map { row ->
+            val first = row.first.filter{!it.isNaN()}
+            val second = row.second.filter{!it.isNaN()}
             if (isLogVal == true) {
-                row.first.average() - row.second.average()
+                first.average() - second.average()
             } else {
-                row.first.average() / row.second.average()
+                first.average() / second.average()
             }
         }
     }
@@ -120,7 +122,10 @@ class TTestComputation {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
 
         return ints.map { row ->
-            val pVal = apacheTTest.homoscedasticTTest(row.first.toDoubleArray(), row.second.toDoubleArray())
+            val first = row.first.filter{!it.isNaN()}
+            val second = row.second.filter{!it.isNaN()}
+
+            val pVal = if(first.size < 2 || second.size < 2) Double.NaN else apacheTTest.homoscedasticTTest(first.toDoubleArray(), second.toDoubleArray())
             pVal
         }
     }
