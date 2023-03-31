@@ -30,7 +30,8 @@ class CheckForNewDirs {
             localResultPaths = resultPaths
             val maxQuantDirs = checkMaxQuant(existingRes)
             val spectronautDirs = checkSpectronaut(existingRes)
-            return maxQuantDirs.plus(spectronautDirs)
+            val allDirs =  maxQuantDirs.plus(spectronautDirs)
+            return allDirs.sortedBy { it.fileCreationDate }.reversed()
         }
 
         private fun checkMaxQuant(existingRes: Sequence<Result>?): List<AvailableDir>{
