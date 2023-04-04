@@ -47,8 +47,6 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames)
 
-        println(selProtData)
-
         return BoxPlot(
             experimentNames = experimentNames,
             boxPlotData = boxplotGroupData?.keys?.toList(),
@@ -68,18 +66,24 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val protGroup = readTableData.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTableData.getStringColumn(table, headerMap["gene"]!!)?.map { it.split(";")?.get(0) }
 
-        return params?.selProts.map { p ->
+        val selProts = params?.selProts.map { p ->
             val i = protGroup?.indexOf(p)
-            val ints = sortedIntMatrix.map { if (i == null) null else it[i] }
-            val normInts = if (params?.logScale != false) {
-                ints.map { if (it != 0.0 && it != null) log2(it) else null }
-            } else {
-                ints.map{ if(it?.isNaN() == true) null else it}
-            }
+            if(i != null && i >= 0){
+                val ints = sortedIntMatrix.map { if (i == null) null else it[i] }
+                val normInts = if (params?.logScale != false) {
+                    ints.map { if (it != null && !it.isNaN() && it != 0.0) log2(it) else null }
+                } else {
+                    ints.map{ if(it?.isNaN() == true) null else it}
+                }
 
-            val gene = if (i == null) "" else genes?.get(i)
-            SelProtData(prot = p, ints = normInts, gene = gene)
+                val gene = if (i == null) "" else genes?.get(i)
+                SelProtData(prot = p, ints = normInts, gene = gene)
+            }else{
+                null
+            }
         }
+
+        return selProts.filterNotNull().ifEmpty { null }
     }
 
     private fun createBoxplotGroupData(
