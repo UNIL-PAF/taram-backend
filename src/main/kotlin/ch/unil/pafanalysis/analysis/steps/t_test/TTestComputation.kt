@@ -18,8 +18,12 @@ class TTestComputation {
             "Please specify your groups in the Analysis parameters."
         )
 
-        if (((params?.firstGroup?.size ?: 0) == 0) || (params?.firstGroup?.size != params?.secondGroup?.size)) {
+        if ((params?.firstGroup?.size ?: 0) == 0) {
             throw StepException("You must at least chose one valid pair of groups in first and second group.")
+        }
+
+        if(params?.firstGroup?.size != params?.secondGroup?.size){
+            throw StepException("First and second groups don't have the same number of items. Please select pairs.")
         }
 
         val comparisions: List<GroupComp>? =
