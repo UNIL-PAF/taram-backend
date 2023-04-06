@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.common.HeaderMaps
 import ch.unil.pafanalysis.common.ReadTableData
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import java.io.File
 import kotlin.math.log10
 
 @Service
@@ -24,6 +25,10 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
             )
         }
         tryToRun(funToRun, newStep)
+    }
+
+    private fun invalidToNull(d: Double?): Double?{
+        return if(d?.isNaN() != false || d?.isInfinite()?:true) return null else d
     }
 
     private fun createVolcanoObj(analysisStep: AnalysisStep?): VolcanoPlot {
@@ -63,10 +68,10 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
                 gene = geneName?.get(i)?.split(";")?.get(0),
-                fc = if (foldChanges?.get(i).isNaN()) null else foldChanges?.get(i),
-                pVal = if (v.isNaN()) null else v,
-                qVal = if (qVal != null && qVal?.isNaN()) null else qVal,
-                plotVal = if (plotPVal.isNaN()) null else plotPVal,
+                fc = invalidToNull(foldChanges?.get(i)),
+                pVal = invalidToNull(v),
+                qVal = invalidToNull(qVal),
+                plotVal = invalidToNull(plotPVal),
                 isSign = isSign,
                 qIsSign = qIsSign
             )
