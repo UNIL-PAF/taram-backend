@@ -36,10 +36,10 @@ class AsyncSummaryStatRunner() : CommonStep() {
     ): SummaryStat? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        val ints = readTableData.getDoubleMatrix(table, intCol).second
+        val (headers, ints) = readTableData.getDoubleMatrix(table, intCol)
 
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getSummaryStat(ints)
+        return summaryStatComp.getSummaryStat(ints, headers)
     }
 
 }

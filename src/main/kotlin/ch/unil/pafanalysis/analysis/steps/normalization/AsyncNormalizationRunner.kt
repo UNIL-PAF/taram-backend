@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.normalization
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.SummaryStatComputation
 import ch.unil.pafanalysis.common.WriteTableData
@@ -39,7 +40,7 @@ class AsyncNormalizationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         params: NormalizationParams,
-    ): Normalization? {
+    ): SummaryStat? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
@@ -56,16 +57,7 @@ class AsyncNormalizationRunner() : CommonStep() {
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
         val summaryStatComp = SummaryStatComputation()
-        val summaryStat = summaryStatComp.getSummaryStat(normInts)
-
-        return Normalization(
-            summaryStat.min,
-            summaryStat.max,
-            summaryStat.mean,
-            summaryStat.median,
-            summaryStat.nrNans,
-            summaryStat.sum
-        )
+        return summaryStatComp.getSummaryStat(normInts, selHeaders)
     }
 
 }

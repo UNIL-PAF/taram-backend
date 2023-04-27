@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.log_transformation
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.SummaryStatComputation
 import ch.unil.pafanalysis.common.WriteTableData
@@ -44,7 +45,7 @@ class AsyncLogTransformationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         params: LogTransformationParams
-    ): LogTransformation? {
+    ): SummaryStat? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
@@ -60,16 +61,7 @@ class AsyncLogTransformationRunner() : CommonStep() {
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
         val summaryComp = SummaryStatComputation()
-        val summaryStat = summaryComp.getSummaryStat(transInts)
-
-        return LogTransformation(
-            summaryStat.min,
-            summaryStat.max,
-            summaryStat.mean,
-            summaryStat.median,
-            summaryStat.nrNans,
-            summaryStat.sum
-        )
+        return summaryComp.getSummaryStat(transInts, selHeaders)
     }
 
 }

@@ -5,6 +5,6 @@ data class Normalization(
     val max: Double?,
     val mean: Double?,
     val median: Double?,
-    val nrNans: Int?,
+    val nrValid: Int?,
     val sum: Double?
 )
