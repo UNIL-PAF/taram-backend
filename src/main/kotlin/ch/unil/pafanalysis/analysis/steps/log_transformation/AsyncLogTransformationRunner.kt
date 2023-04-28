@@ -60,8 +60,8 @@ class AsyncLogTransformationRunner() : CommonStep() {
 
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
-        val summaryComp = SummaryStatComputation()
-        return summaryComp.getSummaryStat(transInts, selHeaders)
+        val summaryStatComp = SummaryStatComputation()
+        return summaryStatComp.getBasicSummaryStat(transInts, selHeaders)
     }
 
 }

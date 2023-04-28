@@ -8,6 +8,7 @@ data class SummaryStat(
     val mean: List<Double>? = null,
     val median: List<Double>? = null,
     val nrValid: List<Int>? = null,
+    val nrNaN: List<Int>? = null,
     val sum: List<Double>? = null,
     val stdDev: List<Double>? = null,
     val stdErr: List<Double>? = null,

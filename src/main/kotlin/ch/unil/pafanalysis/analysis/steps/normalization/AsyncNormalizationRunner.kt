@@ -57,7 +57,7 @@ class AsyncNormalizationRunner() : CommonStep() {
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getSummaryStat(normInts, selHeaders)
+        return summaryStatComp.getBasicSummaryStat(normInts, selHeaders)
     }
 
 }
