@@ -14,4 +14,8 @@ interface CommonRunner {
     fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document?
 
     fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String?
+
+    fun getResultByteArray(step: AnalysisStep?): ByteArray? {
+        throw Exception("'getResultByteArray' is not implemented for this Runner [${step?.type}].")
+    }
 }

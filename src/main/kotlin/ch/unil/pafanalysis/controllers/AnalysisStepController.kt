@@ -165,6 +165,20 @@ class AnalysisStepController {
         return response;
     }
 
+    @GetMapping(path = ["/result/{stepId}"])
+    fun getResult(@PathVariable(value = "stepId") stepId: Int): ResponseEntity<ByteArray>? {
+        val step = analysisStepRepository?.findById(stepId)
+        val contents = commonStep?.getRunner(step?.type)?.getResultByteArray(step)
+
+        val headers = HttpHeaders();
+        headers.contentType = MediaType.TEXT_PLAIN;
+        val filename = "output.txt";
+        headers.setContentDispositionFormData(filename, filename);
+        headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";
+        val response = ResponseEntity(contents, headers, HttpStatus.OK);
+        return response;
+    }
+
     @GetMapping(path = ["/zip/{stepId}"])
     fun getZip(
         @PathVariable(value = "stepId") stepId: Int,
