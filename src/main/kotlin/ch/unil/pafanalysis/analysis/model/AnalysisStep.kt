@@ -29,6 +29,7 @@ data class AnalysisStep (
     val imputationTablePath: String? = null,
     val resultTableHash: Long? = null,
     val tableNr: Int? = null,
+    val nrProteinGroups: Int? = null,
 
     val copyFromId: Int? = null,
     val copyDifference: String? = null,

@@ -141,6 +141,11 @@ open class CommonStep {
         }
     }
 
+    private fun getNrProteinGroups(resultTablePath: String?): Int? {
+        val fileName = getOutputRoot() + resultTablePath
+        return File(fileName).readLines().size - 1
+    }
+
     fun addStep(stepId: Int, stepParams: AnalysisStepParams): AnalysisStep? {
         return getRunner(stepParams.type)?.run(stepId, params = stepParams.params)
     }
@@ -271,7 +276,8 @@ open class CommonStep {
                 stepWithFileHash?.copy(
                     status = AnalysisStepStatus.DONE.value,
                     stepHash = newHash,
-                    copyDifference = getCopyDifference(stepWithFileHash)
+                    copyDifference = getCopyDifference(stepWithFileHash),
+                    nrProteinGroups = getNrProteinGroups(stepWithFileHash.resultTablePath)
                 )
             analysisStepRepository?.saveAndFlush(updatedStep!!)!!
             updateNextStep(updatedStep!!)
