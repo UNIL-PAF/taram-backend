@@ -29,7 +29,7 @@ class ColumnMappingParserTests {
 
         assert(colMapping.experimentNames?.size == 4)
         assert(colMapping.experimentNames!!.contains("15628"))
-        assert(colMapping.intCol == "Intensity")
+        assert(colMapping.intCol == "iBAQ")
         assert(commonResults.headers?.size == 64)
 
         // check first header
@@ -50,7 +50,7 @@ class ColumnMappingParserTests {
 
         assert(colMapping.experimentNames?.size == 16)
         assert(colMapping.experimentNames!!.contains("KO-13703"))
-        assert(colMapping.intCol == "Intensity")
+        assert(colMapping.intCol == "iBAQ")
         assert(commonResults.headers?.size == 219)
 
         // check first header

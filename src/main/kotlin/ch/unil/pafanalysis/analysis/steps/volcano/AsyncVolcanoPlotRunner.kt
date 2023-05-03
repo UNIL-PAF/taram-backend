@@ -40,7 +40,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         )
 
         val params = gson.fromJson(analysisStep?.parameters, VolcanoPlotParams().javaClass)
-        val compName = "." + params.comparison?.group1?.plus("-" + params.comparison?.group2)
+        val compName = "." + params.comparison?.group1?.trim().plus("-" + params.comparison?.group2?.trim())
 
         val hasQVal: Boolean = (table.headers?.find { it.name == "q.value$compName" }) != null
         if (params?.useAdjustedPVal == true && !hasQVal) throw StepException("There are no q-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
