@@ -82,7 +82,7 @@ class TTestComputation {
         comp: GroupComp
     ): Pair<Table?, List<Header>?> {
         val nrHeaders = table?.headers?.size!!
-        val compName = "${comp.group1}-${comp.group2}"
+        val compName = "${comp.group1.trim()}-${comp.group2.trim()}"
         val pValHeader = listOf(Header(name = "p.value.$compName", idx = nrHeaders, ColType.NUMBER, Experiment(comp = comp)))
         val idxOffset = if(qVals == null) 0 else 1
         val foldHeader = listOf(
