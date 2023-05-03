@@ -131,7 +131,7 @@ class ColumnMappingParser {
         val colMapping = ColumnMapping(
             experimentDetails = cols?.expDetails,
             experimentNames = cols?.expNames?.toList(),
-            intCol = if (cols?.expFields?.contains("Intensity") == true) "Intensity" else null
+            intCol = if (cols?.expFields?.contains("iBAQ") == true) "iBAQ" else null
         )
 
         val commonResult = CommonResult(

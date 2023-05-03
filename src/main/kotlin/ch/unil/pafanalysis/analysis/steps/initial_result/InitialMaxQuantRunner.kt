@@ -13,7 +13,7 @@ class InitialMaxQuantRunner() {
         return InitialResult(
             maxQuantParameters = mqParams,
             fastaFiles = fastaFiles,
-            softwareVersion = version
+            softwareVersion = "MaxQuant $version"
         )
     }
 

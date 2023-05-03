@@ -156,7 +156,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val initialRes = if (type == ResultType.MaxQuant) {
             InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "parameters.txt")
         } else {
-            InitialSpectronautRunner().createInitialSpectronautResult(resultPath, resultFilename, table)
+            InitialSpectronautRunner().createInitialSpectronautResult(resultPath, table)
         }
         return initialRes.copy(nrProteinGroups = table?.cols?.get(0)?.size)
     }
