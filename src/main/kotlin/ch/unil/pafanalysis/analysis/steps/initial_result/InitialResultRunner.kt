@@ -78,7 +78,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 results = gson.toJson(initialResult),
                 columnInfo = emptyStep?.columnInfo ?: columnInfo,
                 commonResult = emptyStep?.commonResult ?: commonRes,
-                tableNr = 1
+                tableNr = 1,
+                nrProteinGroups = initialResult.nrProteinGroups
             )
         } catch (e: StepException) {
             e.printStackTrace()
@@ -146,41 +147,18 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         return analysisStepRepository?.saveAndFlush(newStep)
     }
 
-
     private fun createInitialResult(
         resultPath: String?,
         resultFilename: String?,
         type: ResultType?,
         table: Table?
     ): InitialResult {
-        return if (type == ResultType.MaxQuant) {
-            createInitialMaxQuantResult(resultPath, "parameters.txt")
+        val initialRes = if (type == ResultType.MaxQuant) {
+            InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "parameters.txt")
         } else {
-            createInitialSpectronautResult(resultPath, resultFilename, table)
+            InitialSpectronautRunner().createInitialSpectronautResult(resultPath, resultFilename, table)
         }
-    }
-
-    private fun createInitialSpectronautResult(
-        spectronautPath: String?,
-        fileName: String?,
-        table: Table?
-    ): InitialResult {
-        val fastaFileCol = table?.headers?.find { it.name?.contains("fastafile", ignoreCase = true) ?: false }
-        val fastaFiles: List<String>? =
-            if (fastaFileCol != null) ReadTableData().getStringColumn(table, fastaFileCol.name!!)?.distinct() else null
-        return InitialResult(
-            nrProteinGroups = getNrProteinGroups(spectronautPath.plus(fileName)),
-            fastaFiles = fastaFiles
-        )
-    }
-
-    private fun createInitialMaxQuantResult(maxQuantPath: String?, fileName: String?): InitialResult {
-        val (mqParams, fastaFiles) = parseMaxquantParameters(maxQuantPath.plus(fileName))
-        return InitialResult(
-            maxQuantParameters = mqParams,
-            nrProteinGroups = getNrProteinGroups(maxQuantPath + "proteinGroups.txt"),
-            fastaFiles = fastaFiles
-        )
+        return initialRes.copy(nrProteinGroups = table?.cols?.get(0)?.size)
     }
 
     private fun copyResultsTable(
@@ -211,32 +189,5 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         originalTable.copyTo(newTable)
         return newTable
     }
-
-    private fun getNrProteinGroups(proteinGroupsTable: String): Int {
-        val reader = BufferedReader(FileReader(proteinGroupsTable))
-        var lines = 0
-        while (reader.readLine() != null) lines++
-        reader.close()
-        lines--
-        return lines
-    }
-
-    private fun parseMaxquantParameters(parametersTable: String): Pair<MaxQuantParameters, List<String>?> {
-        val paramsFile = File(parametersTable)
-        if (!paramsFile.exists()) throw StepException("Could not find parameters.txt in the results directory.")
-        val pMap: HashMap<String, String> = HashMap<String, String>()
-        paramsFile.useLines { lines ->
-            lines.forEach {
-                val (n, v) = it.split("\t")
-                pMap[n] = v
-            }
-        }
-
-        val matchBetweenRuns = pMap["Match between runs"] == "True"
-        val fastaFiles = pMap["Fasta file"]?.split(";")?.map { it.replace(Regex(".+\\\\(.+)\\.fasta"), "$1") }
-        val mqParams = MaxQuantParameters(version = pMap["Version"], matchBetweenRuns = matchBetweenRuns)
-        return Pair(mqParams, fastaFiles)
-    }
-
 
 }
