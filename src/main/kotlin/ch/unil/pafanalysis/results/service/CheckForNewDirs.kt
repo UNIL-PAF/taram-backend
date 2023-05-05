@@ -5,16 +5,19 @@ import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultPaths
 import ch.unil.pafanalysis.results.model.ResultType
 import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.filefilter.WildcardFileFilter
 import org.springframework.stereotype.Component
+import java.io.File
+import java.io.FileFilter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.regex.Pattern
 import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.io.path.readAttributes
+
 
 @Component
 class CheckForNewDirs {
@@ -22,7 +25,7 @@ class CheckForNewDirs {
     companion object {
         // the filename and a boolean indicating weither it is an exact match or a pattern
         private val maxQuantResName = listOf(Pair("proteinGroups.txt", true))
-        private val spectronautResName = listOf(Pair("_Report\\.txt", false), Pair("_Report[^\\.].*\\.txt", false))
+        private val spectronautResName = listOf(Pair("_Report.xls", false))
 
         private var localResultPaths: ResultPaths? = null
 
@@ -37,7 +40,6 @@ class CheckForNewDirs {
         private fun checkMaxQuant(existingRes: Sequence<Result>?): List<AvailableDir>{
             val maxQuantRes = existingRes?.filter { it.type == "MaxQuant" }
             return checkCommon(maxQuantRes, localResultPaths!!.maxQuantPath!!, maxQuantResName, ResultType.MaxQuant)
-
         }
 
         private fun checkSpectronaut(existingRes: Sequence<Result>?): List<AvailableDir>{
@@ -70,12 +72,21 @@ class CheckForNewDirs {
                 val dirString = FilenameUtils.getPath(pathString)
                 val fileString = FilenameUtils.getBaseName(pathString) + '.' + FilenameUtils.getExtension(pathString)
 
+                val resDir = if(resType == ResultType.MaxQuant)  localResultPaths!!.maxQuantPath else  localResultPaths!!.spectronautPath
+                val dir = File(resDir + dirString)
+                val fileFilter: FileFilter = WildcardFileFilter("*.txt")
+                val files: List<String> = dir.listFiles(fileFilter).map{ f -> f.name}
+
+                // for spectronaut we have to add the .xls file
+                val filesAll = if(resType == ResultType.Spectronaut) files.plus(fileString) else files
+
                 AvailableDir(
                     type=resType.value,
                     resFile = fileString,
                     fileCreationDate = creationTime,
                     path = dirString,
-                    alreadyUsed = usedDirsPath.contains(dirString)
+                    alreadyUsed = usedDirsPath.contains(dirString),
+                    resFileList = filesAll.reversed()
                 )
             }.toList()
             return newResults

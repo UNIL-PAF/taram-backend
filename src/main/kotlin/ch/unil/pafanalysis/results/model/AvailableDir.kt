@@ -7,5 +7,6 @@ class AvailableDir (
     val resFile: String? = null,
     val path: String? = null,
     val fileCreationDate: LocalDateTime? = null,
-    val alreadyUsed: Boolean? = null
+    val alreadyUsed: Boolean? = null,
+    val resFileList: List<String>? = null
 )
