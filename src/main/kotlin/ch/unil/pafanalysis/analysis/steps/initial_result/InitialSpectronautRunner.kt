@@ -23,9 +23,6 @@ class InitialSpectronautRunner() {
                 }
             } else null
 
-        val version = parseSoftwareVersion(spectronautPath)
-        println(version)
-
         return InitialResult(
             fastaFiles = fastaFiles,
             softwareVersion = parseSoftwareVersion(spectronautPath)
