@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import java.io.File
 import java.io.FileFilter
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
@@ -58,14 +59,16 @@ class CheckForNewDirs {
                 }
             }
 
-            val availableDirs = Files.walk(Paths.get(path))
+            val availableDirs: List<Path> = Files.walk(Paths.get(path))
                 .filter(Files::isRegularFile)
                 .filter{file ->
                     val fileName: String? = file?.fileName?.name
                     resFileNames.find{resFile -> isFileValid(fileName, resFile)} != null
-                }
+                }.toList()
 
-            val newResults = availableDirs.map{
+            val validDirs = availableDirs.filter{ it.toFile().exists() }
+
+            val newResults = validDirs.map{
                 val attr: BasicFileAttributes = it.readAttributes()
                 val creationTime = LocalDateTime.ofInstant( attr.creationTime().toInstant(), ZoneId.systemDefault())
                 val pathString = it.pathString.replace(path, "")

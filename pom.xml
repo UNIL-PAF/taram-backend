@@ -10,12 +10,13 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>paf-analysis-backend</artifactId>
-    <version>0.6.2</version>
+    <version>0.6.3</version>
     <name>paf-analysis-backend</name>
     <description>The backend for the PAF analysis pipeline</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>16</java.version>
         <kotlin.version>1.5.10</kotlin.version>
+        <encoding>UTF-8</encoding>
     </properties>
     <dependencies>
         <dependency>
