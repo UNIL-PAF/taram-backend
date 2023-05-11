@@ -75,7 +75,7 @@ class ColumnMappingParser {
                             name = matchResult.groupValues[1] + "." + matchResult.groupValues[2],
                             idx = i,
                             type = colTypes?.get(i),
-                            experiment = Experiment(name = matchResult.groupValues[1], field = matchResult.groupValues[2], initialName = matchResult.groupValues[1])
+                            experiment = Experiment(name = matchResult.groupValues[1], field = matchResult.groupValues[2])
                         )
                     ),
                     expDetails = acc.expDetails.plus(
@@ -100,8 +100,6 @@ class ColumnMappingParser {
         )
 
         val commonResult = CommonResult(
-            numericalColumns = cols.headers.filterIndexed{i, c ->
-                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}.map{it.experiment!!.field}.distinct(),
             headers = cols.headers
         )
         return Pair(colMapping, commonResult)
@@ -119,7 +117,7 @@ class ColumnMappingParser {
             if(expName != null){
                 val field = col.replace(expName, "").trim().replace(Regex("[^A-Za-z0-9]+"), ".").replace(Regex("^\\.*|\\.*\$"), "")
                 val expFields = acc.expFields.plus(field)
-                val headers = acc.headers.plus(Header(name = "$expName.$field", idx = i, type = colTypes?.get(i), experiment = Experiment(expName, field, initialName = expName)))
+                val headers = acc.headers.plus(Header(name = "$expName.$field", idx = i, type = colTypes?.get(i), experiment = Experiment(expName, field)))
                 acc.copy(expFields = expFields, headers = headers)
             }else{
                 val field = col.trim().replace(Regex("[^A-Za-z0-9]+"), ".").replace(Regex("^\\.*|\\.*\$"), "")
@@ -135,8 +133,6 @@ class ColumnMappingParser {
         )
 
         val commonResult = CommonResult(
-            numericalColumns = cols?.headers?.filterIndexed{i, c ->
-                colTypes?.get(i) == ColType.NUMBER  && c.experiment != null}?.map{it.experiment!!.field}?.distinct(),
             headers = cols?.headers
         )
         return Pair(colMapping, commonResult)

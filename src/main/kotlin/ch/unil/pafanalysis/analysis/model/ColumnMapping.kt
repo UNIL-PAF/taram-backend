@@ -9,7 +9,6 @@ data class ExpInfo(
 )
 
 data class ColumnMapping(
-//    val headers: List<Header>? = null,
     val experimentDetails: Map<String, ExpInfo>? = null,
     val experimentNames: List<String>? = null,
     val intCol: String? = null
@@ -26,7 +25,6 @@ data class Experiment(
     val name: String? = null,
     val field: String? = null,
     val group: String? = null,
-    val initialName: String? = null,
     val comp: GroupComp? = null
     )
 

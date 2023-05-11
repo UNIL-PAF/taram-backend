@@ -36,10 +36,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(0)?.idx == 0)
         assert(commonResults.headers?.get(0)?.name == "Protein.IDs")
         assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
-
-        // check commonResults
-        assert(commonResults.numericalColumns?.size == 6)
-        assert(commonResults.numericalColumns!!.contains("iBAQ"))
     }
 
     @Test
@@ -64,10 +60,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(12)?.experiment?.name == "KO-13704")
         assert(commonResults.headers?.get(12)?.experiment?.field == "Mutation.names")
-
-        // check commonResults
-        assert(commonResults.numericalColumns?.size == 10)
-        assert(commonResults.numericalColumns!!.contains("LFQ.intensity"))
     }
 
     @Test
@@ -90,10 +82,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(12)?.experiment?.name == "14652")
         assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
-
-        // check commonResults
-        assert(commonResults.numericalColumns?.size == 3)
-        assert(commonResults.numericalColumns!!.contains("NrOfPrecursorsIdentified"))
     }
 
     @Test
@@ -116,10 +104,6 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(11)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(11)?.experiment?.name == "14181")
         assert(commonResults.headers?.get(11)?.experiment?.field == "NrOfPrecursorsIdentified")
-
-        // check commonResults
-        assert(commonResults.numericalColumns?.size == 3)
-        assert(commonResults.numericalColumns!!.contains("NrOfPrecursorsIdentified"))
     }
 
     @Test
@@ -143,9 +127,5 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(11)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(11)?.experiment?.name == "12818")
         assert(commonResults.headers?.get(11)?.experiment?.field == "TotalQuantity (Settings)")
-
-        // check commonResults
-        assert(commonResults.numericalColumns?.size == 1)
-        assert(commonResults.numericalColumns!!.contains("TotalQuantity (Settings)"))
     }
 }

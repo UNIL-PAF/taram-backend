@@ -130,7 +130,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
     private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Header>? {
         return headers?.map { h ->
-            val expInfo = experimentDetails?.get(h.experiment?.initialName)
+            val expInfo = experimentDetails?.get(h.experiment?.name)
             val exp = h.experiment?.copy(name = expInfo?.name, group = expInfo?.group)
             h.copy(experiment = exp)
         }

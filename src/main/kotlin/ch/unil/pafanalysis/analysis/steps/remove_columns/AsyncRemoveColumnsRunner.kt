@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.remove_columns
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ColType
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.TableService
@@ -26,7 +27,6 @@ class AsyncRemoveColumnsRunner() : CommonStep() {
             val params = gson.fromJson(newStep?.parameters, RemoveColumnsParams().javaClass)
 
             val headersFiltered = filterHeaders(newStep?.commonResult?.headers, params.keepIdxs)
-            val numColsFiltered = filterNumCols(newStep?.commonResult?.numericalColumns, headersFiltered)
             val newHeaders = headersFiltered?.mapIndexed{ i, h -> h.copy(idx = i) }
 
             val oldTable = ReadTableData().getTable(
@@ -48,7 +48,7 @@ class AsyncRemoveColumnsRunner() : CommonStep() {
                         newStep?.commonResult?.headers?.size?.minus(newHeaders?.size ?: 0)
                     )
                 ),
-                commonResult = newStep?.commonResult?.copy(headers = newHeaders, numericalColumns = numColsFiltered)
+                commonResult = newStep?.commonResult?.copy(headers = newHeaders)
             )
         }
 
