@@ -103,7 +103,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
         //val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
-        val headers: List<Header>? = updateHeaders(colMapping.experimentDetails, analysisStep.commonResult?.headers)
+        val newHeaders: List<Header>? = updateHeaders(colMapping.experimentDetails, analysisStep.commonResult?.headers)
+        val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders)
 
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(
@@ -115,24 +116,40 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val newColumnInfo: ColumnInfo? =
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.saveAndFlush(newColumnInfo!!)
-        val newCommonRes = analysisStep.commonResult?.copy(headers = headers)
+        val newCommonRes = analysisStep.commonResult?.copy(headers = newHeaders)
         analysisStepRepository?.saveAndFlush(
             analysisStep.copy(
                 status = AnalysisStepStatus.DONE.value,
-                commonResult = newCommonRes
+                commonResult = newCommonRes,
+                resultTableHash = newTableHash,
+                resultPath = newTablePath
             )
         )
 
         updateNextStep(analysisStep)
-
         return runningStep!!
+    }
+
+    private fun updateResFile(analysisStep: AnalysisStep?, newHeaders: List<Header>?): Pair<String?, Long?> {
+        val resFilePath = getOutputRoot() + analysisStep?.resultTablePath
+        val oldTable = ReadTableData().getTable(resFilePath, analysisStep?.commonResult?.headers)
+        WriteTableData().write(resFilePath, oldTable.copy(headers = newHeaders))
+        val resultType = getResultType(analysisStep?.analysis?.result?.type)
+        return getResultTablePath(
+            modifiesResult = true,
+            oldStep = analysisStep,
+            oldTablePath = analysisStep?.resultTablePath,
+            stepPath = analysisStep?.resultPath,
+            resultType = resultType
+        )
     }
 
     private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Header>? {
         return headers?.map { h ->
             val expInfo = experimentDetails?.get(h.experiment?.name)
-            val exp = h.experiment?.copy(name = expInfo?.name, group = expInfo?.group)
-            h.copy(experiment = exp)
+            val exp = h.experiment?.copy(name = expInfo?.name)
+            val headerName = if (exp != null) "${expInfo?.name}.${h.experiment?.field}" else h.name
+            h.copy(experiment = exp, name = headerName)
         }
     }
 

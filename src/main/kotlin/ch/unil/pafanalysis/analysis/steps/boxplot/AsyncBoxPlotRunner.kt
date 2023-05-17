@@ -44,8 +44,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
-        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol) }
-        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames)
+        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
+        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
 
         return BoxPlot(
             experimentNames = experimentNames,
@@ -54,9 +54,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
     }
 
-    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?, resType: String?, expNames: List<String>?): List<SelProtData>? {
+    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?, resType: String?, expNames: List<String>?, expDetails: Map<String, ExpInfo>?): List<SelProtData>? {
         if (params?.selProts == null) return null
-        val (headers, intMatrix) = readTableData.getDoubleMatrix(table, intCol)
+        val (headers, intMatrix) = readTableData.getDoubleMatrix(table, intCol, expDetails)
 
         val colOrder = expNames?.map{ n -> headers.indexOf(headers.find{it.experiment?.name == n}) }
         val orderById = colOrder?.withIndex()?.associate { (index, it) -> it to index }
@@ -90,9 +90,10 @@ class AsyncBoxPlotRunner() : CommonStep() {
         group: String?,
         params: BoxPlotParams?,
         table: Table?,
-        intCol: String?
+        intCol: String?,
+        expDetails: Map<String, ExpInfo>?
     ): BoxPlotGroupData {
-        val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, group)
+        val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails, group)
 
         val listOfBoxplots =
             headers.mapIndexed { i, h ->

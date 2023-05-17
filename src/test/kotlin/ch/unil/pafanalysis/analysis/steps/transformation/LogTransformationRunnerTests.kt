@@ -39,7 +39,7 @@ class LogTransformationRunnerTests {
     @Test
     fun log2Transformation() {
         val params = LogTransformationParams(transformationType = TransformationType.LOG2.value)
-        val ints = readTableData.getDoubleMatrix(table, "Intensity").second
+        val ints = readTableData.getDoubleMatrix(table, "Intensity", null).second
 
         val res = runner?.runTransformation(ints!!, params)
         val oneRes = BigDecimal(res!![0][0]).setScale(5, RoundingMode.HALF_EVEN)
@@ -49,7 +49,7 @@ class LogTransformationRunnerTests {
     @Test
     fun noneTransformation() {
         val params = LogTransformationParams(transformationType = TransformationType.NONE.value)
-        val ints = readTableData.getDoubleMatrix(table, "Intensity").second
+        val ints = readTableData.getDoubleMatrix(table, "Intensity", null).second
         val res = runner?.runTransformation(ints!!, params)
         val oneRes = res!![0][0]
         assert(oneRes == 16557000.0)

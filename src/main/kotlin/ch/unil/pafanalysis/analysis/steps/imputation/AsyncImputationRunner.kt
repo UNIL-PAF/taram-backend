@@ -42,7 +42,7 @@ class AsyncImputationRunner() : CommonStep() {
     ): Pair<Int?, String?> {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
         val (impInts, imputedRows) = imputationRunner!!.runImputation(ints, params)
 
         val newCols: List<List<Any>>? = table.cols?.mapIndexed { i, c ->

@@ -36,7 +36,7 @@ class TTestComputation {
             Triple(table, table?.headers, TTest(comparisions = emptyList()))
 
         val res: Triple<Table?, List<Header>?, TTest> = comparisions?.fold(initialRes) { acc, comp ->
-            computeComparision(comp, acc.first, field, acc.third, isLogVal, params)
+            computeComparision(comp, acc.first, field, acc.third, isLogVal, params, step?.columnInfo?.columnMapping?.experimentDetails)
         } ?: initialRes
 
         return res
@@ -50,10 +50,11 @@ class TTestComputation {
         field: String?,
         ttest: TTest,
         isLogVal: Boolean?,
-        params: TTestParams?
+        params: TTestParams?,
+        expDetails: Map<String, ExpInfo>?
     ): Triple<Table?, List<Header>?, TTest> {
         val ints: Pair<List<List<Double>>, List<List<Double>>> =
-            listOf(comp.group1, comp.group2).map { c -> readTableData.getDoubleMatrixByRow(table, field, c).second }.zipWithNext().single()
+            listOf(comp.group1, comp.group2).map { c -> readTableData.getDoubleMatrixByRow(table, field, expDetails, c).second }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
         val pVals = computeTTest(rowInts)
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null

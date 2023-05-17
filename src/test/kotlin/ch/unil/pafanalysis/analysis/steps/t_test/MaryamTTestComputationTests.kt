@@ -39,7 +39,7 @@ class MaryamTTestComputationTests {
         val resPath = "./src/test/resources/results/maxquant/Maryam/14448-50-517-19-602-04/"
         val filePath = "./src/test/resources/results/maxquant/Maryam/14448-50-517-19-602-04/Maryam_preprocessed.txt"
         val (mqMapping, commonRes) = colParser!!.parse(filePath, resPath, ResultType.MaxQuant)
-        val tableWithoutGroups = readTableData.getTable(filePath, commonRes.headers)
+        table = readTableData.getTable(filePath, commonRes.headers)
 
         val grp30 = listOf("14517", "14448", "14602")
         val grp30_e2 = listOf("14518", "14449", "14603")
@@ -47,17 +47,8 @@ class MaryamTTestComputationTests {
 
         val mqMappingWithGroups = mqMapping.copy(experimentDetails = mqMapping.experimentDetails?.mapValues { (k, v) ->
             if (grp30.contains(v.name)) v.copy(group = "GRP30")
-            else if (grp30_e2.contains(v.name)) v.copy(group = "GRP30_E2")
+            else if (grp30_e2.contains(v.name)) v.copy(group = "GRP30-E2")
             else v.copy(group = "NES")
-        })
-
-        table = tableWithoutGroups.copy(headers = tableWithoutGroups.headers?.map {
-            it.copy(
-                experiment = it.experiment?.copy(
-                    group = if (grp30.contains(it.experiment?.name)) "GRP30"
-                    else if (grp30_e2.contains(it.experiment?.name)) "GRP30-E2" else "NES"
-                )
-            )
         })
 
         colInfoWithoutGroups = ColumnInfo(columnMapping = mqMapping, columnMappingHash = null)

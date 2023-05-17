@@ -43,7 +43,7 @@ class WriteImputationTableDataTests {
         val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val filePath = resPath + "proteinGroups.txt"
         val table = readTableData.getTable(filePath, headers)
-        val (cols, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity")
+        val (cols, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity", null)
 
         assert(table!!.cols?.size == 219)
         assert(table!!.headers!!.isNotEmpty())

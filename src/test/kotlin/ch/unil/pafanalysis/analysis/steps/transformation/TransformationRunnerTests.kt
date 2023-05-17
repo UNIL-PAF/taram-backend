@@ -50,7 +50,7 @@ class TransformationRunnerTests {
         val filePath = resPath + "proteinGroups.txt"
         val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
         table = readTableData.getTable(filePath, commonRes.headers)
-        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity").second
+        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity", null).second
     }
 
     @Test
@@ -81,7 +81,7 @@ class TransformationRunnerTests {
         val res3 = imputation?.runImputation(res2!!, imputParams)?.first
         val oneRes = BigDecimal(res3!![0][22]).setScale(5, RoundingMode.HALF_EVEN).toDouble()
 
-        val selHeaders = readTableData.getDoubleMatrix(table, "LFQ.intensity").first
+        val selHeaders = readTableData.getDoubleMatrix(table, "LFQ.intensity", null).first
 
         val newCols: List<List<Any>>? = table?.cols?.mapIndexed{ i, c ->
             val selHeader = selHeaders.withIndex().find{ it.value.idx == i }

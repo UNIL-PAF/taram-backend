@@ -34,12 +34,13 @@ class AsyncSummaryStatRunner() : CommonStep() {
         step: AnalysisStep?,
         params: SummaryStatParams,
     ): SummaryStat? {
+        val expDetails = step?.columnInfo?.columnMapping?.experimentDetails
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        val (headers, ints) = readTableData.getDoubleMatrix(table, intCol)
+        val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails)
 
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getSummaryStat(ints, headers)
+        return summaryStatComp.getSummaryStat(ints, headers, expDetails)
     }
 
 }

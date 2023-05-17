@@ -32,17 +32,11 @@ class FixFilterRunnerTests {
         val resPath = "./src/test/resources/results/maxquant/Grepper-13695-710/"
         val filePath = resPath + "proteinGroups.txt"
         val (mqMapping, commonRes) = colParser!!.parse(filePath, resPath, ResultType.MaxQuant)
-        val tableWithoutGroups = readTableData.getTable(filePath, commonRes.headers)
+        table = readTableData.getTable(filePath, commonRes.headers)
 
         val mqMappingWithGroups = mqMapping.copy(experimentDetails = mqMapping.experimentDetails?.mapValues { (k, v) ->
             if (v.name?.contains("WT") == true) v.copy(group = "WT")
             else v.copy(group = "KO")
-        })
-
-        table = tableWithoutGroups.copy(headers = tableWithoutGroups.headers?.map {
-            it.copy(
-                experiment = it.experiment?.copy(group = if (it.experiment?.name?.contains("WT") == true) "WT" else "KO")
-            )
         })
 
         colInfoWithoutGroups = ColumnInfo(columnMapping = mqMapping, columnMappingHash = null)

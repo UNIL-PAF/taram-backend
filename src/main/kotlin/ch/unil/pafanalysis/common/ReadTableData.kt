@@ -102,15 +102,15 @@ class ReadTableData {
         return Table(headers, cols)
     }
 
-    fun getDoubleMatrix(table: Table?, field: String?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
-        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || it.experiment?.group == group)}
+    fun getDoubleMatrix(table: Table?, field: String?, expDetails: Map<String, ExpInfo>?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
+        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group)}
         if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
         if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
         return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
     }
 
-    fun getDoubleMatrixByRow(table: Table?, field: String?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
-        val matrix = getDoubleMatrix(table, field, group)
+    fun getDoubleMatrixByRow(table: Table?, field: String?, expDetails: Map<String, ExpInfo>?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
+        val matrix = getDoubleMatrix(table, field, expDetails, group)
         val initialList: List<List<Double>> = emptyList()
         val rowNr = matrix.second[0].size - 1
         val byRow = (0..rowNr).fold(initialList){ acc, i ->

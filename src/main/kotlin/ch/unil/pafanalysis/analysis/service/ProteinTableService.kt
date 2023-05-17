@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.ProteinGroup
 import ch.unil.pafanalysis.analysis.model.ProteinTable
 import ch.unil.pafanalysis.analysis.steps.CommonStep
@@ -22,11 +23,11 @@ class ProteinTableService {
     fun getProteinTable(step: AnalysisStep?, selProteins: List<String>?, resType: String?): ProteinTable {
         val table = readTable.getTable(commonStep?.getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val defaultInt = step?.columnInfo?.columnMapping?.intCol
-        val protTable = tableToProteinTable(table = table, resultType = step?.analysis?.result?.type, selProteins = selProteins, defaultInt = defaultInt, resType = resType)
+        val protTable = tableToProteinTable(table = table, resultType = step?.analysis?.result?.type, selProteins = selProteins, defaultInt = defaultInt, resType = resType, step?.columnInfo?.columnMapping?.experimentDetails)
         return protTable.copy(table = protTable.table?.sortedByDescending{ it.sel })
     }
 
-    private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?, defaultInt: String?, resType: String?): ProteinTable {
+    private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?, defaultInt: String?, resType: String?, expDetails: Map<String, ExpInfo>?): ProteinTable {
         val headerMap = HeaderMaps.getHeaderMap(resType)
 
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
@@ -36,7 +37,7 @@ class ProteinTableService {
         val ids: List<Int>? = if(resType == ResultType.MaxQuant.value){
             readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
         } else listOf(1..(prots?.size ?: 1)).flatten()
-        val colOrMeans = intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!).second.map{ it.average() }
+        val colOrMeans = intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!, expDetails).second.map{ it.average() }
         val fltInt = colOrMeans.filter{ !it.isNaN() }
         val sel = prots?.map{ selProteins?.contains(it) ?: false }
 

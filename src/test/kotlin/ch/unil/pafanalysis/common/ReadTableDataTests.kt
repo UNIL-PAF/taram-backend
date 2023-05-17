@@ -65,7 +65,7 @@ class ReadTableDataTests {
         val filePath = resPath + "proteinGroups.txt"
         val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
         val table = readTableData.getTable(filePath, commonRes.headers)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity")
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "LFQ.intensity", null)
 
         assert(ints?.size == 16)
         assert(selHeaders.size == 16)
@@ -81,7 +81,7 @@ class ReadTableDataTests {
         val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
         val table = readTableData.getTable(filePath, commonRes.headers)
 
-        val exception: Exception = assertThrows { readTableData.getDoubleMatrix(table, "blibla") }
+        val exception: Exception = assertThrows { readTableData.getDoubleMatrix(table, "blibla", null) }
         val expectedMessage = "No entries for [blibla] found."
         val actualMessage = exception.message
 
@@ -95,7 +95,7 @@ class ReadTableDataTests {
         val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
         val table = readTableData.getTable(filePath, commonRes.headers)
 
-        val exception: Exception = assertThrows { readTableData.getDoubleMatrix(table, "Identification.type") }
+        val exception: Exception = assertThrows { readTableData.getDoubleMatrix(table, "Identification.type", null) }
         val expectedMessage = "Entries for [Identification.type] are not numerical."
         val actualMessage = exception.message
 

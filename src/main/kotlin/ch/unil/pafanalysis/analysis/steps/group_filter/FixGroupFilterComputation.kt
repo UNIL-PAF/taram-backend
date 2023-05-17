@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.group_filter
 
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.common.Table
 import org.springframework.stereotype.Service
@@ -12,7 +13,9 @@ class FixGroupFilterComputation() {
         if (columnInfo?.columnMapping?.experimentDetails == null || columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw Exception(
             "Please specify your groups in the Analysis parameters."
         )
-        val validGroups = getValidGroups(table, params?.field ?: columnInfo?.columnMapping?.intCol, params?.zeroIsInvalid)
+        val field = params?.field ?: columnInfo?.columnMapping?.intCol
+        val expDetails = columnInfo?.columnMapping?.experimentDetails
+        val validGroups = getValidGroups(table, expDetails, field, params?.zeroIsInvalid)
 
         val validRows: List<Boolean>? = when (params?.filterInGroup) {
             FilterInGroup.ONE_GROUP.value -> checkOneGroup(validGroups, params?.minNrValid)
@@ -57,9 +60,9 @@ class FixGroupFilterComputation() {
         }
     }
 
-    private fun getValidGroups(table: Table?, field: String?, zeroIsInvalid: Boolean?): List<List<Int>>? {
+    private fun getValidGroups(table: Table?, expDetails: Map<String, ExpInfo>?, field: String?, zeroIsInvalid: Boolean?): List<List<Int>>? {
         val headerGroups: Map<String?, List<Header>>? =
-            table?.headers?.filter { it.experiment?.field == field }?.groupBy { it.experiment?.group }
+            table?.headers?.filter { it.experiment?.field == field }?.groupBy { expDetails?.get(it.experiment?.name)?.group }
 
         return headerGroups?.mapValues { it ->
             it.value.fold(emptyList<Int>()) { acc, el ->

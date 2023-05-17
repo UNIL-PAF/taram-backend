@@ -30,10 +30,10 @@ class SummaryStatTests {
         val filePath = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"
         val commonRes = colParser!!.parse(filePath, null, ResultType.Spectronaut).second
         val table = readTableData.getTable(filePath, commonRes.headers)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "Quantity")
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "Quantity", null)
         assert(ints.size == selHeaders.size)
 
-        val summary = SummaryStatComputation().getSummaryStat(ints, selHeaders)
+        val summary = SummaryStatComputation().getSummaryStat(ints, selHeaders, null)
         assert(summary.expNames?.size == 4)
 
         assert(summary?.expNames?.get(0) == "14650")
@@ -53,7 +53,7 @@ class SummaryStatTests {
         val filePath = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"
         val commonRes = colParser!!.parse(filePath, null, ResultType.Spectronaut).second
         val table = readTableData.getTable(filePath, commonRes.headers)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "Quantity")
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, "Quantity", null)
         assert(ints.size == selHeaders.size)
 
         val summary = SummaryStatComputation().getBasicSummaryStat(ints, selHeaders)

@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.scatter_plot
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
@@ -51,7 +52,7 @@ class AsyncScatterPlotRunner() : CommonStep() {
 
         // add colorByData
         val colData = if (!params.colorBy.isNullOrEmpty()) {
-            getColorData(params.colorBy, table)
+            getColorData(params.colorBy, table, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
         } else null
 
         val doLog = params.logTrans == true
@@ -84,12 +85,12 @@ class AsyncScatterPlotRunner() : CommonStep() {
         return if (a == null) a else log10(a)
     }
 
-    private fun getColorData(colorBy: String, table: Table?): List<Double?>? {
+    private fun getColorData(colorBy: String, table: Table?, expDetails: Map<String, ExpInfo>?): List<Double?>? {
         val isDirectVal: Header? = table?.headers?.find { h -> h.name == colorBy }
         return if (isDirectVal !== null) {
             readTableData.getDoubleColumn(table, colorBy)?.map { if (it.isNaN()) null else it }
         } else {
-            val matrix = readTableData.getDoubleMatrixByRow(table, colorBy)
+            val matrix = readTableData.getDoubleMatrixByRow(table, colorBy, expDetails)
             matrix.second.map { it.average() }
         }
     }

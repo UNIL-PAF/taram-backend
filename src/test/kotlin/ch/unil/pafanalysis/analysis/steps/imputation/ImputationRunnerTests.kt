@@ -19,7 +19,6 @@ class ImputationRunnerTests {
     @Autowired
     val colParser: ColumnMappingParser? = null
 
-
     private val readTableData = ReadTableData()
     private var ints: List< List<Double>>? = null
 
@@ -29,7 +28,7 @@ class ImputationRunnerTests {
         val filePath = resPath + "proteinGroups.txt"
         val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
         val table = readTableData.getTable(filePath, commonRes.headers)
-        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity").second
+        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity", null).second
     }
 
     @Test

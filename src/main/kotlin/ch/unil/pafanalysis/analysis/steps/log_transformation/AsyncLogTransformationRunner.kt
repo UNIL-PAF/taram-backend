@@ -48,7 +48,7 @@ class AsyncLogTransformationRunner() : CommonStep() {
     ): SummaryStat? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol)
+        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
 
         val transInts = logComp!!.runTransformation(ints, params)
         val newCols: List<List<Any>>? = table.cols?.mapIndexed { i, c ->

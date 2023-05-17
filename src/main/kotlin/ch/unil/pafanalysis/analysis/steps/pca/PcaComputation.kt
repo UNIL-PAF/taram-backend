@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.pca
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.ReadTableData
@@ -16,23 +17,23 @@ class PcaComputation {
 
     fun run(table: Table?, params: PcaParams?, step: AnalysisStep?): PcaRes {
         val field = params?.column ?: step?.columnInfo?.columnMapping?.intCol
-        val (headers, intTable) = readTableData.getDoubleMatrix(table, field)
+        val (headers, intTable) = readTableData.getDoubleMatrix(table, field, step?.columnInfo?.columnMapping?.experimentDetails)
         if(checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
         val (pcs, explVar) = rComputePc(intTable)
 
-        return createPcaRes(pcs, explVar, headers)
+        return createPcaRes(pcs, explVar, headers, step?.columnInfo?.columnMapping?.experimentDetails)
     }
 
     private fun checkIfMissingVals(intTable: List<List<Double>>?): Boolean {
         return intTable?.find { it.find{ it.isNaN()} == null } == null
     }
 
-    private fun createPcaRes(pcs: List<List<Double>>, explVar: List<Double>, headers: List<Header>): PcaRes {
+    private fun createPcaRes(pcs: List<List<Double>>, explVar: List<Double>, headers: List<Header>, expDetails: Map<String, ExpInfo>?): PcaRes {
         val groups: List<String> =
-            headers.filter { h -> h.experiment?.group != null }.map { it.experiment?.group!! }.distinct()
+            headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }.map { expDetails?.get(it.experiment?.name)?.group!! }.distinct()
         val pcList = pcs.mapIndexed { i, pc ->
             OnePcRow(
-                groupName = headers?.get(i).experiment?.group,
+                groupName = expDetails?.get(headers?.get(i).experiment?.name)?.group,
                 expName = headers?.get(i).experiment?.name,
                 pcVals = pc
             )

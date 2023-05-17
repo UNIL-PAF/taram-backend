@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.common
 
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import com.google.common.math.Quantiles
@@ -9,9 +10,9 @@ import kotlin.math.sign
 import kotlin.math.sqrt
 
 class SummaryStatComputation {
-    private fun addSummaryStat(h: Header, ints: List<Double>, old: SummaryStat): SummaryStat {
+    private fun addSummaryStat(h: Header, ints: List<Double>, old: SummaryStat, expDetails: Map<String, ExpInfo>?): SummaryStat {
         val expName = h.experiment?.name
-        val groupName = h.experiment?.group
+        val groupName = expDetails?.get(h.experiment?.name)?.group
         val nrValid = ints.filter { !it.isNaN() }.size
         val nrNaN = ints.filter { it.isNaN() }.size
         val fltInts = ints.filter { !it.isNaN() }
@@ -41,11 +42,11 @@ class SummaryStatComputation {
     }
 
 
-    fun getSummaryStat(intMatrix: List<List<Double>>, headers: List<Header>): SummaryStat {
+    fun getSummaryStat(intMatrix: List<List<Double>>, headers: List<Header>, expDetails: Map<String, ExpInfo>?): SummaryStat {
         val zipped = headers.zip(intMatrix)
         val summaryStat = zipped.fold(SummaryStat()) { acc, el ->
             val (h, ints) = el
-            addSummaryStat(h, ints, acc)
+            addSummaryStat(h, ints, acc, expDetails)
         }
         return summaryStat
     }

@@ -24,7 +24,6 @@ data class Header(
 data class Experiment(
     val name: String? = null,
     val field: String? = null,
-    val group: String? = null,
     val comp: GroupComp? = null
     )
 
