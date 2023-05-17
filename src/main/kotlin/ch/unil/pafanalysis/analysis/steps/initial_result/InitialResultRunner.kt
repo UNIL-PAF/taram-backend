@@ -117,16 +117,17 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
         columnInfoRepository?.saveAndFlush(newColumnInfo!!)
         val newCommonRes = analysisStep.commonResult?.copy(headers = newHeaders)
-        analysisStepRepository?.saveAndFlush(
-            analysisStep.copy(
-                status = AnalysisStepStatus.DONE.value,
-                commonResult = newCommonRes,
-                resultTableHash = newTableHash,
-                resultPath = newTablePath
-            )
+
+        val finalStep = analysisStep.copy(
+            status = AnalysisStepStatus.DONE.value,
+            commonResult = newCommonRes,
+            resultTableHash = newTableHash,
+            resultTablePath = newTablePath
         )
 
-        updateNextStep(analysisStep)
+        analysisStepRepository?.saveAndFlush(finalStep)
+
+        updateNextStep(finalStep)
         return runningStep!!
     }
 
