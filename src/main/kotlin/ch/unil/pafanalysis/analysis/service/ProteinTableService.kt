@@ -38,14 +38,15 @@ class ProteinTableService {
             readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
         } else listOf(1..(prots?.size ?: 1)).flatten()
         val colOrMeans = intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!, expDetails).second.map{ it.average() }
-        val fltInt = colOrMeans.filter{ !it.isNaN() }
+
         val sel = prots?.map{ selProteins?.contains(it) ?: false }
 
-        val proteinRows: List<ProteinGroup>? = fltInt?.mapIndexed { i, colOrMean ->
+        val proteinRows: List<ProteinGroup>? = colOrMeans?.mapIndexed { i, colOrMean ->
             ProteinGroup(ids?.get(i) ?: i, prots?.get(i), genes?.get(i), descs?.get(i), colOrMean, sel?.get(i))
         }
+        val fltRows = proteinRows?.filter{it.int?.isNaN() != true}
 
-        return ProteinTable(table = proteinRows, resultType = resultType, intField = defaultInt)
+        return ProteinTable(table = fltRows, resultType = resultType, intField = defaultInt)
     }
 
 }
