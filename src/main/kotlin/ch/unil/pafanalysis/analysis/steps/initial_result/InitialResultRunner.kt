@@ -11,17 +11,23 @@ import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
+import com.itextpdf.kernel.geom.PageSize
+import com.itextpdf.kernel.geom.Rectangle
 import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.awt.SystemColor.text
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
+import java.io.StringReader
 import java.sql.Timestamp
 import java.time.LocalDateTime
+
 
 @Service
 class InitialResultRunner() : CommonStep(), CommonRunner {
@@ -29,19 +35,16 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
+    @Autowired
+    private var initialResultPdf: InitialResultPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
 
     private val readTable = ReadTableData()
     private val writeTable = WriteTableData()
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val initialResult = gson.fromJson(step.results, InitialResult::class.java)
-        val nrResults = Paragraph().add(Text("Number of protein groups: ${initialResult.nrProteinGroups}"))
-        document?.add(title)
-        document?.add(nrResults)
-        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
-        return document
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
+        return initialResultPdf?.createPdf(step, document, pageSize, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

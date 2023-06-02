@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.pdf
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
@@ -29,10 +30,12 @@ class PdfService {
 
         val filePath = kotlin.io.path.createTempFile(suffix = ".pdf").toFile()
         val pdf = PdfDocument(PdfWriter(filePath))
-        val document: Document? = Document(pdf)
 
-        steps?.fold(document) { acc, el ->
-            commonStep?.getRunner(el.type)?.createPdf(el, acc, pdf)
+        val pageSize: PageSize = PageSize.A4
+        val document: Document? = Document(pdf, pageSize)
+
+        steps?.foldIndexed(document) { i, acc, el ->
+            commonStep?.getRunner(el.type)?.createPdf(el, acc, pdf, pageSize, i + 1)
         }
 
         document?.close()

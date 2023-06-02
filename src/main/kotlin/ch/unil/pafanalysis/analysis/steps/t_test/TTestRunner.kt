@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterParams
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -24,7 +25,7 @@ class TTestRunner() : CommonStep(), CommonRunner {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, TTestParams().javaClass) else TTestParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         //val params = gson.fromJson(step.parameters, FilterParams::class.java)
         document?.add(title)

@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.EchartsServer
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
@@ -32,14 +33,14 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, ScatterPlotParams().javaClass) else ScatterPlotParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, ScatterPlotParams::class.java)
         val selCol = Paragraph().add(Text("Selected x-axis: ${params?.xAxis}"))
 
         document?.add(title)
         document?.add(selCol)
-        val plot = echartsServer?.makeEchartsPlot(step, pdf)
+        val plot = echartsServer?.makeEchartsPlot(step, pdf, pageSize, document)
         document?.add(plot)
 
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))

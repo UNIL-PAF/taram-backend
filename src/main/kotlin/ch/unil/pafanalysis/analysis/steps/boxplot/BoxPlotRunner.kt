@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.EchartsServer
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -20,27 +21,17 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
     @Autowired
-    private var echartsServer: EchartsServer? = null
+    var asyncBoxplotRunner: AsyncBoxPlotRunner? = null
 
     @Autowired
-    var asyncBoxplotRunner: AsyncBoxPlotRunner? = null
+    var boxPlotPdf: BoxPlotPdf? = null
 
     fun getParameters(step: AnalysisStep?): BoxPlotParams {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, BoxPlotParams().javaClass) else BoxPlotParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val params = gson.fromJson(step.parameters, BoxPlotParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
-
-        document?.add(title)
-        document?.add(selCol)
-        val plot = echartsServer?.makeEchartsPlot(step, pdf)
-        document?.add(plot)
-        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
-
-        return document
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
+        return boxPlotPdf?.createPdf(step, document, pdf, pageSize, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

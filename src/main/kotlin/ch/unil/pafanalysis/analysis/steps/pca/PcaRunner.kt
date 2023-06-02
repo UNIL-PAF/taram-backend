@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.EchartsServer
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -29,14 +30,14 @@ class PcaRunner() : CommonStep(), CommonRunner {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, PcaParams().javaClass) else PcaParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, PcaParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
 
         document?.add(title)
         document?.add(selCol)
-        document?.add(echartsServer?.makeEchartsPlot(step, pdf))
+        document?.add(echartsServer?.makeEchartsPlot(step, pdf, pageSize, document))
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
 
         return document

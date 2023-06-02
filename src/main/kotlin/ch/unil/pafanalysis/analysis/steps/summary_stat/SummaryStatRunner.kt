@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
+import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
@@ -35,7 +36,7 @@ class SummaryStatRunner() : CommonStep(), CommonRunner {
         ) else SummaryStatParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument): Document? {
+    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
         val title = Paragraph().add(Text(step.type).setBold())
         val transParams = gson.fromJson(step.parameters, SummaryStatParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
