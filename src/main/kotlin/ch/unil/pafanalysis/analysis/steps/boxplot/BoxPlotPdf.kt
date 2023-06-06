@@ -25,7 +25,7 @@ class BoxPlotPdf() : PdfCommon() {
         document?.add(plot)
         if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
         document?.add(horizontalLineDiv())
-        
+
         return document
     }
 

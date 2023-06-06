@@ -45,7 +45,7 @@ open class PdfCommon {
 
         val text = Text(title)
         text.setBold()
-        text.setFontSize(16f)
+        text.setFontSize(14f)
         p.add(text)
 
         p.add(Tab())

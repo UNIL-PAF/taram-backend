@@ -19,6 +19,9 @@ class FilterRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncFilterRunner: AsyncFilterRunner? = null
 
+    @Autowired
+    var filterPdf: FilterPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.FILTER
 
     fun getParameters(step: AnalysisStep?): FilterParams {
@@ -29,10 +32,7 @@ class FilterRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        document?.add(title)
-        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
-        return document
+        return filterPdf?.createPdf(step, document, pageSize, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
