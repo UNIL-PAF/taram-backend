@@ -20,6 +20,9 @@ class LogTransformationRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncTransformationRunner: AsyncLogTransformationRunner? = null
 
+    @Autowired
+    private var logTransformationPdf: LogTransformationPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.LOG_TRANSFORMATION
 
     fun getParameters(step: AnalysisStep?): LogTransformationParams {
@@ -30,13 +33,7 @@ class LogTransformationRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val transParams = gson.fromJson(step.parameters, LogTransformationParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
-        document?.add(title)
-        document?.add(selCol)
-        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
-        return document
+       return logTransformationPdf?.createPdf(step, document, pageSize, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

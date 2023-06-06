@@ -45,7 +45,7 @@ class AsyncLogTransformationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         params: LogTransformationParams
-    ): SummaryStat? {
+    ): LogTransformation? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
@@ -61,7 +61,16 @@ class AsyncLogTransformationRunner() : CommonStep() {
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getBasicSummaryStat(transInts, selHeaders)
+        val stat = summaryStatComp.getBasicSummaryStat(transInts, selHeaders)
+        
+        return LogTransformation(
+            min = stat.min?.first(),
+            max = stat.max?.first(),
+            mean = stat.mean?.first(),
+            median = stat.median?.first(),
+            nrNans = stat.nrNaN?.first(),
+            sum = stat.sum?.first()
+        )
     }
 
 }
