@@ -20,6 +20,7 @@ class FilterPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
+        stepDiv.add(horizontalLineDiv())
         stepDiv.add(titleDiv("$stepNr - Filter rows", step.nrProteinGroups))
 
         val tableData: SortedMap<String, String?> = sortedMapOf(
@@ -29,7 +30,6 @@ class FilterPdf() : PdfCommon() {
         stepDiv.add(addTable(tableData))
 
         if(step.comments != null) stepDiv.add(commentDiv(step.comments))
-        stepDiv.add(horizontalLineDiv())
 
         document?.add(stepDiv)
         return document

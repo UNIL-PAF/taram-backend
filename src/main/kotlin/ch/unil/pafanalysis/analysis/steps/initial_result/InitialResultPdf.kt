@@ -15,6 +15,7 @@ class InitialResultPdf() : PdfCommon() {
     fun createPdf(step: AnalysisStep, document: Document?, pageSize: PageSize?, stepNr: Int): Document? {
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
 
+        document?.add(horizontalLineDiv())
         document?.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups))
 
         document?.add(addTabbedText("Selected intensity column:", step?.columnInfo?.columnMapping?.intCol))
@@ -22,7 +23,6 @@ class InitialResultPdf() : PdfCommon() {
         document?.add(addTabbedText("Software version:", initialResult.softwareVersion))
 
         if(step.comments != null) document?.add(commentDiv(step.comments))
-        document?.add(horizontalLineDiv())
         return document
     }
 
