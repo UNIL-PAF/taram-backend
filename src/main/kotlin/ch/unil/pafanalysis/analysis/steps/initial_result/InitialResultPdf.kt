@@ -16,13 +16,13 @@ class InitialResultPdf() : PdfCommon() {
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
 
         document?.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups))
-        document?.add(horizontalLineDiv())
 
         document?.add(addTabbedText("Selected intensity column:", step?.columnInfo?.columnMapping?.intCol))
         document?.add(addTabbedTextList("Fasta files:", initialResult.fastaFiles ?: emptyList()))
         document?.add(addTabbedText("Software version:", initialResult.softwareVersion))
 
         if(step.comments != null) document?.add(commentDiv(step.comments))
+        document?.add(horizontalLineDiv())
         return document
     }
 

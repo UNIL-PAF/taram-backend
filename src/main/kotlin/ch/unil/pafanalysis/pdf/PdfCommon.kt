@@ -1,20 +1,47 @@
 package ch.unil.pafanalysis.pdf
 
 import com.google.gson.Gson
+import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.colors.WebColors
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine
+import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TabAlignment
+import java.util.*
 
 
 open class PdfCommon {
 
     val gson = Gson()
 
+    private val fontSizeConst = 10f
+    private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
+
+    fun addTable(tableData: SortedMap<String, String?>): Div {
+
+        val div = Div()
+
+        val table = Table(2)
+        tableData.map{ (name, cont) ->
+            val cell1 = Cell().add(Paragraph(name).setBold().setFontSize(fontSizeConst));
+            cell1.setBorder(Border.NO_BORDER)
+            table.addCell(cell1)
+            val cell2= Cell().add(Paragraph(cont).setFontSize(fontSizeConst));
+            cell2.setBorder(Border.NO_BORDER)
+            table.addCell(cell2)
+
+        }
+
+        div.add(table)
+        return div
+    }
 
     fun titleDiv(title: String, nrProts: Int?): Div {
-        val p = Paragraph()
+        val p = Paragraph().setBackgroundColor(myGrayConst)
+        p.setPaddingLeft(10f)
 
         val text = Text(title)
         text.setBold()
@@ -22,7 +49,7 @@ open class PdfCommon {
         p.add(text)
 
         p.add(Tab())
-        p.addTabStops(TabStop(1000f, TabAlignment.RIGHT))
+        p.addTabStops(TabStop(500f, TabAlignment.RIGHT))
 
         val nrProtsText = Text("$nrProts protein groups")
         nrProtsText.setHorizontalAlignment(HorizontalAlignment.RIGHT)
