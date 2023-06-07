@@ -24,7 +24,6 @@ class LogTransformationPdf() : PdfCommon() {
         stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val colTable = Table(2)
-
         colTable.setWidth(plotWidth)
 
         val tableData: List<Pair<String, Paragraph?>> = listOf(
@@ -37,6 +36,7 @@ class LogTransformationPdf() : PdfCommon() {
         )
 
         val leftCell = Cell().add(addTwoRowTable(tableData))
+        leftCell.setWidth(plotWidth/2)
         leftCell.setBorder(Border.NO_BORDER)
         colTable.addCell(leftCell)
 

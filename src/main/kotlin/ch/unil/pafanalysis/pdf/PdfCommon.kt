@@ -102,7 +102,7 @@ open class PdfCommon {
     fun parametersDiv(parameters: List<Paragraph>): Div {
         val div = Div()
         div.setPaddingLeft(5f)
-        div.setBackgroundColor(myGrayConst)
+        //div.setBackgroundColor(myGrayConst)
         val title = Paragraph("Parameters:").setFontSize(fontSizeConst-1f).setBold()
         div.add(title)
 
