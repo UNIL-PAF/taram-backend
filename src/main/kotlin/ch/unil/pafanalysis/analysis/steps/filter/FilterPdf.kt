@@ -17,11 +17,11 @@ class FilterPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, Filter::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(horizontalLineDiv(plotWidth))
         stepDiv.add(titleDiv("$stepNr - Filter rows", step.nrProteinGroups, step.tableNr, plotWidth))
 
         val colTable = Table(2)
-        colTable.setWidth(plotWidth)
+        val tableMargin = 5f
+        colTable.setWidth(plotWidth - tableMargin)
 
         val tableData: List<Pair<String, Paragraph?>> = listOf(
             "Rows removed" to Paragraph(res.nrRowsRemoved.toString())
@@ -36,10 +36,10 @@ class FilterPdf() : PdfCommon() {
         val rightCell = Cell().add(params)
         rightCell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
         colTable.addCell(rightCell)
+        colTable.setMarginRight(tableMargin)
+        colTable.setMarginBottom(tableMargin)
 
         stepDiv.add(colTable)
-
-        if(step.comments != null) stepDiv.add(commentDiv(step.comments))
         return stepDiv
     }
 
