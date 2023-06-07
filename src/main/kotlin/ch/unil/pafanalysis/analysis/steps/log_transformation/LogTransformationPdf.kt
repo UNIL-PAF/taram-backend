@@ -23,19 +23,19 @@ class LogTransformationPdf() : PdfCommon() {
         val plotWidth = getPlotWidth(pageSize, document)
 
         stepDiv.add(horizontalLineDiv())
-        stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val colTable = Table(2)
 
         colTable.setWidth(plotWidth)
 
         val tableData: SortedMap<String, String?> = sortedMapOf(
-            "Min:" to String.format("%.2f", res.min),
-            "Max:" to String.format("%.2f", res.max),
-            "Mean:" to String.format("%.2f", res.mean),
-            "Median:" to String.format("%.2f", res.median),
-            "Sum:" to String.format("%.2f", res.sum),
-            "Nr of NaN:" to res.nrNans?.toString()
+            "Min" to String.format("%.2f", res.min),
+            "Max" to String.format("%.2f", res.max),
+            "Mean" to String.format("%.2f", res.mean),
+            "Median" to String.format("%.2f", res.median),
+            "Sum" to String.format("%.2f", res.sum),
+            "Nr of NaN" to res.nrNans?.toString()
         )
 
         val leftCell = Cell().add(addTable(tableData))

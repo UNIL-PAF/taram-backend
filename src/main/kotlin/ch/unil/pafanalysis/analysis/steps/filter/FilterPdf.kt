@@ -20,8 +20,10 @@ class FilterPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
+        val plotWidth = getPlotWidth(pageSize, document)
+
         stepDiv.add(horizontalLineDiv())
-        stepDiv.add(titleDiv("$stepNr - Filter rows", step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr - Filter rows", step.nrProteinGroups, step.tableNr, plotWidth))
 
         val tableData: SortedMap<String, String?> = sortedMapOf(
             "Rows removed" to res.nrRowsRemoved.toString()

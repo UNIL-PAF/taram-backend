@@ -16,7 +16,8 @@ class InitialResultPdf() : PdfCommon() {
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
 
         document?.add(horizontalLineDiv())
-        document?.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups))
+        val plotWidth = getPlotWidth(pageSize, document)
+        document?.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups, step.tableNr, plotWidth))
 
         document?.add(addTabbedText("Selected intensity column:", step?.columnInfo?.columnMapping?.intCol))
         document?.add(addTabbedTextList("Fasta files:", initialResult.fastaFiles ?: emptyList()))

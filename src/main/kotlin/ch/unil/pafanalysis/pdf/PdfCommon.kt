@@ -12,6 +12,7 @@ import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TabAlignment
+import com.itextpdf.layout.properties.TextAlignment
 import java.util.*
 
 
@@ -45,24 +46,43 @@ open class PdfCommon {
         return div
     }
 
-    fun titleDiv(title: String, nrProts: Int?, plotWidth: Float? = 500f): Div {
-        val paddingLeft = 10f
+    fun titleDiv(title: String, nrProts: Int?, tableNr: Int?, plotWidth: Float? = 500f): Div {
+        val titlePadding = 5f
 
         val p = Paragraph().setBackgroundColor(myGrayConst)
-        p.setPaddingLeft(paddingLeft)
+        p.setPaddingLeft(titlePadding)
 
-        val text = Text("Step $title")
+        val t = Table(3)
+        t.setWidth(plotWidth?.minus(titlePadding) ?: 500f)
+
+        val text = Paragraph(Text(title))
         text.setBold()
         text.setFontSize(12f)
-        p.add(text)
+        val colLeft = Cell()
+        colLeft.setWidth(170f)
+        colLeft.setTextAlignment(TextAlignment.LEFT)
+        colLeft.setBorder(Border.NO_BORDER)
+        colLeft.add(text)
+        t.addCell(colLeft)
 
-        p.add(Tab())
-        p.addTabStops(TabStop(plotWidth?.minus(paddingLeft) ?: 500f, TabAlignment.RIGHT))
-
+        val colCenter = Cell()
+        colCenter .setWidth(170f)
+        colCenter.setTextAlignment(TextAlignment.CENTER)
+        colCenter.setBorder(Border.NO_BORDER)
         val nrProtsText = Text("$nrProts protein groups")
         nrProtsText.setFontSize(fontSizeConst)
-        nrProtsText.setHorizontalAlignment(HorizontalAlignment.RIGHT)
-        p.add(nrProtsText)
+        colCenter.add(Paragraph(nrProtsText))
+        t.addCell(colCenter)
+
+        val colRight = Cell().setTextAlignment(TextAlignment.RIGHT)
+        colRight.setTextAlignment(TextAlignment.RIGHT)
+        colRight.setBorder(Border.NO_BORDER)
+        colRight.setPaddingRight(titlePadding)
+
+        if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setItalic()))
+        t.addCell(colRight)
+
+        p.add(t)
 
         val div = Div()
         div.add(p)
@@ -105,7 +125,7 @@ open class PdfCommon {
     }
 
     fun horizontalLineDiv(): Div {
-        val line = SolidLine(1f)
+        val line = SolidLine(2f)
         line.setColor(ColorConstants.LIGHT_GRAY)
         val ls = LineSeparator(line)
         ls.setWidth(520f)

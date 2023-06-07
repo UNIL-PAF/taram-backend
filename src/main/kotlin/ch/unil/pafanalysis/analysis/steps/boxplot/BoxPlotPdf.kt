@@ -20,7 +20,8 @@ class BoxPlotPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
         document?.add(horizontalLineDiv())
-        document?.add(titleDiv("$stepNr - Boxplot", step?.nrProteinGroups))
+        val plotWidth = getPlotWidth(pageSize, document)
+        document?.add(titleDiv("$stepNr - Boxplot", step?.nrProteinGroups, null, plotWidth))
         document?.add(Paragraph(" "))
         val plot = echartsServer?.makeEchartsPlot(step, pdf, pageSize, document)
         document?.add(plot)
