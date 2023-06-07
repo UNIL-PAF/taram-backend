@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.geom.PageSize
+import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
@@ -16,12 +17,11 @@ import java.util.*
 @Service
 class LogTransformationPdf() : PdfCommon() {
 
-    fun createPdf(step: AnalysisStep, document: Document?, pageSize: PageSize?, stepNr: Int): Document? {
+    fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
         val res = gson.fromJson(step.results, LogTransformation::class.java)
         val parsedParams = gson.fromJson(step.parameters, LogTransformationParams::class.java)
 
         val stepDiv = Div()
-        val plotWidth = getPlotWidth(pageSize, document)
 
         stepDiv.add(horizontalLineDiv())
         stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
@@ -51,9 +51,7 @@ class LogTransformationPdf() : PdfCommon() {
         stepDiv.add(colTable)
 
         if(step.comments != null) stepDiv.add(commentDiv(step.comments))
-
-        document?.add(stepDiv)
-        return document
+        return stepDiv
     }
 
 }

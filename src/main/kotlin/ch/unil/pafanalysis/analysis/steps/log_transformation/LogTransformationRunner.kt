@@ -4,11 +4,8 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.element.Text
+import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -32,8 +29,8 @@ class LogTransformationRunner() : CommonStep(), CommonRunner {
         ) else LogTransformationParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
-       return logTransformationPdf?.createPdf(step, document, pageSize, stepNr)
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
+       return logTransformationPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

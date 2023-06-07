@@ -9,6 +9,7 @@ import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,8 +31,8 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, BoxPlotParams().javaClass) else BoxPlotParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
-        return boxPlotPdf?.createPdf(step, document, pdf, pageSize, stepNr)
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
+        return boxPlotPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

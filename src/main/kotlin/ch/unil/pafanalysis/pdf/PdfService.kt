@@ -34,8 +34,12 @@ class PdfService {
         val pageSize: PageSize = PageSize.A4
         val document: Document? = Document(pdf, pageSize)
 
-        steps?.foldIndexed(document) { i, acc, el ->
-            commonStep?.getRunner(el.type)?.createPdf(el, acc, pdf, pageSize, i + 1)
+        val plotWidth: Float = pageSize?.width?.minus(document?.rightMargin?: 0f)?.minus(document?.leftMargin?: 0f)
+
+        steps?.forEachIndexed { i, step ->
+            val div = commonStep?.getRunner(step.type)?.createPdf(step, pdf, plotWidth, i + 1)
+            div?.isKeepTogether = true
+            document?.add(div)
         }
 
         document?.close()

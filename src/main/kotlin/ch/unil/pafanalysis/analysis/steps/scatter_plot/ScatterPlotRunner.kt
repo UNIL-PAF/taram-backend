@@ -11,6 +11,7 @@ import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
@@ -33,19 +34,20 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, ScatterPlotParams().javaClass) else ScatterPlotParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, ScatterPlotParams::class.java)
         val selCol = Paragraph().add(Text("Selected x-axis: ${params?.xAxis}"))
 
-        document?.add(title)
-        document?.add(selCol)
-        val plot = echartsServer?.makeEchartsPlot(step, pdf, pageSize, document)
-        document?.add(plot)
+        val div = Div()
+        div.add(title)
+        div.add(selCol)
+        val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
+        div.add(plot)
 
-        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
+        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
 
-        return document
+        return div
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

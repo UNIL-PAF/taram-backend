@@ -9,6 +9,7 @@ import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,17 +31,17 @@ class PcaRunner() : CommonStep(), CommonRunner {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, PcaParams().javaClass) else PcaParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
         val title = Paragraph().add(Text(step.type).setBold())
         val params = gson.fromJson(step.parameters, PcaParams::class.java)
         val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
-
-        document?.add(title)
-        document?.add(selCol)
-        document?.add(echartsServer?.makeEchartsPlot(step, pdf, pageSize, document))
-        if (step.comments !== null) document?.add(Paragraph().add(Text(step.comments)))
-
-        return document
+        val div = Div()
+        div.add(title)
+        div.add(selCol)
+        div.add(echartsServer?.makeEchartsPlot(step, pdf, plotWidth))
+        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
+        div.setKeepTogether(true)
+        return div
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

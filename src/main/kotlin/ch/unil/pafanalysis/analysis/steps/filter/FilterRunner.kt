@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,8 +32,8 @@ class FilterRunner() : CommonStep(), CommonRunner {
         ) else FilterParams()
     }
 
-    override fun createPdf(step: AnalysisStep, document: Document?, pdf: PdfDocument, pageSize: PageSize?, stepNr: Int): Document? {
-        return filterPdf?.createPdf(step, document, pageSize, stepNr)
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, pageWidth: Float, stepNr: Int): Div? {
+        return filterPdf?.createPdf(step, pdf, pageWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

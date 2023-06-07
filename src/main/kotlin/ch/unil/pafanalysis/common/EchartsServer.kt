@@ -10,10 +10,17 @@ import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
+import com.itextpdf.layout.font.FontProvider
+import com.itextpdf.svg.converter.SvgConverter
+import com.itextpdf.svg.processors.ISvgConverterProperties
+import com.itextpdf.svg.processors.impl.SvgConverterProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import java.awt.GraphicsEnvironment
+import java.io.File
+import java.io.FileInputStream
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -29,7 +36,7 @@ class EchartsServer {
 
     val gson = Gson()
 
-    fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument, pageSize: PageSize?, document: Document?): Image? {
+    fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float): Image? {
         val results = gson.fromJson(step.results, BoxPlot::class.java)
         val echartsPlot = results.plot?.copy(outputPath = step.resultPath)
 
@@ -46,15 +53,13 @@ class EchartsServer {
 
         if(response.statusCode() != HttpStatus.OK.value()) throw Exception("Could not generate eCharts pdf graph: " + response.body())
 
-        val effectivePageSize: Rectangle? = document?.getPageEffectiveArea(pageSize)
-
         val pdfPath: String = env?.getProperty("output.path") + response.body()
         val sourcePdf = PdfDocument(PdfReader(pdfPath))
         val pdfPlot = sourcePdf.getPage(1)
         val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
         sourcePdf.close()
         val img = Image(pdfPlotCopy)
-        return if(effectivePageSize != null) img.scaleToFit(effectivePageSize.width, effectivePageSize.height) else img
+        return img.scaleToFit(plotWidth, 300f)
     }
 
     fun getSvgPlot(step: AnalysisStep?, svgPath: String): String? {

@@ -8,12 +8,8 @@ import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
-import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
-import com.itextpdf.layout.properties.HorizontalAlignment
-import com.itextpdf.layout.properties.TabAlignment
 import com.itextpdf.layout.properties.TextAlignment
-import java.util.*
 
 
 open class PdfCommon {
@@ -22,10 +18,6 @@ open class PdfCommon {
 
     private val fontSizeConst = 10f
     private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
-
-    fun getPlotWidth(pageSize: PageSize?, document: Document?): Float {
-        return pageSize?.width?.minus(document?.rightMargin?: 0f)?.minus(document?.leftMargin?: 0f) ?: 10f
-    }
 
     fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
         val div = Div()
@@ -44,14 +36,14 @@ open class PdfCommon {
         return div
     }
 
-    fun titleDiv(title: String, nrProts: Int?, tableNr: Int?, plotWidth: Float? = 500f): Div {
+    fun titleDiv(title: String, nrProts: Int?, tableNr: Int?, plotWidth: Float): Div {
         val titlePadding = 5f
 
         val p = Paragraph().setBackgroundColor(myGrayConst)
         p.setPaddingLeft(titlePadding)
 
         val t = Table(3)
-        t.setWidth(plotWidth?.minus(titlePadding) ?: 500f)
+        t.setWidth(plotWidth?.minus(titlePadding))
 
         val text = Paragraph(Text(title))
         text.setBold()
