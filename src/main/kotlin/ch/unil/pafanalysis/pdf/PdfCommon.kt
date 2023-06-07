@@ -90,6 +90,7 @@ open class PdfCommon {
     fun commentDiv(comment: String): Div {
         val p1 = Paragraph(comment)
         p1.setBackgroundColor(ColorConstants.YELLOW)
+        p1.setFontSize(fontSizeConst)
         val div = Div()
         div.add(p1)
         return div
