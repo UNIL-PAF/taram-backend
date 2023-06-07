@@ -16,7 +16,6 @@ class InitialResultPdf() : PdfCommon() {
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
 
         val div = Div()
-        div.add(horizontalLineDiv(plotWidth))
         div.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups, step.tableNr, plotWidth))
 
         val fastaFileParagraph = Paragraph()
@@ -29,8 +28,6 @@ class InitialResultPdf() : PdfCommon() {
         )
 
         div.add(addTwoRowTable(tableData))
-
-        if(step.comments != null) div.add(commentDiv(step.comments))
         return div
     }
 
