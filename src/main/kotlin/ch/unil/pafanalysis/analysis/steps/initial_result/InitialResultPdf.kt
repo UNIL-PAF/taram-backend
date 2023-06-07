@@ -3,9 +3,10 @@ package ch.unil.pafanalysis.analysis.steps.initial_result
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.element.*
+import com.itextpdf.layout.element.Div
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
-import java.util.*
 
 
 @Service
@@ -15,7 +16,7 @@ class InitialResultPdf() : PdfCommon() {
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
 
         val div = Div()
-        div.add(horizontalLineDiv())
+        div.add(horizontalLineDiv(plotWidth))
         div.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups, step.tableNr, plotWidth))
 
         val fastaFileParagraph = Paragraph()

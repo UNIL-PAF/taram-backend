@@ -88,11 +88,11 @@ open class PdfCommon {
         return div
     }
 
-    fun horizontalLineDiv(): Div {
+    fun horizontalLineDiv(plotWidth: Float): Div {
         val line = SolidLine(2f)
         line.setColor(ColorConstants.LIGHT_GRAY)
         val ls = LineSeparator(line)
-        ls.setWidth(520f)
+        ls.setWidth(plotWidth)
         ls.setMarginTop(5f)
         val div = Div()
         div.add(ls)

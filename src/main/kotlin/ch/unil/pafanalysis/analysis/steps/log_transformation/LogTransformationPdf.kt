@@ -2,16 +2,13 @@ package ch.unil.pafanalysis.analysis.steps.log_transformation
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.pdf.PdfCommon
-import com.itextpdf.kernel.colors.ColorConstants
-import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
-import com.itextpdf.layout.borders.SolidBorder
-import com.itextpdf.layout.element.*
-import com.itextpdf.layout.properties.UnitValue
+import com.itextpdf.layout.element.Cell
+import com.itextpdf.layout.element.Div
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Table
 import org.springframework.stereotype.Service
-import java.util.*
 
 
 @Service
@@ -23,7 +20,7 @@ class LogTransformationPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
-        stepDiv.add(horizontalLineDiv())
+        stepDiv.add(horizontalLineDiv(plotWidth))
         stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val colTable = Table(2)
