@@ -45,7 +45,6 @@ class PdfService {
             if(step.comments != null) div?.add(commentDiv(step.comments))
             div?.setMarginBottom(20f)
             div?.isKeepTogether = true
-            //div?.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
             document?.add(div)
         }
 

@@ -28,6 +28,9 @@ class SummaryStatRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncRunner: AsyncSummaryStatRunner? = null
 
+    @Autowired
+    var summaryStatPdf: SummaryStatPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.SUMMARY_STAT
 
     fun getParameters(step: AnalysisStep?): SummaryStatParams {
@@ -37,15 +40,8 @@ class SummaryStatRunner() : CommonStep(), CommonRunner {
         ) else SummaryStatParams()
     }
 
-    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val transParams = gson.fromJson(step.parameters, SummaryStatParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
-        val div = Div()
-        div.add(title)
-        div.add(selCol)
-        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
-        return div
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
+        return summaryStatPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
