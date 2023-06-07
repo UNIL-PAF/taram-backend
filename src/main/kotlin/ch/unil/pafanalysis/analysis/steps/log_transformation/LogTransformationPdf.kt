@@ -29,19 +29,18 @@ class LogTransformationPdf() : PdfCommon() {
 
         colTable.setWidth(plotWidth)
 
-        val tableData: SortedMap<String, String?> = sortedMapOf(
-            "Min" to String.format("%.2f", res.min),
-            "Max" to String.format("%.2f", res.max),
-            "Mean" to String.format("%.2f", res.mean),
-            "Median" to String.format("%.2f", res.median),
-            "Sum" to String.format("%.2f", res.sum),
-            "Nr of NaN" to res.nrNans?.toString()
+        val tableData: List<Pair<String, Paragraph?>> = listOf(
+            "Min" to Paragraph(String.format("%.2f", res.min)),
+            "Max" to Paragraph(String.format("%.2f", res.max)),
+            "Mean" to Paragraph(String.format("%.2f", res.mean)),
+            "Median" to Paragraph(String.format("%.2f", res.median)),
+            "Sum" to Paragraph(String.format("%.2f", res.sum)),
+            "Nr of NaN" to Paragraph(res.nrNans?.toString())
         )
 
-        val leftCell = Cell().add(addTable(tableData))
+        val leftCell = Cell().add(addTwoRowTable(tableData))
         leftCell.setBorder(Border.NO_BORDER)
         colTable.addCell(leftCell)
-
 
         val params = parametersDiv(listOf("aésldfjkasdél élasdj fdsj"))
         val rightCell = Cell().add(params)

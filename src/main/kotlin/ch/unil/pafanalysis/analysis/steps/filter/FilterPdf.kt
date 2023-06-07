@@ -25,11 +25,11 @@ class FilterPdf() : PdfCommon() {
         stepDiv.add(horizontalLineDiv())
         stepDiv.add(titleDiv("$stepNr - Filter rows", step.nrProteinGroups, step.tableNr, plotWidth))
 
-        val tableData: SortedMap<String, String?> = sortedMapOf(
-            "Rows removed" to res.nrRowsRemoved.toString()
+        val tableData: List<Pair<String, Paragraph?>> = listOf(
+            "Rows removed" to Paragraph(res.nrRowsRemoved.toString())
         )
 
-        stepDiv.add(addTable(tableData))
+        stepDiv.add(addTwoRowTable(tableData))
 
         if(step.comments != null) stepDiv.add(commentDiv(step.comments))
 

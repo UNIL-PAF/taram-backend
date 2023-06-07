@@ -27,8 +27,7 @@ open class PdfCommon {
         return pageSize?.width?.minus(document?.rightMargin?: 0f)?.minus(document?.leftMargin?: 0f) ?: 10f
     }
 
-    fun addTable(tableData: SortedMap<String, String?>): Div {
-
+    fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
         val div = Div()
 
         val table = Table(2)
@@ -36,10 +35,9 @@ open class PdfCommon {
             val cell1 = Cell().add(Paragraph(name).setBold().setFontSize(fontSizeConst-1f));
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
-            val cell2= Cell().add(Paragraph(cont).setFontSize(fontSizeConst));
+            val cell2= Cell().add(cont?.setFontSize(fontSizeConst));
             cell2.setBorder(Border.NO_BORDER)
             table.addCell(cell2)
-
         }
 
         div.add(table)
@@ -88,33 +86,6 @@ open class PdfCommon {
         div.add(p)
         return div
     }
-
-    fun addTabbedText(text1: String, text2: String?): Div {
-        val p = Paragraph()
-        p.add(Text(text1).setBold())
-        p.add(Tab())
-        p.add(Text(text2))
-        val div = Div()
-        div.add(p)
-
-        return div
-    }
-
-    fun addTabbedTextList(text1: String, text2: List<String?>): Div {
-        val p = Paragraph()
-        p.add(Text(text1).setBold())
-        text2?.forEach {
-            p.add(Text("\n"))
-            p.add(Tab())
-            p.add(Text(it))
-        }
-
-        val div = Div()
-        div.add(p)
-
-        return div
-    }
-
 
     fun commentDiv(comment: String): Div {
         val p1 = Paragraph(comment)

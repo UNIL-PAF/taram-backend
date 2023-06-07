@@ -7,6 +7,7 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.UnitValue
 import org.springframework.stereotype.Service
+import java.util.*
 
 
 @Service
@@ -19,9 +20,16 @@ class InitialResultPdf() : PdfCommon() {
         val plotWidth = getPlotWidth(pageSize, document)
         document?.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups, step.tableNr, plotWidth))
 
-        document?.add(addTabbedText("Selected intensity column:", step?.columnInfo?.columnMapping?.intCol))
-        document?.add(addTabbedTextList("Fasta files:", initialResult.fastaFiles ?: emptyList()))
-        document?.add(addTabbedText("Software version:", initialResult.softwareVersion))
+        val fastaFileParagraph = Paragraph()
+        initialResult.fastaFiles?.forEach{ fastaFileParagraph.add(Text(it + "\n")) }
+
+        val tableData: List<Pair<String, Paragraph?>> = listOf(
+            "Selected intensity column" to Paragraph(step?.columnInfo?.columnMapping?.intCol),
+            "Fasta files" to fastaFileParagraph,
+            "Software version" to Paragraph( initialResult.softwareVersion),
+        )
+
+        document?.add(addTwoRowTable(tableData))
 
         if(step.comments != null) document?.add(commentDiv(step.comments))
         return document
