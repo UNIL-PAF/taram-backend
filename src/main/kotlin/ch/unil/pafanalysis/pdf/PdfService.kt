@@ -43,9 +43,9 @@ class PdfService {
         steps?.forEachIndexed { i, step ->
             val div = commonStep?.getRunner(step.type)?.createPdf(step, pdf, plotWidth, i + 1)
             if(step.comments != null) div?.add(commentDiv(step.comments))
-            div?.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+            div?.setMarginBottom(20f)
             div?.isKeepTogether = true
-            div?.setMarginBottom(3f)
+            //div?.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
             document?.add(div)
         }
 
