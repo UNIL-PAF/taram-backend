@@ -18,6 +18,7 @@ class LogTransformationPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, document: Document?, pageSize: PageSize?, stepNr: Int): Document? {
         val res = gson.fromJson(step.results, LogTransformation::class.java)
+        val parsedParams = gson.fromJson(step.parameters, LogTransformationParams::class.java)
 
         val stepDiv = Div()
         val plotWidth = getPlotWidth(pageSize, document)
@@ -42,7 +43,7 @@ class LogTransformationPdf() : PdfCommon() {
         leftCell.setBorder(Border.NO_BORDER)
         colTable.addCell(leftCell)
 
-        val params = parametersDiv(listOf("aésldfjkasdél élasdj fdsj"))
+        val params = parametersDiv(listOf(Paragraph(parsedParams.transformationType + " transformation.")))
         val rightCell = Cell().add(params)
         rightCell.setBorder(Border.NO_BORDER)
         colTable.addCell(rightCell)
