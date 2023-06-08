@@ -27,13 +27,13 @@ class SummaryStatPdf() : PdfCommon() {
 
         stepDiv.add(titleDiv("$stepNr - Summary", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
-        val nrEntries = res.min?.size?.plus(1)
+        val nrEntries = res.min?.size
 
         if(nrEntries != null){
 
-            val maxRows = 10
+            val maxRows = 8
             val nrTables = nrEntries/maxRows
-            val lastTableSize = Math.floorMod(nrEntries, maxRows)
+            val lastTableSize = nrEntries.mod(maxRows)
 
             val tables: List<Table> = (1..nrTables).map{
                 val start = it * maxRows - maxRows
@@ -48,7 +48,7 @@ class SummaryStatPdf() : PdfCommon() {
 
             if(lastTableSize > 0){
                 val start = nrTables * maxRows
-                val end = start + lastTableSize -1
+                val end = start + lastTableSize
                 val lastTable = createTable(res, start, end, plotWidth)
                 stepDiv.add(lastTable)
             }
@@ -69,6 +69,8 @@ class SummaryStatPdf() : PdfCommon() {
         addDoubleRow("Std dev", res.stdDev, start, end, table)
         addDoubleRow("Std err", res.stdErr, start, end, table)
         addDoubleRow("Coef of var", res.coefOfVar, start, end, table)
+        addIntRow("Nr of valid", res.nrValid, start, end, table)
+        addIntRow("Nr of NaN", res.nrNaN, start, end, table)
         return table
     }
 
@@ -92,6 +94,14 @@ class SummaryStatPdf() : PdfCommon() {
 
         data?.subList(start, end)?.forEach{ a ->
             addStringCell(a, colTable)
+        }
+    }
+
+    private fun addIntRow(rowName: String, data: List<Int>?, start: Int, end: Int, colTable: Table){
+        addFirstCol(rowName, colTable)
+
+        data?.subList(start, end)?.forEach{ a ->
+            addStringCell(a.toString(), colTable)
         }
     }
 
