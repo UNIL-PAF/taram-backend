@@ -24,7 +24,7 @@ open class PdfCommon {
 
         val table = Table(2)
         tableData.map{ (name, cont) ->
-            val cell1 = Cell().add(Paragraph(name).setBold().setFontSize(fontSizeConst-1f));
+            val cell1 = Cell().add(Paragraph(name).setBold().setFontSize(fontSizeConst));
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
             val cell2= Cell().add(cont?.setFontSize(fontSizeConst));
@@ -68,7 +68,7 @@ open class PdfCommon {
         colRight.setTextAlignment(TextAlignment.RIGHT)
         colRight.setBorder(Border.NO_BORDER)
         colRight.setPaddingRight(titlePadding)
-        if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setItalic().setFontSize(10f)))
+        if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setFontSize(fontSizeConst)))
         t.addCell(colRight)
 
         p.add(t)
@@ -102,7 +102,7 @@ open class PdfCommon {
         val div = Div()
         div.setPaddingLeft(5f)
         //div.setBackgroundColor(myGrayConst)
-        val title = Paragraph("Parameters:").setFontSize(fontSizeConst-1f).setBold()
+        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setBold()
         div.add(title)
 
         parameters.forEach{ param ->
