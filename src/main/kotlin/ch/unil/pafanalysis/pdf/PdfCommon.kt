@@ -68,8 +68,7 @@ open class PdfCommon {
         colRight.setTextAlignment(TextAlignment.RIGHT)
         colRight.setBorder(Border.NO_BORDER)
         colRight.setPaddingRight(titlePadding)
-
-        if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setItalic()))
+        if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setItalic().setFontSize(10f)))
         t.addCell(colRight)
 
         p.add(t)
