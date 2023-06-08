@@ -77,13 +77,10 @@ class PdfService {
 
         val infoTable = Table(2).setPaddingLeft(5f)
 
-        if(analysis?.name != null){
-            addInfoCell("Analysis", analysis?.name, infoTable)
-        }
+        addInfoCell("Description", result?.description ?: "", infoTable)
 
-        if(result?.description != null){
-            addInfoCell("Description", result?.description, infoTable)
-        }
+        val analysisName = if(analysis?.name != null) analysis.name else if(analysis?.idx != null) "#${analysis.idx}" else ""
+        addInfoCell("Analysis", analysisName, infoTable)
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)

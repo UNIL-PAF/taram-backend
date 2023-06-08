@@ -46,9 +46,9 @@ class FilterPdf() : PdfCommon() {
     private fun getParams(step: AnalysisStep): Div {
         val parsedParams = gson.fromJson(step.parameters, FilterParams::class.java)
         var pList: MutableList<Paragraph> = mutableListOf<Paragraph>()
-        if(parsedParams.removeOnlyIdentifiedBySite == true) pList.add(Paragraph("Remove only-identified-by-site."))
-        if(parsedParams.removeReverse == true) pList.add(Paragraph("Remove reverse hits."))
-        if(parsedParams.removePotentialContaminant == true) pList.add(Paragraph("Remove potential contaminants."))
+        if(parsedParams.removeOnlyIdentifiedBySite == true) pList.add(Paragraph("Remove only-identified-by-site"))
+        if(parsedParams.removeReverse == true) pList.add(Paragraph("Remove reverse hits"))
+        if(parsedParams.removePotentialContaminant == true) pList.add(Paragraph("Remove potential contaminants"))
         val freeParams = getFreeParams(parsedParams.colFilters)
         freeParams?.forEach { pList.add(it) }
         return parametersDiv(pList)
@@ -56,7 +56,7 @@ class FilterPdf() : PdfCommon() {
 
     private fun getFreeParams(colFilters: List<ColFilter>?): List<Paragraph>? {
         return colFilters?.map{ flt ->
-            val action = if(flt.removeSelected == true) "Remove" else "Keep"
+            val action = if(flt.removeSelected == true) "Remove" else "Only keep"
             val p = Paragraph("$action ")
             p.add(Text(" ${flt.colName} ").setItalic())
             p.add(Text(flt.comparator.symbol))
