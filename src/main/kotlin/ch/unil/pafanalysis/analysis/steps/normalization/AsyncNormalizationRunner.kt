@@ -40,7 +40,7 @@ class AsyncNormalizationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         params: NormalizationParams,
-    ): SummaryStat? {
+    ): Normalization? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
@@ -57,7 +57,16 @@ class AsyncNormalizationRunner() : CommonStep() {
         writeTableData.write(getOutputRoot() + step?.resultTablePath, table.copy(cols = newCols))
 
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getBasicSummaryStat(normInts, selHeaders)
+        val basicStat = summaryStatComp.getBasicSummaryStat(normInts, selHeaders)
+        return Normalization(
+            min = basicStat.min?.first(),
+            max = basicStat.max?.first(),
+            mean = basicStat.mean?.first(),
+            median = basicStat.median?.first(),
+            sum = basicStat.sum?.first(),
+            nrValid = basicStat.nrValid?.first(),
+            nrNaN = basicStat.nrNaN?.first()
+        )
     }
 
 }

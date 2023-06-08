@@ -68,7 +68,8 @@ class AsyncLogTransformationRunner() : CommonStep() {
             max = stat.max?.first(),
             mean = stat.mean?.first(),
             median = stat.median?.first(),
-            nrNans = stat.nrNaN?.first(),
+            nrNaN = stat.nrNaN?.first(),
+            nrValid = stat.nrValid?.first(),
             sum = stat.sum?.first()
         )
     }

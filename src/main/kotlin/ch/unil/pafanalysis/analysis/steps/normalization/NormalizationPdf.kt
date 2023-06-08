@@ -1,4 +1,4 @@
-package ch.unil.pafanalysis.analysis.steps.log_transformation
+package ch.unil.pafanalysis.analysis.steps.normalization
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.pdf.PdfCommon
@@ -12,16 +12,22 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class LogTransformationPdf() : PdfCommon() {
+class NormalizationPdf() : PdfCommon() {
+
+    val normType = mapOf(
+        "median" to "Median",
+        "mean" to "Mean",
+        "none" to "None"
+    )
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
-        val res = gson.fromJson(step.results, LogTransformation::class.java)
-        val parsedParams = gson.fromJson(step.parameters, LogTransformationParams::class.java)
+        val res = gson.fromJson(step.results, Normalization::class.java)
+        val parsedParams = gson.fromJson(step.parameters, NormalizationParams::class.java)
 
         val stepDiv = Div()
 
         stepDiv.add(horizontalLineDiv(plotWidth))
-        stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Normalization", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)
@@ -41,7 +47,7 @@ class LogTransformationPdf() : PdfCommon() {
         leftCell.setBorder(Border.NO_BORDER)
         colTable.addCell(leftCell)
 
-        val params = parametersDiv(listOf(Paragraph(parsedParams.transformationType + " transformation")))
+        val params = parametersDiv(listOf(Paragraph(normType[parsedParams.normalizationType] + " normalization")))
         val rightCell = Cell().add(params)
         colTable.addCell(rightCell)
 

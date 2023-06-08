@@ -5,6 +5,7 @@ data class LogTransformation(
     val max: Double?,
     val mean: Double?,
     val median: Double?,
-    val nrNans: Int?,
+    val nrNaN: Int?,
+    val nrValid: Int?,
     val sum: Double?
 )

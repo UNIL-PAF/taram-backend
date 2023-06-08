@@ -54,6 +54,7 @@ class SummaryStatComputation {
     fun getBasicSummaryStat(intMatrix: List<List<Double>>, headers: List<Header>): SummaryStat {
         val flatInts = intMatrix.flatten()
         val nrNaN = flatInts.filter { it.isNaN() }.size
+        val nrValid = flatInts.filter { ! it.isNaN() }.size
         val fltInts = flatInts.filter { !it.isNaN() }
         val min = fltInts.minOrNull()
         val max = fltInts.maxOrNull()
@@ -61,13 +62,16 @@ class SummaryStatComputation {
         val median = Quantiles.median().compute(fltInts)
         val sum = fltInts.sum()
 
+        println(nrNaN)
+
         return SummaryStat(
             min = if(min!=null) listOf(min) else null,
             max = if(max!=null) listOf(max) else null,
             mean = if(mean!=null) listOf(mean) else null,
             median = if(median!=null) listOf(median) else null,
             sum = if(sum!=null) listOf(sum) else null,
-            nrNaN = if(nrNaN!=null) listOf(nrNaN) else null
+            nrNaN = if(nrNaN!=null) listOf(nrNaN) else null,
+            nrValid = if(nrValid!=null) listOf(nrValid) else null
         )
     }
 

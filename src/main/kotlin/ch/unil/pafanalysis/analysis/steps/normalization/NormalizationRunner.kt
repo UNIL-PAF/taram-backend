@@ -21,6 +21,9 @@ class NormalizationRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncRunner: AsyncNormalizationRunner? = null
 
+    @Autowired
+    var normalizationPdf: NormalizationPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.NORMALIZATION
 
     fun getParameters(step: AnalysisStep?): NormalizationParams {
@@ -31,14 +34,7 @@ class NormalizationRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val transParams = gson.fromJson(step.parameters, NormalizationParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${transParams.intCol}"))
-        val div = Div()
-        div.add(title)
-        div.add(selCol)
-        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
-        return div
+        return normalizationPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
