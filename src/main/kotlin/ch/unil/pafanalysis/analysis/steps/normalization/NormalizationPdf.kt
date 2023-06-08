@@ -25,8 +25,6 @@ class NormalizationPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, NormalizationParams::class.java)
 
         val stepDiv = Div()
-
-        stepDiv.add(horizontalLineDiv(plotWidth))
         stepDiv.add(titleDiv("$stepNr - Normalization", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val colTable = Table(2)
@@ -50,10 +48,8 @@ class NormalizationPdf() : PdfCommon() {
         val params = parametersDiv(listOf(Paragraph(normType[parsedParams.normalizationType] + " normalization")))
         val rightCell = Cell().add(params)
         colTable.addCell(rightCell)
-
         stepDiv.add(colTable)
 
-        if(step.comments != null) stepDiv.add(commentDiv(step.comments))
         return stepDiv
     }
 

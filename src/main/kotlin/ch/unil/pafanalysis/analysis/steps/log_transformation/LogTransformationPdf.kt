@@ -19,8 +19,6 @@ class LogTransformationPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, LogTransformationParams::class.java)
 
         val stepDiv = Div()
-
-        stepDiv.add(horizontalLineDiv(plotWidth))
         stepDiv.add(titleDiv("$stepNr - Log transformation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val colTable = Table(2)
@@ -44,10 +42,8 @@ class LogTransformationPdf() : PdfCommon() {
         val params = parametersDiv(listOf(Paragraph(parsedParams.transformationType + " transformation")))
         val rightCell = Cell().add(params)
         colTable.addCell(rightCell)
-
         stepDiv.add(colTable)
 
-        if(step.comments != null) stepDiv.add(commentDiv(step.comments))
         return stepDiv
     }
 
