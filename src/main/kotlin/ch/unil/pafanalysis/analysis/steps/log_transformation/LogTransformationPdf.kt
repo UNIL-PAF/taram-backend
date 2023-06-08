@@ -42,7 +42,6 @@ class LogTransformationPdf() : PdfCommon() {
 
         val params = parametersDiv(listOf(Paragraph(parsedParams.transformationType + " transformation.")))
         val rightCell = Cell().add(params)
-        rightCell.setBorder(Border.NO_BORDER)
         colTable.addCell(rightCell)
 
         stepDiv.add(colTable)

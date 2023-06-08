@@ -19,6 +19,9 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncGroupFilterRunner: AsyncGroupFilterRunner? = null
 
+    @Autowired
+    var groupFilterPdf: GroupFilterPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.GROUP_FILTER
 
     fun getParameters(step: AnalysisStep?): GroupFilterParams {
@@ -26,12 +29,7 @@ class GroupFilterRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, pageWidth: Float, stepNr: Int): Div? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        //val params = gson.fromJson(step.parameters, FilterParams::class.java)
-        val div = Div()
-        div.add(title)
-        if (step.comments !== null) div?.add(Paragraph().add(Text(step.comments)))
-        return div
+        return groupFilterPdf?.createPdf(step, pdf, pageWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
