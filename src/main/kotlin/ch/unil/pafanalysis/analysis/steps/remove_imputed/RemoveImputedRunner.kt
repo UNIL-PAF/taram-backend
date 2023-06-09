@@ -21,6 +21,9 @@ class RemoveImputedRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncRemoveImputedRunner: AsyncRemoveImputedRunner? = null
 
+    @Autowired
+    var removeImputedPdf: RemoveImputedPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.REMOVE_IMPUTED
 
     fun getParameters(step: AnalysisStep?): RemoveImputedParams {
@@ -30,15 +33,8 @@ class RemoveImputedRunner() : CommonStep(), CommonRunner {
         ) else RemoveImputedParams()
     }
 
-    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val transParams = gson.fromJson(step.parameters, RemoveImputedParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${transParams.replaceBy}"))
-        val div = Div()
-        div.add(title)
-        div.add(selCol)
-        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
-        return div
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
+        return removeImputedPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

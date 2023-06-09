@@ -6,9 +6,9 @@ data class RemoveImputedParams (
     val replaceBy: ReplaceBy? = null
 )
 
-enum class ReplaceBy(val ident: String, val value: Double) {
+enum class ReplaceBy(val ident: String, val value: Double, val printName: String) {
     @SerializedName("nan")
-    NAN("nan", Double.NaN),
+    NAN("nan", Double.NaN, "NaN"),
     @SerializedName("zero")
-    ZERO("zero", 0.0),
+    ZERO("zero", 0.0, "0"),
 }
