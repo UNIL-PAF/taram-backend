@@ -27,21 +27,15 @@ class PcaRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncBoxplotRunner: AsyncPcaRunner? = null
 
+    @Autowired
+    var pcaPdf: PcaPdf? = null
+
     fun getParameters(step: AnalysisStep?): PcaParams {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, PcaParams().javaClass) else PcaParams()
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val params = gson.fromJson(step.parameters, PcaParams::class.java)
-        val selCol = Paragraph().add(Text("Selected column: ${params?.column}"))
-        val div = Div()
-        div.add(title)
-        div.add(selCol)
-        div.add(echartsServer?.makeEchartsPlot(step, pdf, plotWidth))
-        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
-        div.setKeepTogether(true)
-        return div
+        return pcaPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
