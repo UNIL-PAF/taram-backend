@@ -20,19 +20,17 @@ class TTestRunner() : CommonStep(), CommonRunner {
     @Autowired
     var asyncTTestRunner: AsyncTTestRunner? = null
 
+    @Autowired
+    var tTestPdf: TTestPdf? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.T_TEST
 
     fun getParameters(step: AnalysisStep?): TTestParams {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, TTestParams().javaClass) else TTestParams()
     }
 
-    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
-        val title = Paragraph().add(Text(step.type).setBold())
-        //val params = gson.fromJson(step.parameters, FilterParams::class.java)
-        val div = Div()
-        div.add(title)
-        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
-        return div
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
+        return tTestPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

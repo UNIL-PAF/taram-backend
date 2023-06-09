@@ -16,8 +16,8 @@ open class PdfCommon {
 
     val gson = Gson()
 
-    private val fontSizeConst = 10f
-    private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
+    val fontSizeConst = 10f
+    val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
 
     fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
         val div = Div()
