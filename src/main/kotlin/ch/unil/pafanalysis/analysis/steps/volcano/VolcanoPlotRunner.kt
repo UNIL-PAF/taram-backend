@@ -5,13 +5,8 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.common.EchartsServer
-import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Div
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -25,22 +20,14 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     var asyncVolcanoPlotRunner: AsyncVolcanoPlotRunner? = null
 
     @Autowired
-    private var echartsServer: EchartsServer? = null
+    private var volcanoPdf: VolcanoPdf? = null
 
     fun getParameters(step: AnalysisStep?): VolcanoPlotParams {
         return if(step?.parameters != null) gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass) else VolcanoPlotParams()
     }
 
-    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
-        val title = Paragraph().add(Text(step.type).setBold())
-        val params = gson.fromJson(step.parameters, VolcanoPlotParams::class.java)
-        val selCol = Paragraph().add(Text("P-val threshold column: ${params?.pValThresh}"))
-        val div = Div()
-        div.add(title)
-        div.add(selCol)
-        div.add(echartsServer?.makeEchartsPlot(step, pdf, plotWidth))
-        if (step.comments !== null) div.add(Paragraph().add(Text(step.comments)))
-        return div
+    override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
+        return volcanoPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
