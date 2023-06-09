@@ -6,7 +6,6 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.results.model.Result
-import ch.unil.pafanalysis.results.service.ResultService
 import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.WebColors
@@ -19,10 +18,10 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
-import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.VerticalAlignment
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service
 import java.io.File
 import java.time.LocalDateTime
@@ -105,8 +104,10 @@ class PdfService {
     }
 
     private fun addLogo(document: Document?, pdf: PdfDocument){
-        val unilLogoPath = "./src/main/resources/images/lo_unil06_bleu.pdf"
-        val sourcePdf = PdfDocument(PdfReader(unilLogoPath))
+        val imagePath = "/resources/images/lo_unil06_bleu.pdf"
+        val unilLogoServer = File(ClassPathResource(imagePath).path)
+        val unilLogo = if(unilLogoServer.exists()) unilLogoServer else File(ClassPathResource("/src/main$imagePath").path)
+        val sourcePdf = PdfDocument(PdfReader(unilLogo))
         val pdfPlot = sourcePdf.getPage(1)
         val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
         sourcePdf.close()
