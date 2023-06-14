@@ -23,28 +23,48 @@ class ProteinTableService {
     fun getProteinTable(step: AnalysisStep?, selProteins: List<String>?, resType: String?): ProteinTable {
         val table = readTable.getTable(commonStep?.getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val defaultInt = step?.columnInfo?.columnMapping?.intCol
-        val protTable = tableToProteinTable(table = table, resultType = step?.analysis?.result?.type, selProteins = selProteins, defaultInt = defaultInt, resType = resType, step?.columnInfo?.columnMapping?.experimentDetails)
-        return protTable.copy(table = protTable.table?.sortedByDescending{ it.sel })
+        val protTable = tableToProteinTable(
+            table = table,
+            resultType = step?.analysis?.result?.type,
+            selProteins = selProteins,
+            defaultInt = defaultInt,
+            resType = resType,
+            step?.columnInfo?.columnMapping?.experimentDetails
+        )
+        return protTable.copy(table = protTable.table?.sortedByDescending { it.sel })
     }
 
-    private fun tableToProteinTable(table: Table?, resultType: String?, selProteins: List<String>?, defaultInt: String?, resType: String?, expDetails: Map<String, ExpInfo>?): ProteinTable {
+    private fun tableToProteinTable(
+        table: Table?,
+        resultType: String?,
+        selProteins: List<String>?,
+        defaultInt: String?,
+        resType: String?,
+        expDetails: Map<String, ExpInfo>?
+    ): ProteinTable {
         val headerMap = HeaderMaps.getHeaderMap(resType)
 
         val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
         val genes = readTable.getStringColumn(table, headerMap["gene"]!!)?.map { it.split(";")?.get(0) }
         val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
         val intCol = readTable.getDoubleColumn(table, defaultInt!!)
-        val ids: List<Int>? = if(resType == ResultType.MaxQuant.value){
+        val ids: List<Int>? = if (resType == ResultType.MaxQuant.value) {
             readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
         } else listOf(1..(prots?.size ?: 1)).flatten()
-        val colOrMeans = intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!, expDetails).second.map{ it.average() }
+        val colOrMeans: List<Double> =
+            intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!, expDetails).second.map { d ->
+                val flt = d.filter { !it.isNaN() }
+                if (flt.isNotEmpty()) flt.average()
+                else Double.NaN
+            }
 
-        val sel = prots?.map{ selProteins?.contains(it) ?: false }
+        val sel = prots?.map { selProteins?.contains(it) ?: false }
 
         val proteinRows: List<ProteinGroup>? = colOrMeans?.mapIndexed { i, colOrMean ->
             ProteinGroup(ids?.get(i) ?: i, prots?.get(i), genes?.get(i), descs?.get(i), colOrMean, sel?.get(i))
         }
-        val fltRows = proteinRows?.filter{it.int?.isNaN() != true}
+
+        val fltRows = proteinRows?.filter { it.int?.isNaN() != true }
 
         return ProteinTable(table = fltRows, resultType = resultType, intField = defaultInt)
     }
