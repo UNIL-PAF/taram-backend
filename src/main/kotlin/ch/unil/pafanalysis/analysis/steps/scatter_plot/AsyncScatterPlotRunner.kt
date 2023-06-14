@@ -55,21 +55,14 @@ class AsyncScatterPlotRunner() : CommonStep() {
             getColorData(params.colorBy, table, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
         } else null
 
-        val doLog = params.logTrans == true
-
-
-
         val data: List<ScatterPoint>? =
             xList?.mapIndexed { i, x ->
                 val y = yList?.get(i)
-
-                val tmpX = if (doLog) computeLog(x) else x
-                val tmpY = if (doLog) computeLog(y) else y
                 val tmpCol = colData?.get(i)
 
                 ScatterPoint(
-                    x = if(tmpX?.isNaN() == true) null else tmpX,
-                    y = if(tmpY?.isNaN() == true) null else tmpY,
+                    x = if(x.isNaN()) null else x,
+                    y = if(y?.isNaN() == true) null else y,
                     d = if(tmpCol?.isNaN() == true) null else tmpCol,
                     n = names?.get(i)
                 )
