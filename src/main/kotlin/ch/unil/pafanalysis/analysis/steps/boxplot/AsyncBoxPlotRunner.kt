@@ -71,7 +71,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             if(i != null && i >= 0){
                 val ints = sortedIntMatrix.map { if (i == null) null else it[i] }
                 val normInts = if (params?.logScale != false) {
-                    ints.map { if (it != null && !it.isNaN() && it != 0.0) log2(it) else null }
+                    ints.map { if (it != null && !it.isNaN() && it > 0.0) log2(it) else null }
                 } else {
                     ints.map{ if(it?.isNaN() == true) null else it}
                 }
