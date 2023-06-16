@@ -58,9 +58,11 @@ class SummaryStatPdf() : PdfCommon() {
     }
 
     private fun createTable(res: SummaryStat, start: Int, end: Int, plotWidth: Float): Table {
+        val groups = res.groups ?: res.expNames?.map{""}
+
         val table = Table(end-start + 1) //.setWidth(plotWidth)
         addStringRow("Name", res.expNames, start, end, table)
-        addStringRow("Group", res.groups, start, end, table)
+        addStringRow("Group", groups, start, end, table)
         addDoubleRow("Min", res.min, start, end, table)
         addDoubleRow("Max", res.max, start, end, table)
         addDoubleRow("Mean", res.mean, start, end, table)

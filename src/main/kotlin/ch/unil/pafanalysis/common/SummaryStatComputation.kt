@@ -41,7 +41,6 @@ class SummaryStatComputation {
         )
     }
 
-
     fun getSummaryStat(intMatrix: List<List<Double>>, headers: List<Header>, expDetails: Map<String, ExpInfo>?): SummaryStat {
         val zipped = headers.zip(intMatrix)
         val summaryStat = zipped.fold(SummaryStat()) { acc, el ->
@@ -61,8 +60,6 @@ class SummaryStatComputation {
         val mean = fltInts.average()
         val median = Quantiles.median().compute(fltInts)
         val sum = fltInts.sum()
-
-        println(nrNaN)
 
         return SummaryStat(
             min = if(min!=null) listOf(min) else null,
