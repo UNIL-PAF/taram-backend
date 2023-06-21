@@ -60,9 +60,9 @@ class ColumnMappingParser {
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
 
-        val regex1 = Regex(".+_DIA_(\\d+?)_.+\\.(.+?)$")
-        val regex2 = Regex(".+_(\\d+?)_DIA_.+\\.(.+?)$")
-        val regex3 = Regex(".+_(\\d+?)_\\d+min_DIA_.+\\.(.+?)$")
+        val regex1 = Regex(".+_DIA_(\\w+?)_.+\\.(.+?)$")
+        val regex2 = Regex(".+_(\\w+?)_DIA_.+\\.(.+?)$")
+        val regex3 = Regex(".+_(\\w+?)_\\d+min_DIA_.+\\.(.+?)$")
 
         val cols: ColumnsParsed = columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
             val matchResult = regex1.matchEntire(s) ?: regex2.matchEntire(s) ?: regex3.matchEntire(s)
