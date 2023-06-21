@@ -66,6 +66,7 @@ class ColumnMappingParserTests {
     fun parseSpectronautFluder() {
         val resFile = "./src/test/resources/results/spectronaut/20220707_114227_Fluder-14650-53_Report_Copy.txt"
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
         assert(colMapping.experimentNames?.size == 4)
         assert(colMapping.experimentNames!!.contains("14650"))
         assert(colMapping.intCol == "Quantity")
@@ -127,5 +128,29 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(11)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(11)?.experiment?.name == "12818")
         assert(commonResults.headers?.get(11)?.experiment?.field == "TotalQuantity (Settings)")
+    }
+
+    @Test
+    fun parseSpectronautAchsel() {
+        val resFile = "./src/test/resources/results/spectronaut/20230620_Achsel_15892-911_Report.xls"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
+        assert(colMapping.experimentNames?.size == 20)
+        assert(colMapping.experimentNames!!.contains("15905-d5"))
+        assert(colMapping.intCol == "Quantity")
+        assert(commonResults.headers?.size == 90)
+
+        // check first header
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "PG.ProteinGroups")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
+
+        // check header with experiment
+        assert(commonResults.headers?.get(12)?.idx == 12)
+        assert(commonResults.headers?.get(12)?.name == "15907-d20.NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(12)?.experiment?.name == "15907-d20")
+        assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
+
     }
 }

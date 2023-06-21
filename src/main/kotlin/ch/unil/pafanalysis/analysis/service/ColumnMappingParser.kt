@@ -60,12 +60,18 @@ class ColumnMappingParser {
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
 
-        val regex1 = Regex(".+_DIA_(\\w+?)_.+\\.(.+?)$")
-        val regex2 = Regex(".+_(\\w+?)_DIA_.+\\.(.+?)$")
-        val regex3 = Regex(".+_(\\w+?)_\\d+min_DIA_.+\\.(.+?)$")
+        val regexMinRight = Regex(".+_DIA_\\d+min.+")
+        val regexMinLeft = Regex(".+_\\d+min_DIA_.+")
+
+        val regex1 = Regex(".+_DIA_([A-Za-z0-9-]+?)_.+\\.(.+?)$")
+        val regex2 = Regex(".+_([A-Za-z0-9-]+?)_DIA_.+\\.(.+?)$")
+        val regexLeft = Regex(".+_([A-Za-z0-9-]+?)_\\d+min_DIA_.+\\.(.+?)$")
 
         val cols: ColumnsParsed = columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
-            val matchResult = regex1.matchEntire(s) ?: regex2.matchEntire(s) ?: regex3.matchEntire(s)
+            val matchResult = if(regexMinLeft.matches(s)){ regexLeft.matchEntire(s) }
+                        else if(regexMinRight.matches(s)){ regex2.matchEntire(s) }
+                        else { regex1.matchEntire(s) ?: regex2.matchEntire(s) }
+
             val accWithExp = if (matchResult != null) {
                 acc.copy(
                     expNames = acc.expNames.plus(matchResult.groupValues[1]),
