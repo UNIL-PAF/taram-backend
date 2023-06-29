@@ -1,7 +1,8 @@
 package ch.unil.pafanalysis.analysis.steps.order_columns
 
 data class OrderColumnsParams (
-    val moveColumn: List<Pair<Int, Int>>? = null,
-    val addGroupsToHeaders: Boolean? = null,
+    val move: List<MoveCol>? = null,
     val moveSelIntFirst: Boolean? = null
 )
+
+data class MoveCol(val from: Int? = null, val to: Int? = null)

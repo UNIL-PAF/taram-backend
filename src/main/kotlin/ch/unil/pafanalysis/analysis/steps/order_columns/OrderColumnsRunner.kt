@@ -45,7 +45,7 @@ class OrderColumnsRunner() : CommonStep(), CommonRunner {
 
         return "Parameter(s) changed:"
             .plus(
-                if (params.addGroupsToHeaders != origParams?.addGroupsToHeaders) " [Add group name to headers: ${params.addGroupsToHeaders}]" else ""
+                if (params.move?.size != origParams?.move?.size) " [Number of moves: ${params.move?.size}]" else ""
             ).plus(
                 if (params.moveSelIntFirst != origParams?.moveSelIntFirst) " [Move selected intesity first: ${params.moveSelIntFirst}]" else ""
             )
