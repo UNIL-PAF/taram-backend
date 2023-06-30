@@ -27,7 +27,6 @@ class AsyncOrderColumnsRunner() : CommonStep() {
                 newStep?.commonResult?.headers
             )
 
-
             val intCol = newStep?.columnInfo?.columnMapping?.intCol
             val order1 =  if(params.moveSelIntFirst == true) moveSelIntFirst(origTable, intCol) else origTable
 
@@ -72,19 +71,24 @@ class AsyncOrderColumnsRunner() : CommonStep() {
         val newRes = table?.headers?.zip(table?.cols!!)?.fold(emptyBeforeAndAfter) { acc, col ->
             if(col.first.experiment != null && col.first.experiment?.field == intCol){
                 val newHeaders: Pair<List<Header>, List<Header>>  = Pair(acc.first.first + col.first, acc.first.second)
-                val newCols: Pair<List<List<Any>>, List<List<Any>>> = Pair(acc.second.first.plusElement(col.second), acc.second.second)
+                val addThis = if(acc.second.first.last().isEmpty()) listOf(col.second) else acc.second.first.plusElement(col.second)
+                val newCols: Pair<List<List<Any>>, List<List<Any>>> = Pair(addThis, acc.second.second)
+                if(acc.second.first.get(0).isNotEmpty()) println(acc.second.first.get(0).take(1))
                 Pair(newHeaders, newCols)
             }else{
                 val newHeaders: Pair<List<Header>, List<Header>> = Pair(acc.first.first, acc.first.second + col.first)
-                val newCols: Pair<List<List<Any>>, List<List<Any>>> = Pair(acc.second.first, acc.second.second.plusElement(col.second))
+                val addThis = if(acc.second.second.last().isEmpty()) listOf(col.second) else acc.second.second.plusElement(col.second)
+                val newCols: Pair<List<List<Any>>, List<List<Any>>> = Pair(acc.second.first, addThis)
                 Pair(newHeaders, newCols)
             }
         }
 
+
         val newHeaders = newRes?.first?.first?.plus(newRes?.first?.second)
+        val corrIdxHeaders = newHeaders?.mapIndexed{ i, h -> h.copy(idx = i)}
         val newCols = newRes?.second?.first?.plus(newRes?.second?.second)
 
-        return Table(newHeaders, newCols)
+        return Table(corrIdxHeaders, newCols)
     }
 
 }

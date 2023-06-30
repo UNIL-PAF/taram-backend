@@ -20,7 +20,7 @@ class OrderColumnsRunner() : CommonStep(), CommonRunner {
     @Autowired
     var orderColumnsPdf: OrderColumnsPdf? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.REMOVE_COLUMNS
+    override var type: AnalysisStepType? = AnalysisStepType.ORDER_COLUMNS
 
     fun getParameters(step: AnalysisStep?): OrderColumnsParams {
         return if (step?.parameters != null) gson.fromJson(
@@ -47,7 +47,7 @@ class OrderColumnsRunner() : CommonStep(), CommonRunner {
             .plus(
                 if (params.move?.size != origParams?.move?.size) " [Number of moves: ${params.move?.size}]" else ""
             ).plus(
-                if (params.moveSelIntFirst != origParams?.moveSelIntFirst) " [Move selected intesity first: ${params.moveSelIntFirst}]" else ""
+                if (params.moveSelIntFirst != origParams?.moveSelIntFirst) " [Move selected intensity first: ${params.moveSelIntFirst}]" else ""
             )
     }
 

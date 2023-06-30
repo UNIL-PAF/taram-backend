@@ -18,8 +18,7 @@ class OrderColumnsPdf() : PdfCommon() {
         stepDiv.add(titleDiv("$stepNr - Order columns", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
 
         val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Nr of columns moved" to Paragraph(res.nrColumnsMoved.toString()),
-            "Nr of group names added" to Paragraph(res.nrGroupNamesAdded.toString())
+            "Nr of columns moved" to Paragraph(res.nrColumnsMoved.toString())
         )
 
         stepDiv.add(addTwoRowTable(tableData))
