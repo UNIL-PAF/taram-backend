@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class AsyncOrderColumnsRunner() : CommonStep() {
@@ -29,40 +30,38 @@ class AsyncOrderColumnsRunner() : CommonStep() {
 
             val intCol = newStep?.columnInfo?.columnMapping?.intCol
             val order1 =  if(params.moveSelIntFirst == true) moveSelIntFirst(origTable, intCol) else origTable
+            val order2 = changeOrder(order1, params.move)
 
             WriteTableData().write(
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
-                order1!!)
-
-
-            /*
-            val headersFiltered = filterHeaders(newStep?.commonResult?.headers, params.keepIdxs)
-
-            val newHeaders = headersFiltered?.mapIndexed{ i, h -> h.copy(idx = i) }
-
-            val oldTable = ReadTableData().getTable(
-                env?.getProperty("output.path").plus(newStep?.resultTablePath),
-                newStep?.commonResult?.headers
-            )
-
-            val newTable = Table(headers = newHeaders, cols = oldTable.cols?.filterIndexed{ i, _ -> params.keepIdxs?.contains(i) ?: false})
-
-            WriteTableData().write(
-                env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
-                newTable
-            )
-          */
+                order2!!)
 
             newStep?.copy(
                 results = gson.toJson(
                     OrderColumns(
                     )
                 ),
-                commonResult = newStep?.commonResult?.copy(headers = order1?.headers)
+                commonResult = newStep?.commonResult?.copy(headers = order2?.headers)
             )
         }
 
         tryToRun(funToRun, newStep)
+    }
+
+    private fun changeOrder(table: Table?, move: List<MoveCol>?): Table? {
+        return move?.fold(table){ acc, mov ->
+            val newHeaders: List<Header>? = acc?.headers?.swap(mov.from!!, mov.to!!)
+            val columns =  acc?.cols?.swap(mov.from!!, mov.to!!)
+            Table(newHeaders?.mapIndexed{ i, h -> h.copy(idx = i)}, columns)
+        }
+    }
+
+    private fun <T> List<T>.swap(from: Int, to: Int): List<T>? {
+        val my = this.toMutableList()
+        val tmp = my[from]
+        my.add(to, tmp)
+        my.removeAt(from)
+        return my.toList()
     }
 
     private fun moveSelIntFirst(table: Table?, intCol: String?): Table? {
@@ -73,7 +72,6 @@ class AsyncOrderColumnsRunner() : CommonStep() {
                 val newHeaders: Pair<List<Header>, List<Header>>  = Pair(acc.first.first + col.first, acc.first.second)
                 val addThis = if(acc.second.first.last().isEmpty()) listOf(col.second) else acc.second.first.plusElement(col.second)
                 val newCols: Pair<List<List<Any>>, List<List<Any>>> = Pair(addThis, acc.second.second)
-                if(acc.second.first.get(0).isNotEmpty()) println(acc.second.first.get(0).take(1))
                 Pair(newHeaders, newCols)
             }else{
                 val newHeaders: Pair<List<Header>, List<Header>> = Pair(acc.first.first, acc.first.second + col.first)
