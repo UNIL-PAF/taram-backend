@@ -22,13 +22,13 @@ class AsyncImputationRunner() : CommonStep() {
         val funToRun: () -> AnalysisStep? = {
             val params = gson.fromJson(newStep?.parameters, ImputationParams().javaClass)
 
-            val (nrImputed, imputationFileName) = transformTable(
+            val (nrImputed, nrImputedGroups, imputationFileName) = transformTable(
                 newStep,
                 params
             )
 
             newStep?.copy(
-                results = gson.toJson(Imputation(nrImputed)),
+                results = gson.toJson(Imputation(nrImputed, nrImputedGroups)),
                 imputationTablePath = imputationFileName
             )
         }
@@ -39,7 +39,7 @@ class AsyncImputationRunner() : CommonStep() {
     fun transformTable(
         step: AnalysisStep?,
         params: ImputationParams
-    ): Pair<Int?, String?> {
+    ): Triple<Int?, Int?, String?> {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
@@ -59,8 +59,9 @@ class AsyncImputationRunner() : CommonStep() {
             val imputationFileName = step?.resultTablePath?.replace(".txt", "_imputation.txt")
             writeImputation.write(getOutputRoot() + imputationFileName, imputationTable)
             val nrImputed: Int = imputedRows.sumOf { r -> r.sumOf { (if (it) 1 else 0).toInt() } }
-            Pair(nrImputed, imputationFileName)
-        } else Pair(null, null)
+            val nrImputedGroups: Int? = imputedRows.map { r -> if(r.find { it } == true) 1 else 0 }.sum()
+            Triple(nrImputed, nrImputedGroups, imputationFileName)
+        } else Triple(null, null, null)
 
     }
 
