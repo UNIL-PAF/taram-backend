@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class OrderColumnsPdf() : PdfCommon() {
+class RenameColumnsPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
         val res = gson.fromJson(step.results, RenameColumns::class.java)

@@ -16,5 +16,6 @@ enum class AnalysisStepType(val value: String) {
     SCATTER_PLOT("scatter-plot"),
     NORMALIZATION("normalization"),
     SUMMARY_STAT("summary-stat"),
-    ORDER_COLUMNS("order-columns")
+    ORDER_COLUMNS("order-columns"),
+    RENAME_COLUMNS("rename-columns")
 }

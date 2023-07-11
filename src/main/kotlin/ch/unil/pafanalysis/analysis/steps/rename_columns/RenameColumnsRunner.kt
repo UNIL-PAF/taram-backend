@@ -18,9 +18,9 @@ class RenameColumnsRunner() : CommonStep(), CommonRunner {
     var asyncRunner: AsyncRenameColumnsRunner? = null
 
     @Autowired
-    var orderColumnsPdf: OrderColumnsPdf? = null
+    var renameColumnsPdf: RenameColumnsPdf? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.ORDER_COLUMNS
+    override var type: AnalysisStepType? = AnalysisStepType.RENAME_COLUMNS
 
     fun getParameters(step: AnalysisStep?): RenameColumnsParams {
         return if (step?.parameters != null) gson.fromJson(
@@ -30,7 +30,7 @@ class RenameColumnsRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
-        return orderColumnsPdf?.createPdf(step, pdf, plotWidth, stepNr)
+        return renameColumnsPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
