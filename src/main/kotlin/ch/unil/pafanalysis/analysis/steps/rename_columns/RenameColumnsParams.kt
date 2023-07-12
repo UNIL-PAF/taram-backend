@@ -5,4 +5,4 @@ data class RenameColumnsParams (
     val addConditionNames: Boolean? = null
 )
 
-data class RenameCol(val idx: Int? = null, val from: String? = null, val to: String? = null)
+data class RenameCol(val idx: String? = null, val name: String? = null)

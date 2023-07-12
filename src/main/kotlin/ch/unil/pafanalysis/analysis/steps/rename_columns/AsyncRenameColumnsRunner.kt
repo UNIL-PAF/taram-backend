@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.rename_columns
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
@@ -21,23 +22,27 @@ class AsyncRenameColumnsRunner() : CommonStep() {
         val funToRun: () -> AnalysisStep? = {
             val params = gson.fromJson(newStep?.parameters, RenameColumnsParams().javaClass)
 
+            if(params?.rename?.find{ r -> r.idx == newStep?.columnInfo?.columnMapping?.intCol} != null){
+                throw StepException("You cannot rename the intensity column [${newStep?.columnInfo?.columnMapping?.intCol}] that is currently used.")
+            }
+
             val origTable = ReadTableData().getTable(
                 env?.getProperty("output.path").plus(newStep?.resultTablePath),
                 newStep?.commonResult?.headers
             )
-
-            val renamed1 = addConditionNames(origTable, params?.addConditionNames)
+            val renamed1 = renameItems(origTable, params?.rename)
+            val renamed2 = addConditionNames(renamed1, params?.addConditionNames)
 
             WriteTableData().write(
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
-                origTable!!
+                renamed2!!
             )
 
             newStep?.copy(
                 results = gson.toJson(
                     RenameColumns()
                 ),
-                commonResult = newStep?.commonResult?.copy(headers = renamed1?.headers)
+                commonResult = newStep?.commonResult?.copy(headers = renamed2?.headers)
             )
         }
 
@@ -46,6 +51,23 @@ class AsyncRenameColumnsRunner() : CommonStep() {
 
     private fun addConditionNames(table: Table?, addConditionNames: Boolean?): Table? {
         return table
+    }
+
+    private fun renameItems(table: Table?, rename: List<RenameCol>?): Table? {
+        val newHeaders = table?.headers?.map{ h ->
+            if(h.experiment != null){
+                val renameItem = rename?.find{it.idx == h.experiment.field}
+                val newExpField = if(renameItem != null) renameItem.name else h.experiment.field
+                val newExp = h.experiment.copy(field = newExpField)
+                val newName = if(renameItem != null) h.experiment.name + "." + renameItem.name else h.name
+                h.copy(name = newName, experiment = newExp)
+            }else{
+                val renameItem = rename?.find{it.idx?.toInt() == h.idx}
+                val newName = if(renameItem != null) renameItem.name else h.name
+                h.copy(name = newName)
+            }
+        }
+        return table?.copy(headers = newHeaders)
     }
 
 }

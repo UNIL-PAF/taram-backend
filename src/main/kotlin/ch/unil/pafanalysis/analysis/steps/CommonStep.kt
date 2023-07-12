@@ -15,6 +15,7 @@ import ch.unil.pafanalysis.analysis.steps.order_columns.OrderColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
 import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.remove_imputed.RemoveImputedRunner
+import ch.unil.pafanalysis.analysis.steps.rename_columns.RenameColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStatRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
@@ -88,6 +89,9 @@ open class CommonStep {
 
     @Autowired
     private var orderColumnsRunner: OrderColumnsRunner? = null
+
+    @Autowired
+    private var renameColumnsRunner: RenameColumnsRunner? = null
 
     val gson = Gson()
 
@@ -171,6 +175,7 @@ open class CommonStep {
             AnalysisStepType.REMOVE_COLUMNS.value -> removeColumnsRunner
             AnalysisStepType.SCATTER_PLOT.value -> scatterPlotRunner
             AnalysisStepType.ORDER_COLUMNS.value -> orderColumnsRunner
+            AnalysisStepType.RENAME_COLUMNS.value -> renameColumnsRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }
@@ -260,6 +265,7 @@ open class CommonStep {
             AnalysisStepType.SCATTER_PLOT.value -> scatterPlotRunner?.getParameters(step).toString()
             AnalysisStepType.SUMMARY_STAT.value -> summaryStatRunner?.getParameters(step).toString()
             AnalysisStepType.ORDER_COLUMNS.value -> orderColumnsRunner?.getParameters(step).toString()
+            AnalysisStepType.RENAME_COLUMNS.value -> renameColumnsRunner?.getParameters(step).toString()
             else -> throw RuntimeException("Cannot parse parameters for type [${step?.type}]")
         }
         return hashComp.computeStringHash(filterParams)
