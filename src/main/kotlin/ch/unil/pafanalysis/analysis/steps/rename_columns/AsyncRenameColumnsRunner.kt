@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.rename_columns
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.ReadTableData
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import kotlin.math.exp
 
 @Service
 class AsyncRenameColumnsRunner() : CommonStep() {
@@ -31,7 +33,7 @@ class AsyncRenameColumnsRunner() : CommonStep() {
                 newStep?.commonResult?.headers
             )
             val renamed1 = renameItems(origTable, params?.rename)
-            val renamed2 = addConditionNames(renamed1, params?.addConditionNames)
+            val renamed2 = addConditionNames(renamed1, params?.addConditionNames, newStep?.columnInfo?.columnMapping?.experimentDetails)
 
             WriteTableData().write(
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
@@ -49,8 +51,17 @@ class AsyncRenameColumnsRunner() : CommonStep() {
         tryToRun(funToRun, newStep)
     }
 
-    private fun addConditionNames(table: Table?, addConditionNames: Boolean?): Table? {
-        return table
+    private fun addConditionNames(table: Table?, addConditionNames: Boolean?, expInfo: Map<String, ExpInfo>?): Table? {
+        return if(addConditionNames == true){
+            val newHeaders = table?.headers?.map{ h ->
+                if(h.experiment != null){
+                    val groupName = expInfo?.get(h.experiment.name)?.group
+                    val newName = if(groupName != null) h.name + "." + groupName else h.name
+                    h.copy(name = newName)
+                } else h
+            }
+            table?.copy(headers = newHeaders)
+        }else table
     }
 
     private fun renameItems(table: Table?, rename: List<RenameCol>?): Table? {
