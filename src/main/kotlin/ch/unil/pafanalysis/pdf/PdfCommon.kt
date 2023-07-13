@@ -1,13 +1,22 @@
 package ch.unil.pafanalysis.pdf
 
 import com.google.gson.Gson
+import com.itextpdf.io.font.constants.FontStyles
+import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.colors.WebColors
+import com.itextpdf.kernel.font.PdfFont
+import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine
 import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
+import com.itextpdf.layout.properties.Property
 import com.itextpdf.layout.properties.TextAlignment
+import com.itextpdf.layout.renderer.CellRenderer
+import javax.swing.text.StyleConstants.FontConstants
 
 
 open class PdfCommon {
@@ -15,17 +24,32 @@ open class PdfCommon {
     val gson = Gson()
 
     val fontSizeConst = 10f
+    val myFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+    val myBoldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
     val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
+
+    fun getTwoRowTable(tableData: List<Pair<String, String>>): Table {
+        val table = Table(2)
+        tableData.forEach{ (name, cont) ->
+            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myBoldFont));
+            cell1.setBorder(Border.NO_BORDER)
+            table.addCell(cell1)
+            val cell2= Cell().add(Paragraph(cont).setFontSize(fontSizeConst).setFont(myFont));
+            cell2.setBorder(Border.NO_BORDER)
+            table.addCell(cell2)
+        }
+        return table
+    }
 
     fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
         val div = Div()
 
         val table = Table(2)
         tableData.map{ (name, cont) ->
-            val cell1 = Cell().add(Paragraph(name).setBold().setFontSize(fontSizeConst));
+            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myFont));
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
-            val cell2= Cell().add(cont?.setFontSize(fontSizeConst));
+            val cell2= Cell().add(cont);
             cell2.setBorder(Border.NO_BORDER)
             table.addCell(cell2)
         }
@@ -36,16 +60,20 @@ open class PdfCommon {
 
     fun titleDiv(title: String, nrProts: Int?, tableNr: Int?, plotWidth: Float): Div {
         val titlePadding = 5f
+        val unilBlue = DeviceRgb(0, 140, 204)
 
-        val p = Paragraph().setBackgroundColor(myGrayConst)
+        val p = Paragraph().setBackgroundColor(unilBlue)
         p.setPaddingLeft(titlePadding)
+        p.setPaddingTop(5f)
 
-        val t = Table(3)
+        val t = Table(1)
         t.setWidth(plotWidth?.minus(titlePadding))
 
         val text = Paragraph(Text(title))
-        text.setBold()
+        //text.setBold()
         text.setFontSize(12f)
+        text.setFontColor(ColorConstants.WHITE)
+        text.setFont(myFont)
         val colLeft = Cell()
         colLeft.setWidth(170f)
         colLeft.setTextAlignment(TextAlignment.LEFT)
@@ -53,6 +81,7 @@ open class PdfCommon {
         colLeft.add(text)
         t.addCell(colLeft)
 
+        /*
         val colCenter = Cell()
         colCenter .setWidth(170f)
         colCenter.setTextAlignment(TextAlignment.CENTER)
@@ -68,7 +97,7 @@ open class PdfCommon {
         colRight.setPaddingRight(titlePadding)
         if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setFontSize(fontSizeConst)))
         t.addCell(colRight)
-
+*/
         p.add(t)
 
         val div = Div()
@@ -76,38 +105,67 @@ open class PdfCommon {
         return div
     }
 
-    fun commentDiv(comment: String): Div {
-        val p1 = Paragraph(comment)
-        p1.setBackgroundColor(ColorConstants.YELLOW)
-        p1.setFontSize(fontSizeConst)
-        val div = Div()
-        div.add(p1)
-        return div
+    fun getText(s: String, bold: Boolean = true): Text {
+        val text = Text(s)
+        text.setFontSize(fontSizeConst)
+        text.setFont(myFont)
+        if(bold) text.setBold()
+        return text
     }
 
-    fun horizontalLineDiv(plotWidth: Float): Div {
-        val line = SolidLine(2f)
-        line.setColor(ColorConstants.LIGHT_GRAY)
-        val ls = LineSeparator(line)
-        ls.setWidth(plotWidth)
-        ls.setMarginTop(5f)
-        val div = Div()
-        div.add(ls)
-        return div
+    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false): Paragraph {
+        val p = Paragraph(s)
+        p.setFontSize(fontSizeConst)
+        p.setFont(if(bold) myBoldFont else myFont)
+        if(underline) p.setUnderline()
+        return p
     }
 
-    fun parametersDiv(parameters: List<Paragraph>): Div {
+
+    fun getParamsCell(paramsData: List<Pair<String, String>>, width: Float): Cell {
         val div = Div()
         div.setPaddingLeft(5f)
         //div.setBackgroundColor(myGrayConst)
-        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setBold()
+        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setFont(myBoldFont).setUnderline()
         div.add(title)
+        div.add(getTwoRowTable(paramsData))
 
-        parameters.forEach{ param ->
-            param.setFontSize(fontSizeConst)
-            div.add(param)
-        }
+        val paramsCell = Cell().add(div)
+        paramsCell.setWidth(width)
+        paramsCell.setBorder(Border.NO_BORDER)
+        val cellRenderer = CellRenderer(paramsCell)
+        cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
+        paramsCell.setNextRenderer(cellRenderer)
 
+        return paramsCell
+    }
+
+    fun getDataCell(div: Div, width: Float): Cell {
+        val cell = Cell()
+        cell.add(div)
+        cell.setWidth(width)
+        cell.setBorder(Border.NO_BORDER)
+        val cellRenderer = CellRenderer(cell)
+        cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
+        cell.setNextRenderer(cellRenderer)
+        cell.setPaddingLeft(5f)
+        return cell
+    }
+
+    fun getResultCell(div: Div, width: Float): Cell {
+        val cell = Cell()
+        cell.add(div)
+        cell.setWidth(width)
+        cell.setBorder(Border.NO_BORDER)
+        cell.setPaddingLeft(5f)
+        return cell
+    }
+
+    fun parametersDiv(dummy: List<Paragraph>): Div {
+        val div = Div()
+        div.setPaddingLeft(5f)
+        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setBold().setFont(myFont)
+        div.add(title)
         return div
     }
 
