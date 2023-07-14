@@ -27,6 +27,33 @@ class NormalizationPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Normalization", plotWidth = plotWidth))
 
+        val colTable = Table(3)
+        colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
+
+        // 1. parameters
+        val paramsDiv = Div()
+        paramsDiv.add(getParagraph(normType[parsedParams.normalizationType] + " normalization"))
+        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+
+        // 2. data
+        val middleDiv = Div()
+        val tableData: List<Pair<String, String>> = listOf(
+            "Min" to String.format("%.2f", res.min),
+            "Max" to String.format("%.2f", res.max),
+        )
+        middleDiv.add(getTwoRowTable(tableData))
+        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
+
+        // 3. results
+        val rightDiv = Div()
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
+
+        stepDiv.add(colTable)
+        return stepDiv
+        /*
         val colTable = Table(2)
         colTable.setWidth(plotWidth)
 
@@ -50,7 +77,7 @@ class NormalizationPdf() : PdfCommon() {
         colTable.addCell(rightCell)
         stepDiv.add(colTable)
 
-        return stepDiv
+         */
     }
 
 }
