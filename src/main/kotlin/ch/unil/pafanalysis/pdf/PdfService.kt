@@ -6,9 +6,12 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.results.model.Result
+import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.colors.WebColors
+import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
@@ -42,6 +45,9 @@ class PdfService {
 
     private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
     private val fontSizeConst = 10f
+    val myFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
+    val myBoldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+    val unilBlue = DeviceRgb(0, 140, 204)
 
     fun createPdf(analysisId: Int): File {
         val analysis = analysisRepo?.findById(analysisId)
@@ -71,20 +77,22 @@ class PdfService {
 
         val result: Result? = analysis?.result
 
-        val title = Paragraph(result?.name).setFontSize(14f).setBackgroundColor(myGrayConst).setBold().setPaddingLeft(5f)
+        val title = Paragraph(result?.name).setFont(myBoldFont).setFontSize(14f).setBackgroundColor(unilBlue).setPaddingLeft(5f).setFontColor(ColorConstants.WHITE)
+        title.setMarginTop(0f)
         div.add(title)
+        div.setPaddingTop(0f)
 
         val infoTable = Table(2).setPaddingLeft(5f)
 
         addInfoCell("Description", result?.description ?: "", infoTable)
 
-        val analysisName = if(analysis?.name != null) analysis.name else if(analysis?.idx != null) "#${analysis.idx}" else ""
+        val analysisName = if(analysis?.name != null) analysis.name else if(analysis?.idx != null) "#${analysis.idx + 1}" else ""
         addInfoCell("Analysis", analysisName, infoTable)
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)
 
-        div.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 2f))
+        div.setBorder(SolidBorder(unilBlue, 1f))
         div.setMarginTop(10f)
         div.setMarginBottom(20f)
         div.add(infoTable)
@@ -94,10 +102,10 @@ class PdfService {
 
     private fun addInfoCell(name: String, cont: String, table: Table) {
         val cell1 = Cell().setBorder(Border.NO_BORDER)
-        val p1 = Paragraph(name).setBold().setFontSize(fontSizeConst)
+        val p1 = Paragraph(name).setFont(myBoldFont).setFontSize(fontSizeConst)
         cell1.add(p1)
         val cell2 = Cell().setBorder(Border.NO_BORDER)
-        val p2 = Paragraph(cont).setFontSize(fontSizeConst)
+        val p2 = Paragraph(cont).setFont(myFont).setFontSize(fontSizeConst)
         cell2.add(p2)
         table.addCell(cell1)
         table.addCell(cell2)
@@ -119,7 +127,7 @@ class PdfService {
     }
 
     private fun commentDiv(comment: String): Div {
-        val p1 = Paragraph(comment)
+        val p1 = Paragraph(comment).setFont(myFont)
         p1.setBackgroundColor(ColorConstants.YELLOW)
         p1.setFontSize(fontSizeConst)
         p1.setPaddingLeft(5f)
@@ -148,12 +156,12 @@ class PdfService {
         // left header pos
         val xPosLeft = 55f
         val yPosTop = pageSize?.height.minus(10f)
-        val leftHeader = Paragraph("UNIL - PAF").setFontSize(headerFontSize)
+        val leftHeader = Paragraph("UNIL - PAF").setFont(myFont).setFontSize(headerFontSize)
 
         // right header
         val xPosRight= pageSize?.width.minus(15f)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val rightHeader = Paragraph(LocalDateTime.now().format(formatter)).setFontSize(headerFontSize)
+        val rightHeader = Paragraph(LocalDateTime.now().format(formatter)).setFont(myFont).setFontSize(headerFontSize)
 
         val numberOfPages: Int = pdf.getNumberOfPages()
         for (i in 1..numberOfPages) {
