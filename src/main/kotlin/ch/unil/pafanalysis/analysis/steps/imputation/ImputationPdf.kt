@@ -25,7 +25,7 @@ class ImputationPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, ImputationParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Imputation", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Imputation", plotWidth = plotWidth))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)

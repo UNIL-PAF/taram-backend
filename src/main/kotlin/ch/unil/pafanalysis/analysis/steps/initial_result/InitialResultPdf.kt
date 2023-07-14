@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Table
 import com.itextpdf.layout.element.Text
 import org.springframework.stereotype.Service
 
@@ -14,21 +15,39 @@ class InitialResultPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
         val initialResult = gson.fromJson(step.results, InitialResult::class.java)
+        val groupsDefined = step.columnInfo?.columnMapping?.experimentDetails?.values?.find { it.group != null } != null
 
-        val div = Div()
-        div.add(titleDiv("$stepNr - Initial result", initialResult.nrProteinGroups, step.tableNr, plotWidth))
+        val stepDiv = Div()
+        stepDiv.add(titleDiv("$stepNr - Initial result", plotWidth))
 
-        val fastaFileParagraph = Paragraph()
-        initialResult.fastaFiles?.forEach{ fastaFileParagraph.add(Text(it + "\n")) }
+        val colTable = Table(3)
+        colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
 
-        val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Selected intensity column" to Paragraph(step?.columnInfo?.columnMapping?.intCol),
-            "Fasta files" to fastaFileParagraph,
-            "Software version" to Paragraph( initialResult.softwareVersion),
+        // 1. parameters
+        val leftDiv = Div()
+        val groupTxt = if(groupsDefined) "Groups are defined" else "No groups are defined"
+        leftDiv.add(getParagraph(groupTxt))
+        leftDiv.add(getTwoRowTable(listOf(Pair("Default intensity column:", step?.columnInfo?.columnMapping?.intCol ?: ""))))
+        colTable.addCell(getDataCell(leftDiv, 2*cellFifth))
+
+        // 2. data
+        val dataTable: List<Pair<String, List<String>>> = listOf(
+            Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
+            Pair("Software version: ", listOf(initialResult?.softwareVersion ?: ""))
         )
+        val dataDiv = Div()
+        dataDiv.add(getTwoRowTableWithList(dataTable))
+        colTable.addCell(getDataCell(dataDiv, 2*cellFifth))
 
-        div.add(addTwoRowTable(tableData))
-        return div
+        // 3. results
+        val rightDiv = Div()
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
+
+        stepDiv.add(colTable)
+        return stepDiv
     }
 
 }

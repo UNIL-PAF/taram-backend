@@ -17,7 +17,7 @@ class GroupFilterPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, GroupFilter::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Filter on valid", step.nrProteinGroups, step.tableNr, plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Filter on valid", plotWidth))
 
         val colTable = Table(2)
         val tableMargin = 5f

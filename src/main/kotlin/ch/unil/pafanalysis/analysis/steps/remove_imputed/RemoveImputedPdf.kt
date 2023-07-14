@@ -18,7 +18,7 @@ class RemoveImputedPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, RemoveImputedParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Remove imputed", step.nrProteinGroups, step.tableNr, plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Remove imputed", plotWidth))
 
         val colTable = Table(2)
         val tableMargin = 5f

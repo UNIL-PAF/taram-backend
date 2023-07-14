@@ -28,6 +28,22 @@ open class PdfCommon {
     val myBoldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
     val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
 
+    fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
+        val table = Table(2)
+        tableData.forEach{ (name, cont) ->
+            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myBoldFont));
+            cell1.setBorder(Border.NO_BORDER)
+            table.addCell(cell1)
+            val cell2Div = Div()
+            cont.forEach{ cell2Div.add(Paragraph(it).setFontSize(fontSizeConst).setFont(myFont))}
+            val cell2= Cell().add(cell2Div);
+            cell2.setBorder(Border.NO_BORDER)
+            table.addCell(cell2)
+        }
+        return table
+    }
+
+
     fun getTwoRowTable(tableData: List<Pair<String, String>>): Table {
         val table = Table(2)
         tableData.forEach{ (name, cont) ->
@@ -41,24 +57,7 @@ open class PdfCommon {
         return table
     }
 
-    fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
-        val div = Div()
-
-        val table = Table(2)
-        tableData.map{ (name, cont) ->
-            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myFont));
-            cell1.setBorder(Border.NO_BORDER)
-            table.addCell(cell1)
-            val cell2= Cell().add(cont);
-            cell2.setBorder(Border.NO_BORDER)
-            table.addCell(cell2)
-        }
-
-        div.add(table)
-        return div
-    }
-
-    fun titleDiv(title: String, nrProts: Int?, tableNr: Int?, plotWidth: Float): Div {
+    fun titleDiv(title: String, plotWidth: Float): Div {
         val titlePadding = 5f
         val unilBlue = DeviceRgb(0, 140, 204)
 
@@ -70,7 +69,6 @@ open class PdfCommon {
         t.setWidth(plotWidth?.minus(titlePadding))
 
         val text = Paragraph(Text(title))
-        //text.setBold()
         text.setFontSize(12f)
         text.setFontColor(ColorConstants.WHITE)
         text.setFont(myFont)
@@ -105,14 +103,6 @@ open class PdfCommon {
         return div
     }
 
-    fun getText(s: String, bold: Boolean = true): Text {
-        val text = Text(s)
-        text.setFontSize(fontSizeConst)
-        text.setFont(myFont)
-        if(bold) text.setBold()
-        return text
-    }
-
     fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false): Paragraph {
         val p = Paragraph(s)
         p.setFontSize(fontSizeConst)
@@ -121,11 +111,9 @@ open class PdfCommon {
         return p
     }
 
-
     fun getParamsCell(paramsData: List<Pair<String, String>>, width: Float): Cell {
         val div = Div()
         div.setPaddingLeft(5f)
-        //div.setBackgroundColor(myGrayConst)
         val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setFont(myBoldFont).setUnderline()
         div.add(title)
         div.add(getTwoRowTable(paramsData))
@@ -161,6 +149,9 @@ open class PdfCommon {
         return cell
     }
 
+    // *****************
+    // DELETE FOLL_OWING
+
     fun parametersDiv(dummy: List<Paragraph>): Div {
         val div = Div()
         div.setPaddingLeft(5f)
@@ -168,5 +159,32 @@ open class PdfCommon {
         div.add(title)
         return div
     }
+
+    fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
+        val div = Div()
+
+        val table = Table(2)
+        tableData.map{ (name, cont) ->
+            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myFont));
+            cell1.setBorder(Border.NO_BORDER)
+            table.addCell(cell1)
+            val cell2= Cell().add(cont);
+            cell2.setBorder(Border.NO_BORDER)
+            table.addCell(cell2)
+        }
+
+        div.add(table)
+        return div
+    }
+
+    /*
+fun getText(s: String, bold: Boolean = true): Text {
+    val text = Text(s)
+    text.setFontSize(fontSizeConst)
+    text.setFont(myFont)
+    if(bold) text.setBold()
+    return text
+}
+ */
 
 }

@@ -15,7 +15,7 @@ class RenameColumnsPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, RenameColumns::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Rename columns", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Rename columns", plotWidth = plotWidth))
 
         val tableData: List<Pair<String, Paragraph?>> = listOf(
             "Nr of columns renamed" to Paragraph(res.nrColumnsRenamed.toString())

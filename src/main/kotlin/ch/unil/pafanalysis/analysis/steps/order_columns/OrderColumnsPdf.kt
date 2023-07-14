@@ -15,7 +15,7 @@ class OrderColumnsPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, OrderColumns::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Order columns", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Order columns", plotWidth = plotWidth))
 
         val tableData: List<Pair<String, Paragraph?>> = listOf(
             "Nr of columns moved" to Paragraph(res.nrColumnsMoved.toString())

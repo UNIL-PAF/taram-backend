@@ -30,7 +30,7 @@ class TTestPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, TTestParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - t-test", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - t-test", plotWidth = plotWidth))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

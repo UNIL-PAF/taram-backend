@@ -17,7 +17,7 @@ class FilterPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, Filter::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Filter rows", step.nrProteinGroups, step.tableNr, plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Filter rows", plotWidth))
 
         val colTable = Table(2)
         val tableMargin = 5f

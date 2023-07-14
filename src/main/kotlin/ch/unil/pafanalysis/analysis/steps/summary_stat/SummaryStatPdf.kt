@@ -25,7 +25,7 @@ class SummaryStatPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
-        stepDiv.add(titleDiv("$stepNr - Summary", step.nrProteinGroups, step.tableNr, plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - Summary", plotWidth = plotWidth))
 
         val nrEntries = res.min?.size
 
