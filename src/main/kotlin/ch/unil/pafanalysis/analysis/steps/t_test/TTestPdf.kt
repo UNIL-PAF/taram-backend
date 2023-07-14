@@ -34,13 +34,14 @@ class TTestPdf() : PdfCommon() {
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
 
         // 1. parameters
         val paramsData: List<Pair<String, String>> = listOf(
             Pair("Significance threshold:", parsedParams.signThres.toString()),
             Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: "")
         )
-        val leftCell = getParamsCell(paramsData, plotWidth/3)
+        val leftCell = getParamsCell(paramsData, 2 * cellFifth)
         colTable.addCell(leftCell)
 
         // 2. data
@@ -50,13 +51,13 @@ class TTestPdf() : PdfCommon() {
             Pair("${comp.firstGroup} - ${comp.secondGroup}:", comp.numberOfSignificant.toString())
         } ?: emptyList()
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, plotWidth/3))
+        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
 
         // 3. results
         val rightDiv = Div()
         rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
         rightDiv.add(getParagraph("Table ${step.tableNr}"))
-        colTable.addCell(getResultCell(rightDiv, plotWidth/3))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
         return stepDiv
