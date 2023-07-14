@@ -20,26 +20,29 @@ class RemoveImputedPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Remove imputed", plotWidth))
 
-        val colTable = Table(2)
-        val tableMargin = 5f
-        colTable.setWidth(plotWidth - tableMargin)
+        val colTable = Table(3)
+        colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
 
-        val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Nr of replacements" to Paragraph(res.nrValuesReplaced.toString()),
-            "Nr of protein groups with replacements" to Paragraph(res.nrProteinGroupsReplaced.toString())
+        // 1. parameters
+        val paramsDiv = Div()
+        paramsDiv.add(getParagraph("Replace imputed values by [${parsedParams.replaceBy?.printName}]."))
+        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+
+        // 2. data
+        val middleDiv = Div()
+        val tableData: List<Pair<String, String>> = listOf(
+            "Nr of replacements:" to res.nrValuesReplaced.toString(),
+            "Nr of protein groups with replacements:" to res.nrProteinGroupsReplaced.toString()
         )
+        middleDiv.add(getTwoRowTable(tableData))
+        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
 
-        val leftCell = Cell().add(addTwoRowTable(tableData))
-        leftCell.setWidth(plotWidth/2)
-        leftCell.setBorder(Border.NO_BORDER)
-        colTable.addCell(leftCell)
-
-        val params = parametersDiv(listOf(Paragraph("Replace imputed values by ${parsedParams.replaceBy?.printName}")))
-        val rightCell = Cell().add(params)
-        rightCell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-        colTable.addCell(rightCell)
-        colTable.setMarginRight(tableMargin)
-        colTable.setMarginBottom(tableMargin)
+        // 3. results
+        val rightDiv = Div()
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
         return stepDiv
