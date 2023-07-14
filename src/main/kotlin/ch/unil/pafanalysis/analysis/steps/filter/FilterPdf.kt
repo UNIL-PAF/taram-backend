@@ -29,7 +29,7 @@ class FilterPdf() : PdfCommon() {
 
         // 2. data
         val middleDiv = Div()
-        val tableData = listOf(Pair("Protein groups removed: ", res.nrRowsRemoved.toString()))
+        val tableData = listOf(Pair("Protein groups removed:", res.nrRowsRemoved.toString()))
         middleDiv.add(getTwoRowTable(tableData))
         colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
 

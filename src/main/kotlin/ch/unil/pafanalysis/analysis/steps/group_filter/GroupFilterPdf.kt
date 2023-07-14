@@ -19,25 +19,25 @@ class GroupFilterPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Filter on valid", plotWidth))
 
-        val colTable = Table(2)
-        val tableMargin = 5f
-        colTable.setWidth(plotWidth - tableMargin)
+        val colTable = Table(3)
+        colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
 
-        val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Rows removed" to Paragraph(res.nrRowsRemoved.toString())
-        )
+        // 1. parameters
+        val paramsDiv = getParams(step)
+        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
-        val leftCell = Cell().add(addTwoRowTable(tableData))
-        leftCell.setWidth(plotWidth/2)
-        leftCell.setBorder(Border.NO_BORDER)
-        colTable.addCell(leftCell)
+        // 2. data
+        val middleDiv = Div()
+        val tableData = listOf(Pair("Protein groups removed:", res.nrRowsRemoved.toString()))
+        middleDiv.add(getTwoRowTable(tableData))
+        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
 
-        val params = getParams(step)
-        val rightCell = Cell().add(params)
-        rightCell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-        colTable.addCell(rightCell)
-        colTable.setMarginRight(tableMargin)
-        colTable.setMarginBottom(tableMargin)
+        // 3. results
+        val rightDiv = Div()
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
         return stepDiv
@@ -50,12 +50,13 @@ class GroupFilterPdf() : PdfCommon() {
 
         val myIntField = if(parsedParams.field != null) parsedParams.field else step.columnInfo?.columnMapping?.intCol
 
-        val p = Paragraph()
-        p.add(Text("Only keep rows where "))
-        p.add(Text(myIntField ?: "").setItalic())
-        p.add(Text(" has at least ${parsedParams.minNrValid} valid values in ${groupTxt[parsedParams.filterInGroup]}."))
+        val p = getParagraph("Only keep rows where ")
+        p.add(getText(myIntField ?: "", italic = true))
+        p.add(getText(" has at least ${parsedParams.minNrValid} valid value(s) in ${groupTxt[parsedParams.filterInGroup]}."))
 
-        return parametersDiv(listOf(p))
+        val d = Div()
+        d.add(p)
+        return d
     }
 
 }
