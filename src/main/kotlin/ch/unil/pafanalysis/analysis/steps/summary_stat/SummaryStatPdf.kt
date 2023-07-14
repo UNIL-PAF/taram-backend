@@ -77,16 +77,14 @@ class SummaryStatPdf() : PdfCommon() {
     }
 
     private fun addFirstCol(rowName: String, colTable: Table){
-        val rowNamePar = Paragraph(rowName).setBold().setFontSize(cellFontSize-1f)
+        val rowNamePar = getParagraph(rowName, bold = true).setFontSize(cellFontSize)
         val rowNameCell = Cell().add(rowNamePar)
         rowNameCell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
         colTable.addCell(rowNameCell)
     }
 
     private fun addStringCell(cellString: String, colTable: Table){
-        val cellP = Paragraph().setFontSize(cellFontSize)
-        cellP.add(cellString)
-        val cell = Cell().add(cellP)
+        val cell = Cell().add(getParagraph(cellString).setFontSize(cellFontSize))
         cell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
         colTable.addCell(cell)
     }
