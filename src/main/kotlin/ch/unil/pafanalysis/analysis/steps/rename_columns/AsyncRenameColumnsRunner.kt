@@ -58,7 +58,7 @@ class AsyncRenameColumnsRunner() : CommonStep() {
             val newHeaders = table?.headers?.map{ h ->
                 if(h.experiment != null){
                     val groupName = expInfo?.get(h.experiment.name)?.group
-                    val newName = if(groupName != null) h.name + "." + groupName else h.name
+                    val newName = if(groupName != null) groupName + "." + h.name else h.name
                     h.copy(name = newName)
                 } else h
             }

@@ -1,22 +1,18 @@
 package ch.unil.pafanalysis.pdf
 
 import com.google.gson.Gson
-import com.itextpdf.io.font.constants.FontStyles
 import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.colors.WebColors
-import com.itextpdf.kernel.font.PdfFont
 import com.itextpdf.kernel.font.PdfFontFactory
-import com.itextpdf.kernel.pdf.canvas.draw.SolidLine
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.Property
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.renderer.CellRenderer
-import javax.swing.text.StyleConstants.FontConstants
 
 
 open class PdfCommon {
@@ -77,24 +73,6 @@ open class PdfCommon {
         colLeft.setBorder(Border.NO_BORDER)
         colLeft.add(text)
         t.addCell(colLeft)
-
-        /*
-        val colCenter = Cell()
-        colCenter .setWidth(170f)
-        colCenter.setTextAlignment(TextAlignment.CENTER)
-        colCenter.setBorder(Border.NO_BORDER)
-        val nrProtsText = Text("$nrProts protein groups")
-        nrProtsText.setFontSize(fontSizeConst)
-        colCenter.add(Paragraph(nrProtsText))
-        t.addCell(colCenter)
-
-        val colRight = Cell().setTextAlignment(TextAlignment.RIGHT)
-        colRight.setTextAlignment(TextAlignment.RIGHT)
-        colRight.setBorder(Border.NO_BORDER)
-        colRight.setPaddingRight(titlePadding)
-        if(tableNr != null) colRight.add(Paragraph(Text("Table-$tableNr").setFontSize(fontSizeConst)))
-        t.addCell(colRight)
-*/
         p.add(t)
 
         val div = Div()
@@ -127,26 +105,6 @@ open class PdfCommon {
         return paramsCell
     }
 
-    /*
-    fun getParamsCell(paramsData: List<Pair<String, String>>, width: Float): Cell {
-        val div = Div()
-        div.setPaddingLeft(5f)
-        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setFont(myBoldFont).setUnderline()
-        div.add(title)
-        div.add(getTwoRowTable(paramsData))
-
-        val paramsCell = Cell().add(div)
-        paramsCell.setWidth(width)
-        paramsCell.setBorder(Border.NO_BORDER)
-        val cellRenderer = CellRenderer(paramsCell)
-        cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
-        paramsCell.setNextRenderer(cellRenderer)
-
-        return paramsCell
-    }
-
-     */
-
     fun getDataCell(div: Div, width: Float): Cell {
         val cell = Cell()
         cell.add(div)
@@ -176,35 +134,5 @@ open class PdfCommon {
         if(italic) text.setItalic()
         return text
     }
-
-
-    // *****************
-    // DELETE FOLL_OWING
-
-    fun parametersDiv(dummy: List<Paragraph>): Div {
-        val div = Div()
-        div.setPaddingLeft(5f)
-        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setBold().setFont(myFont)
-        div.add(title)
-        return div
-    }
-
-    fun addTwoRowTable(tableData: List<Pair<String, Paragraph?>>): Div {
-        val div = Div()
-
-        val table = Table(2)
-        tableData.map{ (name, cont) ->
-            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myFont));
-            cell1.setBorder(Border.NO_BORDER)
-            table.addCell(cell1)
-            val cell2= Cell().add(cont);
-            cell2.setBorder(Border.NO_BORDER)
-            table.addCell(cell2)
-        }
-
-        div.add(table)
-        return div
-    }
-
 
 }
