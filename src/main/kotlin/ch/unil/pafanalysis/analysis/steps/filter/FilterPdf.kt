@@ -19,50 +19,49 @@ class FilterPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Filter rows", plotWidth))
 
-        val colTable = Table(2)
-        val tableMargin = 5f
-        colTable.setWidth(plotWidth - tableMargin)
+        val colTable = Table(3)
+        colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
 
-        val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Rows removed" to Paragraph(res.nrRowsRemoved.toString())
-        )
-
-        val leftCell = Cell().add(addTwoRowTable(tableData))
-        leftCell.setWidth(plotWidth/2)
-        leftCell.setBorder(Border.NO_BORDER)
-        colTable.addCell(leftCell)
-
+        // 1. parameters
         val params = getParams(step)
-        val rightCell = Cell().add(params)
-        rightCell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-        colTable.addCell(rightCell)
-        colTable.setMarginRight(tableMargin)
-        colTable.setMarginBottom(tableMargin)
+        colTable.addCell(getParamsCell(params, 2*cellFifth))
+
+        // 2. data
+        val middleDiv = Div()
+        val tableData = listOf(Pair("Protein groups removed: ", res.nrRowsRemoved.toString()))
+        middleDiv.add(getTwoRowTable(tableData))
+        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
+
+        // 3. results
+        val rightDiv = Div()
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
         return stepDiv
     }
 
     private fun getParams(step: AnalysisStep): Div {
+        val paramDiv = Div()
         val parsedParams = gson.fromJson(step.parameters, FilterParams::class.java)
-        var pList: MutableList<Paragraph> = mutableListOf<Paragraph>()
-        if(parsedParams.removeOnlyIdentifiedBySite == true) pList.add(Paragraph("Remove only-identified-by-site"))
-        if(parsedParams.removeReverse == true) pList.add(Paragraph("Remove reverse hits"))
-        if(parsedParams.removePotentialContaminant == true) pList.add(Paragraph("Remove potential contaminants"))
-        val freeParams = getFreeParams(parsedParams.colFilters)
-        freeParams?.forEach { pList.add(it) }
-        return parametersDiv(pList)
+        val l = emptyList<Paragraph>()
+        val l2 = if(parsedParams.removeOnlyIdentifiedBySite == true) l.plus(getParagraph("Remove only-identified-by-site")) else l
+        val l3 = if(parsedParams.removeReverse == true) l2.plus(getParagraph("Remove reverse hits")) else l2
+        val l4 = if(parsedParams.removePotentialContaminant == true) l3.plus(getParagraph("Remove potential contaminants")) else l3
+        l4.plus(getFreeParams(parsedParams.colFilters)).forEach{paramDiv.add(it)}
+        return paramDiv
     }
 
-    private fun getFreeParams(colFilters: List<ColFilter>?): List<Paragraph>? {
+    private fun getFreeParams(colFilters: List<ColFilter>?): List<Paragraph> {
         return colFilters?.map{ flt ->
-            val action = if(flt.removeSelected == true) "Remove" else "Only keep"
-            val p = Paragraph("$action ")
-            p.add(Text(" ${flt.colName} ").setItalic())
-            p.add(Text(flt.comparator.symbol))
-            p.add(Text(" ${flt.compareToValue}"))
+            val action = if(flt.removeSelected) "Remove" else "Only keep"
+            val p = getParagraph("$action ")
+            p.add(getText(" ${flt.colName} ", italic = true))
+            p.add(getText("${flt.comparator.symbol} ${flt.compareToValue}"))
             p
-        }
+        } ?: emptyList()
     }
 
 }

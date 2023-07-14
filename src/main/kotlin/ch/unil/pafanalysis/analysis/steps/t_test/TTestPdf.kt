@@ -41,7 +41,9 @@ class TTestPdf() : PdfCommon() {
             Pair("Significance threshold:", parsedParams.signThres.toString()),
             Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: "")
         )
-        val leftCell = getParamsCell(paramsData, 2 * cellFifth)
+        val paramsDiv = Div()
+        paramsDiv.add(getTwoRowTable(paramsData))
+        val leftCell = getParamsCell(paramsDiv, 2 * cellFifth)
         colTable.addCell(leftCell)
 
         // 2. data

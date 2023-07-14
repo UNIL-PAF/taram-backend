@@ -31,11 +31,11 @@ open class PdfCommon {
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
         tableData.forEach{ (name, cont) ->
-            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myBoldFont));
+            val cell1 = Cell().add(getParagraph(name, bold = true));
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
             val cell2Div = Div()
-            cont.forEach{ cell2Div.add(Paragraph(it).setFontSize(fontSizeConst).setFont(myFont))}
+            cont.forEach{ cell2Div.add(getParagraph(it))}
             val cell2= Cell().add(cell2Div);
             cell2.setBorder(Border.NO_BORDER)
             table.addCell(cell2)
@@ -43,14 +43,13 @@ open class PdfCommon {
         return table
     }
 
-
     fun getTwoRowTable(tableData: List<Pair<String, String>>): Table {
         val table = Table(2)
         tableData.forEach{ (name, cont) ->
-            val cell1 = Cell().add(Paragraph(name).setFontSize(fontSizeConst).setFont(myBoldFont));
+            val cell1 = Cell().add(getParagraph(name, bold = true));
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
-            val cell2= Cell().add(Paragraph(cont).setFontSize(fontSizeConst).setFont(myFont));
+            val cell2= Cell().add(getParagraph(cont));
             cell2.setBorder(Border.NO_BORDER)
             table.addCell(cell2)
         }
@@ -111,6 +110,24 @@ open class PdfCommon {
         return p
     }
 
+    fun getParamsCell(content: Div, width: Float): Cell {
+        val div = Div()
+        div.setPaddingLeft(5f)
+        val title = Paragraph("Parameters:").setFontSize(fontSizeConst).setFont(myBoldFont).setUnderline()
+        div.add(title)
+        div.add(content)
+
+        val paramsCell = Cell().add(div)
+        paramsCell.setWidth(width)
+        paramsCell.setBorder(Border.NO_BORDER)
+        val cellRenderer = CellRenderer(paramsCell)
+        cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
+        paramsCell.setNextRenderer(cellRenderer)
+
+        return paramsCell
+    }
+
+    /*
     fun getParamsCell(paramsData: List<Pair<String, String>>, width: Float): Cell {
         val div = Div()
         div.setPaddingLeft(5f)
@@ -127,6 +144,8 @@ open class PdfCommon {
 
         return paramsCell
     }
+
+     */
 
     fun getDataCell(div: Div, width: Float): Cell {
         val cell = Cell()
@@ -148,6 +167,16 @@ open class PdfCommon {
         cell.setPaddingLeft(5f)
         return cell
     }
+
+    fun getText(s: String, bold: Boolean = false, italic: Boolean = false): Text {
+        val text = Text(s)
+        text.setFontSize(fontSizeConst)
+        text.setFont(myFont)
+        if(bold) text.setBold()
+        if(italic) text.setItalic()
+        return text
+    }
+
 
     // *****************
     // DELETE FOLL_OWING
@@ -177,14 +206,5 @@ open class PdfCommon {
         return div
     }
 
-    /*
-fun getText(s: String, bold: Boolean = true): Text {
-    val text = Text(s)
-    text.setFontSize(fontSizeConst)
-    text.setFont(myFont)
-    if(bold) text.setBold()
-    return text
-}
- */
 
 }
