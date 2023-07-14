@@ -30,8 +30,8 @@ class LogTransformationPdf() : PdfCommon() {
         // 2. data
         val middleDiv = Div()
         val tableData: List<Pair<String, String>> = listOf(
-            "Min" to String.format("%.2f", res.min),
-            "Max" to String.format("%.2f", res.max),
+            "Min:" to String.format("%.2f", res.min),
+            "Max:" to String.format("%.2f", res.max),
         )
         middleDiv.add(getTwoRowTable(tableData))
         colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))

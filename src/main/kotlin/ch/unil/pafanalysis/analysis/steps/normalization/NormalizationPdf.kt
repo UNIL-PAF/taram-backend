@@ -39,8 +39,8 @@ class NormalizationPdf() : PdfCommon() {
         // 2. data
         val middleDiv = Div()
         val tableData: List<Pair<String, String>> = listOf(
-            "Min" to String.format("%.2f", res.min),
-            "Max" to String.format("%.2f", res.max),
+            "Min:" to String.format("%.2f", res.min),
+            "Max:" to String.format("%.2f", res.max),
         )
         middleDiv.add(getTwoRowTable(tableData))
         colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
@@ -53,31 +53,6 @@ class NormalizationPdf() : PdfCommon() {
 
         stepDiv.add(colTable)
         return stepDiv
-        /*
-        val colTable = Table(2)
-        colTable.setWidth(plotWidth)
-
-        val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Min" to Paragraph(String.format("%.2f", res.min)),
-            "Max" to Paragraph(String.format("%.2f", res.max)),
-            "Mean" to Paragraph(String.format("%.2f", res.mean)),
-            "Median" to Paragraph(String.format("%.2f", res.median)),
-            "Sum" to Paragraph(String.format("%.2f", res.sum)),
-            "Nr of valid" to Paragraph(res.nrValid?.toString()),
-            "Nr of NaN" to Paragraph(res.nrNaN?.toString())
-        )
-
-        val leftCell = Cell().add(addTwoRowTable(tableData))
-        leftCell.setWidth(plotWidth/2)
-        leftCell.setBorder(Border.NO_BORDER)
-        colTable.addCell(leftCell)
-
-        val params = parametersDiv(listOf(Paragraph(normType[parsedParams.normalizationType] + " normalization")))
-        val rightCell = Cell().add(params)
-        colTable.addCell(rightCell)
-        stepDiv.add(colTable)
-
-         */
     }
 
 }

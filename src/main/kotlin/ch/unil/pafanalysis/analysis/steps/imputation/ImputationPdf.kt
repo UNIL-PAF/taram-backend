@@ -27,40 +27,51 @@ class ImputationPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Imputation", plotWidth = plotWidth))
 
-        val colTable = Table(2)
+        val colTable = Table(3)
         colTable.setWidth(plotWidth)
+        val cellFifth = plotWidth/5
 
-        val tableData: List<Pair<String, Paragraph?>> = listOf(
-            "Nr of imputed values" to Paragraph(res.nrImputedValues.toString()),
-        )
-
-        val leftCell = Cell().add(addTwoRowTable(tableData))
-        leftCell.setWidth(plotWidth / 2)
-        leftCell.setBorder(Border.NO_BORDER)
-        colTable.addCell(leftCell)
-
-        val firstParam = listOf(Paragraph(imputationText[parsedParams.imputationType]))
+        // 1. parameters
+        val paramsDiv = Div()
+        val firstParam = listOf(getParagraph(imputationText[parsedParams.imputationType]?:"", bold = true))
 
         val additionalParams: List<Paragraph> =
-            if (parsedParams.imputationType == "normal") getNormParams(parsedParams.normImputationParams)
-            else if (parsedParams.imputationType == "value") listOf(Paragraph(parsedParams.replaceValue.toString()))
+            if (parsedParams.imputationType == "normal") listOf(getNormParams(parsedParams.normImputationParams))
+            else if (parsedParams.imputationType == "value") listOf(getParagraph(parsedParams.replaceValue.toString()))
             else emptyList<Paragraph>()
 
-        val allParams: List<Paragraph> = firstParam.plus(additionalParams)
+        firstParam.plus(additionalParams).forEach{ paramsDiv.add(it) }
+        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
-        val rightCell = Cell().add(parametersDiv(allParams))
-        colTable.addCell(rightCell)
+        // 2. data
+        val middleDiv = Div()
+        val tableData: List<Pair<String, String>> = listOf(
+            "Nr of imputed values:" to res.nrImputedValues.toString(),
+            "Nr of protein groups with imputation:" to res.nrOfImputedGroups.toString()
+        )
+        middleDiv.add(getTwoRowTable(tableData))
+        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
+
+        // 3. results
+        val rightDiv = Div()
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
         return stepDiv
     }
 
-    private fun getNormParams(params: NormImputationParams?): List<Paragraph> {
-        return listOf<Paragraph>(
-            Paragraph("Width: ${params?.width.toString()}"),
-            Paragraph("Downshift: ${params?.downshift.toString()}"),
-            Paragraph("Seed: ${params?.seed.toString()}")
+    private fun getNormParams(params: NormImputationParams?): Paragraph {
+        val normParams = listOf(
+            Pair("Width:", params?.width.toString()),
+            Pair("Downshift:", params?.downshift.toString()),
+            Pair("Seed:", params?.seed.toString())
         )
+        val table = getTwoRowTable(normParams)
+        val p = Paragraph()
+        p.add(table)
+        return p
     }
 
 }
