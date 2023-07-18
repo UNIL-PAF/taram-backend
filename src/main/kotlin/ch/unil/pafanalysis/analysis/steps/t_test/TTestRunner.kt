@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service
 @Service
 class TTestRunner() : CommonStep(), CommonRunner {
 
+    val version = "1.0"
+
     @Autowired
     var asyncTTestRunner: AsyncTTestRunner? = null
 
@@ -29,7 +31,7 @@ class TTestRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, oldStepId, true, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, true, step, params)
            asyncTTestRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }

@@ -101,6 +101,7 @@ open class CommonStep {
 
     fun runCommonStep(
         type: AnalysisStepType,
+        version: String,
         oldStepId: Int? = null,
         modifiesResult: Boolean? = null,
         step: AnalysisStep? = null,

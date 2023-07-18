@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service
 @Service
 class BoxPlotRunner() : CommonStep(), CommonRunner {
 
+    val version = "1.0"
+
     override var type: AnalysisStepType? = AnalysisStepType.BOXPLOT
 
     @Autowired
@@ -36,7 +38,7 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, oldStepId, false, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, false, step, params)
         asyncBoxplotRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }

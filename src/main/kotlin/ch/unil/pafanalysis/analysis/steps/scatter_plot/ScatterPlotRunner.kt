@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service
 @Service
 class ScatterPlotRunner() : CommonStep(), CommonRunner {
 
+    val version = "1.0"
+
     override var type: AnalysisStepType? = AnalysisStepType.SCATTER_PLOT
 
     @Autowired
@@ -31,7 +33,7 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, oldStepId, false, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, false, step, params)
         asyncRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }

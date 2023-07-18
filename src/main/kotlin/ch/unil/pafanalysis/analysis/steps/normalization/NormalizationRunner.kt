@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service
 @Service
 class NormalizationRunner() : CommonStep(), CommonRunner {
 
+    val version = "1.0"
+
     @Lazy
     @Autowired
     var asyncRunner: AsyncNormalizationRunner? = null
@@ -38,7 +40,7 @@ class NormalizationRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, oldStepId, true, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, true, step, params)
         asyncRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }

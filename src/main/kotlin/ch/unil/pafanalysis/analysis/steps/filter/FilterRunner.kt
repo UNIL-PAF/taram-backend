@@ -17,6 +17,8 @@ import kotlin.math.max
 @Service
 class FilterRunner() : CommonStep(), CommonRunner {
 
+    val version = "1.0"
+
     @Autowired
     var asyncFilterRunner: AsyncFilterRunner? = null
 
@@ -37,7 +39,7 @@ class FilterRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, oldStepId, true, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, true, step, params)
         asyncFilterRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }

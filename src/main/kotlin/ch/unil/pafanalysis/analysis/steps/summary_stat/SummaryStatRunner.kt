@@ -24,6 +24,8 @@ import java.nio.file.Path
 @Service
 class SummaryStatRunner() : CommonStep(), CommonRunner {
 
+    val version = "1.0"
+
     @Lazy
     @Autowired
     var asyncRunner: AsyncSummaryStatRunner? = null
@@ -45,7 +47,7 @@ class SummaryStatRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, oldStepId, false, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, false, step, params)
         asyncRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
