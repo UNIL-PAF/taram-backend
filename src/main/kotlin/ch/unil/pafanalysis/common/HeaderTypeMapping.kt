@@ -7,9 +7,11 @@ class HeaderTypeMapping {
 
     // 1. MaxQuant
     // 2. Spectronaut
-    private val mapping: Map<String, List<String>> = mapOf(
+    private val mapping: Map<String, List<String?>> = mapOf(
+        "id" to listOf("id", null),
         "proteinIds" to listOf("Majority.protein.IDs", "PG.ProteinGroups"),
-        "geneNames" to listOf("Gene.names", "PG.Genes")
+        "geneNames" to listOf("Gene.names", "PG.Genes"),
+        "description" to listOf("Protein.names", "PG.FASTAHeader"),
     )
 
     fun getCol(name: String, type: String?): String {

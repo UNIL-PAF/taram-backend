@@ -5,7 +5,7 @@ import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.ProteinGroup
 import ch.unil.pafanalysis.analysis.model.ProteinTable
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.common.HeaderMaps
+import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.results.model.ResultType
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service
 @Service
 class ProteinTableService {
 
-    val readTable = ReadTableData()
+    private val readTable = ReadTableData()
+    private val hMap = HeaderTypeMapping()
 
     @Autowired
     private var commonStep: CommonStep? = null
@@ -42,14 +43,12 @@ class ProteinTableService {
         resType: String?,
         expDetails: Map<String, ExpInfo>?
     ): ProteinTable {
-        val headerMap = HeaderMaps.getHeaderMap(resType)
-
-        val prots = readTable.getStringColumn(table, headerMap["prot"]!!)?.map { it.split(";")?.get(0) }
-        val genes = readTable.getStringColumn(table, headerMap["gene"]!!)?.map { it.split(";")?.get(0) }
-        val descs = readTable.getStringColumn(table, headerMap["desc"]!!)
+        val prots = readTable.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")?.get(0) }
+        val genes = readTable.getStringColumn(table, hMap.getCol("geneNames", resType))?.map { it.split(";")?.get(0) }
+        val descs = readTable.getStringColumn(table, hMap.getCol("description", resType))
         val intCol = readTable.getDoubleColumn(table, defaultInt!!)
         val ids: List<Int>? = if (resType == ResultType.MaxQuant.value) {
-            readTable.getDoubleColumn(table, headerMap["id"]!!)?.map { it.toInt() }
+            readTable.getDoubleColumn(table, hMap.getCol("id", resType))?.map { it.toInt() }
         } else listOf(1..(prots?.size ?: 1)).flatten()
         val colOrMeans: List<Double> =
             intCol ?: readTable.getDoubleMatrixByRow(table, defaultInt!!, expDetails).second.map { d ->

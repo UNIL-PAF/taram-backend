@@ -3,17 +3,17 @@ package ch.unil.pafanalysis.analysis.steps.volcano
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.common.HeaderMaps
+import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.io.File
 import kotlin.math.log10
 
 @Service
 class AsyncVolcanoPlotRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
+    private val hMap = HeaderTypeMapping()
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
@@ -32,8 +32,6 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     }
 
     private fun createVolcanoObj(analysisStep: AnalysisStep?): VolcanoPlot {
-        val headerMap = HeaderMaps.getHeaderMap(analysisStep?.analysis?.result?.type)
-
         val table = readTableData.getTable(
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers
@@ -45,10 +43,12 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val hasQVal: Boolean = (table.headers?.find { it.name == "q.value$compName" }) != null
         if (params?.useAdjustedPVal == true && !hasQVal) throw StepException("There are no q-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
 
+        val resType = analysisStep?.analysis?.result?.type
+
         val value = readTableData.getDoubleColumn(table, "p.value$compName")
         val foldChanges = readTableData.getDoubleColumn(table, "fold.change$compName")
-        val proteinName = readTableData.getStringColumn(table, headerMap.get("prot")!!)
-        val geneName = readTableData.getStringColumn(table, headerMap.get("gene")!!)
+        val proteinName = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))
+        val geneName = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
         val qVals = if(hasQVal) readTableData.getDoubleColumn(table, "q.value$compName") else null
 
         if (foldChanges == null) throw StepException("You have to run a statistical test before this plot.")

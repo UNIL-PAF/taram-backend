@@ -2,10 +2,7 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.common.HeaderMaps
 import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.Table
-import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
