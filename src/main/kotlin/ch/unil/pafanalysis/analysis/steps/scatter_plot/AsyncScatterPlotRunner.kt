@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import org.springframework.scheduling.annotation.Async
@@ -14,6 +15,7 @@ import kotlin.math.log10
 class AsyncScatterPlotRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
+    private val hMap = HeaderTypeMapping()
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
@@ -39,9 +41,13 @@ class AsyncScatterPlotRunner() : CommonStep() {
         val xList = readTableData.getDoubleColumn(table, xId?.name!!)
         val yList = readTableData.getDoubleColumn(table, yId?.name!!)
 
+        val resType = analysisStep?.analysis?.result?.type
+        val protColName = hMap.getCol("proteinIds", resType)
+        val geneColName = hMap.getCol("geneNames", resType)
+
         // get the gene or protein name
-        val protGroup = readTableData.getStringColumn(table, "Majority.protein.IDs")?.map { it.split(";")?.get(0) }
-        val genes = readTableData.getStringColumn(table, "Gene.names")?.map { it.split(";")?.get(0) }
+        val protGroup = readTableData.getStringColumn(table, protColName)?.map { it.split(";")?.get(0) }
+        val genes = readTableData.getStringColumn(table, geneColName)?.map { it.split(";")?.get(0) }
         val names = genes?.zip(protGroup!!)?.map { a ->
             if (a.first.isNotEmpty()) {
                 a.first
