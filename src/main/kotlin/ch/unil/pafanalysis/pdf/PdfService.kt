@@ -45,8 +45,8 @@ class PdfService {
 
     private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
     private val fontSizeConst = 10f
-    val myFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-    val myBoldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+    val myFont = StandardFonts.HELVETICA
+    val myBoldFont = StandardFonts.HELVETICA_BOLD
     val unilBlue = DeviceRgb(0, 140, 204)
 
     fun createPdf(analysisId: Int): File {
@@ -77,7 +77,7 @@ class PdfService {
 
         val result: Result? = analysis?.result
 
-        val title = Paragraph(result?.name).setFont(myBoldFont).setFontSize(14f).setBackgroundColor(unilBlue).setPaddingLeft(5f).setFontColor(ColorConstants.WHITE)
+        val title = Paragraph(result?.name).setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(14f).setBackgroundColor(unilBlue).setPaddingLeft(5f).setFontColor(ColorConstants.WHITE)
         title.setMarginTop(0f)
         div.add(title)
         div.setPaddingTop(0f)
@@ -102,10 +102,10 @@ class PdfService {
 
     private fun addInfoCell(name: String, cont: String, table: Table) {
         val cell1 = Cell().setBorder(Border.NO_BORDER)
-        val p1 = Paragraph(name).setFont(myBoldFont).setFontSize(fontSizeConst)
+        val p1 = Paragraph(name).setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
         cell1.add(p1)
         val cell2 = Cell().setBorder(Border.NO_BORDER)
-        val p2 = Paragraph(cont).setFont(myFont).setFontSize(fontSizeConst)
+        val p2 = Paragraph(cont).setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
         cell2.add(p2)
         table.addCell(cell1)
         table.addCell(cell2)
@@ -127,7 +127,7 @@ class PdfService {
     }
 
     private fun commentDiv(comment: String): Div {
-        val p1 = Paragraph(comment).setFont(myFont)
+        val p1 = Paragraph(comment).setFont(PdfFontFactory.createFont(myFont))
         p1.setBackgroundColor(ColorConstants.YELLOW)
         p1.setFontSize(fontSizeConst)
         p1.setPaddingLeft(5f)
@@ -156,12 +156,12 @@ class PdfService {
         // left header pos
         val xPosLeft = 55f
         val yPosTop = pageSize?.height.minus(10f)
-        val leftHeader = Paragraph("UNIL - PAF").setFont(myFont).setFontSize(headerFontSize)
+        val leftHeader = Paragraph("UNIL - PAF").setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
         // right header
         val xPosRight= pageSize?.width.minus(15f)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val rightHeader = Paragraph(LocalDateTime.now().format(formatter)).setFont(myFont).setFontSize(headerFontSize)
+        val rightHeader = Paragraph(LocalDateTime.now().format(formatter)).setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
         val numberOfPages: Int = pdf.getNumberOfPages()
         for (i in 1..numberOfPages) {

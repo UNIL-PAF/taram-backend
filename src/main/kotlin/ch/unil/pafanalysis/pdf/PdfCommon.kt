@@ -20,8 +20,8 @@ open class PdfCommon {
     val gson = Gson()
 
     val fontSizeConst = 10f
-    val myFont = PdfFontFactory.createFont(StandardFonts.HELVETICA)
-    val myBoldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)
+    val myFont = StandardFonts.HELVETICA
+    val myBoldFont = StandardFonts.HELVETICA_BOLD
     val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
@@ -66,7 +66,7 @@ open class PdfCommon {
         val text = Paragraph(Text(title))
         text.setFontSize(12f)
         text.setFontColor(ColorConstants.WHITE)
-        text.setFont(myFont)
+        text.setFont(PdfFontFactory.createFont(myFont))
         val colLeft = Cell()
         colLeft.setWidth(170f)
         colLeft.setTextAlignment(TextAlignment.LEFT)
@@ -83,7 +83,7 @@ open class PdfCommon {
     fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false): Paragraph {
         val p = Paragraph(s)
         p.setFontSize(fontSizeConst)
-        p.setFont(if(bold) myBoldFont else myFont)
+        p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
         if(underline) p.setUnderline()
         return p
     }
@@ -129,7 +129,7 @@ open class PdfCommon {
     fun getText(s: String, bold: Boolean = false, italic: Boolean = false): Text {
         val text = Text(s)
         text.setFontSize(fontSizeConst)
-        text.setFont(myFont)
+        text.setFont(PdfFontFactory.createFont(myFont))
         if(bold) text.setBold()
         if(italic) text.setItalic()
         return text
