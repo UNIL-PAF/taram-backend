@@ -79,10 +79,12 @@ class AsyncScatterPlotRunner() : CommonStep() {
         return ScatterPlot(sortedData)
     }
 
+    /*
     private fun computeLog(d: Double?): Double? {
         val a = if (d == 0.0) null else d
         return if (a == null) a else log10(a)
     }
+     */
 
     private fun getColorData(colorBy: String, table: Table?, expDetails: Map<String, ExpInfo>?): List<Double?>? {
         val isDirectVal: Header? = table?.headers?.find { h -> h.name == colorBy }

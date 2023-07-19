@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotParams
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,6 +55,15 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
                 (if (params.yAxis != origParams?.yAxis) " [y-axis: ${params.yAxis}]" else "")
 
         return if(message != "") "Parameter(s) changed:".plus(message) else null
+    }
+
+    fun switchSelProt(step: AnalysisStep?, proteinAc: String): List<String>? {
+        val origParams = gson.fromJson(step?.parameters, ScatterPlotParams().javaClass)
+        val origList = origParams.selProteins ?: emptyList()
+        val newList = if(origList.contains(proteinAc)) origList.filter{it != proteinAc} else origList.plus(proteinAc)
+        val newParams = origParams.copy(selProteins = newList)
+        analysisStepRepository?.saveAndFlush(step?.copy(parameters = gson.toJson(newParams))!!)
+        return newList
     }
 
 }

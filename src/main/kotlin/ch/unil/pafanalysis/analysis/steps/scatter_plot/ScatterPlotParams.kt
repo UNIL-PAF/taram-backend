@@ -5,5 +5,6 @@ data class ScatterPlotParams (
     val yAxis: String? = null,
     val colorBy: String? = null,
     val logScaleColor: Boolean? = null,
-    val logTrans: Boolean? = null
+    val logTrans: Boolean? = null,
+    val selProteins: List<String>? = null
 )

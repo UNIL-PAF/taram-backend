@@ -1,16 +1,15 @@
 package ch.unil.pafanalysis.controllers
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.INITIAL_RESULT
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.VOLCANO_PLOT
-import ch.unil.pafanalysis.analysis.model.FullProteinTable
-import ch.unil.pafanalysis.analysis.model.ProteinTable
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType.SCATTER_PLOT
 import ch.unil.pafanalysis.analysis.service.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
+import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -45,6 +44,9 @@ class AnalysisStepController {
 
     @Autowired
     private var volcanoPlotRunner: VolcanoPlotRunner? = null
+
+    @Autowired
+    private var scatterPlotRunner: ScatterPlotRunner? = null
 
     @Autowired
     private var proteinTableService: ProteinTableService? = null
@@ -94,6 +96,7 @@ class AnalysisStepController {
         val step = analysisStepRepository?.findById(stepId)
         val selProts = when (step?.type) {
             VOLCANO_PLOT.value -> volcanoPlotRunner?.switchSelProt(step, proteinAc)
+            SCATTER_PLOT.value -> scatterPlotRunner?.switchSelProt(step, proteinAc)
             else -> throw StepException("Cannot select proteins for [$step?.type].")
         }
         return selProts?.joinToString(", ")
