@@ -1,5 +1,6 @@
-package ch.unil.pafanalysis.analysis.steps.initial_result
+package ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut
 
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import org.apache.commons.io.filefilter.WildcardFileFilter

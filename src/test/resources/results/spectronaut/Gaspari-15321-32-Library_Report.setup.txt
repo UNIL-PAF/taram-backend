@@ -1,0 +1,1472 @@
+Spectronaut 17.0.221202.55965
+Computer Name: CIG-1018-27457
+User Domain Name: CIG-1018-27457
+User Name: PAF
+Analysis Mode: UI
+Analysis Type: Peptide-Centric
+Analysis Date: 13-December-2022 12:15:49 +01:00
+
+
+[BEGIN-SETTINGS]
+Settings Used: PAF_SETTINGS_DEC21_QVal
+   ├─ Calibration
+   │  ├─ Calibration Mode:	Automatic
+   │  ├─ MZ Extraction Strategy:	Maximum Intensity
+   │  ├─ Used Biognosys' iRT Kit:	False
+   │  ├─ Allow source specific iRT Calibration:	True
+   │  ├─ Precision iRT:	True
+   │  │  ├─ Exclude De-amidated Peptides:	True
+   │  │  └─ iRT <-> RT Regression Type:	Local (Non-Linear) Regression
+   │  ├─ Calibration Carry-Over:	False
+   │  ├─ MS1 Mass Tolerance Strategy:	System Default
+   │  └─ MS2 Mass Tolerance Strategy:	System Default
+   ├─ Identification
+   │  ├─ Precursor Qvalue Cutoff:	0.01
+   │  ├─ Precursor PEP Cutoff:	1
+   │  ├─ Protein Qvalue Cutoff (Experiment):	0.01
+   │  ├─ Protein Qvalue Cutoff (Run):	1
+   │  ├─ Protein PEP Cutoff:	0.75
+   │  ├─ Single Hit Definition:	By Stripped Sequence
+   │  ├─ Exclude Single Hit Proteins:	False
+   │  ├─ Exclude Duplicate Assays:	True
+   │  ├─ Exclude Predicted Fragment Scores:	False
+   │  ├─ Generate Decoys:	True
+   │  │  ├─ Decoy Generation Method:	Mutated
+   │  │  │  └─ Preferred Fragment Source:	NN Predicted Fragments
+   │  │  └─ Decoy Limit Strategy:	Dynamic
+   │  │     └─ Library Size Fraction:	0.1
+   │  └─ Pvalue Estimator:	Kernel Density Estimator
+   ├─ Pipeline Mode
+   │  ├─ Generate SNE File:	True
+   │  │  └─ Store Ion traces in SNE:	False
+   │  ├─ Post Analysis Reports:	
+   │  │  ├─ CV Density Line Chart:	True
+   │  │  ├─ CVs Below X Bar Chart:	True
+   │  │  ├─ Data Completeness Bar Chart:	True
+   │  │  ├─ Run Identifications Bar Chart:	True
+   │  │  └─ Scoring Histograms:	True
+   │  ├─ Report Schema:	PAF_2 (Pivot), BGS Factory Report (Normal)
+   │  └─ Reporting Unit:	Across Experiment
+   ├─ Post Analysis
+   │  ├─ Differential Abundance Testing:	Unpaired t-test
+   │  │  ├─ Assume Equal Variance:	False
+   │  │  └─ Group-Wise Testing Correction:	False
+   │  ├─ Differential Abundance Grouping:	Major Group (Quantification Settings)
+   │  │  └─ Smallest Quantitative Unit:	Major Group (Quantification Settings)
+   │  │     └─ Use All MS-Level Quantities:	True
+   │  ├─ Calculate Explained TIC:	None
+   │  ├─ Calculate Sample Correlation Matrix:	False
+   │  ├─ Gene Ontology:	C:\Users\PAF\AppData\Roaming\Spectronaut\geneOntology/Ontologies\bgs_default_go-basic.obo
+   │  └─ Hierarchical Clustering:	True
+   │     ├─ Distance Metric:	Manhattan Distance
+   │     ├─ Linkage Strategy:	Ward's Method
+   │     ├─ Order Runs by Clustering:	True
+   │     └─ Z-score Transformation:	False
+   ├─ Protein Inference
+   │  └─ Protein Inference Workflow:	Automatic
+   │     └─ Inference Algorithm:	IDPicker
+   ├─ PTM Workflow
+   │  └─ PTM Localization:	False
+   ├─ Quantification
+   │  ├─ Precursor Filtering:	Identified (Qvalue)
+   │  │  └─ Imputation Strategy:	None
+   │  ├─ Proteotypicity Filter:	None
+   │  ├─ Protein LFQ Method:	Automatic
+   │  ├─ Quantity MS Level:	MS2
+   │  ├─ Quantity Type:	Area
+   │  ├─ Cross-Run Normalization:	True
+   │  │  ├─ Normalization Filter Type:	None
+   │  │  ├─ Normalization Strategy:	Global Normalization
+   │  │  │  └─ Normalize on:	Median
+   │  │  └─ Row Selection:	Automatic
+   │  ├─ Interference Correction:	True
+   │  │  ├─ Only Identified Peptides:	True
+   │  │  ├─ Exclude All Multi-Channel Interferences:	True
+   │  │  ├─ MS1 Min:	2
+   │  │  └─ MS2 Min:	3
+   │  ├─ Major (Protein) Grouping:	by Protein Group Id
+   │  ├─ Minor (Peptide) Grouping:	by Stripped Sequence
+   │  ├─ Major Group Quantity:	Sum peptide quantity
+   │  ├─ Major Group Top N:	False
+   │  ├─ Minor Group Quantity:	Median precursor quantity
+   │  └─ Minor Group Top N:	True
+   │     ├─ Max:	3
+   │     └─ Min:	1
+   ├─ Workflow
+   │  ├─ Multi-Channel Workflow Definition:	From Library Annotation
+   │  │  └─ Fallback Option:	Labeled
+   │  ├─ Profiling Strategy:	None
+   │  ├─ In-Silico Library Optimization:	False
+   │  └─ Unify Peptide Peaks Strategy:	None
+   └─ XIC Extraction
+      ├─ XIC IM Extraction Window:	Dynamic
+      │  └─ Correction Factor:	1
+      ├─ XIC RT Extraction Window:	Dynamic
+      │  └─ Correction Factor:	1
+      ├─ MS1 Mass Tolerance Strategy:	Dynamic
+      │  └─ Correction Factor:	1
+      └─ MS2 Mass Tolerance Strategy:	Dynamic
+         └─ Correction Factor:	1
+[END-SETTINGS]
+
+[BEGIN-SETUP]
+Run: 4450_12-7-2022_Gaspari_15321_DIA_140min_3ul_RB1.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4450_12-7-2022_Gaspari_15321_DIA_140min_3ul_RB1
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4450_12-7-2022_Gaspari_15321_DIA_140min_3ul_RB1.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 1
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 672
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4451_12-7-2022_Gaspari_15322_DIA_140min_3ul_RB2.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4451_12-7-2022_Gaspari_15322_DIA_140min_3ul_RB2
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4451_12-7-2022_Gaspari_15322_DIA_140min_3ul_RB2.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 2
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4452_12-7-2022_Gaspari_15323_DIA_140min_3ul_RB3.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4452_12-7-2022_Gaspari_15323_DIA_140min_3ul_RB3
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4452_12-7-2022_Gaspari_15323_DIA_140min_3ul_RB3.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 3
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4455_12-7-2022_Gaspari_15327_DIA_140min_3ul_RB4.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4455_12-7-2022_Gaspari_15327_DIA_140min_3ul_RB4
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4455_12-7-2022_Gaspari_15327_DIA_140min_3ul_RB4.htrms"
+   ├─ Condition: Tmem117
+   ├─ Replicate: 1
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4456_12-8-2022_Gaspari_15328_DIA_140min_3ul_RB5.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4456_12-8-2022_Gaspari_15328_DIA_140min_3ul_RB5
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4456_12-8-2022_Gaspari_15328_DIA_140min_3ul_RB5.htrms"
+   ├─ Condition: Tmem117
+   ├─ Replicate: 2
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4457_12-8-2022_Gaspari_15329_DIA_140min_3ul_RB6.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4457_12-8-2022_Gaspari_15329_DIA_140min_3ul_RB6
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4457_12-8-2022_Gaspari_15329_DIA_140min_3ul_RB6.htrms"
+   ├─ Condition: Tmem117
+   ├─ Replicate: 3
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4460_12-8-2022_Gaspari_15324_DIA_140min_3ul_RB7.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4460_12-8-2022_Gaspari_15324_DIA_140min_3ul_RB7
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4460_12-8-2022_Gaspari_15324_DIA_140min_3ul_RB7.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 4
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4461_12-8-2022_Gaspari_15325_DIA_140min_3ul_RB8.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4461_12-8-2022_Gaspari_15325_DIA_140min_3ul_RB8
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4461_12-8-2022_Gaspari_15325_DIA_140min_3ul_RB8.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 5
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4462_12-8-2022_Gaspari_15326_DIA_140min_3ul_RC1.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4462_12-8-2022_Gaspari_15326_DIA_140min_3ul_RC1
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4462_12-8-2022_Gaspari_15326_DIA_140min_3ul_RC1.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 6
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4465_12-8-2022_Gaspari_15330_DIA_140min_3ul_RC2.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4465_12-8-2022_Gaspari_15330_DIA_140min_3ul_RC2
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4465_12-8-2022_Gaspari_15330_DIA_140min_3ul_RC2.htrms"
+   ├─ Condition: Tmem117
+   ├─ Replicate: 4
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4466_12-8-2022_Gaspari_15331_DIA_140min_3ul_RC3.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4466_12-8-2022_Gaspari_15331_DIA_140min_3ul_RC3
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4466_12-8-2022_Gaspari_15331_DIA_140min_3ul_RC3.htrms"
+   ├─ Condition: Tmem117
+   ├─ Replicate: 5
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+Run: 4467_12-8-2022_Gaspari_15332_DIA_140min_3ul_RC4.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 4467_12-8-2022_Gaspari_15332_DIA_140min_3ul_RC4
+   ├─ Path: "D:\Spectronaut data\Gaspari\DIA\4467_12-8-2022_Gaspari_15332_DIA_140min_3ul_RC4.htrms"
+   ├─ Condition: Tmem117
+   ├─ Replicate: 6
+   ├─ HTRMS Version: 17.0.221202.55965
+   ├─ Libraries Used
+   │  ├─ Gaspari-15377-RPB-TIMS
+   │  │  ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\spectral_libraries\20221209_160314_Gaspari-15377-RPB-TIMS.kit
+   │  │  ├─ Precursors Targeted: 103.212
+   │  │  ├─ Decoys Added: 10.272
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\PAF\AppData\Roaming\Spectronaut\17.0.221202E\iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3.339
+   │     ├─ Decoys Added: 1.008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ uniprot_sprot_2022-01-07_HUMAN
+   │  │  ├─ Protein Entries: 20.375
+   │  │  ├─ Original File: uniprot_sprot_2022-01-07_HUMAN.fasta
+   │  │  ├─ Date Created: 31-May-2022 11:51:11 +02:00
+   │  │  ├─ Date Modified: 09-December-2022 18:52:00 +01:00
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 +02:00
+   │     ├─ Date Modified: 09-December-2022 18:52:02 +01:00
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.73
+      ├─ [425 - 450] - IM: 0.74
+      ├─ [450 - 475] - IM: 0.75
+      ├─ [475 - 500] - IM: 0.76
+      ├─ [500 - 525] - IM: 0.77
+      ├─ [525 - 550] - IM: 0.78
+      ├─ [550 - 575] - IM: 0.8
+      ├─ [575 - 600] - IM: 0.82
+      ├─ [600 - 625] - IM: 0.84
+      ├─ [625 - 650] - IM: 0.86
+      ├─ [650 - 675] - IM: 0.88
+      ├─ [675 - 700] - IM: 0.9
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.95
+      ├─ [750 - 775] - IM: 0.97
+      ├─ [775 - 800] - IM: 0.99
+      ├─ [800 - 825] - IM: 1.01
+      ├─ [825 - 850] - IM: 1.03
+      ├─ [850 - 875] - IM: 1.05
+      ├─ [875 - 900] - IM: 1.07
+      ├─ [900 - 925] - IM: 1.09
+      ├─ [925 - 950] - IM: 1.11
+      ├─ [950 - 975] - IM: 1.13
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.18
+      ├─ [1025 - 1050] - IM: 1.2
+      ├─ [1050 - 1075] - IM: 1.22
+      ├─ [1075 - 1100] - IM: 1.24
+      ├─ [1100 - 1125] - IM: 1.26
+      ├─ [1125 - 1150] - IM: 1.28
+      ├─ [1150 - 1175] - IM: 1.3
+      └─ [1175 - 1200] - IM: 1.32
+
+[END-SETUP]
+
+[BEGIN-LOG]
+INFO:    [13/12/2022 12:03:51] -> Initializing Pipeline...
+INFO:    [13/12/2022 12:03:51] -> Loading...
+INFO:    [09/12/2022 16:16:31] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:16:31] -> Preprocessing Run #1 of 12...
+INFO:    [09/12/2022 16:16:31] -> Initializing Experiment...
+INFO:    [09/12/2022 16:16:31] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:17:01] -> Initialize Scoring...
+INFO:    [09/12/2022 16:17:01] -> Generating Scan Map...
+INFO:    [09/12/2022 16:17:01] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:17:02] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:17:03] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:17:03] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:17:08] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:17:08] -> Preprocessing Run #1 of 12...
+INFO:    [09/12/2022 16:17:08] -> Initialize Scoring...
+INFO:    [09/12/2022 16:17:08] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:18:56] -> Machine Learning...
+INFO:    [09/12/2022 16:18:58] -> Pipeline executed in 1.83m
+INFO:    [09/12/2022 16:19:05] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:19:05] -> Preprocessing Run #1 of 12...
+INFO:    [09/12/2022 16:19:05] -> Initialize Scoring...
+INFO:    [09/12/2022 16:19:05] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:21:01] -> Machine Learning...
+INFO:    [09/12/2022 16:21:08] -> Pipeline executed in 2.05m
+INFO:    [09/12/2022 16:21:25] -> Initialize Scoring...
+INFO:    [09/12/2022 16:21:25] -> Preprocessing Run #2 of 12...
+INFO:    [09/12/2022 16:21:25] -> Initializing Experiment...
+INFO:    [09/12/2022 16:21:25] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:21:25] -> Initialize Scoring...
+INFO:    [09/12/2022 16:21:25] -> Generating Scan Map...
+INFO:    [09/12/2022 16:21:25] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:21:25] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:21:26] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:21:26] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:21:30] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:21:30] -> Preprocessing Run #2 of 12...
+INFO:    [09/12/2022 16:21:30] -> Initialize Scoring...
+INFO:    [09/12/2022 16:21:30] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:23:40] -> Machine Learning...
+INFO:    [09/12/2022 16:23:42] -> Pipeline executed in 2.2m
+INFO:    [09/12/2022 16:23:49] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:23:49] -> Preprocessing Run #2 of 12...
+INFO:    [09/12/2022 16:23:49] -> Initialize Scoring...
+INFO:    [09/12/2022 16:23:49] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:26:08] -> Machine Learning...
+INFO:    [09/12/2022 16:26:12] -> Pipeline executed in 2.39m
+INFO:    [09/12/2022 16:26:28] -> Initialize Scoring...
+INFO:    [09/12/2022 16:26:28] -> Preprocessing Run #3 of 12...
+INFO:    [09/12/2022 16:26:28] -> Initializing Experiment...
+INFO:    [09/12/2022 16:26:28] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:26:28] -> Initialize Scoring...
+INFO:    [09/12/2022 16:26:28] -> Generating Scan Map...
+INFO:    [09/12/2022 16:26:28] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:26:28] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:26:29] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:26:29] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:26:33] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:26:33] -> Preprocessing Run #3 of 12...
+INFO:    [09/12/2022 16:26:33] -> Initialize Scoring...
+INFO:    [09/12/2022 16:26:33] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:29:38] -> Machine Learning...
+INFO:    [09/12/2022 16:29:40] -> Pipeline executed in 3.12m
+INFO:    [09/12/2022 16:29:47] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:29:47] -> Preprocessing Run #3 of 12...
+INFO:    [09/12/2022 16:29:47] -> Initialize Scoring...
+INFO:    [09/12/2022 16:29:47] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:32:21] -> Machine Learning...
+INFO:    [09/12/2022 16:32:26] -> Pipeline executed in 2.65m
+INFO:    [09/12/2022 16:32:41] -> Initialize Scoring...
+INFO:    [09/12/2022 16:32:41] -> Preprocessing Run #4 of 12...
+INFO:    [09/12/2022 16:32:41] -> Initializing Experiment...
+INFO:    [09/12/2022 16:32:41] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:32:41] -> Initialize Scoring...
+INFO:    [09/12/2022 16:32:41] -> Generating Scan Map...
+INFO:    [09/12/2022 16:32:41] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:32:41] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:32:42] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:32:42] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:32:46] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:32:46] -> Preprocessing Run #4 of 12...
+INFO:    [09/12/2022 16:32:46] -> Initialize Scoring...
+INFO:    [09/12/2022 16:32:46] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:35:25] -> Machine Learning...
+INFO:    [09/12/2022 16:35:27] -> Pipeline executed in 2.67m
+INFO:    [09/12/2022 16:35:35] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:35:35] -> Preprocessing Run #4 of 12...
+INFO:    [09/12/2022 16:35:35] -> Initialize Scoring...
+INFO:    [09/12/2022 16:35:35] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:37:51] -> Machine Learning...
+INFO:    [09/12/2022 16:37:56] -> Pipeline executed in 2.36m
+INFO:    [09/12/2022 16:38:14] -> Initialize Scoring...
+INFO:    [09/12/2022 16:38:14] -> Preprocessing Run #5 of 12...
+INFO:    [09/12/2022 16:38:14] -> Initializing Experiment...
+INFO:    [09/12/2022 16:38:14] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:38:14] -> Initialize Scoring...
+INFO:    [09/12/2022 16:38:14] -> Generating Scan Map...
+INFO:    [09/12/2022 16:38:14] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:38:14] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:38:15] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:38:15] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:38:19] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:38:19] -> Preprocessing Run #5 of 12...
+INFO:    [09/12/2022 16:38:19] -> Initialize Scoring...
+INFO:    [09/12/2022 16:38:19] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:40:21] -> Machine Learning...
+INFO:    [09/12/2022 16:40:23] -> Pipeline executed in 2.07m
+INFO:    [09/12/2022 16:40:31] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:40:31] -> Preprocessing Run #5 of 12...
+INFO:    [09/12/2022 16:40:31] -> Initialize Scoring...
+INFO:    [09/12/2022 16:40:31] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:42:11] -> Machine Learning...
+INFO:    [09/12/2022 16:42:17] -> Pipeline executed in 1.76m
+INFO:    [09/12/2022 16:42:33] -> Initialize Scoring...
+INFO:    [09/12/2022 16:42:33] -> Preprocessing Run #6 of 12...
+INFO:    [09/12/2022 16:42:33] -> Initializing Experiment...
+INFO:    [09/12/2022 16:42:33] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:42:33] -> Initialize Scoring...
+INFO:    [09/12/2022 16:42:33] -> Generating Scan Map...
+INFO:    [09/12/2022 16:42:33] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:42:33] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:42:34] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:42:34] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:42:38] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:42:38] -> Preprocessing Run #6 of 12...
+INFO:    [09/12/2022 16:42:38] -> Initialize Scoring...
+INFO:    [09/12/2022 16:42:38] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:44:33] -> Machine Learning...
+INFO:    [09/12/2022 16:44:36] -> Pipeline executed in 1.96m
+INFO:    [09/12/2022 16:44:45] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:44:45] -> Preprocessing Run #6 of 12...
+INFO:    [09/12/2022 16:44:45] -> Initialize Scoring...
+INFO:    [09/12/2022 16:44:45] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:46:36] -> Machine Learning...
+INFO:    [09/12/2022 16:46:41] -> Pipeline executed in 1.94m
+INFO:    [09/12/2022 16:46:57] -> Initialize Scoring...
+INFO:    [09/12/2022 16:46:57] -> Preprocessing Run #7 of 12...
+INFO:    [09/12/2022 16:46:58] -> Initializing Experiment...
+INFO:    [09/12/2022 16:46:58] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:46:58] -> Initialize Scoring...
+INFO:    [09/12/2022 16:46:58] -> Generating Scan Map...
+INFO:    [09/12/2022 16:46:58] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:46:58] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:46:58] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:46:58] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:47:02] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:47:02] -> Preprocessing Run #7 of 12...
+INFO:    [09/12/2022 16:47:02] -> Initialize Scoring...
+INFO:    [09/12/2022 16:47:02] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:48:42] -> Machine Learning...
+INFO:    [09/12/2022 16:48:44] -> Pipeline executed in 1.7m
+INFO:    [09/12/2022 16:48:52] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:48:52] -> Preprocessing Run #7 of 12...
+INFO:    [09/12/2022 16:48:52] -> Initialize Scoring...
+INFO:    [09/12/2022 16:48:52] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:50:08] -> Machine Learning...
+INFO:    [09/12/2022 16:50:13] -> Pipeline executed in 1.36m
+INFO:    [09/12/2022 16:50:29] -> Initialize Scoring...
+INFO:    [09/12/2022 16:50:29] -> Preprocessing Run #8 of 12...
+INFO:    [09/12/2022 16:50:29] -> Initializing Experiment...
+INFO:    [09/12/2022 16:50:29] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:50:29] -> Initialize Scoring...
+INFO:    [09/12/2022 16:50:29] -> Generating Scan Map...
+INFO:    [09/12/2022 16:50:29] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:50:29] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:50:30] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:50:30] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:50:34] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:50:34] -> Preprocessing Run #8 of 12...
+INFO:    [09/12/2022 16:50:34] -> Initialize Scoring...
+INFO:    [09/12/2022 16:50:34] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:52:37] -> Machine Learning...
+INFO:    [09/12/2022 16:52:39] -> Pipeline executed in 2.07m
+INFO:    [09/12/2022 16:52:46] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:52:46] -> Preprocessing Run #8 of 12...
+INFO:    [09/12/2022 16:52:46] -> Initialize Scoring...
+INFO:    [09/12/2022 16:52:46] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:54:22] -> Machine Learning...
+INFO:    [09/12/2022 16:54:27] -> Pipeline executed in 1.68m
+INFO:    [09/12/2022 16:54:42] -> Initialize Scoring...
+INFO:    [09/12/2022 16:54:42] -> Preprocessing Run #9 of 12...
+INFO:    [09/12/2022 16:54:42] -> Initializing Experiment...
+INFO:    [09/12/2022 16:54:42] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:54:42] -> Initialize Scoring...
+INFO:    [09/12/2022 16:54:42] -> Generating Scan Map...
+INFO:    [09/12/2022 16:54:42] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:54:42] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:54:43] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:54:43] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:54:47] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:54:47] -> Preprocessing Run #9 of 12...
+INFO:    [09/12/2022 16:54:47] -> Initialize Scoring...
+INFO:    [09/12/2022 16:54:47] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:56:56] -> Machine Learning...
+INFO:    [09/12/2022 16:56:58] -> Pipeline executed in 2.18m
+INFO:    [09/12/2022 16:57:06] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:57:06] -> Preprocessing Run #9 of 12...
+INFO:    [09/12/2022 16:57:06] -> Initialize Scoring...
+INFO:    [09/12/2022 16:57:06] -> Extracting Ion Currents...
+INFO:    [09/12/2022 16:58:56] -> Machine Learning...
+INFO:    [09/12/2022 16:59:02] -> Pipeline executed in 1.94m
+INFO:    [09/12/2022 16:59:18] -> Initialize Scoring...
+INFO:    [09/12/2022 16:59:18] -> Preprocessing Run #10 of 12...
+INFO:    [09/12/2022 16:59:18] -> Initializing Experiment...
+INFO:    [09/12/2022 16:59:18] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 16:59:18] -> Initialize Scoring...
+INFO:    [09/12/2022 16:59:18] -> Generating Scan Map...
+INFO:    [09/12/2022 16:59:18] -> Initializing Workpackages...
+INFO:    [09/12/2022 16:59:18] -> Performing Basic Calibration...
+INFO:    [09/12/2022 16:59:18] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 16:59:18] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 16:59:23] -> Initializing Pipeline...
+INFO:    [09/12/2022 16:59:23] -> Preprocessing Run #10 of 12...
+INFO:    [09/12/2022 16:59:23] -> Initialize Scoring...
+INFO:    [09/12/2022 16:59:23] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:01:34] -> Machine Learning...
+INFO:    [09/12/2022 17:01:36] -> Pipeline executed in 2.23m
+INFO:    [09/12/2022 17:01:43] -> Initializing Pipeline...
+INFO:    [09/12/2022 17:01:43] -> Preprocessing Run #10 of 12...
+INFO:    [09/12/2022 17:01:43] -> Initialize Scoring...
+INFO:    [09/12/2022 17:01:43] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:03:42] -> Machine Learning...
+INFO:    [09/12/2022 17:03:47] -> Pipeline executed in 2.06m
+INFO:    [09/12/2022 17:04:02] -> Initialize Scoring...
+INFO:    [09/12/2022 17:04:02] -> Preprocessing Run #11 of 12...
+INFO:    [09/12/2022 17:04:02] -> Initializing Experiment...
+INFO:    [09/12/2022 17:04:02] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 17:04:02] -> Initialize Scoring...
+INFO:    [09/12/2022 17:04:02] -> Generating Scan Map...
+INFO:    [09/12/2022 17:04:02] -> Initializing Workpackages...
+INFO:    [09/12/2022 17:04:02] -> Performing Basic Calibration...
+INFO:    [09/12/2022 17:04:03] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 17:04:03] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 17:04:08] -> Initializing Pipeline...
+INFO:    [09/12/2022 17:04:08] -> Preprocessing Run #11 of 12...
+INFO:    [09/12/2022 17:04:08] -> Initialize Scoring...
+INFO:    [09/12/2022 17:04:08] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:06:21] -> Machine Learning...
+INFO:    [09/12/2022 17:06:23] -> Pipeline executed in 2.25m
+INFO:    [09/12/2022 17:06:30] -> Initializing Pipeline...
+INFO:    [09/12/2022 17:06:30] -> Preprocessing Run #11 of 12...
+INFO:    [09/12/2022 17:06:30] -> Initialize Scoring...
+INFO:    [09/12/2022 17:06:30] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:08:12] -> Machine Learning...
+INFO:    [09/12/2022 17:08:17] -> Pipeline executed in 1.78m
+INFO:    [09/12/2022 17:08:33] -> Initialize Scoring...
+INFO:    [09/12/2022 17:08:33] -> Preprocessing Run #12 of 12...
+INFO:    [09/12/2022 17:08:33] -> Initializing Experiment...
+INFO:    [09/12/2022 17:08:33] -> Loading Spectral Libraries...
+INFO:    [09/12/2022 17:08:33] -> Initialize Scoring...
+INFO:    [09/12/2022 17:08:33] -> Generating Scan Map...
+INFO:    [09/12/2022 17:08:33] -> Initializing Workpackages...
+INFO:    [09/12/2022 17:08:33] -> Performing Basic Calibration...
+INFO:    [09/12/2022 17:08:34] -> Identifying Calibration Peptides...
+INFO:    [09/12/2022 17:08:34] -> Correcting Gradient Fine Structure...
+INFO:    [09/12/2022 17:08:38] -> Initializing Pipeline...
+INFO:    [09/12/2022 17:08:38] -> Preprocessing Run #12 of 12...
+INFO:    [09/12/2022 17:08:38] -> Initialize Scoring...
+INFO:    [09/12/2022 17:08:38] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:10:44] -> Machine Learning...
+INFO:    [09/12/2022 17:10:46] -> Pipeline executed in 2.14m
+INFO:    [09/12/2022 17:10:54] -> Initializing Pipeline...
+INFO:    [09/12/2022 17:10:54] -> Preprocessing Run #12 of 12...
+INFO:    [09/12/2022 17:10:54] -> Initialize Scoring...
+INFO:    [09/12/2022 17:10:54] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:12:31] -> Machine Learning...
+INFO:    [09/12/2022 17:12:36] -> Pipeline executed in 1.71m
+INFO:    [09/12/2022 17:12:52] -> Initialize Scoring...
+INFO:    [09/12/2022 17:12:52] -> Initializing QC...
+INFO:    [09/12/2022 17:12:53] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 17:12:53] -> Assigning ML Features...
+INFO:    [09/12/2022 17:12:56] -> Generating Decoys...
+INFO:    [09/12/2022 17:13:08] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:20:48] -> Releasing Raw Files...
+INFO:    [09/12/2022 17:20:48] -> Machine Learning...
+INFO:    [09/12/2022 17:22:00] -> Initializing HTRMS...
+INFO:    [09/12/2022 17:22:00] -> Releasing Run Resources...
+INFO:    [09/12/2022 17:22:02] -> Calculating Qvalues...
+INFO:    [09/12/2022 17:22:03] -> Unique precursors: 98.434 of 103.212 | modified peptides: 81.969 of 85.759 | peptides: 75.684 of 78.272 |  protein groups: 7.714 (Qvalue <= 0.01) [4450_12-7-2022_Gaspari_15321_DIA_140min_3ul_RB1.htrms]
+INFO:    [09/12/2022 17:22:04] -> Collapsing Search Tree...
+INFO:    [09/12/2022 17:22:04] -> Processed in 9.2m
+INFO:    [09/12/2022 17:22:04] -> Initializing QC...
+INFO:    [09/12/2022 17:22:04] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 17:22:04] -> Assigning ML Features...
+INFO:    [09/12/2022 17:22:04] -> Generating Decoys...
+INFO:    [09/12/2022 17:22:05] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:28:21] -> Releasing Raw Files...
+INFO:    [09/12/2022 17:28:21] -> Machine Learning...
+INFO:    [09/12/2022 17:29:29] -> Initializing HTRMS...
+INFO:    [09/12/2022 17:29:29] -> Releasing Run Resources...
+INFO:    [09/12/2022 17:29:31] -> Calculating Qvalues...
+INFO:    [09/12/2022 17:29:32] -> Unique precursors: 97.065 of 103.212 | modified peptides: 81.081 of 85.759 | peptides: 74.966 of 78.272 |  protein groups: 7.639 (Qvalue <= 0.01) [4451_12-7-2022_Gaspari_15322_DIA_140min_3ul_RB2.htrms]
+INFO:    [09/12/2022 17:29:32] -> Collapsing Search Tree...
+INFO:    [09/12/2022 17:29:32] -> Processed in 7.47m
+INFO:    [09/12/2022 17:29:32] -> Initializing QC...
+INFO:    [09/12/2022 17:29:32] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 17:29:32] -> Assigning ML Features...
+INFO:    [09/12/2022 17:29:32] -> Generating Decoys...
+INFO:    [09/12/2022 17:29:33] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:36:25] -> Releasing Raw Files...
+INFO:    [09/12/2022 17:36:25] -> Machine Learning...
+INFO:    [09/12/2022 17:37:35] -> Initializing HTRMS...
+INFO:    [09/12/2022 17:37:35] -> Releasing Run Resources...
+INFO:    [09/12/2022 17:37:37] -> Calculating Qvalues...
+INFO:    [09/12/2022 17:37:39] -> Unique precursors: 97.416 of 103.212 | modified peptides: 81.203 of 85.759 | peptides: 75.189 of 78.272 |  protein groups: 7.661 (Qvalue <= 0.01) [4452_12-7-2022_Gaspari_15323_DIA_140min_3ul_RB3.htrms]
+INFO:    [09/12/2022 17:37:39] -> Collapsing Search Tree...
+INFO:    [09/12/2022 17:37:39] -> Processed in 8.11m
+INFO:    [09/12/2022 17:37:39] -> Initializing QC...
+INFO:    [09/12/2022 17:37:39] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 17:37:39] -> Assigning ML Features...
+INFO:    [09/12/2022 17:37:39] -> Generating Decoys...
+INFO:    [09/12/2022 17:37:40] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:44:00] -> Releasing Raw Files...
+INFO:    [09/12/2022 17:44:00] -> Machine Learning...
+INFO:    [09/12/2022 17:45:12] -> Initializing HTRMS...
+INFO:    [09/12/2022 17:45:12] -> Releasing Run Resources...
+INFO:    [09/12/2022 17:45:14] -> Calculating Qvalues...
+INFO:    [09/12/2022 17:45:16] -> Unique precursors: 97.222 of 103.212 | modified peptides: 81.104 of 85.759 | peptides: 74.996 of 78.272 |  protein groups: 7.633 (Qvalue <= 0.01) [4455_12-7-2022_Gaspari_15327_DIA_140min_3ul_RB4.htrms]
+INFO:    [09/12/2022 17:45:16] -> Collapsing Search Tree...
+INFO:    [09/12/2022 17:45:16] -> Processed in 7.62m
+INFO:    [09/12/2022 17:45:16] -> Initializing QC...
+INFO:    [09/12/2022 17:45:16] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 17:45:16] -> Assigning ML Features...
+INFO:    [09/12/2022 17:45:16] -> Generating Decoys...
+INFO:    [09/12/2022 17:45:17] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:51:28] -> Releasing Raw Files...
+INFO:    [09/12/2022 17:51:28] -> Machine Learning...
+INFO:    [09/12/2022 17:52:40] -> Initializing HTRMS...
+INFO:    [09/12/2022 17:52:40] -> Releasing Run Resources...
+INFO:    [09/12/2022 17:52:43] -> Calculating Qvalues...
+INFO:    [09/12/2022 17:52:44] -> Unique precursors: 97.390 of 103.212 | modified peptides: 81.169 of 85.759 | peptides: 74.884 of 78.272 |  protein groups: 7.621 (Qvalue <= 0.01) [4456_12-8-2022_Gaspari_15328_DIA_140min_3ul_RB5.htrms]
+INFO:    [09/12/2022 17:52:44] -> Collapsing Search Tree...
+INFO:    [09/12/2022 17:52:44] -> Processed in 7.47m
+INFO:    [09/12/2022 17:52:44] -> Initializing QC...
+INFO:    [09/12/2022 17:52:44] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 17:52:44] -> Assigning ML Features...
+INFO:    [09/12/2022 17:52:45] -> Generating Decoys...
+INFO:    [09/12/2022 17:52:45] -> Extracting Ion Currents...
+INFO:    [09/12/2022 17:59:23] -> Releasing Raw Files...
+INFO:    [09/12/2022 17:59:23] -> Machine Learning...
+INFO:    [09/12/2022 18:00:27] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:00:27] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:00:29] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:00:30] -> Unique precursors: 97.352 of 103.212 | modified peptides: 81.127 of 85.759 | peptides: 75.114 of 78.272 |  protein groups: 7.637 (Qvalue <= 0.01) [4457_12-8-2022_Gaspari_15329_DIA_140min_3ul_RB6.htrms]
+INFO:    [09/12/2022 18:00:30] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:00:30] -> Processed in 7.77m
+INFO:    [09/12/2022 18:00:30] -> Initializing QC...
+INFO:    [09/12/2022 18:00:30] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 18:00:31] -> Assigning ML Features...
+INFO:    [09/12/2022 18:00:31] -> Generating Decoys...
+INFO:    [09/12/2022 18:00:31] -> Extracting Ion Currents...
+INFO:    [09/12/2022 18:06:27] -> Releasing Raw Files...
+INFO:    [09/12/2022 18:06:27] -> Machine Learning...
+INFO:    [09/12/2022 18:07:37] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:07:37] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:07:39] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:07:40] -> Unique precursors: 95.293 of 103.212 | modified peptides: 79.596 of 85.759 | peptides: 73.640 of 78.272 |  protein groups: 7.552 (Qvalue <= 0.01) [4460_12-8-2022_Gaspari_15324_DIA_140min_3ul_RB7.htrms]
+INFO:    [09/12/2022 18:07:40] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:07:40] -> Processed in 7.17m
+INFO:    [09/12/2022 18:07:40] -> Initializing QC...
+INFO:    [09/12/2022 18:07:41] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 18:07:41] -> Assigning ML Features...
+INFO:    [09/12/2022 18:07:41] -> Generating Decoys...
+INFO:    [09/12/2022 18:07:41] -> Extracting Ion Currents...
+INFO:    [09/12/2022 18:14:44] -> Releasing Raw Files...
+INFO:    [09/12/2022 18:14:44] -> Machine Learning...
+INFO:    [09/12/2022 18:15:54] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:15:54] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:15:55] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:15:57] -> Unique precursors: 95.511 of 103.212 | modified peptides: 79.679 of 85.759 | peptides: 73.651 of 78.272 |  protein groups: 7.561 (Qvalue <= 0.01) [4461_12-8-2022_Gaspari_15325_DIA_140min_3ul_RB8.htrms]
+INFO:    [09/12/2022 18:15:57] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:15:57] -> Processed in 8.27m
+INFO:    [09/12/2022 18:15:57] -> Initializing QC...
+INFO:    [09/12/2022 18:15:57] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 18:15:57] -> Assigning ML Features...
+INFO:    [09/12/2022 18:15:57] -> Generating Decoys...
+INFO:    [09/12/2022 18:15:58] -> Extracting Ion Currents...
+INFO:    [09/12/2022 18:22:54] -> Releasing Raw Files...
+INFO:    [09/12/2022 18:22:54] -> Machine Learning...
+INFO:    [09/12/2022 18:24:03] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:24:03] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:24:05] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:24:06] -> Unique precursors: 96.544 of 103.212 | modified peptides: 80.606 of 85.759 | peptides: 74.659 of 78.272 |  protein groups: 7.603 (Qvalue <= 0.01) [4462_12-8-2022_Gaspari_15326_DIA_140min_3ul_RC1.htrms]
+INFO:    [09/12/2022 18:24:06] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:24:06] -> Processed in 8.16m
+INFO:    [09/12/2022 18:24:06] -> Initializing QC...
+INFO:    [09/12/2022 18:24:06] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 18:24:06] -> Assigning ML Features...
+INFO:    [09/12/2022 18:24:07] -> Generating Decoys...
+INFO:    [09/12/2022 18:24:07] -> Extracting Ion Currents...
+INFO:    [09/12/2022 18:30:19] -> Releasing Raw Files...
+INFO:    [09/12/2022 18:30:19] -> Machine Learning...
+INFO:    [09/12/2022 18:31:30] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:31:30] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:31:32] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:31:33] -> Unique precursors: 96.525 of 103.212 | modified peptides: 80.488 of 85.759 | peptides: 74.489 of 78.272 |  protein groups: 7.611 (Qvalue <= 0.01) [4465_12-8-2022_Gaspari_15330_DIA_140min_3ul_RC2.htrms]
+INFO:    [09/12/2022 18:31:33] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:31:33] -> Processed in 7.45m
+INFO:    [09/12/2022 18:31:33] -> Initializing QC...
+INFO:    [09/12/2022 18:31:33] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 18:31:33] -> Assigning ML Features...
+INFO:    [09/12/2022 18:31:34] -> Generating Decoys...
+INFO:    [09/12/2022 18:31:34] -> Extracting Ion Currents...
+INFO:    [09/12/2022 18:37:48] -> Releasing Raw Files...
+INFO:    [09/12/2022 18:37:48] -> Machine Learning...
+INFO:    [09/12/2022 18:38:57] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:38:57] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:38:59] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:39:00] -> Unique precursors: 96.116 of 103.212 | modified peptides: 80.224 of 85.759 | peptides: 74.301 of 78.272 |  protein groups: 7.587 (Qvalue <= 0.01) [4466_12-8-2022_Gaspari_15331_DIA_140min_3ul_RC3.htrms]
+INFO:    [09/12/2022 18:39:00] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:39:00] -> Processed in 7.45m
+INFO:    [09/12/2022 18:39:00] -> Initializing QC...
+INFO:    [09/12/2022 18:39:01] -> Determining Calibration Parameter...
+INFO:    [09/12/2022 18:39:01] -> Assigning ML Features...
+INFO:    [09/12/2022 18:39:01] -> Generating Decoys...
+INFO:    [09/12/2022 18:39:02] -> Extracting Ion Currents...
+INFO:    [09/12/2022 18:44:58] -> Releasing Raw Files...
+INFO:    [09/12/2022 18:44:59] -> Machine Learning...
+INFO:    [09/12/2022 18:46:12] -> Initializing HTRMS...
+INFO:    [09/12/2022 18:46:12] -> Releasing Run Resources...
+INFO:    [09/12/2022 18:46:14] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:46:15] -> Unique precursors: 96.446 of 103.212 | modified peptides: 80.457 of 85.759 | peptides: 74.521 of 78.272 |  protein groups: 7.590 (Qvalue <= 0.01) [4467_12-8-2022_Gaspari_15332_DIA_140min_3ul_RC4.htrms]
+INFO:    [09/12/2022 18:46:15] -> Collapsing Search Tree...
+INFO:    [09/12/2022 18:46:16] -> Processed in 7.25m
+INFO:    [09/12/2022 18:46:16] -> Normalizing Cscores...
+INFO:    [09/12/2022 18:46:16] -> Initializing Protein Groups...
+INFO:    [09/12/2022 18:46:50] -> Correcting Interferences...
+INFO:    [09/12/2022 18:48:55] -> Calculating Global CVs
+INFO:    [09/12/2022 18:48:57] -> Calculating Precursor Quantities...
+INFO:    [09/12/2022 18:48:57] -> Normalizing Quantification...
+INFO:    [09/12/2022 18:49:00] -> Calculating Global CVs
+INFO:    [09/12/2022 18:49:02] -> Calculating Condition CVs
+INFO:    [09/12/2022 18:49:07] -> Excluding Library Duplicates...
+INFO:    [09/12/2022 18:49:08] -> Calculating Global CVs
+INFO:    [09/12/2022 18:49:09] -> Building Protein Groups...
+INFO:    [09/12/2022 18:49:38] -> Calculating Run-Wise Protein Group FDR...
+INFO:    [09/12/2022 18:49:44] -> Annotating Protein Single Hits...
+INFO:    [09/12/2022 18:49:46] -> Calculating Global CVs
+INFO:    [09/12/2022 18:49:48] -> Updating Identification Counts...
+INFO:    [09/12/2022 18:49:51] -> Resetting existing imputation...
+INFO:    [09/12/2022 18:49:52] -> Calculating Protein Quantities...
+INFO:    [09/12/2022 18:49:54] -> Calculating Protein Quantities...
+INFO:    [09/12/2022 18:49:54] -> Calculating MaxLFQ Protein Quantities...
+INFO:    [09/12/2022 18:50:48] -> Collapsing PTM-Locations...
+INFO:    [09/12/2022 18:50:48] -> Creating Protein Map...
+INFO:    [09/12/2022 18:50:48] -> Compiling Run Summary Information...
+INFO:    [09/12/2022 18:50:49] -> Running Post Analysis Processes...
+INFO:    [09/12/2022 18:51:53] -> Saving Qc Data...
+INFO:    [09/12/2022 18:51:59] -> Writing Summary Information...
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 98.217 of 103.212 | modified peptides: 81.752 of 85.759 | peptides: 75.467 of 78.272 |  protein groups: 7.510 (Qvalue <= 0.01) for run #1 "4450_12-7-2022_Gaspari_15321_DIA_140min_3ul_RB1.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 96.864 of 103.212 | modified peptides: 80.880 of 85.759 | peptides: 74.765 of 78.272 |  protein groups: 7.456 (Qvalue <= 0.01) for run #2 "4451_12-7-2022_Gaspari_15322_DIA_140min_3ul_RB2.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 97.223 of 103.212 | modified peptides: 81.010 of 85.759 | peptides: 74.996 of 78.272 |  protein groups: 7.483 (Qvalue <= 0.01) for run #3 "4452_12-7-2022_Gaspari_15323_DIA_140min_3ul_RB3.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 97.033 of 103.212 | modified peptides: 80.915 of 85.759 | peptides: 74.807 of 78.272 |  protein groups: 7.459 (Qvalue <= 0.01) for run #4 "4455_12-7-2022_Gaspari_15327_DIA_140min_3ul_RB4.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 97.209 of 103.212 | modified peptides: 80.988 of 85.759 | peptides: 74.703 of 78.272 |  protein groups: 7.458 (Qvalue <= 0.01) for run #5 "4456_12-8-2022_Gaspari_15328_DIA_140min_3ul_RB5.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 97.145 of 103.212 | modified peptides: 80.921 of 85.759 | peptides: 74.908 of 78.272 |  protein groups: 7.454 (Qvalue <= 0.01) for run #6 "4457_12-8-2022_Gaspari_15329_DIA_140min_3ul_RB6.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 95.086 of 103.212 | modified peptides: 79.389 of 85.759 | peptides: 73.433 of 78.272 |  protein groups: 7.364 (Qvalue <= 0.01) for run #7 "4460_12-8-2022_Gaspari_15324_DIA_140min_3ul_RB7.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 95.279 of 103.212 | modified peptides: 79.448 of 85.759 | peptides: 73.420 of 78.272 |  protein groups: 7.354 (Qvalue <= 0.01) for run #8 "4461_12-8-2022_Gaspari_15325_DIA_140min_3ul_RB8.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 96.369 of 103.212 | modified peptides: 80.431 of 85.759 | peptides: 74.484 of 78.272 |  protein groups: 7.443 (Qvalue <= 0.01) for run #9 "4462_12-8-2022_Gaspari_15326_DIA_140min_3ul_RC1.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 96.280 of 103.212 | modified peptides: 80.243 of 85.759 | peptides: 74.244 of 78.272 |  protein groups: 7.390 (Qvalue <= 0.01) for run #10 "4465_12-8-2022_Gaspari_15330_DIA_140min_3ul_RC2.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 95.912 of 103.212 | modified peptides: 80.021 of 85.759 | peptides: 74.098 of 78.272 |  protein groups: 7.408 (Qvalue <= 0.01) for run #11 "4466_12-8-2022_Gaspari_15331_DIA_140min_3ul_RC3.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 96.199 of 103.212 | modified peptides: 80.211 of 85.759 | peptides: 74.275 of 78.272 |  protein groups: 7.371 (Qvalue <= 0.01) for run #12 "4467_12-8-2022_Gaspari_15332_DIA_140min_3ul_RC4.htrms"
+INFO:    [09/12/2022 18:51:59] -> Unique precursors: 102.118 of 103.212 | modified peptides: 84.816 of 85.759 | peptides: 77.510 of 78.272 |  protein groups: 7.683 (Qvalue <= 0.01) for whole experiment "Gaspari-15321-32-Library"
+
+INFO:    [09/12/2022 18:51:59] -> Saving SNE File...
+INFO:    [09/12/2022 18:52:00] -> Storing SNE File: D:\Spectronaut data\20221209_185200_Gaspari-15321-32-Library.sne
+INFO:    [09/12/2022 18:52:00] -> Initializing Pipeline...
+INFO:    [09/12/2022 18:52:00] -> Calculating Qvalues...
+INFO:    [09/12/2022 18:52:00] -> Saving...
+INFO:    [13/12/2022 12:04:16] -> Updating Quantities...
+INFO:    [13/12/2022 12:04:17] -> Unifying Meta...
+INFO:    [13/12/2022 12:04:17] -> Normalizing Cscores...
+INFO:    [13/12/2022 12:04:18] -> Calculating Global CVs
+INFO:    [13/12/2022 12:04:21] -> Linking References...
+INFO:    [13/12/2022 12:04:22] -> Initializing Protein Groups...
+INFO:    [13/12/2022 12:04:42] -> Building Protein Groups...
+INFO:    [13/12/2022 12:04:47] -> Calculating Run-Wise Protein Group FDR...
+INFO:    [13/12/2022 12:04:54] -> Annotating Protein Single Hits...
+INFO:    [13/12/2022 12:04:56] -> Normalizing Quantification...
+INFO:    [13/12/2022 12:04:56] -> Calculating Global CVs
+INFO:    [13/12/2022 12:04:58] -> Updating Identification Counts...
+INFO:    [13/12/2022 12:05:04] -> Resetting existing imputation...
+INFO:    [13/12/2022 12:05:04] -> Calculating Protein Quantities...
+INFO:    [13/12/2022 12:05:05] -> Calculating Protein Quantities...
+INFO:    [13/12/2022 12:05:05] -> Calculating MaxLFQ Protein Quantities...
+INFO:    [13/12/2022 12:06:02] -> Collapsing PTM-Locations...
+INFO:    [13/12/2022 12:06:02] -> Calculating Condition CVs
+INFO:    [13/12/2022 12:06:08] -> Creating Protein Map...
+INFO:    [13/12/2022 12:06:08] -> Compiling Run Summary Information...
+INFO:    [13/12/2022 12:06:09] -> Running Post Analysis Processes...
+INFO:    [13/12/2022 12:07:10] -> Writing Summary Information...
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 98.217 of 103.212 | modified peptides: 81.752 of 85.759 | peptides: 75.467 of 78.272 |  protein groups: 7.510 (Qvalue <= 0.01) for run #1 "4450_12-7-2022_Gaspari_15321_DIA_140min_3ul_RB1.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 96.864 of 103.212 | modified peptides: 80.880 of 85.759 | peptides: 74.765 of 78.272 |  protein groups: 7.456 (Qvalue <= 0.01) for run #2 "4451_12-7-2022_Gaspari_15322_DIA_140min_3ul_RB2.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 97.223 of 103.212 | modified peptides: 81.010 of 85.759 | peptides: 74.996 of 78.272 |  protein groups: 7.483 (Qvalue <= 0.01) for run #3 "4452_12-7-2022_Gaspari_15323_DIA_140min_3ul_RB3.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 97.033 of 103.212 | modified peptides: 80.915 of 85.759 | peptides: 74.807 of 78.272 |  protein groups: 7.459 (Qvalue <= 0.01) for run #4 "4455_12-7-2022_Gaspari_15327_DIA_140min_3ul_RB4.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 97.209 of 103.212 | modified peptides: 80.988 of 85.759 | peptides: 74.703 of 78.272 |  protein groups: 7.458 (Qvalue <= 0.01) for run #5 "4456_12-8-2022_Gaspari_15328_DIA_140min_3ul_RB5.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 97.145 of 103.212 | modified peptides: 80.921 of 85.759 | peptides: 74.908 of 78.272 |  protein groups: 7.454 (Qvalue <= 0.01) for run #6 "4457_12-8-2022_Gaspari_15329_DIA_140min_3ul_RB6.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 95.086 of 103.212 | modified peptides: 79.389 of 85.759 | peptides: 73.433 of 78.272 |  protein groups: 7.364 (Qvalue <= 0.01) for run #7 "4460_12-8-2022_Gaspari_15324_DIA_140min_3ul_RB7.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 95.279 of 103.212 | modified peptides: 79.448 of 85.759 | peptides: 73.420 of 78.272 |  protein groups: 7.354 (Qvalue <= 0.01) for run #8 "4461_12-8-2022_Gaspari_15325_DIA_140min_3ul_RB8.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 96.369 of 103.212 | modified peptides: 80.431 of 85.759 | peptides: 74.484 of 78.272 |  protein groups: 7.443 (Qvalue <= 0.01) for run #9 "4462_12-8-2022_Gaspari_15326_DIA_140min_3ul_RC1.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 96.280 of 103.212 | modified peptides: 80.243 of 85.759 | peptides: 74.244 of 78.272 |  protein groups: 7.390 (Qvalue <= 0.01) for run #10 "4465_12-8-2022_Gaspari_15330_DIA_140min_3ul_RC2.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 95.912 of 103.212 | modified peptides: 80.021 of 85.759 | peptides: 74.098 of 78.272 |  protein groups: 7.408 (Qvalue <= 0.01) for run #11 "4466_12-8-2022_Gaspari_15331_DIA_140min_3ul_RC3.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 96.199 of 103.212 | modified peptides: 80.211 of 85.759 | peptides: 74.275 of 78.272 |  protein groups: 7.371 (Qvalue <= 0.01) for run #12 "4467_12-8-2022_Gaspari_15332_DIA_140min_3ul_RC4.htrms"
+INFO:    [13/12/2022 12:07:10] -> Unique precursors: 102.118 of 103.212 | modified peptides: 84.816 of 85.759 | peptides: 77.510 of 78.272 |  protein groups: 7.683 (Qvalue <= 0.01) for whole experiment "Gaspari-15321-32-Library"
+
+INFO:    [13/12/2022 12:07:11] -> Pipeline executed in 3.34m
+[END-LOG]
