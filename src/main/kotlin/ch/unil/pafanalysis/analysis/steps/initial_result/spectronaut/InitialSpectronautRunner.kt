@@ -19,20 +19,10 @@ class InitialSpectronautRunner() {
         spectronautPath: String?,
         table: Table?
     ): InitialResult {
-        val fastaFileCol = table?.headers?.find { it.name?.contains("fastafile", ignoreCase = true) ?: false }
-        val fastaFiles: List<String>? =
-            if (fastaFileCol != null) {
-                val fastas = ReadTableData().getStringColumn(table, fastaFileCol.name!!)
-                fastas?.fold(emptyList<String>()) { a, v ->
-                    val names = v.split(";")
-                    names.plus(a).distinct()
-                }
-            } else null
-
         val spectronautSetup = parseSetupFile(spectronautPath)
 
         return InitialResult(
-            fastaFiles = fastaFiles,
+            fastaFiles = spectronautSetup?.proteinDBs?.map{it.fileName ?: ""},
             softwareVersion = spectronautSetup?.softwareVersion,
             spectronautSetup = spectronautSetup
         )
