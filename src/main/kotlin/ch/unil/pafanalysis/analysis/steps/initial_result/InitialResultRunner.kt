@@ -30,6 +30,9 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     @Autowired
     private var initialResultPdf: InitialResultPdf? = null
 
+    @Autowired
+    private var initialSpectronautRunner: InitialSpectronautRunner? = null
+
     override var type: AnalysisStepType? = AnalysisStepType.INITIAL_RESULT
 
     private val readTable = ReadTableData()
@@ -63,7 +66,20 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
             val table = readTable.getTable(newTable.path, commonRes?.headers)
             writeTable.write(newTable.path, table)
             val newTableHash = Crc32HashComputations().computeFileHash(newTable)
-            val initialResult = createInitialResult(resultPath, result?.resFile, resultType, table)
+            val initialResult = createInitialResult(resultPath, resultType, table)
+
+            // for spectronaut we can try to get the groups from the setup
+            val newColInfo = if(initialResult?.spectronautSetup != null){
+                val newExpDetails = columnInfo?.columnMapping?.experimentNames?.fold(emptyMap<String, ExpInfo>()){ acc, expName ->
+                    val matched = initialResult.spectronautSetup.runs?.filter{ it.name?.contains(expName) == true }
+                    val condition = if(matched?.size == 1) matched?.get(0).condition else null
+                    val newEntry = columnInfo?.columnMapping?.experimentDetails?.get(expName)?.copy(group = condition)
+                    acc.plus(Pair(expName, newEntry!!))
+                }
+                val newColMapping = columnInfo?.columnMapping?.copy(experimentDetails = newExpDetails)
+                val newColumnInfo = columnInfo?.copy(columnMapping = newColMapping)
+                columnInfoRepository?.saveAndFlush(newColumnInfo!!)
+            } else columnInfo
 
             emptyStep?.copy(
                 resultPath = stepPath,
@@ -71,10 +87,10 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
-                columnInfo = emptyStep?.columnInfo ?: columnInfo,
+                columnInfo = emptyStep?.columnInfo ?: newColInfo,
                 commonResult = emptyStep?.commonResult ?: commonRes,
                 tableNr = 1,
-                nrProteinGroups = initialResult.nrProteinGroups
+                nrProteinGroups = initialResult?.nrProteinGroups
             )
         } catch (e: StepException) {
             e.printStackTrace()
@@ -162,16 +178,15 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
     private fun createInitialResult(
         resultPath: String?,
-        resultFilename: String?,
         type: ResultType?,
         table: Table?
-    ): InitialResult {
+    ): InitialResult? {
         val initialRes = if (type == ResultType.MaxQuant) {
             InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "parameters.txt")
         } else {
-            InitialSpectronautRunner().createInitialSpectronautResult(resultPath, table)
+            initialSpectronautRunner?.createInitialSpectronautResult(resultPath, table)
         }
-        return initialRes.copy(nrProteinGroups = table?.cols?.get(0)?.size)
+        return initialRes?.copy(nrProteinGroups = table?.cols?.get(0)?.size)
     }
 
     private fun copyResultsTable(
