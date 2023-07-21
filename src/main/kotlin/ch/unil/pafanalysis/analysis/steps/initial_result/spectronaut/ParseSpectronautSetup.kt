@@ -9,11 +9,10 @@ class ParseSpectronautSetup() {
 
     fun parseSetup(setupFile: File): SpectronautSetup {
         val lines: List<String> = setupFile.readLines()
-        println(lines.size)
 
         val softwareVersion = lines.find{ s -> s.contains("^Spectronaut".toRegex())}?.trim()
         val analysisType = lines.find{ s -> s.contains("^Analysis Type".toRegex())}?.trim()?.replace("^(.+:\\s*)".toRegex(), "")
-        val analysisDate = lines.find{ s -> s.contains("^Analysis Date".toRegex())}?.trim()?.replace("^(.+:\\s*)".toRegex(), "")
+        val analysisDate = lines.find{ s -> s.contains("^Analysis Date".toRegex())}?.trim()?.replace("^(.+:\\s)".toRegex(), "")
 
         val runParts = getRunParts(lines.dropWhile{ !it.contains("[BEGIN-SETUP]") }.dropLastWhile { !it.contains("[END-SETUP]") })
 
