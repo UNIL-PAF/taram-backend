@@ -32,10 +32,7 @@ class InitialResultPdf() : PdfCommon() {
         colTable.addCell(getDataCell(leftDiv, 2*cellFifth))
 
         // 2. data
-        val dataTable: List<Pair<String, List<String>>> = listOf(
-            Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
-            Pair("Software version: ", listOf(initialResult?.softwareVersion ?: ""))
-        )
+        val dataTable = getDataTable(initialResult)
         val dataDiv = Div()
         dataDiv.add(getTwoRowTableWithList(dataTable))
         colTable.addCell(getDataCell(dataDiv, 2*cellFifth))
@@ -48,6 +45,22 @@ class InitialResultPdf() : PdfCommon() {
 
         stepDiv.add(colTable)
         return stepDiv
+    }
+
+    private fun getDataTable(initialResult: InitialResult): List<Pair<String, List<String>>>{
+        return if(initialResult?.spectronautSetup != null){
+            listOf(
+                Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
+                Pair("Analysis date: ", listOf(initialResult.spectronautSetup.analysisDate ?: "")),
+                Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
+                Pair("Libraries:", initialResult.spectronautSetup.libraries?.map{it.name ?: ""} ?: emptyList())
+            )
+        }else{
+            listOf(
+                Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
+                Pair("Fasta files:", initialResult.fastaFiles ?: emptyList())
+            )
+        }
     }
 
 }
