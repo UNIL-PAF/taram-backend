@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.results.model.Result
+import ch.unil.pafanalysis.zip.ZipDataSelection
 import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
@@ -43,13 +44,12 @@ class PdfService {
     @Autowired
     private var commonStep: CommonStep? = null
 
-    private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
     private val fontSizeConst = 10f
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
     val unilBlue = DeviceRgb(0, 140, 204)
 
-    fun createPdf(analysisId: Int): File {
+    fun createPdf(analysisId: Int, zipSelection: ZipDataSelection? = null): File {
         val analysis = analysisRepo?.findById(analysisId)
         val steps = analysisService?.sortAnalysisSteps(analysis?.analysisSteps)
 
@@ -63,7 +63,7 @@ class PdfService {
 
         addLogo(document, pdf)
         addResultInfo(analysis, document)
-        addSteps(steps, document, pdf, plotWidth)
+        addSteps(steps, document, pdf, plotWidth, zipSelection)
         addHeaderAndFooter(document, pdf, pageSize, plotWidth)
 
         document?.close()
@@ -136,13 +136,14 @@ class PdfService {
         return div
     }
 
-    private fun addSteps(steps: List<AnalysisStep>?, document: Document?, pdf: PdfDocument, plotWidth: Float){
+    private fun addSteps(steps: List<AnalysisStep>?, document: Document?, pdf: PdfDocument, plotWidth: Float,  zipSelection: ZipDataSelection? = null){
         steps?.forEachIndexed { i, step ->
             val div = commonStep?.getRunner(step.type)?.createPdf(step, pdf, plotWidth, i + 1)
             if(step.comments != null) div?.add(commentDiv(step.comments))
             div?.setMarginBottom(15f)
             div?.isKeepTogether = true
-            document?.add(div)
+            // only add the step if it is in the zipSelection
+            if(zipSelection?.steps === null || zipSelection?.steps.contains(step.id!!)) document?.add(div)
         }
     }
 
