@@ -77,7 +77,7 @@ class AnalysisController {
         val contents = inputStream.readAllBytes()
 
         val headers = HttpHeaders();
-        headers.contentType = MediaType.MULTIPART_MIXED;
+        headers.contentType = MediaType.MULTIPART_FORM_DATA;
         val filename = "output.zip";
         headers.setContentDispositionFormData(filename, filename);
         headers.cacheControl = "must-revalidate, post-check=0, pre-check=0";

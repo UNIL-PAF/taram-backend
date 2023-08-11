@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
+import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
 import ch.unil.pafanalysis.pdf.PdfService
@@ -28,6 +29,9 @@ class ZipService {
     private var analysisService: AnalysisService? = null
 
     @Autowired
+    private var analysisStepService: AnalysisStepService? = null
+
+    @Autowired
     private var pdfService: PdfService? = null
 
     @Autowired
@@ -45,6 +49,7 @@ class ZipService {
 
         createPdf(analysisId, zipSelection, "$zipDir/$zipName.pdf")
         createPlots(steps, zipSelection, zipDir)
+        createTables(steps, zipSelection, zipDir)
 
         return File(ZipTool().zipDir(zipDir, "$zipName.zip", createTempDirectory().pathString, true))
     }
@@ -64,6 +69,18 @@ class ZipService {
         val pdfFile = pdfService?.createPdf(analysisId, zipSelection)
         pdfFile?.copyTo(File(pdfPath))
         pdfFile?.delete()
+    }
+
+    private fun createTables(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){
+        val tableDir = "$zipDir/tables"
+        File(tableDir).mkdir()
+
+        steps?.forEachIndexed{ i, step ->
+            if(zipSelection.tables?.contains(step.id) == true){
+                val origTableFile = analysisStepService?.getTable(step.id!!)
+                File(origTableFile).copyTo(File("$tableDir/Table-${step.tableNr}.txt"))
+            }
+        }
     }
 
     private fun createPlots(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){
