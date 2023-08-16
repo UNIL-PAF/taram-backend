@@ -87,17 +87,17 @@ class AnalysisStepController {
         return analysisStepService?.deleteStep(stepId)
     }
 
-    @PostMapping(path = ["/switch-sel-protein-ac/{proteinAc}/step-id/{stepId}"])
+    @PostMapping(path = ["/switch-sel/{selId}/step-id/{stepId}"])
     @ResponseBody
-    fun switchSelProt(
-        @PathVariable(value = "proteinAc") proteinAc: String,
+    fun switchSel(
+        @PathVariable(value = "selId") selId: String,
         @PathVariable(value = "stepId") stepId: Int
     ): String? {
         val step = analysisStepRepository?.findById(stepId)
         val selProts = when (step?.type) {
-            VOLCANO_PLOT.value -> volcanoPlotRunner?.switchSelProt(step, proteinAc)
-            SCATTER_PLOT.value -> scatterPlotRunner?.switchSelProt(step, proteinAc)
-            else -> throw StepException("Cannot select proteins for [$step?.type].")
+            VOLCANO_PLOT.value -> volcanoPlotRunner?.switchSelProt(step, selId)
+            SCATTER_PLOT.value -> scatterPlotRunner?.switchSelProt(step, selId)
+            else -> throw StepException("Cannot select items for [$step?.type].")
         }
         return selProts?.joinToString(", ")
     }
