@@ -137,13 +137,16 @@ class PdfService {
     }
 
     private fun addSteps(steps: List<AnalysisStep>?, document: Document?, pdf: PdfDocument, plotWidth: Float,  zipSelection: ZipDataSelection? = null){
+        var removedSteps = 0
         steps?.forEachIndexed { i, step ->
-            val div = commonStep?.getRunner(step.type)?.createPdf(step, pdf, plotWidth, i + 1)
+            val div = commonStep?.getRunner(step.type)?.createPdf(step, pdf, plotWidth, i + 1 - removedSteps)
             if(step.comments != null) div?.add(commentDiv(step.comments))
             div?.setMarginBottom(15f)
             div?.isKeepTogether = true
             // only add the step if it is in the zipSelection
-            if(zipSelection?.steps === null || zipSelection?.steps.contains(step.id!!)) document?.add(div)
+            if(zipSelection?.steps === null || zipSelection?.steps.contains(step.id!!)){
+                document?.add(div)
+            }else removedSteps++
         }
     }
 

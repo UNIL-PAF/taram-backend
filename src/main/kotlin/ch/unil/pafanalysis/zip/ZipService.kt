@@ -87,10 +87,12 @@ class ZipService {
         val plotDir = "$zipDir/plots"
         File(plotDir).mkdir()
 
+        var removedSteps = 0
         steps?.forEachIndexed{ i, step ->
             if(zipSelection.plots?.contains(step.id) == true){
-                getPlot(step, i+1, "$plotDir/")
+                getPlot(step, i+1-removedSteps, "$plotDir/")
             }
+            if(zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
         }
     }
 
