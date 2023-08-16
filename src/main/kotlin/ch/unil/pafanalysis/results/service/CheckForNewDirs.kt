@@ -24,9 +24,9 @@ import kotlin.io.path.readAttributes
 class CheckForNewDirs {
 
     companion object {
-        // the filename and a boolean indicating weither it is an exact match or a pattern
+        // the filename and a boolean indicating if it is an exact match or a pattern
         private val maxQuantResName = listOf(Pair("proteinGroups.txt", true))
-        private val spectronautResName = listOf(Pair("_Report.xls", false), Pair("_Report.tsv", false))
+        private val spectronautResName = listOf(Pair("_Report[^\\.]*.xls", false), Pair("_Report[^\\.]*.tsv", false))
 
         private var localResultPaths: ResultPaths? = null
 
