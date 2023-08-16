@@ -128,7 +128,7 @@ class PdfService {
 
     private fun commentDiv(comment: String): Div {
         val p1 = Paragraph(comment).setFont(PdfFontFactory.createFont(myFont))
-        p1.setBackgroundColor(ColorConstants.YELLOW)
+        p1.setFontColor(ColorConstants.BLUE)
         p1.setFontSize(fontSizeConst)
         p1.setPaddingLeft(5f)
         val div = Div()
