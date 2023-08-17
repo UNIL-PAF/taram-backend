@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotParams
 import ch.unil.pafanalysis.common.EchartsServer
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -62,6 +63,15 @@ class PcaRunner() : CommonStep(), CommonRunner {
             .plus(if (params.scale != origParams?.scale) " [Scale: ${params.scale}]" else "")
 
         return if(message != "") "Parameter(s) changed:".plus(message) else null
+    }
+
+    fun switchSelExp(step: AnalysisStep?, expName: String): List<String>? {
+        val origParams = gson.fromJson(step?.parameters, PcaParams().javaClass)
+        val origList = origParams.selExps ?: emptyList()
+        val newList = if(origList.contains(expName)) origList.filter{it != expName} else origList.plus(expName)
+        val newParams = origParams.copy(selExps = newList)
+        analysisStepRepository?.saveAndFlush(step?.copy(parameters = gson.toJson(newParams))!!)
+        return newList
     }
 
 }
