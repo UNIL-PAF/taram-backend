@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
@@ -24,10 +25,21 @@ class InitialResultPdf() : PdfCommon() {
         colTable.setWidth(plotWidth)
         val cellFifth = plotWidth/5
 
+        // Groups definitions
+        stepDiv.add(Paragraph("Samples and groups:"))
+        if(groupsDefined){
+            val groupList = getGroups(step.columnInfo?.columnMapping)
+            val table = Table(groupList?.size ?: 0)
+            groupList?.forEach { group -> table.addCell(Paragraph(group.first))}
+
+        }else{
+            stepDiv.add(Paragraph("No groups are defined"))
+        }
+
         // 1. parameters
         val leftDiv = Div()
-        val groupTxt = if(groupsDefined) "Groups are defined" else "No groups are defined"
-        leftDiv.add(getParagraph(groupTxt))
+        //val groupTxt = if(groupsDefined) "Groups are defined" else "No groups are defined"
+        //leftDiv.add(getParagraph(groupTxt))
         leftDiv.add(getTwoRowTable(listOf(Pair("Default intensity column:", step?.columnInfo?.columnMapping?.intCol ?: ""))))
         colTable.addCell(getDataCell(leftDiv, 2*cellFifth))
 
@@ -45,6 +57,23 @@ class InitialResultPdf() : PdfCommon() {
 
         stepDiv.add(colTable)
         return stepDiv
+    }
+
+    private fun getGroups(colMapping: ColumnMapping?): List<Pair<String, List<String>>>? {
+        return colMapping?.experimentNames?.fold(emptyList()){ acc, exp ->
+            val details = colMapping?.experimentDetails?.get(exp)
+            val newAcc = if(details?.group != null && details.group.isNotEmpty()){
+                val currGroup = acc.find{it.first == details.group}
+                val newGroup: Pair<String, List<String>> = if(currGroup != null){
+                    currGroup.copy(second = currGroup.second.plus(exp))
+                } else {
+                    Pair(details.group, listOf(exp))
+                }
+                val fltList: List<Pair<String, List<String>>>? = acc.filter{it.first != details?.group}
+                fltList?.plus(newGroup) ?: listOf(newGroup)
+            }else acc
+            newAcc
+        }
     }
 
     private fun getDataTable(initialResult: InitialResult): List<Pair<String, List<String>>>{
