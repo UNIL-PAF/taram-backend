@@ -3,11 +3,12 @@ package ch.unil.pafanalysis.analysis.steps.initial_result
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.pdf.PdfCommon
+import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.element.Div
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.element.Table
-import com.itextpdf.layout.element.Text
+import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.borders.SolidBorder
+import com.itextpdf.layout.element.*
+import com.itextpdf.layout.properties.BorderRadius
 import org.springframework.stereotype.Service
 
 
@@ -21,46 +22,58 @@ class InitialResultPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Initial result", plotWidth))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
         val cellFifth = plotWidth/5
 
         // Groups definitions
-        stepDiv.add(Paragraph("Samples and groups:"))
+        stepDiv.add(getParagraph("List of experiments per group:", bold = true))
         if(groupsDefined){
-            val groupList = getGroups(step.columnInfo?.columnMapping)
-            val table = Table(groupList?.size ?: 0)
-            groupList?.forEach { group -> table.addCell(Paragraph(group.first))}
-
+            val (groupHeaders, groupRows) = getGroups(step.columnInfo?.columnMapping)
+            if(groupHeaders != null && groupRows != null){
+                val table = Table(groupRows[0].size).setMarginBottom(10f)
+                groupHeaders.forEach{
+                    val cell = Cell().add(getParagraph(it, bold = true)).setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                    table.addCell(cell)
+                }
+                groupRows.forEach { it.forEach{ v ->
+                    val cell = Cell().add(getParagraph(v ?: "")).setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                    table.addCell(cell)
+                }}
+                stepDiv.add(table)
+            }
         }else{
             stepDiv.add(Paragraph("No groups are defined"))
         }
 
         // 1. parameters
         val leftDiv = Div()
-        //val groupTxt = if(groupsDefined) "Groups are defined" else "No groups are defined"
-        //leftDiv.add(getParagraph(groupTxt))
         leftDiv.add(getTwoRowTable(listOf(Pair("Default intensity column:", step?.columnInfo?.columnMapping?.intCol ?: ""))))
-        colTable.addCell(getDataCell(leftDiv, 2*cellFifth))
-
-        // 2. data
         val dataTable = getDataTable(initialResult)
+        leftDiv.add(getTwoRowTableWithList(dataTable))
+        colTable.addCell(getDataCell(leftDiv, 4*cellFifth))
+
+        /*
+        // 2. data
+
         val dataDiv = Div()
-        dataDiv.add(getTwoRowTableWithList(dataTable))
+        dataDiv.add()
         colTable.addCell(getDataCell(dataDiv, 2*cellFifth))
+
+         */
 
         // 3. results
         val rightDiv = Div()
         rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getParagraph("Table ${step.tableNr}"))
+        rightDiv.add(getParagraph("Table ${step.tableNr}", bold = true, underline = true))
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
         return stepDiv
     }
 
-    private fun getGroups(colMapping: ColumnMapping?): List<Pair<String, List<String>>>? {
-        return colMapping?.experimentNames?.fold(emptyList()){ acc, exp ->
+    private fun getGroups(colMapping: ColumnMapping?): Pair<List<String>?, List<List<String?>>?> {
+        val listByGroups: List<Pair<String, List<String>>>? =  colMapping?.experimentNames?.fold(emptyList()){ acc, exp ->
             val details = colMapping?.experimentDetails?.get(exp)
             val newAcc = if(details?.group != null && details.group.isNotEmpty()){
                 val currGroup = acc.find{it.first == details.group}
@@ -74,6 +87,13 @@ class InitialResultPdf() : PdfCommon() {
             }else acc
             newAcc
         }
+
+        val nrRows = listByGroups?.map{it.second.size }?.maxOrNull()?.minus(1)
+        return if(nrRows != null){
+            val headers = listByGroups.map{it.first}
+            val rows = (0..nrRows).map { i -> listByGroups.map{ it.second.getOrNull(i)} }
+            Pair(headers, rows)
+        } else Pair(null, null)
     }
 
     private fun getDataTable(initialResult: InitialResult): List<Pair<String, List<String>>>{
