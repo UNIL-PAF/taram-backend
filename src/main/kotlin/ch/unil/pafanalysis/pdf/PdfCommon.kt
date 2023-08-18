@@ -23,6 +23,7 @@ open class PdfCommon {
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
     val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
+    val antCyan = DeviceRgb(181, 245, 236)
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
@@ -54,9 +55,8 @@ open class PdfCommon {
 
     fun titleDiv(title: String, plotWidth: Float): Div {
         val titlePadding = 5f
-        val unilBlue = DeviceRgb(0, 140, 204)
 
-        val p = Paragraph().setBackgroundColor(unilBlue)
+        val p = Paragraph().setBackgroundColor(antCyan)
         p.setPaddingLeft(titlePadding)
         p.setPaddingTop(5f)
 
@@ -65,7 +65,7 @@ open class PdfCommon {
 
         val text = Paragraph(Text(title))
         text.setFontSize(12f)
-        text.setFontColor(ColorConstants.WHITE)
+        text.setFontColor(ColorConstants.BLACK)
         text.setFont(PdfFontFactory.createFont(myFont))
         val colLeft = Cell()
         colLeft.setWidth(170f)

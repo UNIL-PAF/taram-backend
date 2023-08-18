@@ -47,7 +47,7 @@ class PdfService {
     private val fontSizeConst = 10f
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
-    val unilBlue = DeviceRgb(0, 140, 204)
+    val antCyan = DeviceRgb(181, 245, 236)
 
     fun createPdf(analysisId: Int, zipSelection: ZipDataSelection? = null): File {
         val analysis = analysisRepo?.findById(analysisId)
@@ -77,7 +77,11 @@ class PdfService {
 
         val result: Result? = analysis?.result
 
-        val title = Paragraph(result?.name).setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(14f).setBackgroundColor(unilBlue).setPaddingLeft(5f).setFontColor(ColorConstants.WHITE)
+        val title = Paragraph(result?.name).setFont(PdfFontFactory.createFont(myBoldFont))
+            .setFontSize(14f)
+            .setBackgroundColor(antCyan)
+            .setPaddingLeft(5f)
+            .setFontColor(ColorConstants.BLACK)
         title.setMarginTop(0f)
         div.add(title)
         div.setPaddingTop(0f)
@@ -92,7 +96,7 @@ class PdfService {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)
 
-        div.setBorder(SolidBorder(unilBlue, 1f))
+        div.setBorder(SolidBorder(antCyan, 1f))
         div.setMarginTop(10f)
         div.setMarginBottom(20f)
         div.add(infoTable)
@@ -128,7 +132,7 @@ class PdfService {
 
     private fun commentDiv(comment: String): Div {
         val p1 = Paragraph(comment).setFont(PdfFontFactory.createFont(myFont))
-        p1.setFontColor(ColorConstants.BLUE)
+        p1.setFontColor(DeviceRgb(0, 109, 117))
         p1.setFontSize(fontSizeConst)
         p1.setPaddingLeft(5f)
         val div = Div()
