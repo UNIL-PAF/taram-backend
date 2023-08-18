@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.borders.DoubleBorder
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.BorderRadius
@@ -27,17 +28,26 @@ class InitialResultPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // Groups definitions
-        stepDiv.add(getParagraph("List of experiments per group:", bold = true))
+        stepDiv.add(getParagraph("Groups and experiments:", bold = true))
         if(groupsDefined){
             val (groupHeaders, groupRows) = getGroups(step.columnInfo?.columnMapping)
             if(groupHeaders != null && groupRows != null){
                 val table = Table(groupRows[0].size).setMarginBottom(10f)
                 groupHeaders.forEach{
-                    val cell = Cell().add(getParagraph(it, bold = true)).setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                    val cell = Cell().add(getParagraph(it, bold = true))
+                        .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                        .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                        .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+                        .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+
                     table.addCell(cell)
                 }
                 groupRows.forEach { it.forEach{ v ->
-                    val cell = Cell().add(getParagraph(v ?: "")).setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                    val cell = Cell().add(getParagraph(v ?: ""))
+                        .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                        .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                        .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+                        .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
                     table.addCell(cell)
                 }}
                 stepDiv.add(table)
@@ -52,15 +62,6 @@ class InitialResultPdf() : PdfCommon() {
         val dataTable = getDataTable(initialResult)
         leftDiv.add(getTwoRowTableWithList(dataTable))
         colTable.addCell(getDataCell(leftDiv, 4*cellFifth))
-
-        /*
-        // 2. data
-
-        val dataDiv = Div()
-        dataDiv.add()
-        colTable.addCell(getDataCell(dataDiv, 2*cellFifth))
-
-         */
 
         // 3. results
         val rightDiv = Div()
