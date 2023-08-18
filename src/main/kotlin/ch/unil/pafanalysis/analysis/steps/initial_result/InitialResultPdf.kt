@@ -78,11 +78,8 @@ class InitialResultPdf() : PdfCommon() {
             val details = colMapping?.experimentDetails?.get(exp)
             val newAcc = if(details?.group != null && details.group.isNotEmpty()){
                 val currGroup = acc.find{it.first == details.group}
-                val newGroup: Pair<String, List<String>> = if(currGroup != null){
-                    currGroup.copy(second = currGroup.second.plus(exp))
-                } else {
-                    Pair(details.group, listOf(exp))
-                }
+                val newGroup: Pair<String, List<String>> =
+                    currGroup?.copy(second = currGroup.second.plus(exp)) ?: Pair(details.group, listOf(exp))
                 val fltList: List<Pair<String, List<String>>>? = acc.filter{it.first != details?.group}
                 fltList?.plus(newGroup) ?: listOf(newGroup)
             }else acc
