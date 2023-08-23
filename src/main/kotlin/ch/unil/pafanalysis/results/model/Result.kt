@@ -17,3 +17,8 @@ data class Result (
     val fileCreationDate: LocalDateTime? = null,
     val lastModifDate: LocalDateTime? = null
 )
+
+enum class ResultStatus(val value: String) {
+    RUNNING("running"),
+    DONE("done")
+}

@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.results.model.AvailableDir
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultPaths
+import ch.unil.pafanalysis.results.model.ResultStatus
 import ch.unil.pafanalysis.results.service.CheckForNewDirs
 import ch.unil.pafanalysis.results.service.ResultRepository
 import ch.unil.pafanalysis.results.service.ResultService
@@ -35,7 +36,7 @@ class ResultController {
     @PostMapping("/add")
     @ResponseBody
     fun addResult(@RequestBody res: Result): Int?{
-        val newRes = res.copy(lastModifDate = LocalDateTime.now())
+        val newRes = res.copy(lastModifDate = LocalDateTime.now(), status = ResultStatus.RUNNING.value)
         return resultRepository?.save(newRes)?.id
     }
 

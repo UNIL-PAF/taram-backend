@@ -14,6 +14,7 @@ data class Analysis (
     val idx: Int? = null,
     val name: String? = null,
     val status: String? = null,
+    val isLocked: Boolean? = null,
     val copyFromIdx: Int? =  null,
     val lastModifDate: LocalDateTime? = null,
 

@@ -55,6 +55,11 @@ class AnalysisController {
         return analysisService?.setName(analysisId, analysisName.drop(1).dropLast(1))
     }
 
+    @PutMapping(path = ["/switch-lock/{analysisId}"])
+    fun switchLock(@PathVariable(value = "analysisId") analysisId: Int): Boolean? {
+        return analysisService?.switchLock(analysisId)
+    }
+
     @GetMapping(path = ["/pdf/{analysisId}"])
     fun createPdf(@PathVariable(value = "analysisId") analysisId: Int): ResponseEntity<ByteArray>? {
         val pdfFile =  pdfService?.createPdf(analysisId)

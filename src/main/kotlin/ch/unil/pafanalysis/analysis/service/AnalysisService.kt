@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.service.ResultRepository
@@ -40,6 +37,13 @@ class AnalysisService {
 
         val analysisList = listOf(analysis)
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>
+    }
+
+    fun switchLock(analysisId: Int): Boolean {
+        val analysis = analysisRepo?.findById(analysisId)
+        val isLocked = analysis?.isLocked != true
+        analysisRepo?.saveAndFlush(analysis?.copy(isLocked = isLocked)!!)
+        return isLocked
     }
 
     fun setName(analysisId: Int, analysisName: String): String {
