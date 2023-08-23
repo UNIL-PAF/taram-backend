@@ -119,8 +119,9 @@ class AnalysisService {
             analysisRepo?.saveAndFlush(analysis!!.copy(
                 id = 0,
                 idx = maxIdx.plus(1),
-                copyFromIdx = analysis?.idx,
-                name = null
+                copyFromIdx = if(copyAllSteps) analysis?.idx else null,
+                name = null,
+                isLocked = null
             ))
 
         val sortedSteps = sortAnalysisSteps(analysis?.analysisSteps)!!
