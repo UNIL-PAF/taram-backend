@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.service
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
+import ch.unil.pafanalysis.results.model.ResultStatus
 import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -43,6 +44,14 @@ class AnalysisService {
         val analysis = analysisRepo?.findById(analysisId)
         val isLocked = analysis?.isLocked != true
         analysisRepo?.saveAndFlush(analysis?.copy(isLocked = isLocked)!!)
+
+        // set result to done if there is any locked analysis
+        val resultId = analysis?.result?.id!!
+        val isAnyLocked = analysisRepo?.findByResultId(resultId)?.map{it.isLocked}?.find{it == true}
+        val resStatus = if(isLocked || isAnyLocked == true) ResultStatus.DONE.value else ResultStatus.RUNNING.value
+        val result = resultRepo?.findById(resultId)
+        resultRepo?.saveAndFlush(result?.copy(status = resStatus)!!)
+
         return isLocked
     }
 
