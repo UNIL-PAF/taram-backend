@@ -45,7 +45,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
-        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, params, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
+        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
 
         return BoxPlot(
@@ -70,14 +70,10 @@ class AsyncBoxPlotRunner() : CommonStep() {
             val i = protGroup?.indexOf(p)
             if(i != null && i >= 0){
                 val ints = sortedIntMatrix.map { if (i == null) null else it[i] }
-                val normInts = if (params?.logScale != false) {
-                    ints.map { if (it != null && !it.isNaN() && it > 0.0) log2(it) else null }
-                } else {
-                    ints.map{ if(it?.isNaN() == true) null else it}
-                }
+                val logInts = ints.map { if (it != null && !it.isNaN() && it > 0.0) log2(it) else null }
 
                 val gene = if (i == null) "" else genes?.get(i)
-                SelProtData(prot = p, ints = normInts, gene = gene)
+                SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene)
             }else{
                 null
             }
@@ -88,7 +84,6 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
     private fun createBoxplotGroupData(
         group: String?,
-        params: BoxPlotParams?,
         table: Table?,
         intCol: String?,
         expDetails: Map<String, ExpInfo>?
@@ -99,7 +94,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
             headers.mapIndexed { i, h ->
                 BoxPlotData(
                     h.experiment?.name,
-                    computeBoxplotData(ints[i], params?.logScale)
+                    computeBoxplotData(ints[i], false),
+                    computeBoxplotData(ints[i], true)
                 )
             }
 
