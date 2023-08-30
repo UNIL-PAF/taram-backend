@@ -20,6 +20,15 @@ class NormalizationPdf() : PdfCommon() {
         "none" to "None"
     )
 
+    fun normText(params: NormalizationParams): String {
+        val myType = normType[params.normalizationType]
+        return if(params.normalizationCalculation == NormalizationCalculation.DIVISION.value){
+            "Divide by $myType"
+        }else{
+            "Substract $myType"
+        }
+    }
+
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
         val res = gson.fromJson(step.results, Normalization::class.java)
         val parsedParams = gson.fromJson(step.parameters, NormalizationParams::class.java)
@@ -33,7 +42,7 @@ class NormalizationPdf() : PdfCommon() {
 
         // 1. parameters
         val paramsDiv = Div()
-        paramsDiv.add(getParagraph(normType[parsedParams.normalizationType] + " normalization"))
+        paramsDiv.add(getParagraph(normText(parsedParams)))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

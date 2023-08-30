@@ -13,7 +13,7 @@ class NormalizationComputation() {
     ): List<List<Double>> {
         if (params.normalizationType == NormalizationType.NONE.value) return ints
 
-        val subtract = when (params.normalizationType) {
+        val myNumber = when (params.normalizationType) {
             NormalizationType.MEDIAN.value -> fun(orig: List<Double>): Double {
                 return Quantiles.median().compute(orig)
             }
@@ -25,7 +25,11 @@ class NormalizationComputation() {
 
         return ints.map { orig: List<Double> ->
             val noNaNs = orig.filter { !it.isNaN() }
-            orig.map { it - subtract(noNaNs) }
+            when (params.normalizationCalculation) {
+                NormalizationCalculation.DIVISION.value -> orig.map { it - myNumber(noNaNs) }
+                NormalizationCalculation.SUBSTRACTION.value -> orig.map { it - myNumber(noNaNs) }
+                else -> throw StepException("${params.normalizationCalculation} is not implemented.")
+            }
         }
     }
 
