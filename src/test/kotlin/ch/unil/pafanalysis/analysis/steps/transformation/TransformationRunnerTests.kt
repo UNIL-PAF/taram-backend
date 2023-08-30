@@ -8,6 +8,7 @@ import ch.unil.pafanalysis.analysis.steps.imputation.NormImputationParams
 import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationComputation
 import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationParams
 import ch.unil.pafanalysis.analysis.steps.log_transformation.TransformationType
+import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationCalculation
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationComputation
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationParams
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationType
@@ -58,7 +59,7 @@ class TransformationRunnerTests {
         val transParams = LogTransformationParams(transformationType = TransformationType.LOG2.value)
         val res1 = transformation?.runTransformation(ints!!, transParams)
 
-        val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value)
+        val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
         val res2 = normalization?.runNormalization(res1!!, normParams)
 
         val imputParams = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())
@@ -74,7 +75,7 @@ class TransformationRunnerTests {
         val transParams = LogTransformationParams(transformationType = TransformationType.LOG2.value)
         val res1 = transformation?.runTransformation(ints!!, transParams)
 
-        val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value)
+        val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
         val res2 = normalization?.runNormalization(res1!!, normParams)
 
         val imputParams = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())

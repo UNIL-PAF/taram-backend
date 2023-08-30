@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.transformation
 
 import ch.unil.pafanalysis.analysis.service.ColumnMappingParser
+import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationCalculation
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationComputation
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationParams
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationType
@@ -39,7 +40,7 @@ class NormalizationRunnerTests {
 
     @Test
     fun medianNormalization() {
-        val params = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value)
+        val params = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
         val res = runner?.runNormalization(ints!!, params)
         val oneRes = res!![0][0]
         assert(oneRes == -8296600.0)
@@ -47,7 +48,7 @@ class NormalizationRunnerTests {
 
     @Test
     fun meanNormalization() {
-        val params = NormalizationParams(normalizationType = NormalizationType.MEAN.value)
+        val params = NormalizationParams(normalizationType = NormalizationType.MEAN.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
         val res = runner?.runNormalization(ints!!, params)
         val oneRes = BigDecimal(res!![0][0])
         assert(oneRes == BigDecimal(-7.563853132827462E8))
@@ -55,7 +56,7 @@ class NormalizationRunnerTests {
 
     @Test
     fun noneNormalization() {
-        val params = NormalizationParams(normalizationType = NormalizationType.NONE.value)
+        val params = NormalizationParams(normalizationType = NormalizationType.NONE.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
         val res = runner?.runNormalization(ints!!, params)
         val oneRes = res!![0][0]
         assert(oneRes == 5670400.0)
