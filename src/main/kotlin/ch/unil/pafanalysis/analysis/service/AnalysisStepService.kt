@@ -6,11 +6,11 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.common.*
+import ch.unil.pafanalysis.common.EchartsServer
+import ch.unil.pafanalysis.common.ZipTool
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -34,9 +34,6 @@ class AnalysisStepService {
 
     @Autowired
     private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
-
-    @Autowired
-    private var tableService: TableService? = null
 
     @Autowired
     private var echartsServer: EchartsServer? = null

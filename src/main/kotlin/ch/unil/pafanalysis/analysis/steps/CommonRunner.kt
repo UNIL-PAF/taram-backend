@@ -1,9 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Div
 
 interface CommonRunner {

@@ -1,10 +1,15 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.*
+import ch.unil.pafanalysis.analysis.model.Analysis
+import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultStatus
 import ch.unil.pafanalysis.results.service.ResultRepository
+import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -23,6 +28,11 @@ class AnalysisService {
 
     @Autowired
     private var analysisStepService: AnalysisStepService? = null
+
+    @Autowired
+    private var commonStep: CommonStep? = null
+
+    private val gson = Gson()
 
     private fun createNewAnalysis(result: Result?): List<Analysis>? {
         val newAnalysis = Analysis(
@@ -47,8 +57,8 @@ class AnalysisService {
 
         // set result to done if there is any locked analysis
         val resultId = analysis?.result?.id!!
-        val isAnyLocked = analysisRepo?.findByResultId(resultId)?.map{it.isLocked}?.find{it == true}
-        val resStatus = if(isLocked || isAnyLocked == true) ResultStatus.DONE.value else ResultStatus.RUNNING.value
+        val isAnyLocked = analysisRepo?.findByResultId(resultId)?.map { it.isLocked }?.find { it == true }
+        val resStatus = if (isLocked || isAnyLocked == true) ResultStatus.DONE.value else ResultStatus.RUNNING.value
         val result = resultRepo?.findById(resultId)
         resultRepo?.saveAndFlush(result?.copy(status = resStatus)!!)
 
@@ -114,9 +124,20 @@ class AnalysisService {
         val analysisList: List<Analysis>? = getByResultId(resultId)
 
         val sortedList = analysisList?.map { a ->
-            a.copy(analysisSteps = sortAnalysisSteps(a.analysisSteps))
+            val analysisStepsWithoutPlots = removePlotResults(a.analysisSteps)
+            val sortedAnalysisSteps = sortAnalysisSteps(analysisStepsWithoutPlots)
+            a.copy(analysisSteps = sortedAnalysisSteps)
         }
         return getAnalysisWithStatus(sortedList)
+    }
+
+    private fun removePlotResults(steps: List<AnalysisStep>?): List<AnalysisStep>? {
+        return steps?.map { step ->
+            val type = AnalysisStepType.values().firstOrNull { it.value == step.type }
+            if (type?.hasPlot == true) {
+                step.copy(results = null)
+            } else step
+        }
     }
 
     fun duplicateAnalysis(analysisId: Int, copyAllSteps: Boolean): Analysis {
@@ -125,13 +146,15 @@ class AnalysisService {
         val maxIdx = allAnalysisIdx?.maxOfOrNull { it ?: 0 } ?: 0
 
         val newAnalysis =
-            analysisRepo?.saveAndFlush(analysis!!.copy(
-                id = 0,
-                idx = maxIdx.plus(1),
-                copyFromIdx = if(copyAllSteps) analysis?.idx else null,
-                name = null,
-                isLocked = null
-            ))
+            analysisRepo?.saveAndFlush(
+                analysis!!.copy(
+                    id = 0,
+                    idx = maxIdx.plus(1),
+                    copyFromIdx = if (copyAllSteps) analysis?.idx else null,
+                    name = null,
+                    isLocked = null
+                )
+            )
 
         val sortedSteps = sortAnalysisSteps(analysis?.analysisSteps)!!
 
