@@ -18,4 +18,9 @@ interface CommonRunner {
     fun getResultByteArray(step: AnalysisStep?): ByteArray? {
         throw Exception("'getResultByteArray' is not implemented for this Runner [${step?.type}].")
     }
+
+    fun switchSel(step: AnalysisStep?, selId: String): List<String>? {
+        throw StepException("Cannot select items for [$step?.type].")
+    }
+
 }

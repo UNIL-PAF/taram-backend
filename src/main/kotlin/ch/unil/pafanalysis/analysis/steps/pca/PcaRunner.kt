@@ -65,7 +65,7 @@ class PcaRunner() : CommonStep(), CommonRunner {
         return if(message != "") "Parameter(s) changed:".plus(message) else null
     }
 
-    fun switchSelExp(step: AnalysisStep?, expName: String): List<String>? {
+    override fun switchSel(step: AnalysisStep?, expName: String): List<String>? {
         val origParams = gson.fromJson(step?.parameters, PcaParams().javaClass)
         val origList = origParams.selExps ?: emptyList()
         val newList = if(origList.contains(expName)) origList.filter{it != expName} else origList.plus(expName)

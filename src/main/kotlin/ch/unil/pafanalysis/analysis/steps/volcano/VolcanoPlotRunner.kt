@@ -58,7 +58,7 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
         return if(message != "") "Parameter(s) changed:".plus(message) else null
     }
 
-    fun switchSelProt(step: AnalysisStep?, proteinAc: String): List<String>? {
+    override fun switchSel(step: AnalysisStep?, proteinAc: String): List<String>? {
         val origParams = gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass)
         val origList = origParams.selProteins ?: emptyList()
         val newList = if(origList.contains(proteinAc)) origList.filter{it != proteinAc} else origList.plus(proteinAc)

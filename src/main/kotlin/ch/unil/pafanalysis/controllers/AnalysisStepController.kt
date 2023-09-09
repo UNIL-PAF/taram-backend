@@ -105,13 +105,8 @@ class AnalysisStepController {
         @PathVariable(value = "stepId") stepId: Int
     ): String? {
         val step = analysisStepRepository?.findById(stepId)
-        val selProts = when (step?.type) {
-            VOLCANO_PLOT.value -> volcanoPlotRunner?.switchSelProt(step, selId)
-            SCATTER_PLOT.value -> scatterPlotRunner?.switchSelProt(step, selId)
-            PCA.value -> pcaRunner?.switchSelExp(step, selId)
-            else -> throw StepException("Cannot select items for [$step?.type].")
-        }
-        return selProts?.joinToString(", ")
+        val selIds = commonStep?.getRunner(step?.type)?.switchSel(step, selId)
+        return selIds?.joinToString(", ")
     }
 
     @PostMapping(path = ["/parameters/{stepId}"])
