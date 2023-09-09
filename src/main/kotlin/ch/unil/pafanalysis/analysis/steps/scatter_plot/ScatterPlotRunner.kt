@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
@@ -63,6 +64,12 @@ class ScatterPlotRunner() : CommonStep(), CommonRunner {
         val newParams = origParams.copy(selProteins = newList)
         analysisStepRepository?.saveAndFlush(step?.copy(parameters = gson.toJson(newParams))!!)
         return newList
+    }
+
+    override fun getResult(step: AnalysisStep?): String? {
+        val res = gson.fromJson(step?.results, ScatterPlot().javaClass)
+        val withoutPlot = res.copy(plot = null)
+        return gson.toJson(withoutPlot)
     }
 
 }

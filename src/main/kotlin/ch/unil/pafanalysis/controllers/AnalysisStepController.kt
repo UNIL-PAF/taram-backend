@@ -68,7 +68,7 @@ class AnalysisStepController {
     @GetMapping(path = ["/results/{stepId}"])
     fun getResults(@PathVariable(value = "stepId") stepId: Int): String? {
         val step = analysisStepRepository?.findById(stepId)
-        return step?.results
+        return commonStep?.getRunner(step?.type)?.getResult(step)
     }
 
     @GetMapping(path = ["/full-protein-table/{stepId}"])

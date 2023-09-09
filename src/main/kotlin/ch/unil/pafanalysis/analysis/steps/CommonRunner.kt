@@ -23,4 +23,8 @@ interface CommonRunner {
         throw StepException("Cannot select items for [$step?.type].")
     }
 
+    fun getResult(step: AnalysisStep?): String? {
+        throw StepException("getResult is not implemented for [$step?.type].")
+    }
+
 }

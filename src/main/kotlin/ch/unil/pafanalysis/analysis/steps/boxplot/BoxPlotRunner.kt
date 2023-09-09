@@ -61,4 +61,10 @@ class BoxPlotRunner() : CommonStep(), CommonRunner {
         return if(message != "") "Parameter(s) changed:".plus(message) else null
     }
 
+    override fun getResult(step: AnalysisStep?): String? {
+        val res = gson.fromJson(step?.results, BoxPlot().javaClass)
+        val withoutPlot = res.copy(plot = null)
+        return gson.toJson(withoutPlot)
+    }
+
 }
