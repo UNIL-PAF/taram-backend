@@ -16,6 +16,7 @@ data class AnalysisStep (
     val id: Int? = null,
     val nextId: Int? = null,
     val beforeId: Int? = null,
+    @Lob
     val comments: String? = null,
     val status: String? = null,
     val type: String? = null,
