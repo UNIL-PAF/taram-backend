@@ -29,11 +29,6 @@ class AnalysisService {
     @Autowired
     private var analysisStepService: AnalysisStepService? = null
 
-    @Autowired
-    private var commonStep: CommonStep? = null
-
-    private val gson = Gson()
-
     private fun createNewAnalysis(result: Result?): List<Analysis>? {
         val newAnalysis = Analysis(
             idx = 0,

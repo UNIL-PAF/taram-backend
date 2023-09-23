@@ -13,6 +13,15 @@ class ParseSpectronautSetupTests {
     private val parser: ParseSpectronautSetup? = null
 
     @Test
+    fun bockSetup() {
+        val resPath = "./src/test/resources/results/spectronaut/"
+        val filePath = File(resPath + "20230921_Bock_16619-42_directDIA_Report.setup.txt")
+        val spectronautSetup = parser?.parseSetup(filePath)
+        println(spectronautSetup)
+    }
+
+
+    @Test
     fun gaspariSetup() {
         val resPath = "./src/test/resources/results/spectronaut/"
         val filePath = File(resPath + "Gaspari-15321-32-Library_Report.setup.txt")

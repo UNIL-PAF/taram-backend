@@ -16,6 +16,8 @@ class ParseSpectronautSetup() {
 
         val runParts = getRunParts(lines.dropWhile{ !it.contains("[BEGIN-SETUP]") }.dropLastWhile { !it.contains("[END-SETUP]") })
 
+        println(runParts)
+
         return SpectronautSetup(
             softwareVersion = softwareVersion,
             analysisType = analysisType,
@@ -56,17 +58,19 @@ class ParseSpectronautSetup() {
         )
     }
 
-    private fun getLinesForField(lines: List<String>, field: String): List<String> {
+    private fun getLinesForField(lines: List<String>, field: String): List<String>? {
         val firstLines = lines.dropWhile { ! it.contains(field) }
+        if(firstLines.isEmpty()) return null
+
         val first: String = firstLines.first()
         val idx = first.indexOfFirst { it == '─' }
         return firstLines.drop(1).takeWhile { a -> a.indexOfFirst { it == '─' } != idx  }
     }
 
-    private fun parseLibraries(lines: List<String>): List<SpectronautLibraries> {
-        val nameIdx = lines.first().indexOfFirst { it == '─' }
+    private fun parseLibraries(lines: List<String>?): List<SpectronautLibraries>? {
+        val nameIdx = lines?.first()?.indexOfFirst { it == '─' }
 
-        return lines.fold(emptyList<SpectronautLibraries>()){ acc, v ->
+        return lines?.fold(emptyList<SpectronautLibraries>()){ acc, v ->
             if(v.indexOfFirst { it == '─'} == nameIdx){
                 val name: String = v.trim().replace("^\\W+".toRegex(), "")
                 acc.plusElement(SpectronautLibraries(name = name))
@@ -86,10 +90,10 @@ class ParseSpectronautSetup() {
         return acc.dropLast(1).plusElement(newLast)
     }
 
-    private fun parseProteinDBs(lines: List<String>): List<SpectronautProteinDB> {
-        val nameIdx = lines.first().indexOfFirst { it == '─' }
+    private fun parseProteinDBs(lines: List<String>?): List<SpectronautProteinDB>? {
+        val nameIdx = lines?.first()?.indexOfFirst { it == '─' }
 
-        return lines.fold(emptyList<SpectronautProteinDB>()){ acc, v ->
+        return lines?.fold(emptyList<SpectronautProteinDB>()){ acc, v ->
             if(v.indexOfFirst { it == '─'} == nameIdx){
                 val name: String = v.trim().replace("^\\W+".toRegex(), "")
                 acc.plusElement(SpectronautProteinDB(name = name))
