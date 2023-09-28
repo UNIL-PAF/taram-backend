@@ -74,8 +74,6 @@ class ColumnMappingParser {
                         else if(regexMinRight.matches(s)){ regex2.matchEntire(s) }
                         else { regex1.matchEntire(s) ?: regex2.matchEntire(s) }
 
-            if(matchResult == null) throw StepException("Could not parse column names from spectronaut result.")
-
             val accWithExp = if (matchResult != null) {
                 acc.copy(
                     expNames = acc.expNames.plus(matchResult.groupValues[1]),
@@ -102,6 +100,8 @@ class ColumnMappingParser {
             } else acc.copy(headers = acc.headers.plus(Header(name = s, idx = i, type = colTypes?.get(i))))
             accWithExp
         }
+
+        if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from spectronaut result.")
 
         val colMapping = ColumnMapping(
             experimentDetails = cols.expDetails,
