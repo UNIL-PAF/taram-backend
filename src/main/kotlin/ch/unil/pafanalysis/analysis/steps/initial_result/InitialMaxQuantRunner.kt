@@ -19,7 +19,7 @@ class InitialMaxQuantRunner() {
 
     private fun parseMaxquantParameters(parametersTable: String): Triple<MaxQuantParameters, List<String>?, String?> {
         val paramsFile = File(parametersTable)
-        if (!paramsFile.exists()) throw StepException("Could not find parameters.txt in the results directory.")
+        if (!paramsFile.exists()) throw StepException("Could not find parameters.txt in results directory.")
         val pMap: HashMap<String, String> = HashMap<String, String>()
         paramsFile.useLines { lines ->
             lines.forEach {

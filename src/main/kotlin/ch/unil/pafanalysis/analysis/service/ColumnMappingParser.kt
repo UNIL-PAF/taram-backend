@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.service
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonResult
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.CheckTypes
 import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.stereotype.Service
@@ -42,7 +43,9 @@ class ColumnMappingParser {
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
         return if (type == ResultType.MaxQuant) {
-            getMaxQuantExperiments(columns, resultPath.plus("summary.txt"), colTypes)
+            val summaryFile = resultPath.plus("summary.txt")
+            if (! File(summaryFile).exists()) throw StepException("Could not find summary.txt in results directory.")
+            getMaxQuantExperiments(columns, summaryFile, colTypes)
         } else {
             getSpectronautExperiments(columns, colTypes)
         }
@@ -59,7 +62,6 @@ class ColumnMappingParser {
         columns: List<String>?,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-
         val regexMinRight = Regex(".+_DIA_\\d+min.+")
         val regexMinLeft = Regex(".+_\\d+min_DIA_.+")
 
@@ -71,6 +73,8 @@ class ColumnMappingParser {
             val matchResult = if(regexMinLeft.matches(s)){ regexLeft.matchEntire(s) }
                         else if(regexMinRight.matches(s)){ regex2.matchEntire(s) }
                         else { regex1.matchEntire(s) ?: regex2.matchEntire(s) }
+
+            if(matchResult == null) throw StepException("Could not parse column names from spectronaut result.")
 
             val accWithExp = if (matchResult != null) {
                 acc.copy(
