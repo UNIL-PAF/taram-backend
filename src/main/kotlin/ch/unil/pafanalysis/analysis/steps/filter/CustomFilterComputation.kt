@@ -78,9 +78,12 @@ class CustomFilterComputation() {
     }
 
     fun compareString(v1: String, v2: String, comparator: Comparator): Boolean {
+        // replace wildcard to regex .*
+        val regex: Regex = Regex(v2.replace("*", ".*"))
+
         return when(comparator){
-            Comparator.EQ -> v1 == v2
-            Comparator.NOT -> v1 != v2
+            Comparator.EQ -> regex.matches(v1)
+            Comparator.NOT -> ! regex.matches(v1)
             else -> throw StepException("Invalid comparator ${comparator.symbol}.")
         }
     }
