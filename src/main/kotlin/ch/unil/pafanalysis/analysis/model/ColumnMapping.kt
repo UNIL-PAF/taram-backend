@@ -11,6 +11,7 @@ data class ExpInfo(
 data class ColumnMapping(
     val experimentDetails: Map<String, ExpInfo>? = null,
     val experimentNames: List<String>? = null,
+    val groupsOrdered: List<String>? = null,
     val intCol: String? = null
 )
 

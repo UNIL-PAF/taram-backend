@@ -36,7 +36,6 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         val experimentNames = expDetailsTable?.map { it?.name!! }
         val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
-
         val params = gson.fromJson(analysisStep?.parameters, BoxPlotParams().javaClass)
 
         val table = readTableData.getTable(
@@ -45,12 +44,14 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
-        val boxplotGroupData = groupedExpDetails?.mapKeys { createBoxplotGroupData(it.key, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
+        val groupNames = analysisStep?.columnInfo?.columnMapping?.groupsOrdered ?: groupedExpDetails?.keys
+
+        val boxplotGroupData = groupNames?.map { createBoxplotGroupData(it, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
 
         return BoxPlot(
             experimentNames = experimentNames,
-            boxPlotData = boxplotGroupData?.keys?.toList(),
+            boxPlotData = boxplotGroupData,
             selProtData = selProtData
         )
     }
