@@ -1,4 +1,4 @@
-package ch.unil.pafanalysis.analysis.steps.rename_columns
+package ch.unil.pafanalysis.analysis.steps.add_column
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
-class AsyncRenameColumnsRunner() : CommonStep() {
+class AsyncAddColumnRunner() : CommonStep() {
 
     @Autowired
     private var env: Environment? = null
@@ -20,13 +20,7 @@ class AsyncRenameColumnsRunner() : CommonStep() {
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
-            val params = gson.fromJson(newStep?.parameters, RenameColumnsParams().javaClass)
-
-            /*
-            if(params?.rename?.find{ r -> r.idx == newStep?.columnInfo?.columnMapping?.intCol} != null){
-                throw StepException("You cannot rename the intensity column [${newStep?.columnInfo?.columnMapping?.intCol}] that is currently used.")
-            }
-             */
+            val params = gson.fromJson(newStep?.parameters, AddColumnParams().javaClass)
 
             val origTable = ReadTableData().getTable(
                 env?.getProperty("output.path").plus(newStep?.resultTablePath),

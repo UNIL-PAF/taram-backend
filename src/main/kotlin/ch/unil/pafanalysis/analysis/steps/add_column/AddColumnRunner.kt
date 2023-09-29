@@ -1,4 +1,4 @@
-package ch.unil.pafanalysis.analysis.steps.rename_columns
+package ch.unil.pafanalysis.analysis.steps.add_column
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
-class RenameColumnsRunner() : CommonStep(), CommonRunner {
+class AddColumnRunner() : CommonStep(), CommonRunner {
 
     val version = "1.0"
 
@@ -20,19 +20,19 @@ class RenameColumnsRunner() : CommonStep(), CommonRunner {
     var asyncRunner: AsyncAddColumnRunner? = null
 
     @Autowired
-    var renameColumnsPdf: AddColumnPdf? = null
+    var addColumnPdf: AddColumnPdf? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.RENAME_COLUMNS
 
-    fun getParameters(step: AnalysisStep?): RenameColumnsParams {
+    fun getParameters(step: AnalysisStep?): AddColumnParams {
         return if (step?.parameters != null) gson.fromJson(
             step?.parameters,
-            RenameColumnsParams().javaClass
-        ) else RenameColumnsParams()
+            AddColumnParams().javaClass
+        ) else AddColumnParams()
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
-        return renameColumnsPdf?.createPdf(step, pdf, plotWidth, stepNr)
+        return addColumnPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
