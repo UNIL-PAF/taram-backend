@@ -23,7 +23,7 @@ open class PdfCommon {
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
     val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
-    val antCyan = DeviceRgb(181, 245, 236)
+    val antCyan = DeviceRgb(244, 240, 236)
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)

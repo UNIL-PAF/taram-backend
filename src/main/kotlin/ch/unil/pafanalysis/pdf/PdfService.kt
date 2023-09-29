@@ -47,7 +47,7 @@ class PdfService {
     private val fontSizeConst = 10f
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
-    val antCyan = DeviceRgb(181, 245, 236)
+    val antCyan = DeviceRgb(244, 240, 236)
 
     fun createPdf(analysisId: Int, zipSelection: ZipDataSelection? = null): File {
         val analysis = analysisRepo?.findById(analysisId)
