@@ -44,7 +44,7 @@ class PdfService {
     @Autowired
     private var commonStep: CommonStep? = null
 
-    private val fontSizeConst = 10f
+    private val fontSizeConst = 8f
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
     val antCyan = DeviceRgb(244, 240, 236)

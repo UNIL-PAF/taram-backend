@@ -19,7 +19,7 @@ open class PdfCommon {
 
     val gson = Gson()
 
-    val fontSizeConst = 10f
+    val fontSizeConst = 8f
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
     val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
@@ -64,7 +64,7 @@ open class PdfCommon {
         t.setWidth(plotWidth?.minus(titlePadding))
 
         val text = Paragraph(Text(title))
-        text.setFontSize(12f)
+        text.setFontSize(11f)
         text.setFontColor(ColorConstants.BLACK)
         text.setFont(PdfFontFactory.createFont(myFont))
         val colLeft = Cell()
