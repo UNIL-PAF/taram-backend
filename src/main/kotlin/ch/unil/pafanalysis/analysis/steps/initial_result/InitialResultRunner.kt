@@ -121,7 +121,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(
                 experimentDetails = colMapping.experimentDetails,
-                intCol = colMapping.intCol
+                intCol = colMapping.intCol,
+                groupsOrdered = colMapping.groupsOrdered
             )
 
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
