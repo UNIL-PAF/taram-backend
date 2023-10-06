@@ -22,6 +22,7 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
+import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.VerticalAlignment
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,7 +62,7 @@ class PdfService {
 
         val plotWidth: Float = pageSize?.width?.minus(document?.rightMargin?: 0f)?.minus(document?.leftMargin?: 0f)
 
-        addLogo(document, pdf)
+        addLogo(document, pdf, plotWidth)
         addResultInfo(analysis, document)
         addSteps(steps, document, pdf, plotWidth, zipSelection)
         addHeaderAndFooter(document, pdf, pageSize, plotWidth)
@@ -115,18 +116,30 @@ class PdfService {
         table.addCell(cell2)
     }
 
-    private fun addLogo(document: Document?, pdf: PdfDocument){
-        val imagePath = "/resources/images/lo_unil06_bleu.pdf"
+    private fun pdfToImage(imagePath: String, pdf: PdfDocument): Image {
         val unilLogoServer = File(ClassPathResource(imagePath).path)
         val unilLogo = if(unilLogoServer.exists()) unilLogoServer else File(ClassPathResource("/src/main$imagePath").path)
         val sourcePdf = PdfDocument(PdfReader(unilLogo))
         val pdfPlot = sourcePdf.getPage(1)
         val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
         sourcePdf.close()
-        val img = Image(pdfPlotCopy)
-        img.scaleToFit(156f/2, 58f/2)
-        val p = Paragraph()
-        p.add(img)
+        return Image(pdfPlotCopy)
+    }
+
+    private fun addLogo(document: Document?, pdf: PdfDocument, plotWidth: Float){
+        val imagePath = "/resources/images/lo_unil06_bleu.pdf"
+        val image2Path = "/resources/images/PAF-logo-HIGH.pdf"
+        val img1 = pdfToImage(imagePath, pdf)
+        val img2 = pdfToImage(image2Path, pdf)
+        img1.scaleToFit(156f/2, 58f/2).setHorizontalAlignment(HorizontalAlignment.RIGHT)
+        img2.scaleToFit(156f/1.6f, 58f/1.6f)
+        val table = Table(2)
+        table.setWidth(plotWidth)
+        val cell1 = Cell().add(img2).setBorder(Border.NO_BORDER)
+        val cell2 = Cell().add(img1).setBorder(Border.NO_BORDER)
+        table.addCell(cell1)
+        table.addCell(cell2)
+        val p = Paragraph().add(table)
         document?.add(p)
     }
 
@@ -159,12 +172,12 @@ class PdfService {
 
         // paging position
         val xPosNum = plotWidth/2 + 30f
-        val yPosNum = 25f
+        val yPosNum = 60f
 
         // left header pos
         val xPosLeft = 55f
-        val yPosTop = pageSize?.height.minus(10f)
-        val leftHeader = Paragraph("UNIL - PAF").setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
+        val yPosTop = pageSize?.height.minus(8f)
+        val leftHeader = Paragraph("PAF - UNIL").setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
         // right header
         val xPosRight= pageSize?.width.minus(15f)
