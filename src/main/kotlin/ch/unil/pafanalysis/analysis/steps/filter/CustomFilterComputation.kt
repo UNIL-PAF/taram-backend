@@ -79,7 +79,7 @@ class CustomFilterComputation() {
 
     fun compareString(v1: String, v2: String, comparator: Comparator): Boolean {
         // replace wildcard to regex .*
-        val regex: Regex = Regex(v2.replace("*", ".*"))
+        val regex: Regex = Regex(v2.replace("*", ".*").replace("+", "\\+"))
 
         return when(comparator){
             Comparator.EQ -> regex.matches(v1)
