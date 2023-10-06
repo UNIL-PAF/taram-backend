@@ -56,4 +56,9 @@ class ResultController {
         return resultService?.delete(resultId)
     }
 
+    @PutMapping(path = ["/update-info/{resultId}"])
+    fun updateInfo(@PathVariable(value = "resultId") resultId: Int, @RequestParam name: String, @RequestParam description: String?): String? {
+        return resultService?.setInfo(resultId = resultId, name = name, description = description)
+    }
+
 }
