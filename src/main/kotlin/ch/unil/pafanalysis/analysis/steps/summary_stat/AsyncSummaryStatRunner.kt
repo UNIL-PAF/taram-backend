@@ -1,6 +1,8 @@
 package ch.unil.pafanalysis.analysis.steps.summary_stat
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ExpInfo
+import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.SummaryStatComputation
@@ -30,6 +32,15 @@ class AsyncSummaryStatRunner() : CommonStep() {
         tryToRun(funToRun, newStep)
     }
 
+    private fun orderHeaders(headers: List<Header>, orderByGroups: Boolean?, groupsOrdered: List<String>?, expDetails: Map<String, ExpInfo>?): List<Header> {
+        return if(orderByGroups == true && groupsOrdered?.isNotEmpty() == true){
+            groupsOrdered.fold(emptyList<Header>()){acc, v ->
+                val groupH = headers.filter{h -> expDetails?.get(h.experiment?.name)?.group == v}
+                acc.plus(groupH)
+            }
+        } else headers
+    }
+
     fun transformTable(
         step: AnalysisStep?,
         params: SummaryStatParams,
@@ -38,9 +49,10 @@ class AsyncSummaryStatRunner() : CommonStep() {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails)
-
+        val groupsOrdered = step?.columnInfo?.columnMapping?.groupsOrdered
+        val orderedHeaders = orderHeaders(headers, params.orderByGroups, groupsOrdered, expDetails)
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getSummaryStat(ints, headers, expDetails)
+        return summaryStatComp.getSummaryStat(ints, orderedHeaders, expDetails)
     }
 
 }

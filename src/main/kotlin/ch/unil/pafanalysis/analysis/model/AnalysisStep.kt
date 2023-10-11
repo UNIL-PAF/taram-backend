@@ -34,6 +34,7 @@ data class AnalysisStep (
     val nrProteinGroups: Int? = null,
 
     val copyFromId: Int? = null,
+    @Lob
     val copyDifference: String? = null,
 
     @Type(type="json")

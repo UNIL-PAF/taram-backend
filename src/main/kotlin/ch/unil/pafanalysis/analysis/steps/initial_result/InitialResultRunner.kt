@@ -76,7 +76,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                     val newEntry = columnInfo?.columnMapping?.experimentDetails?.get(expName)?.copy(group = condition)
                     acc.plus(Pair(expName, newEntry!!))
                 }
-                val newColMapping = columnInfo?.columnMapping?.copy(experimentDetails = newExpDetails)
+                val groupsOrdered = initialResult.spectronautSetup.runs?.map{it.condition}?.filterNotNull()?.distinct()?.sorted()
+                val newColMapping = columnInfo?.columnMapping?.copy(experimentDetails = newExpDetails, groupsOrdered = groupsOrdered)
                 val newColumnInfo = columnInfo?.copy(columnMapping = newColMapping)
                 columnInfoRepository?.saveAndFlush(newColumnInfo!!)
             } else columnInfo
@@ -120,7 +121,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(
                 experimentDetails = colMapping.experimentDetails,
-                intCol = colMapping.intCol
+                intCol = colMapping.intCol,
+                groupsOrdered = colMapping.groupsOrdered
             )
 
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())

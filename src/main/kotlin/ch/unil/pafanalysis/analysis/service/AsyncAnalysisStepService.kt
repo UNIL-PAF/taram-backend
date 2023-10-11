@@ -31,6 +31,7 @@ class AsyncAnalysisStepService {
 
         newSteps.forEach { newStep ->
             val resultPath = "$analysisId/${newStep.id}"
+            File(outputRoot + resultPath).mkdir()
             val newFile: String? = if(newStep.modifiesResult == true){
                 copyFile(newStep, resultPath, outputRoot)
             }else{

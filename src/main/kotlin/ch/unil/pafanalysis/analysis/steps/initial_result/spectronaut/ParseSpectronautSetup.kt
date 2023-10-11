@@ -16,8 +16,6 @@ class ParseSpectronautSetup() {
 
         val runParts = getRunParts(lines.dropWhile{ !it.contains("[BEGIN-SETUP]") }.dropLastWhile { !it.contains("[END-SETUP]") })
 
-        println(runParts)
-
         return SpectronautSetup(
             softwareVersion = softwareVersion,
             analysisType = analysisType,

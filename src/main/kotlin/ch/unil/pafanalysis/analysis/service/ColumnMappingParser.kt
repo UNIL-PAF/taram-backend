@@ -12,6 +12,8 @@ import java.util.*
 @Service
 class ColumnMappingParser {
 
+    val customTypeMatch: List<Pair<Regex, ColType>> = listOf(Regex(".*OrganismId") to ColType.CHARACTER)
+
     val checkTypes = CheckTypes()
 
     fun parse(filePath: String?, resultPath: String?, resultType: ResultType?): Pair<ColumnMapping, CommonResult> {
@@ -33,7 +35,12 @@ class ColumnMappingParser {
                 }
             }
 
-        return Pair(headerNames, headerTypes)
+        val headerTypesWithCustom = headerNames.mapIndexed { i, s ->
+            val typeMatch: Pair<Regex, ColType>? = customTypeMatch.find{ a -> a.first.matches(s)}
+            typeMatch?.second ?: headerTypes[i]
+        }
+
+        return Pair(headerNames, headerTypesWithCustom)
     }
 
     private fun getColumnMapping(

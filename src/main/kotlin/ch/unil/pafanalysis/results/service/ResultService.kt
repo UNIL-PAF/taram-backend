@@ -1,17 +1,10 @@
 package ch.unil.pafanalysis.results.service
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
-import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
-import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class ResultService {
@@ -27,8 +20,15 @@ class ResultService {
 
     fun delete(resultId: Int): Int? {
         val analysisList = analysisRepository?.findByResultId(resultId)
-        analysisList?.forEach{analysisService?.delete(it.id!!)}
+        analysisList?.forEach { analysisService?.delete(it.id!!) }
         return resultRepository?.deleteById(resultId)
+    }
+
+    fun setInfo(resultId: Int, name: String, description: String?): String? {
+        val res = resultRepository?.findById(resultId)
+        val newRes = res?.copy(name = name, description = description)
+        val savedRes = resultRepository?.saveAndFlush(newRes!!)
+        return savedRes.toString()
     }
 
 }
