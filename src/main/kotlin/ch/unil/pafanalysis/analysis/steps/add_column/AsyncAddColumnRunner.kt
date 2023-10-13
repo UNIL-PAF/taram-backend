@@ -57,10 +57,12 @@ class AsyncAddColumnRunner() : CommonStep() {
         val col: List<String>? = ReadTableData().getStringColumn(origTable, params.selectedColumn ?: throw StepException("Please choose a column."))
 
         val escaped = RegexHelper().escapeSpecialChars(params.charColParams?.strVal!!, wildcardMatch = true)
-        println(escaped)
         val regex = Regex(escaped)
 
-        val newCol: List<Any> = col?.map{ a -> if(regex.matches(a)) "+" else "" } as List<Any>
+        val matchRes = if(params.charColParams?.charComp == CharComp.MATCHES_NOT) "" else "+"
+        val noMatchRes = if(params.charColParams?.charComp == CharComp.MATCHES_NOT) "+" else ""
+
+        val newCol: List<Any> = col?.map{ a -> if(regex.matches(a)) matchRes else noMatchRes } ?: emptyList()
         val newCols = origTable.cols?.plusElement(newCol)
 
         val newColIdx = origTable?.headers?.lastIndex?.plus(1) ?: throw StepException("Could not set new Idx.")
