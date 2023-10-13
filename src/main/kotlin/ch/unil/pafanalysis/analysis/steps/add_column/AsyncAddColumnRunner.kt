@@ -1,9 +1,13 @@
 package ch.unil.pafanalysis.analysis.steps.add_column
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.ExpInfo
+import ch.unil.pafanalysis.analysis.model.ColType
+import ch.unil.pafanalysis.analysis.model.Header
+import ch.unil.pafanalysis.analysis.service.TableService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.common.ReadTableData
+import ch.unil.pafanalysis.common.RegexHelper
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,57 +26,48 @@ class AsyncAddColumnRunner() : CommonStep() {
         val funToRun: () -> AnalysisStep? = {
             val params = gson.fromJson(newStep?.parameters, AddColumnParams().javaClass)
 
+            if(params?.newColName == null) throw StepException("The new column needs a name.")
+
             val origTable = ReadTableData().getTable(
                 env?.getProperty("output.path").plus(newStep?.resultTablePath),
                 newStep?.commonResult?.headers
             )
-            val renamed1 = renameItems(origTable, params?.rename)
-            val renamed2 = addConditionNames(renamed1, params?.addConditionNames, newStep?.columnInfo?.columnMapping?.experimentDetails)
+
+            val newTable = if(params.charColParams != null){
+                addNewCharCol(origTable, params)
+            }else origTable
 
             WriteTableData().write(
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
-                renamed2!!
+                newTable!!
             )
 
             newStep?.copy(
                 results = gson.toJson(
                     AddColumn()
                 ),
-                commonResult = newStep?.commonResult?.copy(headers = renamed2?.headers)
+                commonResult = newStep?.commonResult?.copy(headers = newTable?.headers)
             )
         }
 
         tryToRun(funToRun, newStep)
     }
 
-    private fun addConditionNames(table: Table?, addConditionNames: Boolean?, expInfo: Map<String, ExpInfo>?): Table? {
-        return if(addConditionNames == true){
-            val newHeaders = table?.headers?.map{ h ->
-                if(h.experiment != null){
-                    val groupName = expInfo?.get(h.experiment.name)?.group
-                    val newName = if(groupName != null) groupName + "." + h.name else h.name
-                    h.copy(name = newName)
-                } else h
-            }
-            table?.copy(headers = newHeaders)
-        }else table
-    }
+    private fun addNewCharCol(origTable: Table, params: AddColumnParams): Table {
+        val col: List<String>? = ReadTableData().getStringColumn(origTable, params.selectedColumn ?: throw StepException("Please choose a column."))
 
-    private fun renameItems(table: Table?, rename: List<RenameCol>?): Table? {
-        val newHeaders = table?.headers?.map{ h ->
-            if(h.experiment != null){
-                val renameItem = rename?.find{it.idx == h.experiment.field}
-                val newExpField = if(renameItem != null) renameItem.name else h.experiment.field
-                val newExp = h.experiment.copy(field = newExpField)
-                val newName = if(renameItem != null) h.experiment.name + "." + renameItem.name else h.name
-                h.copy(name = newName, experiment = newExp)
-            }else{
-                val renameItem = rename?.find{it.idx?.toInt() == h.idx}
-                val newName = if(renameItem != null) renameItem.name else h.name
-                h.copy(name = newName)
-            }
-        }
-        return table?.copy(headers = newHeaders)
+        val escaped = RegexHelper().escapeSpecialChars(params.charColParams?.strVal!!, wildcardMatch = true)
+        println(escaped)
+        val regex = Regex(escaped)
+
+        val newCol: List<Any> = col?.map{ a -> if(regex.matches(a)) "+" else "" } as List<Any>
+        val newCols = origTable.cols?.plusElement(newCol)
+
+        val newColIdx = origTable?.headers?.lastIndex?.plus(1) ?: throw StepException("Could not set new Idx.")
+        val newHeader = Header(name = params.newColName, idx = newColIdx, type = ColType.CHARACTER)
+        val newHeaders = origTable.headers?.plusElement(newHeader)
+
+        return Table(headers = newHeaders, cols = newCols)
     }
 
 }

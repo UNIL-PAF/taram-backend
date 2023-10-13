@@ -17,5 +17,6 @@ enum class AnalysisStepType(val value: String, val hasPlot: Boolean = false) {
     NORMALIZATION("normalization"),
     SUMMARY_STAT("summary-stat"),
     ORDER_COLUMNS("order-columns"),
-    RENAME_COLUMNS("rename-columns")
+    RENAME_COLUMNS("rename-columns"),
+    ADD_COLUMN("add-column")
 }

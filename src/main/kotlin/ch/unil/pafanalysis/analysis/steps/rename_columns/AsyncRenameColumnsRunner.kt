@@ -22,12 +22,6 @@ class AsyncRenameColumnsRunner() : CommonStep() {
         val funToRun: () -> AnalysisStep? = {
             val params = gson.fromJson(newStep?.parameters, RenameColumnsParams().javaClass)
 
-            /*
-            if(params?.rename?.find{ r -> r.idx == newStep?.columnInfo?.columnMapping?.intCol} != null){
-                throw StepException("You cannot rename the intensity column [${newStep?.columnInfo?.columnMapping?.intCol}] that is currently used.")
-            }
-             */
-
             val origTable = ReadTableData().getTable(
                 env?.getProperty("output.path").plus(newStep?.resultTablePath),
                 newStep?.commonResult?.headers
@@ -42,7 +36,7 @@ class AsyncRenameColumnsRunner() : CommonStep() {
 
             newStep?.copy(
                 results = gson.toJson(
-                    AddColumn()
+                    RenameColumns()
                 ),
                 commonResult = newStep?.commonResult?.copy(headers = renamed2?.headers)
             )

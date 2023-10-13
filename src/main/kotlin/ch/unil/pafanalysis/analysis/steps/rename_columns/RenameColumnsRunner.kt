@@ -17,10 +17,10 @@ class RenameColumnsRunner() : CommonStep(), CommonRunner {
 
     @Lazy
     @Autowired
-    var asyncRunner: AsyncAddColumnRunner? = null
+    var asyncRunner: AsyncRenameColumnsRunner? = null
 
     @Autowired
-    var renameColumnsPdf: AddColumnPdf? = null
+    var renameColumnsPdf: RenameColumnsPdf? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.RENAME_COLUMNS
 

@@ -23,7 +23,7 @@ class AddColumnPdf() : PdfCommon() {
 
         // 1. parameters
         val paramsDiv = Div()
-        if(parsedParams.addConditionNames == true) paramsDiv.add(getParagraph("Add conditions to table headers."))
+        if(parsedParams.charColParams != null) paramsDiv.add(getParagraph("Character."))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

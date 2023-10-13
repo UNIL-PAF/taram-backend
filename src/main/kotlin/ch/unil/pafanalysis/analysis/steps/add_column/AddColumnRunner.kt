@@ -22,7 +22,7 @@ class AddColumnRunner() : CommonStep(), CommonRunner {
     @Autowired
     var addColumnPdf: AddColumnPdf? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.RENAME_COLUMNS
+    override var type: AnalysisStepType? = AnalysisStepType.ADD_COLUMN
 
     fun getParameters(step: AnalysisStep?): AddColumnParams {
         return if (step?.parameters != null) gson.fromJson(
@@ -47,9 +47,7 @@ class AddColumnRunner() : CommonStep(), CommonRunner {
 
         return "Parameter(s) changed:"
             .plus(
-                if (params.rename?.size != origParams?.rename?.size) " [Number of renames: ${params.rename?.size}]" else ""
-            ).plus(
-                if (params.addConditionNames != origParams?.addConditionNames) " [Add condition names to headers: ${params.addConditionNames}]" else ""
+                if (params.selectedColumn != origParams?.selectedColumn) " [Selected column: ${params.selectedColumn}]" else ""
             )
     }
 
