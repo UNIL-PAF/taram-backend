@@ -33,9 +33,10 @@ class AsyncAddColumnRunner() : CommonStep() {
                 newStep?.commonResult?.headers
             )
 
-            val newTable = if(params.charColParams != null){
-                addNewCharCol(origTable, params)
-            }else origTable
+            val newTable = when (params.type){
+                SelColType.CHAR -> addNewCharCol(origTable, params)
+                else -> throw StepException("Not implemented yet..")
+            }
 
             WriteTableData().write(
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
