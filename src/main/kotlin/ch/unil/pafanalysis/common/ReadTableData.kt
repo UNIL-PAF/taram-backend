@@ -102,7 +102,7 @@ class ReadTableData {
         return Table(headers, cols)
     }
 
-    fun getDoubleMatrix(table: Table?, field: String?, expDetails: Map<String, ExpInfo>?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
+    fun getDoubleMatrix(table: Table?, field: String?, expDetails: Map<String, ExpInfo>? = null, group: String? = null): Pair<List<Header>, List<List<Double>>> {
         val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group)}
         if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
         if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
@@ -129,6 +129,12 @@ class ReadTableData {
 
     fun getStringColumn(table: Table?, headerName: String): List<String>? {
         val header = table?.headers?.find { it.name == headerName } ?: return null
+        if(header.type != ColType.CHARACTER) throw Exception("Cannot extract string from non-character column.")
+        return table?.cols?.get(header.idx)?.map { it as? String ?: "" }
+    }
+
+    fun getStringColumn(table: Table?, headerIdx: Int): List<String>? {
+        val header = table?.headers?.find { it.idx == headerIdx } ?: return null
         if(header.type != ColType.CHARACTER) throw Exception("Cannot extract string from non-character column.")
         return table?.cols?.get(header.idx)?.map { it as? String ?: "" }
     }

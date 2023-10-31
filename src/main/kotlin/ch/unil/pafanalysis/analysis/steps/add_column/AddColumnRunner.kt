@@ -47,7 +47,7 @@ class AddColumnRunner() : CommonStep(), CommonRunner {
 
         return "Parameter(s) changed:"
             .plus(
-                if (params.selectedColumn != origParams?.selectedColumn) " [Selected column: ${params.selectedColumn}]" else ""
+                if (params.selectedColumnIdx != origParams?.selectedColumnIdx) " [Selected column: ${params.selectedColumnIdx}]" else ""
             )
     }
 

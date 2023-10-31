@@ -21,6 +21,8 @@ class AsyncAddColumnRunner() : CommonStep() {
     @Autowired
     private var env: Environment? = null
 
+    private val readTable = ReadTableData()
+
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
@@ -35,6 +37,7 @@ class AsyncAddColumnRunner() : CommonStep() {
 
             val newTable = when (params.type){
                 SelColType.CHAR -> addNewCharCol(origTable, params)
+                SelColType.NUM_EXP -> addNewNumExpCol(origTable, params)
                 else -> throw StepException("Not implemented yet..")
             }
 
@@ -54,8 +57,10 @@ class AsyncAddColumnRunner() : CommonStep() {
         tryToRun(funToRun, newStep)
     }
 
+
+
     private fun addNewCharCol(origTable: Table, params: AddColumnParams): Table {
-        val col: List<String>? = ReadTableData().getStringColumn(origTable, params.selectedColumn ?: throw StepException("Please choose a column."))
+        val col: List<String>? = readTable.getStringColumn(origTable, params.selectedColumnIdx ?: throw StepException("Please choose a column."))
 
         val escaped = RegexHelper().escapeSpecialChars(params.charColParams?.strVal!!, wildcardMatch = true)
         val regex = Regex(escaped)
@@ -71,6 +76,28 @@ class AsyncAddColumnRunner() : CommonStep() {
         val newHeaders = origTable.headers?.plusElement(newHeader)
 
         return Table(headers = newHeaders, cols = newCols)
+    }
+
+    private fun addNewNumExpCol(origTable: Table, params: AddColumnParams): Table {
+        println("here")
+
+        val selCol = origTable.headers?.find{it.idx == params.selectedColumnIdx}?.experiment?.field ?: throw StepException("Could not find field of header: [${params.selectedColumnIdx}].")
+        val matrix = readTable.getDoubleMatrix(origTable, selCol).second
+
+        println(matrix)
+
+        /*
+        val newCol: List<Any> = col?.map{ a -> if(regex.matches(a)) matchRes else noMatchRes } ?: emptyList()
+        val newCols = origTable.cols?.plusElement(newCol)
+
+        val newColIdx = origTable?.headers?.lastIndex?.plus(1) ?: throw StepException("Could not set new Idx.")
+        val newHeader = Header(name = params.newColName, idx = newColIdx, type = ColType.CHARACTER)
+        val newHeaders = origTable.headers?.plusElement(newHeader)
+
+        return Table(headers = newHeaders, cols = newCols)
+
+         */
+        return origTable
     }
 
 }
