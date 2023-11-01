@@ -6,7 +6,6 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
-import ch.unil.pafanalysis.results.model.ResultType
 import com.google.common.math.Quantiles
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -70,7 +69,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val selProts = params?.selProts.map { p ->
             val i = protGroup?.indexOf(p)
             if(i != null && i >= 0){
-                val ints = sortedIntMatrix.map { if (i == null) null else it[i] }
+                val ints = sortedIntMatrix.map { if (i == null || it[i].isNaN()) null else it[i] }
                 val logInts = ints.map { if (it != null && !it.isNaN() && it > 0.0) log2(it) else null }
 
                 val gene = if (i == null) "" else genes?.get(i)

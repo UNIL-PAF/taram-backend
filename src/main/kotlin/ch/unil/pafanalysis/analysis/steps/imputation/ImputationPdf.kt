@@ -55,7 +55,7 @@ class ImputationPdf() : PdfCommon() {
         // 3. results
         val rightDiv = Div()
         rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getParagraph("Table ${step.tableNr}", bold = true, underline = true))
+        rightDiv.add(getParagraph("Table $stepNr", bold = true, underline = true))
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)

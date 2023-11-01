@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
+import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
 import ch.unil.pafanalysis.pdf.PdfService
@@ -50,6 +51,7 @@ class ZipService {
         createPdf(analysisId, zipSelection, "$zipDir/$zipName.pdf")
         createPlots(steps, zipSelection, zipDir)
         createTables(steps, zipSelection, zipDir)
+        createSummary(steps, zipSelection, zipDir)
 
         return File(ZipTool().zipDir(zipDir, "$zipName.zip", createTempDirectory().pathString, true))
     }
@@ -71,14 +73,43 @@ class ZipService {
         pdfFile?.delete()
     }
 
+    private fun createSummary(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String) {
+        val sep = "\t"
+
+        File("$zipDir/summary.txt").printWriter().use { out ->
+            // header
+            val header = listOf("Id", "Step", "Table", "Plots").joinToString(separator = sep)
+            out.println(header)
+
+            var removedSteps = 0
+            steps?.forEachIndexed { i, step ->
+                if (zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
+                else {
+                    val idx = i - removedSteps + 1
+                    val table = if (zipSelection.tables?.contains(step.id) == true) {
+                        "tables/Table-$idx.txt"
+                    } else ""
+                    val plots = if (zipSelection.plots?.contains(step.id) == true) {
+                        val plotBase = "plots/$idx-${step.type}"
+                        "$plotBase.png;$plotBase.svg"
+                    } else ""
+                    val row =
+                        listOf(idx.toString(), StepNames.getName(step.type), table, plots).joinToString(separator = sep)
+                    out.println(row)
+                }
+            }
+        }
+    }
+
     private fun createTables(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){
         val tableDir = "$zipDir/tables"
         File(tableDir).mkdir()
-
+        var removedSteps = 0
         steps?.forEachIndexed{ i, step ->
+            if(zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
             if(zipSelection.tables?.contains(step.id) == true){
                 val origTableFile = analysisStepService?.getTable(step.id!!)
-                File(origTableFile).copyTo(File("$tableDir/Table-${step.tableNr}.txt"))
+                File(origTableFile).copyTo(File("$tableDir/Table-${i-removedSteps+1}.txt"))
             }
         }
     }
@@ -112,7 +143,6 @@ class ZipService {
         File("$resultDir/$resName.svg").delete()
         File("$resultDir/$resName.png").delete()
     }
-
 
 }
 
