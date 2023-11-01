@@ -41,6 +41,16 @@ class AsyncSummaryStatRunner() : CommonStep() {
         } else headers
     }
 
+    private fun orderInts(origHeaders: List<Header>, orderedHeaders: List<Header>, ints: List<List<Double>>): List<List<Double>> {
+        val origIdx = origHeaders.map{it.idx}
+        val orderedIdx = orderedHeaders.map{it.idx}
+
+        return orderedIdx.fold(emptyList()){ acc, v ->
+            val pos = origIdx.indexOf(v)
+            acc.plusElement(ints[pos])
+        }
+    }
+
     fun transformTable(
         step: AnalysisStep?,
         params: SummaryStatParams,
@@ -51,8 +61,9 @@ class AsyncSummaryStatRunner() : CommonStep() {
         val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails)
         val groupsOrdered = step?.columnInfo?.columnMapping?.groupsOrdered
         val orderedHeaders = orderHeaders(headers, params.orderByGroups, groupsOrdered, expDetails)
+        val orderedInts = orderInts(headers, orderedHeaders, ints)
         val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getSummaryStat(ints, orderedHeaders, expDetails)
+        return summaryStatComp.getSummaryStat(orderedInts, orderedHeaders, expDetails)
     }
 
 }
