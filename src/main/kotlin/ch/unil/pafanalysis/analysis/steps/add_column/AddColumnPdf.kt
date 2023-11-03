@@ -69,7 +69,10 @@ class AddColumnPdf() : PdfCommon() {
             p.add(getText("${params.charColParams.compVal}.", italic = true))
             p
         }else{
-            val p = getParagraph("not yet..")
+            val p = getParagraph("Compute the ")
+            p.add(getText("${params.numColParams?.mathOp?.value} ", italic = true))
+            p.add(getText("of columns "))
+            p.add(getText("[${res.selColNames?.joinToString(separator = ", ")}].", italic = true))
             p
         }
         return paramDiv.add(paramPara)

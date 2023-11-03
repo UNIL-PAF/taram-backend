@@ -66,7 +66,7 @@ class AsyncAddColumnRunner() : CommonStep() {
         val allSameExps = headers?.filter{h -> h.experiment?.field == exps?.find{it != null}}
 
         val colNames =
-            if (exps?.all { it != null } == true && exps?.all { it == exps?.get(0) } && allSameExps?.size == exps.size) listOf(exps?.get(0)!!) else selHeaders?.map {
+            if (exps?.all { it != null } == true && exps?.all { it == exps?.get(0) } && allSameExps?.size == exps.size) listOf(exps?.get(0)!! + "...") else selHeaders?.map {
                 it.name ?: ""
             }
         return colNames
