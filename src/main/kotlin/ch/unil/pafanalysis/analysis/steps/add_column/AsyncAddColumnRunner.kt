@@ -49,13 +49,27 @@ class AsyncAddColumnRunner() : CommonStep() {
 
             newStep?.copy(
                 results = gson.toJson(
-                    AddColumn()
+                    AddColumn(getSelColNames(origTable.headers, params.selIdxs))
                 ),
                 commonResult = newStep?.commonResult?.copy(headers = newTable?.headers)
             )
         }
 
         tryToRun(funToRun, newStep)
+    }
+
+    private fun getSelColNames(headers: List<Header>?, selIdxs: List<Int>?): List<String>? {
+        val selHeaders = headers?.filter { selIdxs?.contains(it.idx) ?: false }
+        val exps = selHeaders?.map { it.experiment?.field }
+
+        // check if all exps from a group are selected
+        val allSameExps = headers?.filter{h -> h.experiment?.field == exps?.find{it != null}}
+
+        val colNames =
+            if (exps?.all { it != null } == true && exps?.all { it == exps?.get(0) } && allSameExps?.size == exps.size) listOf(exps?.get(0)!!) else selHeaders?.map {
+                it.name ?: ""
+            }
+        return colNames
     }
 
     private fun addNewCharCol(origTable: Table, params: AddColumnParams): Table {
@@ -84,6 +98,7 @@ class AsyncAddColumnRunner() : CommonStep() {
 
         val newCol: List<Any> = matrix?.map { row -> matchRow(row) } ?: emptyList()
         val newCols = origTable.cols?.plusElement(newCol)
+
         val newColIdx = origTable?.headers?.lastIndex?.plus(1)
         val newHeader = Header(name = params.newColName, idx = newColIdx, type = ColType.CHARACTER)
         val newHeaders = origTable.headers?.plusElement(newHeader)
@@ -98,9 +113,9 @@ class AsyncAddColumnRunner() : CommonStep() {
 
         val matrix = readTable.getDoubleMatrixByRow(origTable, selHeaders)
 
-        val newCol: List<Any> = if(params?.numColParams?.mathOp == null){
+        val newCol: List<Any> = if (params?.numColParams?.mathOp == null) {
             throw StepException("MathOp has to be defined.")
-        }else{
+        } else {
             computeNumCol(matrix, params?.numColParams?.mathOp, params?.numColParams?.removeNaN)
         }
 
@@ -113,7 +128,7 @@ class AsyncAddColumnRunner() : CommonStep() {
 
     private fun computeNumCol(matrix: List<List<Double>>, mathOp: MathOp, removeNaN: Boolean?): List<Double> {
         return matrix.map { row ->
-            val myRow = if(removeNaN == true) row.filter{!it.isNaN()} else row
+            val myRow = if (removeNaN == true) row.filter { !it.isNaN() } else row
             when (mathOp) {
                 MathOp.MAX -> myRow.maxOrNull()
                 MathOp.MIN -> myRow.minOrNull()
