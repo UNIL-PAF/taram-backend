@@ -131,6 +131,16 @@ class ReadTableData {
         return headers.map{ h -> table!!.cols!![h.idx].map { it as? String ?: "" }}
     }
 
+    fun getStringMatrixByRow(table: Table?, headers: List<Header>): List<List<String>> {
+        val matrix = getStringMatrix(table, headers)
+        val initialList: List<List<String>> = emptyList()
+        val rowNr = matrix[0].size - 1
+        return (0..rowNr).fold(initialList){ acc, i ->
+            val row: List<String> = matrix.map{it[i]}
+            acc.plusElement(row)
+        }
+    }
+
     fun getDoubleMatrixByRow(table: Table?, field: String?, expDetails: Map<String, ExpInfo>?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
         val matrix = getDoubleMatrix(table, field, expDetails, group)
         val initialList: List<List<Double>> = emptyList()

@@ -65,7 +65,7 @@ class AsyncAddColumnRunner() : CommonStep() {
         }
 
         val matrix: List<List<String>>? =
-            readTable.getStringMatrix(origTable, selHeaders)
+            readTable.getStringMatrixByRow(origTable, selHeaders)
 
         val escaped = RegexHelper().escapeSpecialChars(params.charColParams?.compVal!!, wildcardMatch = true)
         val regex = Regex(escaped)
@@ -84,11 +84,9 @@ class AsyncAddColumnRunner() : CommonStep() {
 
         val newCol: List<Any> = matrix?.map { row -> matchRow(row) } ?: emptyList()
         val newCols = origTable.cols?.plusElement(newCol)
-
-        val newColIdx = origTable?.headers?.lastIndex?.plus(1) ?: throw StepException("Could not set new Idx.")
+        val newColIdx = origTable?.headers?.lastIndex?.plus(1)
         val newHeader = Header(name = params.newColName, idx = newColIdx, type = ColType.CHARACTER)
         val newHeaders = origTable.headers?.plusElement(newHeader)
-
         return Table(headers = newHeaders, cols = newCols)
     }
 
@@ -110,7 +108,6 @@ class AsyncAddColumnRunner() : CommonStep() {
         val newColIdx = origTable?.headers?.lastIndex?.plus(1)
         val newHeader = Header(name = params.newColName, idx = newColIdx, type = ColType.NUMBER)
         val newHeaders = origTable.headers?.plusElement(newHeader)
-
         return Table(headers = newHeaders, cols = newCols)
     }
 
