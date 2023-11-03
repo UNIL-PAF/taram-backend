@@ -109,6 +109,28 @@ class ReadTableData {
         return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
     }
 
+    fun getDoubleMatrix(table: Table?, headers: List<Header>): List<List<Double>> {
+        if(headers.isEmpty()) throw Exception("No headers...")
+        if(! headers.all{it.type == ColType.NUMBER}) throw Exception("All headers have to be numerical.")
+        return headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }}
+    }
+
+    fun getDoubleMatrixByRow(table: Table?, headers: List<Header>): List<List<Double>> {
+        val matrix = getDoubleMatrix(table, headers)
+        val initialList: List<List<Double>> = emptyList()
+        val rowNr = matrix[0].size - 1
+        return (0..rowNr).fold(initialList){ acc, i ->
+            val row: List<Double> = matrix.map{it[i]}
+            acc.plusElement(row)
+        }
+    }
+
+    fun getStringMatrix(table: Table?, headers: List<Header>): List<List<String>> {
+        if(headers.isEmpty()) throw Exception("No headers...")
+        if(! headers.all{it.type == ColType.CHARACTER}) throw Exception("All headers have to be characters.")
+        return headers.map{ h -> table!!.cols!![h.idx].map { it as? String ?: "" }}
+    }
+
     fun getDoubleMatrixByRow(table: Table?, field: String?, expDetails: Map<String, ExpInfo>?, group: String? = null): Pair<List<Header>, List<List<Double>>> {
         val matrix = getDoubleMatrix(table, field, expDetails, group)
         val initialList: List<List<Double>> = emptyList()

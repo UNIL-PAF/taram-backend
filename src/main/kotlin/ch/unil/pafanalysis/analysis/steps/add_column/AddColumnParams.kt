@@ -3,9 +3,9 @@ package ch.unil.pafanalysis.analysis.steps.add_column
 import com.google.gson.annotations.SerializedName
 
 data class AddColumnParams (
-    val selectedColumnIdx: Int? = null,
+    val selIdxs: List<Int>? = null,
     val charColParams: CharColParams? = null,
-    val numExpColParams: NumExpColParams? = null,
+    val numColParams: NumColParams? = null,
     val newColName: String? = null,
     val type: SelColType? = null
 )
@@ -13,24 +13,27 @@ data class AddColumnParams (
 enum class SelColType(val value: String) {
     @SerializedName("char")
     CHAR("char"),
-    @SerializedName("char-exp")
-    CHAR_EXP("char-exp"),
     @SerializedName("num")
     NUM("num"),
-    @SerializedName("num-exp")
-    NUM_EXP("num-exp")
 }
 
-data class CharColParams(val strVal: String? = null, val charComp: CharComp? = null)
+data class CharColParams(val compVal: String? = null, val compOp: CompOp? = null, val compSel: CompSel? = null)
 
-enum class CharComp(val value: String, val symbol: String) {
+enum class CompSel(val value: String) {
+    @SerializedName("all")
+    ALL("all"),
+    @SerializedName("any")
+    ANY("any"),
+}
+
+enum class CompOp(val value: String, val symbol: String) {
     @SerializedName("matches")
     MATCHES("matches", "=="),
     @SerializedName("matches-not")
     MATCHES_NOT("matches-not", "!="),
 }
 
-data class NumExpColParams(val mathOp: MathOp? = null)
+data class NumColParams(val mathOp: MathOp? = null, val removeNaN: Boolean?)
 
 enum class MathOp(val value: String) {
     @SerializedName("min")
@@ -43,5 +46,4 @@ enum class MathOp(val value: String) {
     MEDIAN("median"),
     @SerializedName("sum")
     SUM("sum"),
-
 }
