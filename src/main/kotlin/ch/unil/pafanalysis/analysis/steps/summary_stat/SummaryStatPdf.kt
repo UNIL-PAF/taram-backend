@@ -4,14 +4,12 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.Cell
 import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
 import org.springframework.stereotype.Service
-import java.math.RoundingMode
 import java.text.DecimalFormat
 
 
@@ -30,27 +28,35 @@ class SummaryStatPdf() : PdfCommon() {
         val nrEntries = res.min?.size
 
         if(nrEntries != null){
+            //val totChar = res.expNames?.joinToString("")?.length ?: 0
+            val maxChar = 110
 
-            val maxRows = 8
-            val nrTables = nrEntries/maxRows
-            val lastTableSize = nrEntries.mod(maxRows)
+            var charsUsed = 0
+            var start = 0
+            var end = 0
+            var tables = emptyList<Table>()
+            var i = 0
 
-            val tables: List<Table> = (1..nrTables).map{
-                val start = it * maxRows - maxRows
-                val end = start + maxRows
-                createTable(res, start, end, plotWidth)
+            while(i < nrEntries){
+                val longestChar = listOf(res.expNames?.get(i)?.length ?: 0, res.groups?.get(i)?.length ?: 0, 8).maxOrNull() ?: 8
+                charsUsed += longestChar
+                if(charsUsed > maxChar){
+                    tables += createTable(res, start, end, plotWidth)
+                    start = i
+                    charsUsed = longestChar
+                }
+                i++
+                end = i
+            }
+
+            // add last table if necessary
+            if(end > start){
+                tables += createTable(res, start, end, plotWidth)
             }
 
             tables.forEach{
                 stepDiv.add(it)
                 stepDiv.add(Paragraph(""))
-            }
-
-            if(lastTableSize > 0){
-                val start = nrTables * maxRows
-                val end = start + lastTableSize
-                val lastTable = createTable(res, start, end, plotWidth)
-                stepDiv.add(lastTable)
             }
 
         }
@@ -73,6 +79,7 @@ class SummaryStatPdf() : PdfCommon() {
         addDoubleRow("Coef of var", res.coefOfVar, start, end, table)
         addIntRow("Nr of valid", res.nrValid, start, end, table)
         addIntRow("Nr of NaN", res.nrNaN, start, end, table)
+        table.isKeepTogether = true
         return table
     }
 
