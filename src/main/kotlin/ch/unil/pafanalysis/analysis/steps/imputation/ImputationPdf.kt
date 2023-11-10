@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.imputation
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.borders.Border
@@ -14,11 +15,26 @@ import org.springframework.stereotype.Service
 @Service
 class ImputationPdf() : PdfCommon() {
 
-    val imputationText = mapOf(
-        "normal" to "Replace missing values from normal distribution:",
-        "nan" to "Replace missing values by NaN.",
-        "value" to "Replace missing values by "
-    )
+    private fun getImputationText(params: ImputationParams, step: AnalysisStep): String {
+        val selColTxt = getSelColTxt(params, step)
+        return when (params.imputationType){
+            "normal" -> "Replace missing values in column(s) [$selColTxt] by random numbers drawn from a normal distribution:"
+            "nan" -> "Replace missing values in column(s) [$selColTxt] by NaN."
+            "value" -> "Replace missing values in column(s) [$selColTxt] by ${params.replaceValue}."
+            else -> throw Exception("Imputation type [${params.imputationType}] is not implemented.")
+        }
+    }
+
+    private fun getSelColTxt(params: ImputationParams, step: AnalysisStep): String {
+        return if(params.intCol == null && params.selColIdxs == null){
+            return step.columnInfo?.columnMapping?.intCol + "..."
+        }else if(params.intCol == null && !params.selColIdxs.isNullOrEmpty()){
+            val selColNames = step.commonResult?.headers?.filter{h -> params.selColIdxs.contains(h.idx)}?.map{it.name}
+            return selColNames?.joinToString(", ") ?: ""
+        }else{
+            return params.intCol + "..."
+        }
+    }
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
         val res = gson.fromJson(step.results, Imputation::class.java)
@@ -33,12 +49,11 @@ class ImputationPdf() : PdfCommon() {
 
         // 1. parameters
         val paramsDiv = Div()
-        val firstParam = listOf(getParagraph(imputationText[parsedParams.imputationType]?:"", bold = true))
+        val firstParam = listOf(getParagraph(getImputationText(parsedParams, step), bold = false))
 
         val additionalParams: List<Paragraph> =
             if (parsedParams.imputationType == "normal") listOf(getNormParams(parsedParams.normImputationParams))
-            else if (parsedParams.imputationType == "value") listOf(getParagraph(parsedParams.replaceValue.toString()))
-            else emptyList<Paragraph>()
+            else emptyList()
 
         firstParam.plus(additionalParams).forEach{ paramsDiv.add(it) }
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
