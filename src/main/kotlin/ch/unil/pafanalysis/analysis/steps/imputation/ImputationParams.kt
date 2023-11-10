@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.imputation
 data class ImputationParams(
     val imputationType: String? = null,
     val intCol: String? = null,
+    val selColIdxs: List<Int>? = null,
     val normImputationParams: NormImputationParams? = null,
     val replaceValue: Double? = null,
 )
