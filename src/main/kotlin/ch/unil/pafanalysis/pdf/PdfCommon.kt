@@ -40,10 +40,10 @@ open class PdfCommon {
         return table
     }
 
-    fun getTwoRowTable(tableData: List<Pair<String, String>>): Table {
+    fun getTwoRowTable(tableData: List<Pair<String, String>>, noBold: Boolean? = null): Table {
         val table = Table(2)
         tableData.forEach{ (name, cont) ->
-            val cell1 = Cell().add(getParagraph(name, bold = true));
+            val cell1 = Cell().add(getParagraph(name, bold = noBold != true));
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
             val cell2= Cell().add(getParagraph(cont));

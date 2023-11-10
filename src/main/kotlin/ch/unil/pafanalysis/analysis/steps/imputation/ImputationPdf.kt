@@ -83,7 +83,7 @@ class ImputationPdf() : PdfCommon() {
             Pair("Downshift:", params?.downshift.toString()),
             Pair("Seed:", params?.seed.toString())
         )
-        val table = getTwoRowTable(normParams)
+        val table = getTwoRowTable(normParams, noBold = true)
         val p = Paragraph()
         p.add(table)
         return p
