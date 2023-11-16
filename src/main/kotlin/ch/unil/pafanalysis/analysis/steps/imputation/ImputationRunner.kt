@@ -4,12 +4,10 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import com.itextpdf.kernel.geom.PageSize
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.AsyncOneDEnrichmentRunner
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichmentPdf
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Div
-import com.itextpdf.layout.element.Paragraph
-import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -21,10 +19,10 @@ class ImputationRunner() : CommonStep(), CommonRunner {
 
     @Lazy
     @Autowired
-    var asyncTransformationRunner: AsyncImputationRunner? = null
+    var asyncTransformationRunner: AsyncOneDEnrichmentRunner? = null
 
     @Autowired
-    var imputationPdf: ImputationPdf? = null
+    var imputationPdf: OneDEnrichmentPdf? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.IMPUTATION
 

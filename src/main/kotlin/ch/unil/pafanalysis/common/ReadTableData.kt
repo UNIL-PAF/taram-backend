@@ -80,6 +80,42 @@ class ReadTableData {
         }}
     }
 
+    fun getTableWithoutHeaders(resultTablePath: String?): Table? {
+        val sep = "\t"
+        val reader = BufferedReader(FileReader(resultTablePath))
+        val headers = reader.readLine().split(sep).mapIndexed{ i, h -> Header(name = h, idx = i)}
+
+        val rowsStrings: List<List<String>> = reader.readLines().fold(mutableListOf()) { acc, r ->
+            val line: List<String> = r.split(sep)
+            acc.add(line)
+            acc
+        }
+
+        val table = rowsStrings.fold(Table(cols = Collections.nCopies(headers!!.size, emptyList<Any>()), headers = headers)){ acc, row ->
+            val newCols = row.mapIndexed{ i, col ->
+                acc.cols?.get(i)?.plusElement(col)!!
+            }
+            val newHeaders = acc.headers?.mapIndexed { i, header ->
+                val col = row[i]
+                if(col.isEmpty() || header?.type == ColType.CHARACTER) header
+                else if(col.toDoubleOrNull() != null) header?.copy(type = ColType.NUMBER)
+                else header?.copy(type = ColType.CHARACTER)
+            }
+            Table(cols = newCols, headers = newHeaders)
+        }
+
+        val mappedCols = table.cols?.mapIndexed{ i, col ->
+            col.map{ a ->
+                val c = a as String
+                if (table.headers?.get(i)?.type == ColType.NUMBER) {
+                    if (c.isNotEmpty() && c != "Filtered") c.toDouble() else Double.NaN
+                } else c
+            }
+        }
+
+        return table.copy(cols = mappedCols)
+    }
+
     fun getTable(resultTablePath: String?, headers: List<Header>?): Table {
         val reader = BufferedReader(FileReader(resultTablePath))
         // ignore the first line, it is the header
