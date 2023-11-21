@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.io.path.pathString
 
 
@@ -21,24 +22,15 @@ class OneDEnrichmentRunnerTests {
 
     @Autowired
     private val computation: OneDEnrichmentComputation? = null
-
-    @Autowired
-    val colParser: ColumnMappingParser? = null
-
-
     private val readTableData = ReadTableData()
-    private var table: Table? = null
 
-    /*
-    @BeforeEach
-    fun init() {
-        val resPath = "./src/test/resources/results/maxquant/"
-        val filePath = resPath + "Rodrigues_16632-51_Table_8.txt"
-        val commonRes = colParser!!.parse(filePath, resPath, ResultType.MaxQuant).second
-        val table = readTableData.getTable(filePath, commonRes.headers)
-        ints = readTableData.getDoubleMatrix(table, "LFQ.intensity", null).second
+
+    private val roundingPrecision = 7
+
+    private fun roundNumber(n: Double?, precision: Int = roundingPrecision): BigDecimal {
+        return if(n == null) BigDecimal(0)
+        else BigDecimal(n).setScale(precision, RoundingMode.HALF_UP)
     }
-     */
 
     @Test
     fun rodriguesGobpGomfGocc() {
@@ -47,14 +39,26 @@ class OneDEnrichmentRunnerTests {
 
         val params = OneDEnrichmentParams(
             colName = "fold.change.Ypt7-Ctrl",
-            multipleTestCorr = null,
-            //categoryNames = listOf("GOCC name", "GOBP name", "GOMF name")
-            categoryNames = listOf("GOCC name")
+            multipleTestCorr = MulitTestCorr.BH,
+            categoryNames = listOf("GOCC name", "GOBP name", "GOMF name"),
+            threshold = 0.02
         )
 
         val annotationFile = "./src/test/resources/annotations/mainAnnot.saccharomyces_cerevisiae_strain_atcc_204508_s288c.txt"
-        val enrichmentTable = computation?.computeEnrichment(resTable, resType, params, annotationFile)
-        assert(enrichmentTable?.cols?.size == 99)
+        val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, annotationFile)
+
+        assert(enrichmentRes?.size == 412)
+        assert(enrichmentRes?.filter{it.type == "GOCC name"}?.size == 98)
+        val selRes = enrichmentRes?.find{it.name == "membrane part"}
+        assert(selRes?.column == "fold.change.Ypt7-Ctrl")
+        assert(selRes?.type == "GOCC name")
+        assert(selRes?.name == "membrane part")
+        assert(selRes?.size == 1058)
+        assert(roundNumber(selRes?.score) == roundNumber(0.41310526669970205))
+        assert(roundNumber(selRes?.pValue) == roundNumber(9.98346216121655E-90))
+        assert(roundNumber(selRes?.qValue) == roundNumber(7.57744778036336E-87))
+        assert(roundNumber(selRes?.mean) == roundNumber(0.704807648038113))
+        assert(roundNumber(selRes?.median) == roundNumber(0.539801459001287))
     }
 
 }

@@ -6,7 +6,8 @@ data class OneDEnrichmentParams(
     val colName: String? = null,
     val multipleTestCorr: MulitTestCorr? = null,
     val categoryNames: List<String>? = null,
-    val annotationFileName: String? = null
+    val annotationFileName: String? = null,
+    val threshold: Double? = null
 )
 
 enum class MulitTestCorr(val value: String) {
