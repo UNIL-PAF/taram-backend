@@ -26,7 +26,7 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
     @Autowired
     var enrichmentPdf: OneDEnrichmentPdf? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.IMPUTATION
+    override var type: AnalysisStepType? = AnalysisStepType.ONE_D_ENRICHMENT
 
     fun getParameters(step: AnalysisStep?): OneDEnrichmentParams {
         return if (step?.parameters != null) gson.fromJson(

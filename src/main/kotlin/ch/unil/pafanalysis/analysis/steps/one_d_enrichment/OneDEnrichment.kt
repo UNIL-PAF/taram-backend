@@ -1,7 +1,6 @@
 package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 
-data class OneDEnrichment(val nrSignificant: Int? = null)
-
+data class OneDEnrichment(val enrichmentTable: String? = null, val selResults: List<EnrichmentRow>? = null)
 
 data class EnrichmentRow(
     val column: String?,

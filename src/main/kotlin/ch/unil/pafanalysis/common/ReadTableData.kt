@@ -188,9 +188,17 @@ class ReadTableData {
         return Pair(matrix.first, byRow)
     }
 
-
     fun getDoubleColumn(table: Table?, headerName: String): List<Double>? {
         val header = table?.headers?.find { it.name == headerName } ?: return null
+        return getDoubleColumn(table, header)
+    }
+
+    fun getDoubleColumn(table: Table?, headerIdx: Int): List<Double>? {
+        val header = table?.headers?.find { it.idx == headerIdx } ?: return null
+        return getDoubleColumn(table, header)
+    }
+
+    private fun getDoubleColumn(table: Table?, header: Header): List<Double>? {
         if(header.type != ColType.NUMBER) throw Exception("Cannot extract double from non-numeric column.")
         return table?.cols?.get(header.idx)?.map { it as? Double ?: Double.NaN }
     }

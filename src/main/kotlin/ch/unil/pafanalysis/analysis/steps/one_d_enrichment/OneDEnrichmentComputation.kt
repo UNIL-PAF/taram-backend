@@ -21,11 +21,11 @@ class OneDEnrichmentComputation() {
     private val readTableData = ReadTableData()
     private val headerTypeMapping = HeaderTypeMapping()
 
-    fun computeEnrichment(resTable: Table?, resultType: ResultType?, params: OneDEnrichmentParams?, annotationFilePath: String?): List<EnrichmentRow>? {
+    fun computeEnrichment(resTable: Table?, resultType: String?, params: OneDEnrichmentParams?, annotationFilePath: String?): List<EnrichmentRow>? {
         val mwTest = MannWhitneyUTest()
         val mulitTestCorr = MultipleTestingCorrection()
 
-        val colName = params?.colName ?: throw StepException("You have to choose a valid column.")
+        val colIdx = params?.colIdx ?: throw StepException("You have to choose a valid column.")
 
         // prepare annotation data
         val annotationList: Map<String, List<String>>? = parseAnnotationList(annotationFilePath, params)
@@ -33,10 +33,11 @@ class OneDEnrichmentComputation() {
 
         // prepare result data
         val proteinAcList: List<List<String>>? =
-            readTableData.getStringColumn(resTable, headerTypeMapping.getCol("proteinIds", resultType?.value))
+            readTableData.getStringColumn(resTable, headerTypeMapping.getCol("proteinIds", resultType))
                 ?.map { it.split(";") }
-        val selResVals: List<Double>? = readTableData.getDoubleColumn(resTable, colName)
+        val selResVals: List<Double>? = readTableData.getDoubleColumn(resTable, colIdx)
         val resList = proteinAcList?.zip(selResVals!!)
+        val colName = (resTable?.headers?.find { it.idx == colIdx } ?: return null).name
 
         val res: List<List<EnrichmentRow>?>? = params?.categoryNames?.fold(emptyList()) { acc, category ->
             val categoryAnnotations: Map<String, List<String>> = getCategoryAnnotations(annotationFilePath, category)

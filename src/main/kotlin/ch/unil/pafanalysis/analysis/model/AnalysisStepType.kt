@@ -18,5 +18,6 @@ enum class AnalysisStepType(val value: String, val hasPlot: Boolean = false) {
     SUMMARY_STAT("summary-stat"),
     ORDER_COLUMNS("order-columns"),
     RENAME_COLUMNS("rename-columns"),
-    ADD_COLUMN("add-column")
+    ADD_COLUMN("add-column"),
+    ONE_D_ENRICHMENT("one-d-enrichment")
 }

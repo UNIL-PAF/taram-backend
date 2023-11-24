@@ -12,6 +12,7 @@ import ch.unil.pafanalysis.analysis.steps.imputation.ImputationRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.log_transformation.LogTransformationRunner
 import ch.unil.pafanalysis.analysis.steps.normalization.NormalizationRunner
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichmentRunner
 import ch.unil.pafanalysis.analysis.steps.order_columns.OrderColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
 import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
@@ -96,6 +97,9 @@ open class CommonStep {
 
     @Autowired
     private var addColumnRunner: AddColumnRunner? = null
+
+    @Autowired
+    private var oneDEnrichmentRunner: OneDEnrichmentRunner? = null
 
     val gson = Gson()
 
@@ -182,6 +186,7 @@ open class CommonStep {
             AnalysisStepType.ORDER_COLUMNS.value -> orderColumnsRunner
             AnalysisStepType.RENAME_COLUMNS.value -> renameColumnsRunner
             AnalysisStepType.ADD_COLUMN.value -> addColumnRunner
+            AnalysisStepType.ONE_D_ENRICHMENT.value -> oneDEnrichmentRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }
@@ -273,6 +278,7 @@ open class CommonStep {
             AnalysisStepType.ORDER_COLUMNS.value -> orderColumnsRunner?.getParameters(step).toString()
             AnalysisStepType.RENAME_COLUMNS.value -> renameColumnsRunner?.getParameters(step).toString()
             AnalysisStepType.ADD_COLUMN.value -> addColumnRunner?.getParameters(step).toString()
+            AnalysisStepType.ONE_D_ENRICHMENT.value -> oneDEnrichmentRunner?.getParameters(step).toString()
             else -> throw RuntimeException("Cannot parse parameters for type [${step?.type}]")
         }
         return hashComp.computeStringHash(filterParams)

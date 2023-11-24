@@ -34,11 +34,11 @@ class OneDEnrichmentRunnerTests {
 
     @Test
     fun rodriguesGobpGomfGocc() {
-        val resType = ResultType.MaxQuant
+        val resType = ResultType.MaxQuant.value
         val resTable = readTableData.getTableWithoutHeaders("./src/test/resources/results/maxquant/Rodrigues_16632-51_Table_8.txt")
 
         val params = OneDEnrichmentParams(
-            colName = "fold.change.Ypt7-Ctrl",
+            colIdx = 201, //"fold.change.Ypt7-Ctrl",
             fdrCorrection = true,
             categoryNames = listOf("GOCC name", "GOBP name", "GOMF name"),
             threshold = 0.02
