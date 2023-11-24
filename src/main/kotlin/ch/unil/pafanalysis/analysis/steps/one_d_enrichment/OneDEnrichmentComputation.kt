@@ -57,7 +57,7 @@ class OneDEnrichmentComputation() {
             acc.plusElement(newRows!!)
         }
 
-        val resWithCorr = if(params?.multipleTestCorr == MulitTestCorr.BH){
+        val resWithCorr = if(params?.fdrCorrection == true){
             // compute qValues
             res?.map{ oneCat ->
                 val pVals = oneCat?.map{it?.pValue ?: throw Exception("pValue cannot be null") } ?: emptyList()

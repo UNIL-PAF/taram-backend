@@ -39,7 +39,7 @@ class OneDEnrichmentRunnerTests {
 
         val params = OneDEnrichmentParams(
             colName = "fold.change.Ypt7-Ctrl",
-            multipleTestCorr = MulitTestCorr.BH,
+            fdrCorrection = true,
             categoryNames = listOf("GOCC name", "GOBP name", "GOMF name"),
             threshold = 0.02
         )
