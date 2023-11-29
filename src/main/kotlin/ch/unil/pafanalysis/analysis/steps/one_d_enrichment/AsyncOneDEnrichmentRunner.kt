@@ -1,17 +1,14 @@
 package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.filter.FilterParams
 import ch.unil.pafanalysis.annotations.service.AnnotationRepository
 import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.sql.Timestamp
 
 @Service
 class AsyncOneDEnrichmentRunner() : CommonStep() {
@@ -33,7 +30,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     }
 
     private val readTableData = ReadTableData()
-    private val writeEnrichmentTable = WriteEnrichmentTable()
+    private val writeEnrichmentTable = EnrichmentTableWriter()
 
 
     @Async
@@ -71,9 +68,9 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     private fun saveResToTable(enrichmentRows: List<EnrichmentRow>?, resultPath: String?): String? {
         val currentDateTime: java.util.Date = java.util.Date()
         val currentTimestamp: Long = currentDateTime.time
-        val fileName = "annotation_table_$currentTimestamp.txt"
+        val fileName = "enrichment_table_$currentTimestamp.txt"
         val filePath = getOutputRoot() + resultPath + "/" + fileName
-        writeEnrichmentTable.write(filePath, enrichmentRows ?: throw StepException("No enrichments to save."))
+        writeEnrichmentTable.write(filePath, enrichmentRows ?: throw StepException("No enrichment to save."))
         return fileName
     }
 

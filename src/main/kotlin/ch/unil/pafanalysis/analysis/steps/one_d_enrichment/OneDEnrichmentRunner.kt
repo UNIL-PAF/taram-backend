@@ -12,6 +12,7 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Text
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,7 +27,16 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
     @Autowired
     var enrichmentPdf: OneDEnrichmentPdf? = null
 
+    val enrichmentTableReader = EnrichmentTableReader()
+
     override var type: AnalysisStepType? = AnalysisStepType.ONE_D_ENRICHMENT
+
+    @Autowired
+    private var env: Environment? = null
+
+    private fun getOutputPath(): String? {
+        return env?.getProperty("output.path")
+    }
 
     fun getParameters(step: AnalysisStep?): OneDEnrichmentParams {
         return if (step?.parameters != null) gson.fromJson(
@@ -50,6 +60,12 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
         val origParams = getParameters(origStep)
 
         return "Parameter(s) changed:"
+    }
+
+    fun getFullEnrichmentTable(step: AnalysisStep?): FullEnrichmentTable? {
+        val result: OneDEnrichment = gson.fromJson(step?.results, OneDEnrichment().javaClass)
+        val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + result.enrichmentTable
+        return enrichmentTableReader.readTable(enrichmentResFilePath)
     }
 
 }

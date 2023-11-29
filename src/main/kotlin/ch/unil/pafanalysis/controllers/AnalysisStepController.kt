@@ -1,15 +1,14 @@
 package ch.unil.pafanalysis.controllers
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
-import ch.unil.pafanalysis.analysis.model.FullProteinTable
-import ch.unil.pafanalysis.analysis.model.ProteinTable
 import ch.unil.pafanalysis.analysis.service.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.FullEnrichmentTable
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichmentRunner
 import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
@@ -42,16 +41,10 @@ class AnalysisStepController {
     private var initialResult: InitialResultRunner? = null
 
     @Autowired
+    private var oneDEnrichmentRunner: OneDEnrichmentRunner? = null
+
+    @Autowired
     private var commonStep: CommonStep? = null
-
-    @Autowired
-    private var volcanoPlotRunner: VolcanoPlotRunner? = null
-
-    @Autowired
-    private var scatterPlotRunner: ScatterPlotRunner? = null
-
-    @Autowired
-    private var pcaRunner: PcaRunner? = null
 
     @Autowired
     private var proteinTableService: ProteinTableService? = null
@@ -69,6 +62,14 @@ class AnalysisStepController {
     fun getResults(@PathVariable(value = "stepId") stepId: Int): String? {
         val step = analysisStepRepository?.findById(stepId)
         return commonStep?.getRunner(step?.type)?.getResult(step)
+    }
+
+    @GetMapping(path = ["/full-enrichment-table/{stepId}"])
+    fun getFullEnrichmentTable(@PathVariable(value = "stepId") stepId: Int): FullEnrichmentTable? {
+        val step = analysisStepRepository?.findById(stepId)
+        return if(step?.type == ONE_D_ENRICHMENT.value){
+            oneDEnrichmentRunner?.getFullEnrichmentTable(step)
+        }else throw Exception("You cannot get an enrichment table from step [$stepId].")
     }
 
     @GetMapping(path = ["/full-protein-table/{stepId}"])

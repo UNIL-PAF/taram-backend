@@ -3,7 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 import java.io.BufferedWriter
 import java.io.FileWriter
 
-class WriteEnrichmentTable {
+class EnrichmentTableWriter {
 
     private val headers =
         listOf("Column", "Type", "Name", "Size", "Score", "P value", "Benj. Hoch. FDR", "Mean", "Median")
