@@ -4,7 +4,6 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.AsyncOneDEnrichmentRunner
 import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichmentPdf
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
@@ -19,7 +18,7 @@ class ImputationRunner() : CommonStep(), CommonRunner {
 
     @Lazy
     @Autowired
-    var asyncTransformationRunner: AsyncOneDEnrichmentRunner? = null
+    var imputationRunner: AsyncImputationRunner? = null
 
     @Autowired
     var imputationPdf: OneDEnrichmentPdf? = null
@@ -39,7 +38,7 @@ return imputationPdf?.createPdf(step, pdf, pageWidth, stepNr)
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, version, oldStepId, true, step, params)
-        asyncTransformationRunner?.runAsync(oldStepId, newStep)
+        imputationRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
 

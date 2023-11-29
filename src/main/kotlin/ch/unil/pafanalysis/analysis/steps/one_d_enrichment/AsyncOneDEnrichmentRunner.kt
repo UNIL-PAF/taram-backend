@@ -69,8 +69,9 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     }
 
     private fun saveResToTable(enrichmentRows: List<EnrichmentRow>?, resultPath: String?): String? {
-        val timestamp = Timestamp(System.currentTimeMillis())
-        val fileName = "annotation_table_$timestamp.txt"
+        val currentDateTime: java.util.Date = java.util.Date()
+        val currentTimestamp: Long = currentDateTime.time
+        val fileName = "annotation_table_$currentTimestamp.txt"
         val filePath = getOutputRoot() + resultPath + "/" + fileName
         writeEnrichmentTable.write(filePath, enrichmentRows ?: throw StepException("No enrichments to save."))
         return fileName

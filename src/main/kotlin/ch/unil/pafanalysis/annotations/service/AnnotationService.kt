@@ -42,12 +42,15 @@ class AnnotationService {
         val uploadedFile = File(getAnnotationPath() + fileName)
         file.transferTo(uploadedFile)
 
+        val (headers, nrEntries) = getHeadersAndNrEntries(uploadedFile)
+
         val newAnnotation = AnnotationInfo(
             name = name,
             description = description,
             fileName = fileName,
             origFileName = origFileName,
-            nrEntries = getNrEntries(uploadedFile),
+            nrEntries = nrEntries,
+            headers = headers,
             creationDate = creationTime
         )
 
@@ -55,13 +58,14 @@ class AnnotationService {
         return inserted?.id
     }
 
-    private fun getNrEntries(file: File): Int{
+    private fun getHeadersAndNrEntries(file: File): Pair<String, Int>{
         val reader = BufferedReader(FileReader(file))
         // ignore header
-        reader.readLine()
+        val headers = reader.readLine().split("\t").drop(1).joinToString(";")
 
-        return reader.readLines().fold(0){acc, l ->
+        val nrEntries = reader.readLines().fold(0){acc, l ->
             if(l.contains("Type")) acc else acc+1
         }
+        return Pair(headers, nrEntries)
     }
 }

@@ -7,5 +7,5 @@ data class OneDEnrichmentParams(
     val fdrCorrection: Boolean? = null,
     val categoryNames: List<String>? = null,
     val annotationId: Int? = null,
-    val threshold: Double? = null
+    val threshold: Double? = null,
 )

@@ -16,6 +16,8 @@ data class AnnotationInfo (
     val description: String? = null,
     @Lob
     val usedBy: String? = null,
+    @Lob
+    val headers: String? = null,
     val fileName: String? = null,
     val origFileName: String? = null,
     val nrEntries: Int? = null,
