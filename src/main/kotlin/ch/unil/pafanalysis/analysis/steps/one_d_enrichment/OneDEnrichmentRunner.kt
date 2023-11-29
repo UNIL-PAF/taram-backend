@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.io.FileInputStream
+import java.io.InputStream
 
 @Service
 class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
@@ -68,4 +71,10 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
         return enrichmentTableReader.readTable(enrichmentResFilePath)
     }
 
+    override fun getResultByteArray(step: AnalysisStep?): ByteArray? {
+        val result: OneDEnrichment = gson.fromJson(step?.results, OneDEnrichment().javaClass)
+        val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + result.enrichmentTable
+        val inputStream: InputStream = FileInputStream(enrichmentResFilePath)
+        return inputStream.readAllBytes()
+    }
 }
