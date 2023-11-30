@@ -68,7 +68,12 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
     fun getFullEnrichmentTable(step: AnalysisStep?): FullEnrichmentTable? {
         val result: OneDEnrichment = gson.fromJson(step?.results, OneDEnrichment().javaClass)
         val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + result.enrichmentTable
-        return enrichmentTableReader.readTable(enrichmentResFilePath)
+        val fullTable = enrichmentTableReader.readTable(enrichmentResFilePath)
+        return sortBySelected(fullTable, getParameters(step))
+    }
+
+    private fun sortBySelected(table: FullEnrichmentTable?, params: OneDEnrichmentParams): FullEnrichmentTable?{
+        return table
     }
 
     override fun getResultByteArray(step: AnalysisStep?): ByteArray? {

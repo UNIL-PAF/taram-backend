@@ -52,7 +52,7 @@ class OneDEnrichmentComputation() {
                     val size = xyLists?.first?.size
                     val n = size + xyLists?.second?.size
                     val score = 2 * (r2 - r1) / n
-                    innerAcc.plusElement(EnrichmentRow(colName, category, annot, size, score, pVal, null, mean, median))
+                    innerAcc.plusElement(EnrichmentRow(null, colName, category, annot, size, score, pVal, null, mean, median))
                 } else innerAcc
             }
             acc.plusElement(newRows!!)

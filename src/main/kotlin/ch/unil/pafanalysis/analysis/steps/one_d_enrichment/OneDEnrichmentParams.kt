@@ -8,4 +8,5 @@ data class OneDEnrichmentParams(
     val categoryNames: List<String>? = null,
     val annotationId: Int? = null,
     val threshold: Double? = null,
+    val selResults: List<Int>? = null
 )

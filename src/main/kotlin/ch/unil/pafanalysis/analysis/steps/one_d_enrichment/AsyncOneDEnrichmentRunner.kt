@@ -32,31 +32,40 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     private val readTableData = ReadTableData()
     private val writeEnrichmentTable = EnrichmentTableWriter()
 
-
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
         val funToRun: () -> AnalysisStep? = {
+            val nrRows = 10
+            val params = gson.fromJson(newStep?.parameters, OneDEnrichmentParams().javaClass)
+
             // compute
-            val res = computeEnrichment(newStep)
+            val res = computeEnrichment(newStep, params, nrRows)
+            val newParams = addSelResults(params, nrRows)
 
             newStep?.copy(
-                results = gson.toJson(res)
+                results = gson.toJson(res),
+                parameters = gson.toJson(newParams)
             )
         }
 
         tryToRun(funToRun, newStep)
     }
 
-    private fun computeEnrichment(step: AnalysisStep?): OneDEnrichment {
+    private fun computeEnrichment(step: AnalysisStep?, params: OneDEnrichmentParams, nrRows: Int): OneDEnrichment {
         val resType = step?.analysis?.result?.type
         val outputRoot = getOutputRoot()
-        val params = gson.fromJson(step?.parameters, OneDEnrichmentParams().javaClass)
+
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
         val annotationFilePath = getAnnotationFilePath(params.annotationId)
         val enrichmentRows = comp?.computeEnrichment(table, resType, params, annotationFilePath)
         val enrichmentTable = saveResToTable(enrichmentRows, step?.resultPath)
-        val selEnrichmentRows = getSelEnrichmentRows(enrichmentRows)
+        val selEnrichmentRows = getSelEnrichmentRows(enrichmentRows, nrRows)
         return OneDEnrichment(enrichmentTable, selEnrichmentRows)
+    }
+
+    private fun addSelResults(params: OneDEnrichmentParams, nrRows: Int): OneDEnrichmentParams {
+        val selRes = (0 until nrRows).toList()
+        return params.copy(selResults = selRes)
     }
 
     private fun getAnnotationFilePath(annotationId: Int?) : String? {
@@ -74,7 +83,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
         return fileName
     }
 
-    private fun getSelEnrichmentRows(enrichmentRows: List<EnrichmentRow>?, nrRows: Int = 10): List<EnrichmentRow>? {
+    private fun getSelEnrichmentRows(enrichmentRows: List<EnrichmentRow>?, nrRows: Int): List<EnrichmentRow>? {
         return enrichmentRows?.sortedBy { it.pValue }?.take(nrRows)
     }
 

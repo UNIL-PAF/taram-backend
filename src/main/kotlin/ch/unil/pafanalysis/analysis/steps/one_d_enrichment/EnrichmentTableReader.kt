@@ -6,12 +6,14 @@ import java.io.FileReader
 class EnrichmentTableReader {
 
     fun readTable(filePath: String): FullEnrichmentTable{
+
         val reader = BufferedReader(FileReader(filePath))
         val headers = reader.readLine().split("\t")
 
         val rows = reader.readLines().map{ l ->
             val cols = l.split("\t")
             EnrichmentRow(
+                id = null,
                 column = cols[0],
                 type = cols[1],
                 name = cols[2],
@@ -23,7 +25,9 @@ class EnrichmentTableReader {
                 median = cols[8].toDouble(),
             )
         }
-        return FullEnrichmentTable(rows = rows)
+
+        val sortedRows = rows.sortedBy { r -> r.pValue }.mapIndexed{i, a -> a.copy(id = i)}
+        return FullEnrichmentTable(rows = sortedRows)
     }
 
 }
