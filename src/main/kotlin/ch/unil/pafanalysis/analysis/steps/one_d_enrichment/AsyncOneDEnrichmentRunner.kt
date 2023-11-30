@@ -1,8 +1,10 @@
 package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotParams
 import ch.unil.pafanalysis.annotations.service.AnnotationRepository
 import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,7 +70,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
         return params.copy(selResults = selRes)
     }
 
-    private fun getAnnotationFilePath(annotationId: Int?) : String? {
+    private fun getAnnotationFilePath(annotationId: Int?): String? {
         val myId = annotationId ?: throw StepException("Could not load annotation [$annotationId].")
         val anno = annotationRepository?.findById(myId)
         return getAnnotationPath() + anno?.fileName
@@ -84,7 +86,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     }
 
     private fun getSelEnrichmentRows(enrichmentRows: List<EnrichmentRow>?, nrRows: Int): List<EnrichmentRow>? {
-        return enrichmentRows?.sortedBy { it.pValue }?.take(nrRows)
+        return enrichmentRows?.sortedBy { it.pValue }?.mapIndexed { i, row -> row.copy(id = i) }?.take(nrRows)
     }
 
 }

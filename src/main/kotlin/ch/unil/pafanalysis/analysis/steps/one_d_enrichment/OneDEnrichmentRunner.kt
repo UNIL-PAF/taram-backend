@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
+import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotParams
 import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.Document
@@ -63,6 +64,31 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
         val origParams = getParameters(origStep)
 
         return "Parameter(s) changed:"
+    }
+
+    override fun switchSel(step: AnalysisStep?, idString: String): List<String>? {
+        val origParams = gson.fromJson(step?.parameters, OneDEnrichmentParams().javaClass)
+        val origList = origParams.selResults ?: emptyList()
+        val id = idString.toInt()
+        val remove: Boolean? = origList.contains(id)
+        val newList = if(origList.contains(id)) origList.filter{it != id} else origList.plus(id)
+        val newParams = origParams.copy(selResults = newList)
+        val newRes = addOrRemoveNewRow(step, id, remove)
+        analysisStepRepository?.saveAndFlush(step?.copy(parameters = gson.toJson(newParams), results = gson.toJson(newRes))!!)
+        return newList.map{it.toString()}
+    }
+
+    private fun addOrRemoveNewRow(step: AnalysisStep?, id: Int, remove: Boolean?): OneDEnrichment?{
+        val oldRes = gson.fromJson(step?.results, OneDEnrichment().javaClass)
+        val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + oldRes.enrichmentTable
+        val fullTable = enrichmentTableReader.readTable(enrichmentResFilePath)
+        val newRows = if(remove == true){
+            oldRes.selResults?.filter{ r -> r.id != id}
+        }else{
+            val newRow = fullTable.rows?.find{ r -> r.id == id }!!
+            oldRes.selResults?.plusElement(newRow)
+        }?.sortedBy { it.pValue }
+        return oldRes?.copy(selResults = newRows)
     }
 
     fun getFullEnrichmentTable(step: AnalysisStep?): FullEnrichmentTable? {
