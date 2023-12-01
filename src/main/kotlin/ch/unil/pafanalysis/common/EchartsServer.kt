@@ -39,7 +39,6 @@ class EchartsServer {
     fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float): Image? {
         val results = gson.fromJson(step.results, BoxPlot::class.java)
         val echartsPlot = results.plot?.copy(outputPath = step.resultPath)
-
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
 
         val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
@@ -49,6 +48,7 @@ class EchartsServer {
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
             .build();
+
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
         if(response.statusCode() != HttpStatus.OK.value()) throw Exception("Could not generate eCharts pdf graph: " + response.body())

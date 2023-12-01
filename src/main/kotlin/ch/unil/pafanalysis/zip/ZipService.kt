@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
+import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
@@ -37,6 +38,9 @@ class ZipService {
 
     @Autowired
     private var echartsServer: EchartsServer? = null
+
+    @Autowired
+    private var commonStep: CommonStep? = null
 
     @Autowired
     private var env: Environment? = null
@@ -87,7 +91,11 @@ class ZipService {
                 else {
                     val idx = i - removedSteps + 1
                     val table = if (zipSelection.tables?.contains(step.id) == true) {
-                        "tables/Table-$idx.txt"
+                        if(step.modifiesResult == true){
+                            "tables/Table-$idx.txt"
+                        }else{
+                            "tables/" + commonStep?.getRunner(step?.type)?.getOtherTableName(idx)
+                        }
                     } else ""
                     val plots = if (zipSelection.plots?.contains(step.id) == true) {
                         val plotBase = "plots/$idx-${step.type}"
@@ -107,11 +115,20 @@ class ZipService {
         var removedSteps = 0
         steps?.forEachIndexed{ i, step ->
             if(zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
+            val idx = i-removedSteps+1
             if(zipSelection.tables?.contains(step.id) == true){
-                val origTableFile = analysisStepService?.getTable(step.id!!)
-                File(origTableFile).copyTo(File("$tableDir/Table-${i-removedSteps+1}.txt"))
+                if(step.modifiesResult == true){
+                    val origTableFile = analysisStepService?.getTable(step.id!!)
+                    File(origTableFile).copyTo(File("$tableDir/Table-$idx.txt"))
+                }else{
+                    commonStep?.getRunner(step?.type)?.getOtherTable(step, tableDir, idx)
+                }
             }
         }
+    }
+
+    private fun copyOtherTable(step: AnalysisStep?, tableDir: String, idx: Int){
+
     }
 
     private fun createPlots(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){

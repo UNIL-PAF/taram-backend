@@ -20,6 +20,7 @@ object StepNames {
             "t-test"->"t-test"
             "volcano-plot"->"Volcano plot"
             "one-d-enrichment"->"1D Enrichment"
+            "add-column"->"Add column"
             else -> throw Exception("Type [$type] doesnt exist.")
         }
     }

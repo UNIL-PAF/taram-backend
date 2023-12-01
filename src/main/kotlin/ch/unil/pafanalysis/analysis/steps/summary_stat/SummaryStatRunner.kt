@@ -72,10 +72,18 @@ class SummaryStatRunner() : CommonStep(), CommonRunner {
         return inputStream.readAllBytes()
     }
 
-    private fun createTmpFile(results: SummaryStat): File {
-        val tmpFile = kotlin.io.path.createTempFile("summary_table_", ".txt").toFile()
-        val writer = tmpFile.bufferedWriter()
+    override fun getOtherTable(step: AnalysisStep?, tableDir: String, idx: Int): File {
+        val results = gson.fromJson(step?.results, SummaryStat().javaClass)
+        val file = File("$tableDir/Summary-table-$idx.txt")
+        return writeFile(results, file)
+    }
 
+    override fun getOtherTableName(idx: Int): String? {
+        return "Summary-table-$idx.txt"
+    }
+
+    private fun writeFile(results: SummaryStat, file: File): File {
+        val writer = file.bufferedWriter()
         // there should always be a min
         val nrEntries = results.min?.size
 
@@ -93,7 +101,12 @@ class SummaryStatRunner() : CommonStep(), CommonRunner {
         writeResLine("Nr of NaN", results.nrNaN, nrEntries, writer)
 
         writer.close()
-        return tmpFile
+        return file
+    }
+
+    private fun createTmpFile(results: SummaryStat): File {
+        val tmpFile = kotlin.io.path.createTempFile("summary_table_", ".txt").toFile()
+        return writeFile(results, tmpFile)
     }
 
     private fun writeResLine(name: String, data: List<Any>?, nrEntries: Int?, tmpFile: BufferedWriter){
