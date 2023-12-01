@@ -54,7 +54,7 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, version, oldStepId, true, step, params)
+        val newStep = runCommonStep(type!!, version, oldStepId, false, step, params)
         asyncRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
