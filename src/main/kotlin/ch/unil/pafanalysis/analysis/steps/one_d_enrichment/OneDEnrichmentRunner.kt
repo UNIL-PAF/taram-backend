@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
 
@@ -89,6 +90,18 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
             oldRes.selResults?.plusElement(newRow)
         }?.sortedBy { it.pvalue }
         return oldRes?.copy(selResults = newRows)
+    }
+
+    override fun getOtherTableName(idx: Int): String? {
+        return "Enrichment-table-$idx.txt"
+    }
+
+    override fun getOtherTable(step: AnalysisStep?, tableDir: String, idx: Int): File {
+        val result: OneDEnrichment = gson.fromJson(step?.results, OneDEnrichment().javaClass)
+        val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + result.enrichmentTable
+        val outFile = File("$tableDir/Enrichment-table-$idx.txt")
+        File(enrichmentResFilePath).copyTo(outFile)
+        return outFile
     }
 
     fun getFullEnrichmentTable(step: AnalysisStep?): FullEnrichmentTable? {
