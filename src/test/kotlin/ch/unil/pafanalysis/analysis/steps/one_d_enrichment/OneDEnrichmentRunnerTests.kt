@@ -55,8 +55,8 @@ class OneDEnrichmentRunnerTests {
         assert(selRes?.name == "membrane part")
         assert(selRes?.size == 1058)
         assert(roundNumber(selRes?.score) == roundNumber(0.41310526669970205))
-        assert(roundNumber(selRes?.pValue) == roundNumber(9.98346216121655E-90))
-        assert(roundNumber(selRes?.qValue) == roundNumber(7.57744778036336E-87))
+        assert(roundNumber(selRes?.pvalue) == roundNumber(9.98346216121655E-90))
+        assert(roundNumber(selRes?.qvalue) == roundNumber(7.57744778036336E-87))
         assert(roundNumber(selRes?.mean) == roundNumber(0.704807648038113))
         assert(roundNumber(selRes?.median) == roundNumber(0.539801459001287))
     }

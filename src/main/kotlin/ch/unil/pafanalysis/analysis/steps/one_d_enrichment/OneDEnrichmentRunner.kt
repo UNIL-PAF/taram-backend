@@ -87,7 +87,7 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
         }else{
             val newRow = fullTable.rows?.find{ r -> r.id == id }!!
             oldRes.selResults?.plusElement(newRow)
-        }?.sortedBy { it.pValue }
+        }?.sortedBy { it.pvalue }
         return oldRes?.copy(selResults = newRows)
     }
 
@@ -99,7 +99,12 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
     }
 
     private fun sortBySelected(table: FullEnrichmentTable?, params: OneDEnrichmentParams): FullEnrichmentTable?{
-        return table
+        val rowWithSelInfo = table?.rows?.map{ r ->
+            val isSel = params.selResults?.contains(r.id)
+            Pair(r, isSel == false)
+        }
+        val sortedRow = rowWithSelInfo?.sortedWith(compareBy<Pair<EnrichmentRow, Boolean>>{it.second}.thenBy { it.first.pvalue })?.map{it.first}
+        return table?.copy(rows = sortedRow)
     }
 
     override fun getResultByteArray(step: AnalysisStep?): ByteArray? {

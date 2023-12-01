@@ -9,8 +9,8 @@ data class EnrichmentRow(
     val name: String?,
     val size: Int?,
     val score: Double?,
-    val pValue: Double?,
-    val qValue: Double?,
+    val pvalue: Double?,
+    val qvalue: Double?,
     val mean: Double?,
     val median: Double?
 )

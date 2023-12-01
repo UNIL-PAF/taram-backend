@@ -86,7 +86,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     }
 
     private fun getSelEnrichmentRows(enrichmentRows: List<EnrichmentRow>?, nrRows: Int): List<EnrichmentRow>? {
-        return enrichmentRows?.sortedBy { it.pValue }?.mapIndexed { i, row -> row.copy(id = i) }?.take(nrRows)
+        return enrichmentRows?.sortedBy { it.pvalue }?.mapIndexed { i, row -> row.copy(id = i) }?.take(nrRows)
     }
 
 }

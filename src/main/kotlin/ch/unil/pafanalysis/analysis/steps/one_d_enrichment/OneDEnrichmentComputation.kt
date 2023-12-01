@@ -61,16 +61,16 @@ class OneDEnrichmentComputation() {
         val resWithCorr = if(params?.fdrCorrection == true){
             // compute qValues
             res?.map{ oneCat ->
-                val pVals = oneCat?.map{it?.pValue ?: throw Exception("pValue cannot be null") } ?: emptyList()
+                val pVals = oneCat?.map{it?.pvalue ?: throw Exception("p-value cannot be null") } ?: emptyList()
                 val qVals = mulitTestCorr.fdrCorrection(pVals)
-                oneCat?.mapIndexed{ i, a -> a.copy(qValue = qVals[i])}
+                oneCat?.mapIndexed{ i, a -> a.copy(qvalue = qVals[i])}
             }
         } else res
 
         val flatRes = resWithCorr?.flatMap { it!! }
 
         // filter by threshold
-        return if(params.threshold != null) flatRes?.filter { a -> (a.qValue ?: a.pValue)!! <= params.threshold } else flatRes
+        return if(params.threshold != null) flatRes?.filter { a -> (a.qvalue ?: a.pvalue)!! <= params.threshold } else flatRes
     }
 
     private fun computeMeanRanks(selPart: List<Double>, otherPart: List<Double>): Double {
