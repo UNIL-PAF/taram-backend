@@ -52,4 +52,9 @@ class AnnotationController {
         return annotationService?.delete(annotationId)
     }
 
+    @PutMapping(path = ["/update-info/{annoId}"])
+    fun updateInfo(@PathVariable(value = "annoId") annoId: Int, @RequestParam name: String, @RequestParam description: String?): String? {
+        return annotationService?.setInfo(annoId = annoId, name = name, description = description)
+    }
+
 }

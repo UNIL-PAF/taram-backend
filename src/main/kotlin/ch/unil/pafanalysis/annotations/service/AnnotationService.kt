@@ -31,6 +31,12 @@ class AnnotationService {
         return annotationRepo?.deleteById(annotationId)
     }
 
+    fun setInfo(annoId: Int, name: String, description: String?): String? {
+        val anno = annotationRepo?.findById(annoId)
+        val newAnno = anno?.copy(name = name, description = description)
+        return annotationRepo?.saveAndFlush(newAnno!!).toString()
+    }
+
     fun createNewAnnotation(file: MultipartFile, name: String?, description: String?): Int? {
         val creationTime = LocalDateTime.now()
         val origFileName = file.originalFilename
