@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class OneDEnrichmentParams(
     val colIdx: Int? = null,
     val fdrCorrection: Boolean? = null,
-    val categoryNames: List<String>? = null,
+    val categoryIds: List<Int>? = null,
     val annotationId: Int? = null,
     val threshold: Double? = null,
     val selResults: List<Int>? = null

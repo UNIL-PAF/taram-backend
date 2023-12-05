@@ -58,8 +58,16 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
         val outputRoot = getOutputRoot()
 
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
-        val annotationFilePath = getAnnotationFilePath(params.annotationId)
-        val enrichmentRows = comp?.computeEnrichment(table, resType, params, annotationFilePath)
+
+        // get annotation
+        val annoId = params.annotationId ?: throw StepException("Could not load annotation [$params.annotationId].")
+        val anno = annotationRepository?.findById(annoId)
+        val annotationFilePath = getAnnotationPath() + anno?.fileName
+
+        // get categoryNames
+        val categoryNames: List<String>? = params.categoryIds?.map{id -> anno?.headers?.find{it.id == id}?.name ?: ""}
+
+        val enrichmentRows = comp?.computeEnrichment(table, resType, params, categoryNames, annotationFilePath)
         val enrichmentTable = saveResToTable(enrichmentRows, step?.resultPath)
         val selEnrichmentRows = getSelEnrichmentRows(enrichmentRows, nrRows)
         return OneDEnrichment(enrichmentTable, selEnrichmentRows)
@@ -68,12 +76,6 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     private fun addSelResults(params: OneDEnrichmentParams, nrRows: Int): OneDEnrichmentParams {
         val selRes = (0 until nrRows).toList()
         return params.copy(selResults = selRes)
-    }
-
-    private fun getAnnotationFilePath(annotationId: Int?): String? {
-        val myId = annotationId ?: throw StepException("Could not load annotation [$annotationId].")
-        val anno = annotationRepository?.findById(myId)
-        return getAnnotationPath() + anno?.fileName
     }
 
     private fun saveResToTable(enrichmentRows: List<EnrichmentRow>?, resultPath: String?): String? {

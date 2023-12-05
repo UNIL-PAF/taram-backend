@@ -21,14 +21,14 @@ class OneDEnrichmentComputation() {
     private val readTableData = ReadTableData()
     private val headerTypeMapping = HeaderTypeMapping()
 
-    fun computeEnrichment(resTable: Table?, resultType: String?, params: OneDEnrichmentParams?, annotationFilePath: String?): List<EnrichmentRow>? {
+    fun computeEnrichment(resTable: Table?, resultType: String?, params: OneDEnrichmentParams?, categoryNames: List<String>?, annotationFilePath: String?): List<EnrichmentRow>? {
         val mwTest = MannWhitneyUTest()
         val mulitTestCorr = MultipleTestingCorrection()
 
         val colIdx = params?.colIdx ?: throw StepException("You have to choose a valid column.")
 
         // prepare annotation data
-        val annotationList: Map<String, List<String>>? = parseAnnotationList(annotationFilePath, params)
+        val annotationList: Map<String, List<String>>? = parseAnnotationList(annotationFilePath, categoryNames)
         val proteinMapping: Map<String, String>? = parseProteinMapping(annotationFilePath)
 
         // prepare result data
@@ -39,7 +39,7 @@ class OneDEnrichmentComputation() {
         val resList = proteinAcList?.zip(selResVals!!)
         val colName = (resTable?.headers?.find { it.idx == colIdx } ?: return null).name
 
-        val res: List<List<EnrichmentRow>?>? = params?.categoryNames?.fold(emptyList()) { acc, category ->
+        val res: List<List<EnrichmentRow>?>? = categoryNames?.fold(emptyList()) { acc, category ->
             val categoryAnnotations: Map<String, List<String>> = getCategoryAnnotations(annotationFilePath, category)
             val newRows: List<EnrichmentRow>? = annotationList?.get(category)?.fold(emptyList()) { innerAcc, annot ->
                 val xyLists = createXYLists(resList, proteinMapping, categoryAnnotations, annot)
@@ -144,7 +144,7 @@ class OneDEnrichmentComputation() {
         }
     }
 
-    private fun parseAnnotationList(annotationFilePath: String?, params: OneDEnrichmentParams?): Map<String, List<String>>? {
+    private fun parseAnnotationList(annotationFilePath: String?, categoryNames: List<String>?): Map<String, List<String>>? {
         val sep = "\t"
 
         val reader = BufferedReader(FileReader(annotationFilePath))
@@ -154,7 +154,7 @@ class OneDEnrichmentComputation() {
             // for MaxQuant files we have to remove the second line
             if(cols[0].contains("Type")) acc
             else{
-                params!!.categoryNames!!.fold(acc){ innerAcc, name ->
+                categoryNames!!.fold(acc){ innerAcc, name ->
                     val idx = headers.indexOfFirst { it == name }
                     val a: List<String> = innerAcc[name] ?: emptyList<String>()
                     innerAcc.plus(mapOf(name to a.plus(cols[idx].split(";").filter{it.isNotEmpty()}).distinct()))

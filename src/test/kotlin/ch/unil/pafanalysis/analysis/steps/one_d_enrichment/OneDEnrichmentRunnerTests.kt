@@ -40,12 +40,12 @@ class OneDEnrichmentRunnerTests {
         val params = OneDEnrichmentParams(
             colIdx = 201, //"fold.change.Ypt7-Ctrl",
             fdrCorrection = true,
-            categoryNames = listOf("GOCC name", "GOBP name", "GOMF name"),
+            categoryIds = listOf(1, 2, 3),
             threshold = 0.02
         )
 
         val annotationFile = "./src/test/resources/annotations/mainAnnot.saccharomyces_cerevisiae_strain_atcc_204508_s288c.txt"
-        val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, annotationFile)
+        val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, listOf("GOCC name", "GOBP name", "GOMF name"), annotationFile)
 
         assert(enrichmentRes?.size == 412)
         assert(enrichmentRes?.filter{it.type == "GOCC name"}?.size == 98)
