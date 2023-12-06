@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotParams
 import ch.unil.pafanalysis.annotations.service.AnnotationRepository
+import ch.unil.pafanalysis.annotations.service.AnnotationService
 import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -23,6 +24,9 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
 
     @Autowired
     val annotationRepository: AnnotationRepository? = null
+
+    @Autowired
+    val annotationService: AnnotationService? = null
 
     @Autowired
     private var env: Environment? = null
@@ -43,6 +47,9 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
             // compute
             val res = computeEnrichment(newStep, params, nrRows)
             val newParams = addSelResults(params, nrRows)
+
+            // add current step to usedBy in annotation
+            annotationService?.addStepId(params.annotationId, newStep?.id)
 
             newStep?.copy(
                 results = gson.toJson(res),

@@ -36,6 +36,7 @@ class AnnotationController {
 
     @GetMapping("/list")
     fun listAnnotations(): Iterable<AnnotationInfo>? {
+        annotationService?.purgeUsedBy()
         return annotationRepository?.findAll()
     }
 

@@ -10,6 +10,7 @@ import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
@@ -162,6 +163,16 @@ class AnalysisStepService {
         }
 
         return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, true)
+    }
+
+    fun filterExisting(stepIds: List<Int?>): List<Int> {
+        return stepIds.filter{ id ->
+            if(id != null){
+                analysisStepRepo?.existsById(id) == true
+            }else{
+                false
+            }
+        }.map{it!!}
     }
 
 }
