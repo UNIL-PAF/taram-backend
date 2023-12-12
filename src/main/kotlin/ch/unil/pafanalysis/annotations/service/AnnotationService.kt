@@ -91,7 +91,7 @@ class AnnotationService {
     }
 
     private fun purgeOneUsedBy(usedBy: String?) : String? {
-        val usedByList = usedBy?.split(";")?.map{it.toIntOrNull()}
+        val usedByList = usedBy?.split(";")?.map{it.toIntOrNull()}?.distinct()
 
         // we check if the steps still exist
         return if(usedByList != null){

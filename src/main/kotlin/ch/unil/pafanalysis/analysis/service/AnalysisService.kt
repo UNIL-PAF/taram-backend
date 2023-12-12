@@ -103,7 +103,9 @@ class AnalysisService {
 
         while (nextEl?.nextId != null && emergencyBreak > 0) {
             nextEl = oldList?.find { it.id == nextEl?.nextId }
-            sortedList.add(nextEl!!)
+            if(nextEl != null){
+                sortedList.add(nextEl)
+            }
             emergencyBreak--
         }
 

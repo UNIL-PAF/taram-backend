@@ -45,11 +45,14 @@ class OneDEnrichmentRunnerTests {
         )
 
         val annotationFile = "./src/test/resources/annotations/mainAnnot.saccharomyces_cerevisiae_strain_atcc_204508_s288c.txt"
+        //val annotationFile = "/Users/rmylonas/Work/PAF/projects/paf-analysis/data/annotations/mainAnnot.homo_sapiens.txt"
         val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, listOf("GOCC name", "GOBP name", "GOMF name"), annotationFile)
+
 
         assert(enrichmentRes?.size == 412)
         assert(enrichmentRes?.filter{it.type == "GOCC name"}?.size == 98)
         val selRes = enrichmentRes?.find{it.name == "membrane part"}
+
         assert(selRes?.column == "fold.change.Ypt7-Ctrl")
         assert(selRes?.type == "GOCC name")
         assert(selRes?.name == "membrane part")
