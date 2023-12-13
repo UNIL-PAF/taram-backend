@@ -25,7 +25,7 @@ class NormalizationPdf() : PdfCommon() {
         return if(params.normalizationCalculation == NormalizationCalculation.DIVISION.value){
             "Divide by $myType"
         }else{
-            "Substract $myType"
+            "Subtract $myType"
         }
     }
 
