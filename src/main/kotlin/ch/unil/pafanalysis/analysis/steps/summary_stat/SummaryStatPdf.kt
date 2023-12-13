@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.summary_stat
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -23,7 +24,7 @@ class SummaryStatPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
-        stepDiv.add(titleDiv("$stepNr - Summary", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr - ${StepNames.getName(step?.type)}", plotWidth = plotWidth))
 
         val nrEntries = res.min?.size
 
