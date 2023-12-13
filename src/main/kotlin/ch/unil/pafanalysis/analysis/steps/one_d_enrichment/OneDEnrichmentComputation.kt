@@ -98,18 +98,17 @@ class OneDEnrichmentComputation() {
     }
 
     private fun computeMeanRanks(selPart: List<Double>, otherPart: List<Double>): Double {
-
         /* optimization ?
-        val allEntries = selPart.plus(otherPart)
-        val range = allEntries.indices.toList()
-        val ranks: List<Int> = range.sortedWith{ c1, c2 -> if (allEntries[c2] < allEntries[c1]) +1 else if (allEntries.get(c2) === allEntries.get(c1)) 0 else -1 }
-        val a = ranks.take(selPart.size).map{it+1}.average()
+            val allEntries = selPart.plus(otherPart)
+            val range = allEntries.indices.toList()
+            val ranks: List<Int> = range.sortedWith{ c1, c2 -> if (allEntries[c2] < allEntries[c1]) +1 else if (allEntries.get(c2) === allEntries.get(c1)) 0 else -1 }
+            val a = ranks.take(selPart.size).map{it+1}.average()
          */
 
         val sel = selPart.map { it to true }
         val other = otherPart.map { it to false }
-        val allSorted = sel.plus(other).mapIndexed { i, a -> Triple(i, a.first, a.second) }.sortedBy { it.second }
-        val allRanked = allSorted.reversed().mapIndexed { i, a -> Pair(i + 1, a.third) }
+        val allSorted = sel.plus(other).mapIndexed { i, a -> Triple(i, a.first, a.second) }.sortedByDescending { it.second }
+        val allRanked = allSorted.mapIndexed { i, a -> Pair(i + 1, a.third) }
         return allRanked.filter { it.second }.map { it.first }.average()
     }
 
