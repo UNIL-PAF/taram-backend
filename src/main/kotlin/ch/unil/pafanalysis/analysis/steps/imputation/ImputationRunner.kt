@@ -21,7 +21,7 @@ class ImputationRunner() : CommonStep(), CommonRunner {
     var imputationRunner: AsyncImputationRunner? = null
 
     @Autowired
-    var imputationPdf: OneDEnrichmentPdf? = null
+    var imputationPdf: ImputationPdf? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.IMPUTATION
 
@@ -33,7 +33,7 @@ class ImputationRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, pageWidth: Float, stepNr: Int): Div? {
-return imputationPdf?.createPdf(step, pdf, pageWidth, stepNr)
+        return imputationPdf?.createPdf(step, pdf, pageWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

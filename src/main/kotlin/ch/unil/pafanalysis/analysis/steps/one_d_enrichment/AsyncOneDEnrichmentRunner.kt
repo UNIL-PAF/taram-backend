@@ -1,17 +1,21 @@
 package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotParams
 import ch.unil.pafanalysis.annotations.service.AnnotationRepository
 import ch.unil.pafanalysis.annotations.service.AnnotationService
 import ch.unil.pafanalysis.common.*
+import com.google.gson.*
+import com.sun.jdi.Type
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+
 
 @Service
 class AsyncOneDEnrichmentRunner() : CommonStep() {
@@ -77,7 +81,19 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
         val enrichmentRows = comp?.computeEnrichment(table, resType, params, categoryNames, annotationFilePath)
         val enrichmentTable = saveResToTable(enrichmentRows, step?.resultPath)
         val selEnrichmentRows = getSelEnrichmentRows(enrichmentRows, nrRows)
-        return OneDEnrichment(enrichmentTable, selEnrichmentRows)
+
+        val colName = (table?.headers?.find { it.idx == params.colIdx })?.name
+
+        val myAnno = EnrichmentAnnotationInfo(
+            anno?.name,
+            anno?.description,
+            anno?.origFileName,
+            anno?.nrEntries,
+            anno?.creationString,
+            categoryNames
+        )
+
+        return OneDEnrichment(enrichmentTable, selEnrichmentRows, myAnno, colName)
     }
 
     private fun addSelResults(params: OneDEnrichmentParams, nrRows: Int): OneDEnrichmentParams {

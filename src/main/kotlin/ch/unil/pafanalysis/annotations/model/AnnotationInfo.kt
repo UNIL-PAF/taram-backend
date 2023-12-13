@@ -20,7 +20,8 @@ data class AnnotationInfo (
     val fileName: String? = null,
     val origFileName: String? = null,
     val nrEntries: Int? = null,
-    val creationDate: LocalDateTime? = null
+    val creationDate: LocalDateTime? = null,
+    val creationString: String? = null
 )
 
 

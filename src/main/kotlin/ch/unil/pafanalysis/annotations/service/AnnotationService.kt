@@ -13,6 +13,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 
 @Service
@@ -46,6 +47,7 @@ class AnnotationService {
 
     fun createNewAnnotation(file: MultipartFile, name: String?, description: String?): Int? {
         val creationTime = LocalDateTime.now()
+        val creationString = creationTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val origFileName = file.originalFilename
         val currentDateTime: java.util.Date = java.util.Date()
         val currentTimestamp: Long = currentDateTime.time
@@ -64,7 +66,8 @@ class AnnotationService {
             origFileName = origFileName,
             nrEntries = nrEntries,
             headers = headers,
-            creationDate = creationTime
+            creationDate = creationTime,
+            creationString = creationString
         )
 
         val inserted = annotationRepo?.saveAndFlush(newAnnotation)
