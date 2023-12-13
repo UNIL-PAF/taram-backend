@@ -7,18 +7,15 @@ import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import com.google.common.math.Quantiles
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest
-import org.apache.commons.math3.stat.ranking.NaturalRanking
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.FileReader
-import java.util.*
 
 @Service
 class OneDEnrichmentComputation() {
 
     private val readTableData = ReadTableData()
     private val headerTypeMapping = HeaderTypeMapping()
-    val naturalRanking = NaturalRanking()
 
     fun computeEnrichment(
         resTable: Table?,
@@ -43,7 +40,7 @@ class OneDEnrichmentComputation() {
         val resList = proteinAcList?.zip(selResVals!!)
         val colName = (resTable?.headers?.find { it.idx == colIdx } ?: return null).name
 
-        val res: List<List<EnrichmentRow>?>? = categoryNames?.map { category ->
+        val res: List<List<EnrichmentRow>?>? = categoryNames?.parallelStream()?.map { category ->
 
             val categoryAnnotations: Map<String, List<String>> = getCategoryAnnotations(annotationFilePath, category)
 
@@ -78,7 +75,7 @@ class OneDEnrichmentComputation() {
             }
 
             newRows?.filterNotNull()
-        }
+        }?.toList()
 
         val resWithCorr = if (params?.fdrCorrection == true) {
             // compute qValues
