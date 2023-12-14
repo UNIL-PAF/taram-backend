@@ -64,4 +64,38 @@ class OneDEnrichmentRunnerTests {
         assert(roundNumber(selRes?.median) == roundNumber(0.539801459001287))
     }
 
+    /*
+
+    @Test
+    fun bernaleau() {
+        val resType = ResultType.MaxQuant.value
+        val resTable = readTableData.getTableWithoutHeaders("/Users/rmylonas/Work/PAF/projects/paf-analysis/data/1D_annotation_examples/Bernaleau_16695-98-825-28/Table-10.txt")
+
+        val params = OneDEnrichmentParams(
+            colIdx = 105, //"fold.change.Ypt7-Ctrl",
+            fdrCorrection = true,
+            categoryIds = listOf(1, 2, 3),
+            threshold = 0.02
+        )
+
+        val annotationFile = "/Users/rmylonas/Work/PAF/projects/paf-analysis/data/1D_annotation_examples/Bernaleau_16695-98-825-28/mainAnnot.homo_sapiens.txt"
+        //val annotationFile = "/Users/rmylonas/Work/PAF/projects/paf-analysis/data/annotations/mainAnnot.homo_sapiens.txt"
+        val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, listOf("GOCC name", "GOBP name", "GOMF name", "KEGG name"), annotationFile)
+
+        assert(enrichmentRes?.size == 31)
+        assert(enrichmentRes?.filter{it.type == "KEGG name"}?.size == 2)
+
+        val selRes = enrichmentRes?.find{it.name == "endoplasmic reticulum part"}
+        assert(selRes?.column == "fold.change.CCDC134-Ev")
+        assert(selRes?.type == "GOCC name")
+        assert(selRes?.size == 45)
+        assert(roundNumber(selRes?.score) == roundNumber(0.610546139359699))
+        assert(roundNumber(selRes?.pvalue) == roundNumber(1.00866844473792E-11))
+        assert(roundNumber(selRes?.qvalue) == roundNumber(5.84019029503255E-09))
+        assert(roundNumber(selRes?.mean) == roundNumber(2.076135029))
+        assert(roundNumber(selRes?.median) == roundNumber(2.080982152))
+    }
+    
+     */
+
 }
