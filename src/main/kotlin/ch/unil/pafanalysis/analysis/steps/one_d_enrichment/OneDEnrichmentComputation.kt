@@ -112,22 +112,33 @@ class OneDEnrichmentComputation() {
     private fun getCategoryAnnotations(annotationFilePath: String?, categoryName: String?): Map<String, List<String>> {
         val sep = "\t"
 
+        fun parseLine(line: String, protIdx: Int, annotIdx: Int): Pair<String, List<String>>{
+            val cols = line.split(sep)
+            val prot = cols[protIdx].split(";")[0]
+            val categories = cols[annotIdx].split(";")
+            return prot to categories
+        }
+
         val reader = BufferedReader(FileReader(annotationFilePath))
         val headers: List<String> = reader.readLine().split(sep)
         val protIdx = headers.indexOf("UniProt")
         val annotIdx = headers.indexOf(categoryName)
 
+        // first line can be the type line from Perseus
+        val firstLine = reader.readLine()
+        val firstPair: List<Pair<String, List<String>>> = if(firstLine.contains("Type")){
+            emptyList<Pair<String, List<String>>>()
+        }else {
+            listOf(parseLine(firstLine, protIdx, annotIdx))
+        }
+
         val res: List<Pair<String, List<String>>?> =  reader.useLines {
             it.map{ line ->
-                val cols = line.split(sep)
-                if (cols[0].contains("Type")) null
-                else {
-                    val prot = cols[protIdx].split(";")[0]
-                    val categories = cols[annotIdx].split(";")
-                    prot to categories
-                }
+                parseLine(line, protIdx, annotIdx)
             }.toList()
         }
+
+        firstPair.plus(res)
 
         return res.filterNotNull().toMap()
     }
@@ -164,20 +175,29 @@ class OneDEnrichmentComputation() {
         val headers: List<String> = reader.readLine().split(sep)
         val protIdx = headers.indexOf("UniProt")
 
-        return reader.useLines {
-            it.fold(emptyMap<String, String>()) { acc, line ->
-                val cols = line.split(sep)
-                if (cols[0].contains("Type")) acc
-                else {
-                    val prots = cols[protIdx].split(";")
-                    if (prots.size > 1) {
-                        val to = prots.first()
-                        val fromList = prots.takeLast(prots.size - 1)
-                        fromList.fold(acc) { innerAcc, from ->
-                            acc.plus(Pair(from, to))
-                        }
-                    } else acc
+        fun parseLine(line: String, acc: Map<String, String>, protIdx: Int): Map<String, String>{
+            val cols = line.split(sep)
+            val prots = cols[protIdx].split(";")
+            return if (prots.size > 1) {
+                val to = prots.first()
+                val fromList = prots.takeLast(prots.size - 1)
+                fromList.fold(acc) { innerAcc, from ->
+                    acc.plus(Pair(from, to))
                 }
+            } else acc
+        }
+
+        // first line can be the "Type" line from Perseus
+        val initialLine = reader.readLine()
+        val initialMap = if(initialLine.contains("Type")){
+            emptyMap<String, String>()
+        }else{
+            parseLine(initialLine, emptyMap(), protIdx)
+        }
+
+        return reader.useLines {
+            it.fold(initialMap) { acc, line ->
+                parseLine(initialLine, acc, protIdx)
             }
         }
     }
@@ -191,18 +211,26 @@ class OneDEnrichmentComputation() {
         val reader = BufferedReader(FileReader(annotationFilePath))
         val headers: List<String> = reader.readLine().split(sep)
 
+        fun parseLine(line: String): List<String>{
+            val cols: List<String> = line.split(sep)
+            val idx = headers.indexOfFirst { it == categoryName }
+            return cols[idx].split(";").filter { it.isNotEmpty() }
+        }
+
+        // first line can be the "Type" line from Perseus
+        val initialLine = reader.readLine()
+        val intitialList = if(initialLine.contains("Type")){
+            emptyList()
+        }else{
+            parseLine(initialLine)
+        }
+
         val res: List<String> = reader.useLines {
             it.map{ line ->
-                val cols: List<String> = line.split(sep)
-                // for MaxQuant files we have to remove the second line
-                if (cols[0].contains("Type")) null
-                else {
-                    val idx = headers.indexOfFirst { it == categoryName }
-                    cols[idx].split(";").filter { it.isNotEmpty() }
-                }
+                parseLine(line)
             }.toList()
-        }.filterNotNull().flatMap { it }.distinct()
+        }.flatMap { it }.distinct()
 
-        return res
+        return intitialList.plus(res)
     }
 }
