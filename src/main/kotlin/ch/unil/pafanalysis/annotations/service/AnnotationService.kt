@@ -1,12 +1,10 @@
 package ch.unil.pafanalysis.annotations.service
 
-import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.annotations.model.AnnotationHeader
 import ch.unil.pafanalysis.annotations.model.AnnotationInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.BufferedReader
@@ -74,14 +72,16 @@ class AnnotationService {
         return inserted?.id
     }
 
-    private fun getHeadersAndNrEntries(file: File): Pair<List<AnnotationHeader>, Int>{
+    fun getHeadersAndNrEntries(file: File): Pair<List<AnnotationHeader>, Int>{
         val reader = BufferedReader(FileReader(file))
         // ignore header
         val headers = reader.readLine().split("\t").drop(1).mapIndexed{i, h -> AnnotationHeader(i+1, h)}
+        val firstLineCount = if(reader.readLine().contains("Type")) 0 else 1
 
-        val nrEntries = reader.readLines().fold(0){acc, l ->
-            if(l.contains("Type")) acc else acc+1
-        }
+        var nrEntries = firstLineCount
+        while (reader.readLine() != null) nrEntries++
+        reader.close()
+
         return Pair(headers, nrEntries)
     }
 
