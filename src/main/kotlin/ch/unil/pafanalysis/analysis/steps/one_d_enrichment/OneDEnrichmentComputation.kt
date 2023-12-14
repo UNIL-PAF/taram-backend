@@ -1,10 +1,14 @@
 package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.t_test.TTestParams
 import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.MultipleTestingCorrection
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
+import com.github.rcaller.rstuff.RCaller
+import com.github.rcaller.rstuff.RCallerOptions
+import com.github.rcaller.rstuff.RCode
 import com.google.common.math.Quantiles
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest
 import org.springframework.stereotype.Service
@@ -81,7 +85,8 @@ class OneDEnrichmentComputation() {
             // compute qValues
             res?.map { oneCat ->
                 val pVals = oneCat?.map { it?.pvalue ?: throw Exception("p-value cannot be null") } ?: emptyList()
-                val qVals = mulitTestCorr.fdrCorrection(pVals)
+                //val qVals = mulitTestCorr.fdrCorrection(pVals)
+                val qVals = multiTestCorr(pVals)
                 oneCat?.mapIndexed { i, a -> a.copy(qvalue = qVals[i]) }
             }
         } else res
@@ -92,6 +97,15 @@ class OneDEnrichmentComputation() {
         return if (params.threshold != null) flatRes?.filter { a ->
             (a.qvalue ?: a.pvalue)!! <= params.threshold
         } else flatRes
+    }
+
+    private fun multiTestCorr(pVals: List<Double>): List<Double> {
+        val code = RCode.create()
+        code.addDoubleArray("p_vals", pVals.toDoubleArray())
+        code.addRCode("corr_p_vals <- p.adjust(p_vals, method='BH')")
+        val caller = RCaller.create(code, RCallerOptions.create())
+        caller.runAndReturnResult("corr_p_vals")
+        return caller.parser.getAsDoubleArray("corr_p_vals").toList()
     }
 
     private fun computeMeanRanks(selPart: List<Double>, otherPart: List<Double>): Double {
