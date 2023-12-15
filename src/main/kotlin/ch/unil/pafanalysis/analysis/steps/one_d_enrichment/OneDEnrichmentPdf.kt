@@ -40,7 +40,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
             Pair("Annotation file:", res.annotation?.origFileName ?: ""),
             Pair("Annotation info:", getAnnotationString(res.annotation) ?: ""),
             Pair("Selected annotations:", res.annotation?.selHeaderNames?.joinToString(separator = ", ") ?: ""),
-            Pair("Selected column:", res.selColumn ?: ""),
+            Pair("Selected column:", res.selColumns?.joinToString("; ") ?: ""),
             Pair("Significance threshold:", parsedParams.threshold.toString() ?: ""),
             Pair("Multiple testing correction:", if(parsedParams.fdrCorrection == true) "Benjamini & Hochberg (FDR)" else "None"),
         )

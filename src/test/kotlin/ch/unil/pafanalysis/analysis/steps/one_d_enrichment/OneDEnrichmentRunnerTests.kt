@@ -33,19 +33,18 @@ class OneDEnrichmentRunnerTests {
     }
 
     @Test
-    fun rodriguesGobpGomfGocc() {
+    fun rodriguesOneCol() {
         val resType = ResultType.MaxQuant.value
         val resTable = readTableData.getTableWithoutHeaders("./src/test/resources/results/maxquant/Rodrigues_16632-51_Table_8.txt")
 
         val params = OneDEnrichmentParams(
-            colIdx = 201, //"fold.change.Ypt7-Ctrl",
+            colIdxs = listOf(201), //"fold.change.Ypt7-Ctrl",
             fdrCorrection = true,
             categoryIds = listOf(1, 2, 3),
             threshold = 0.02
         )
 
         val annotationFile = "./src/test/resources/annotations/mainAnnot.saccharomyces_cerevisiae_strain_atcc_204508_s288c.txt"
-        //val annotationFile = "/Users/rmylonas/Work/PAF/projects/paf-analysis/data/annotations/mainAnnot.homo_sapiens.txt"
         val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, listOf("GOCC name", "GOBP name", "GOMF name"), annotationFile)
 
 
@@ -62,6 +61,27 @@ class OneDEnrichmentRunnerTests {
         assert(roundNumber(selRes?.qvalue) == roundNumber(7.57744778036336E-87))
         assert(roundNumber(selRes?.mean) == roundNumber(0.704807648038113))
         assert(roundNumber(selRes?.median) == roundNumber(0.539801459001287))
+    }
+
+
+    @Test
+    fun rodriguesTwoCols() {
+        val resType = ResultType.MaxQuant.value
+        val resTable = readTableData.getTableWithoutHeaders("./src/test/resources/results/maxquant/Rodrigues_16632-51_Table_8.txt")
+
+        val params = OneDEnrichmentParams(
+            colIdxs = listOf(201, 205), //"fold.change.Ypt7-Ctrl",
+            fdrCorrection = true,
+            categoryIds = listOf(1, 2, 3),
+            threshold = 0.02
+        )
+
+        val annotationFile = "./src/test/resources/annotations/mainAnnot.saccharomyces_cerevisiae_strain_atcc_204508_s288c.txt"
+        val enrichmentRes = computation?.computeEnrichment(resTable, resType, params, listOf("GOCC name", "GOBP name", "GOMF name"), annotationFile)
+        val secondCol = enrichmentRes?.filter{it.column != "fold.change.Ypt7-Ctrl"}
+
+        assert(enrichmentRes?.size == 973)
+        assert(secondCol?.size == 561)
     }
 
     /*

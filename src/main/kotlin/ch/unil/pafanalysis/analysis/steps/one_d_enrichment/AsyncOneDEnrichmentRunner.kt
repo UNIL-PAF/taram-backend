@@ -82,7 +82,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
         val enrichmentTable = saveResToTable(enrichmentRows, step?.resultPath)
         val selEnrichmentRows = getSelEnrichmentRows(enrichmentRows, nrRows)
 
-        val colName = (table?.headers?.find { it.idx == params.colIdx })?.name
+        val colNames = (table?.headers?.filter { params.colIdxs?.contains(it.idx) ?: false})?.map{it.name ?: ""}
 
         val myAnno = EnrichmentAnnotationInfo(
             anno?.name,
@@ -93,7 +93,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
             categoryNames
         )
 
-        return OneDEnrichment(enrichmentTable, selEnrichmentRows, myAnno, colName)
+        return OneDEnrichment(enrichmentTable, selEnrichmentRows, myAnno, colNames)
     }
 
     private fun addSelResults(params: OneDEnrichmentParams, nrRows: Int): OneDEnrichmentParams {

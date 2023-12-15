@@ -4,7 +4,7 @@ data class OneDEnrichment(
     val enrichmentTable: String? = null,
     val selResults: List<EnrichmentRow>? = null,
     val annotation: EnrichmentAnnotationInfo? = null,
-    val selColumn: String? = null
+    val selColumns: List<String>? = null
 )
 
 data class EnrichmentAnnotationInfo(

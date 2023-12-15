@@ -31,7 +31,7 @@ class OneDEnrichmentComputation() {
         val mwTest = MannWhitneyUTest()
         val mulitTestCorr = MultipleTestingCorrection()
 
-        val colIdx = params?.colIdx ?: throw StepException("You have to choose a valid column.")
+        val colIdxs = params?.colIdxs ?: throw StepException("You have to choose valid columns.")
 
         val proteinMapping: Map<String, String>? = parseProteinMapping(annotationFilePath)
 
@@ -39,6 +39,8 @@ class OneDEnrichmentComputation() {
         val proteinAcList: List<List<String>>? =
             readTableData.getStringColumn(resTable, headerTypeMapping.getCol("proteinIds", resultType))
                 ?.map { it.split(";") }
+
+        return colIdxs.flatMap{ colIdx ->
 
         val selResVals: List<Double>? = readTableData.getDoubleColumn(resTable, colIdx)
         val resList = proteinAcList?.zip(selResVals!!)
@@ -94,9 +96,11 @@ class OneDEnrichmentComputation() {
         val flatRes = resWithCorr?.flatMap { it!! }
 
         // filter by threshold
-        return if (params.threshold != null) flatRes?.filter { a ->
+         val ha = if (params.threshold != null) flatRes?.filter { a ->
             (a.qvalue ?: a.pvalue)!! <= params.threshold
         } else flatRes
+            ha!!
+        }
     }
 
     private fun multiTestCorr(pVals: List<Double>): List<Double> {
