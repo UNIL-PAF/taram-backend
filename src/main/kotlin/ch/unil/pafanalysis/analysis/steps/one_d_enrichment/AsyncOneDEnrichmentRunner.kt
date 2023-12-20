@@ -1,8 +1,10 @@
 package ch.unil.pafanalysis.analysis.steps.one_d_enrichment
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.annotations.model.AnnotationInfo
 import ch.unil.pafanalysis.annotations.service.AnnotationRepository
 import ch.unil.pafanalysis.annotations.service.AnnotationService
 import ch.unil.pafanalysis.common.*
@@ -35,8 +37,10 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     @Autowired
     private var env: Environment? = null
 
-    private fun getAnnotationPath(): String? {
-        return env?.getProperty("result.path.annotations")
+    private val writeTableData = WriteTableData()
+
+    private fun getAnnotationPath(anno: AnnotationInfo?): String? {
+        return env?.getProperty("result.path.annotations") + anno?.fileName
     }
 
     private val readTableData = ReadTableData()
@@ -48,8 +52,15 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
             val nrRows = 10
             val params = gson.fromJson(newStep?.parameters, OneDEnrichmentParams().javaClass)
 
+            val annoId = params.annotationId ?: throw StepException("Could not load annotation [$params.annotationId].")
+            val anno = annotationRepository?.findById(annoId)
+
+            val outputRoot = getOutputRoot()
+            val table: Table = readTableData.getTable(outputRoot + newStep?.resultTablePath, newStep?.commonResult?.headers)
+
             // compute
-            val res = computeEnrichment(newStep, params, nrRows)
+            val res = computeEnrichment(newStep, table, anno, params, nrRows)
+            val newHeaders = addAnnotationsToResultTable(newStep, table, newStep?.analysis?.result?.type, getAnnotationPath(anno), params)
             val newParams = addSelResults(params, nrRows)
 
             // add current step to usedBy in annotation
@@ -57,28 +68,29 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
 
             newStep?.copy(
                 results = gson.toJson(res),
-                parameters = gson.toJson(newParams)
+                parameters = gson.toJson(newParams),
+                commonResult = newStep?.commonResult?.copy(headers = newHeaders)
             )
         }
 
         tryToRun(funToRun, newStep)
     }
 
-    private fun computeEnrichment(step: AnalysisStep?, params: OneDEnrichmentParams, nrRows: Int): OneDEnrichment {
+    private fun addAnnotationsToResultTable(step: AnalysisStep?, table: Table?, resType: String?, annotationPath: String?, params: OneDEnrichmentParams): List<Header>? {
+        val newTable = AnnotationColumnAdd.addAnnotations(table, resType, annotationPath, params)
+        // write table
+        if(newTable != null) writeTableData.write(getOutputRoot() + step?.resultTablePath, newTable)
+        // add new headers
+        return newTable?.headers
+    }
+
+    private fun computeEnrichment(step: AnalysisStep?, table: Table?, anno: AnnotationInfo?, params: OneDEnrichmentParams, nrRows: Int): OneDEnrichment {
         val resType = step?.analysis?.result?.type
-        val outputRoot = getOutputRoot()
-
-        val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
-
-        // get annotation
-        val annoId = params.annotationId ?: throw StepException("Could not load annotation [$params.annotationId].")
-        val anno = annotationRepository?.findById(annoId)
-        val annotationFilePath = getAnnotationPath() + anno?.fileName
 
         // get categoryNames
         val categoryNames: List<String>? = params.categoryIds?.map{id -> anno?.headers?.find{it.id == id}?.name ?: ""}
 
-        val enrichmentRows = comp?.computeEnrichment(table, resType, params, categoryNames, annotationFilePath)
+        val enrichmentRows = comp?.computeEnrichment(table, resType, params, categoryNames, getAnnotationPath(anno))
         val enrichmentTable = saveResToTable(enrichmentRows, step?.resultPath)
         val selEnrichmentRows = getSelEnrichmentRows(enrichmentRows, nrRows)
 

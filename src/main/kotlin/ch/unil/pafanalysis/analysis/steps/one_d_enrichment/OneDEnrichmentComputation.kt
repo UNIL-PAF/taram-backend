@@ -29,7 +29,7 @@ class OneDEnrichmentComputation() {
         annotationFilePath: String?
     ): List<EnrichmentRow>? {
         val mwTest = MannWhitneyUTest()
-        val mulitTestCorr = MultipleTestingCorrection()
+        // val mulitTestCorr = MultipleTestingCorrection()
 
         val colIdxs = params?.colIdxs ?: throw StepException("You have to choose valid columns.")
 
