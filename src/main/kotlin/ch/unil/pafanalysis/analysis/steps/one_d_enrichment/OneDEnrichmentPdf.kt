@@ -52,7 +52,8 @@ class OneDEnrichmentPdf() : PdfCommon() {
 
         // 2.
         val rightDiv = Div()
-        rightDiv.add(getParagraph("Enrichment table $stepNr", bold = true, underline = true))
+        rightDiv.add(getParagraph("Enrichment-table-$stepNr", bold = true, underline = true))
+        rightDiv.add(getParagraph("Table-$stepNr", bold = true, underline = true))
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         // 3. Table of selected results

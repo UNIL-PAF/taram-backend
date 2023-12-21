@@ -85,24 +85,17 @@ class ZipService {
             val header = listOf("Id", "Step", "Table", "Plots").joinToString(separator = sep)
             out.println(header)
 
-            var removedSteps = 0
             steps?.forEachIndexed { i, step ->
-                if (zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
-                else {
-                    val idx = i - removedSteps + 1
-                    val table = if (zipSelection.tables?.contains(step.id) == true) {
-                        if(step.modifiesResult == true){
-                            "tables/Table-$idx.txt"
-                        }else{
-                            "tables/" + commonStep?.getRunner(step?.type)?.getOtherTableName(idx)
-                        }
-                    } else ""
+                if (zipSelection?.steps != null && zipSelection.steps?.contains(step.id!!)) {
+                    val idx = i + 1
+                    val mainTable = if (zipSelection.mainTables?.contains(step.id) == true) "tables/Table-$idx.txt" else ""
+                    val specialTable = if (zipSelection.specialTables?.contains(step.id) == true) "tables/" + commonStep?.getRunner(step?.type)?.getOtherTableName(idx) else ""
                     val plots = if (zipSelection.plots?.contains(step.id) == true) {
                         val plotBase = "plots/$idx-${step.type}"
                         "$plotBase.png;$plotBase.svg"
                     } else ""
                     val row =
-                        listOf(idx.toString(), StepNames.getName(step.type), table, plots).joinToString(separator = sep)
+                        listOf(idx.toString(), StepNames.getName(step.type), mainTable + specialTable, plots).joinToString(separator = sep)
                     out.println(row)
                 }
             }
@@ -112,35 +105,27 @@ class ZipService {
     private fun createTables(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){
         val tableDir = "$zipDir/tables"
         File(tableDir).mkdir()
-        var removedSteps = 0
+
         steps?.forEachIndexed{ i, step ->
-            if(zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
-            val idx = i-removedSteps+1
-            if(zipSelection.tables?.contains(step.id) == true){
-                if(step.modifiesResult == true){
-                    val origTableFile = analysisStepService?.getTable(step.id!!)
-                    File(origTableFile).copyTo(File("$tableDir/Table-$idx.txt"))
-                }else{
-                    commonStep?.getRunner(step?.type)?.getOtherTable(step, tableDir, idx)
-                }
+            val idx = i+1
+            if(zipSelection.mainTables?.contains(step.id) == true) {
+                val origTableFile = analysisStepService?.getTable(step.id!!)
+                File(origTableFile).copyTo(File("$tableDir/Table-$idx.txt"))
+            }
+            if(zipSelection.specialTables?.contains(step.id) == true) {
+                commonStep?.getRunner(step?.type)?.getOtherTable(step, tableDir, idx)
             }
         }
-    }
-
-    private fun copyOtherTable(step: AnalysisStep?, tableDir: String, idx: Int){
-
     }
 
     private fun createPlots(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){
         val plotDir = "$zipDir/plots"
         File(plotDir).mkdir()
 
-        var removedSteps = 0
         steps?.forEachIndexed{ i, step ->
             if(zipSelection.plots?.contains(step.id) == true){
-                getPlot(step, i+1-removedSteps, "$plotDir/")
+                getPlot(step, i+1, "$plotDir/")
             }
-            if(zipSelection?.steps != null && !zipSelection.steps.contains(step.id!!)) removedSteps++
         }
     }
 
