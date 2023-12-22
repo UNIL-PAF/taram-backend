@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.AdaptSpectronautTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.InitialSpectronautRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
@@ -61,12 +62,19 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath, resultType)
 
         val step: AnalysisStep? = try {
-            val (columnInfo, commonRes) =
+            val (columnInfo, commonResOrig) =
                 columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)!!
-            val table = readTable.getTable(newTable.path, commonRes?.headers)
-            writeTable.write(newTable.path, table)
+            val origTable = readTable.getTable(newTable.path, commonResOrig?.headers)
+
+            val adaptedTable = if(resultType == ResultType.Spectronaut){
+                AdaptSpectronautTable.adaptTable(origTable)
+            } else origTable
+
+            val adaptedCommonRes = commonResOrig?.copy(headers = adaptedTable?.headers)
+
+            if(adaptedTable != null) writeTable.write(newTable.path, adaptedTable)
             val newTableHash = Crc32HashComputations().computeFileHash(newTable)
-            val initialResult = createInitialResult(resultPath, resultType, table)
+            val initialResult = createInitialResult(resultPath, resultType, adaptedTable)
 
             // for spectronaut we can try to get the groups from the setup
             val newColInfo = if(initialResult?.spectronautSetup != null){
@@ -89,7 +97,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(initialResult),
                 columnInfo = emptyStep?.columnInfo ?: newColInfo,
-                commonResult = emptyStep?.commonResult ?: commonRes,
+                commonResult = emptyStep?.commonResult ?: adaptedCommonRes,
                 tableNr = 1,
                 nrProteinGroups = initialResult?.nrProteinGroups
             )
