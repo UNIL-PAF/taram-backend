@@ -54,7 +54,12 @@ class TTestComputation {
         expDetails: Map<String, ExpInfo>?
     ): Triple<Table?, List<Header>?, TTest> {
         val ints: Pair<List<List<Double>>, List<List<Double>>> =
-            listOf(comp.group1, comp.group2).map { c -> readTableData.getDoubleMatrixByRow(table, field, expDetails, c).second }.zipWithNext().single()
+            listOf(comp.group1, comp.group2).map { group ->
+                // check if group is still valid
+                val groupFound = table?.headers?.any { expDetails?.get(it.experiment?.name)?.group == group}
+                if(groupFound != true) throw StepException("Condition [$group] doesn't exist.")
+                readTableData.getDoubleMatrixByRow(table, field, expDetails, group).second
+            }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
         val pVals = computeTTest(rowInts)
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
