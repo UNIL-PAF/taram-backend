@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlin.math.abs
 
 
 @Service
@@ -123,7 +124,7 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
     }
 
     private fun getSelEnrichmentRows(enrichmentRows: List<EnrichmentRow>?, nrRows: Int): List<EnrichmentRow>? {
-        return enrichmentRows?.sortedBy { it.pvalue }?.mapIndexed { i, row -> row.copy(id = i) }?.take(nrRows)
+        return enrichmentRows?.sortedByDescending { it.median }?.mapIndexed { i, row -> row.copy(id = i) }?.take(nrRows)
     }
 
 }

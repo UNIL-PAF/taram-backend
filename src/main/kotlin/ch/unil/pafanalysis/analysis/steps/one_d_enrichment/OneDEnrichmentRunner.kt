@@ -88,7 +88,7 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
         }else{
             val newRow = fullTable.rows?.find{ r -> r.id == id }!!
             oldRes.selResults?.plusElement(newRow)
-        }?.sortedBy { it.pvalue }
+        }?.sortedByDescending { it.median }
         return oldRes?.copy(selResults = newRows)
     }
 
@@ -116,7 +116,7 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
             val isSel = params.selResults?.contains(r.id)
             Pair(r, isSel == false)
         }
-        val sortedRow = rowWithSelInfo?.sortedWith(compareBy<Pair<EnrichmentRow, Boolean>>{it.second}.thenBy { it.first.pvalue })?.map{it.first}
+        val sortedRow = rowWithSelInfo?.sortedWith(compareBy<Pair<EnrichmentRow, Boolean>>{it.second}.thenBy { -1 * (it.first.median ?: 0.0) })?.map{it.first}
         return table?.copy(rows = sortedRow)
     }
 

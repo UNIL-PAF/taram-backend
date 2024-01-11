@@ -26,7 +26,7 @@ class EnrichmentTableReader {
             )
         }
 
-        val sortedRows = rows.sortedBy { r -> r.pvalue }.mapIndexed{i, a -> a.copy(id = i)}
+        val sortedRows = rows.sortedByDescending { r -> r.median }.mapIndexed{i, a -> a.copy(id = i)}
         return FullEnrichmentTable(rows = sortedRows)
     }
 

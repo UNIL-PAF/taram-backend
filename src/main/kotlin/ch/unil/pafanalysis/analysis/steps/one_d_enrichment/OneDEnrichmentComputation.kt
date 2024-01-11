@@ -40,7 +40,7 @@ class OneDEnrichmentComputation() {
             readTableData.getStringColumn(resTable, headerTypeMapping.getCol("proteinIds", resultType))
                 ?.map { it.split(";") }
 
-        return colIdxs.flatMap{ colIdx ->
+        val finalRes =  colIdxs.flatMap{ colIdx ->
 
         val selResVals: List<Double>? = readTableData.getDoubleColumn(resTable, colIdx)
         val resList = proteinAcList?.zip(selResVals!!)
@@ -101,6 +101,8 @@ class OneDEnrichmentComputation() {
         } else flatRes
             ha!!
         }
+
+        return finalRes.sortedByDescending { it.median }
     }
 
     private fun multiTestCorr(pVals: List<Double>): List<Double> {
