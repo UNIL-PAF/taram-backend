@@ -5,6 +5,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.SummaryStatComputation
+import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
@@ -42,13 +43,24 @@ class AsyncLogTransformationRunner() : CommonStep() {
         tryToRun(funToRun, newStep)
     }
 
-    fun transformTable(
+    private fun getSelHeaders(): Table {
+        val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
+        val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
+    }
+
+    private fun transformTable(
         step: AnalysisStep?,
         params: LogTransformationParams
     ): LogTransformation? {
         val intCol = params.intCol ?: step?.columnInfo?.columnMapping?.intCol
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
-        val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
+
+        val (selHeaders, ints) = if(params.selColIdxs != null){
+            val selCols = table?.headers?.filter{params.selColIdxs.contains(it.idx)} ?: emptyList()
+            Pair(selCols, readTableData.getDoubleMatrix(table, selCols))
+        }else{
+            readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
+        }
 
         val transInts = logComp!!.runTransformation(ints, params)
         val newCols: List<List<Any>>? = table.cols?.mapIndexed { i, c ->
