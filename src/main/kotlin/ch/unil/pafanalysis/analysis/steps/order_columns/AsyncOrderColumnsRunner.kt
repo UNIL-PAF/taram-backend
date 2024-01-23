@@ -2,21 +2,23 @@ package ch.unil.pafanalysis.analysis.steps.order_columns
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.Header
+import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.steps.CommonStep
-import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.Table
-import ch.unil.pafanalysis.common.WriteTableData
+import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class AsyncOrderColumnsRunner() : CommonStep() {
 
     @Autowired
     private var env: Environment? = null
+
+    @Autowired
+    private val analysisStepRepo: AnalysisStepRepository? = null
 
     @Async
     fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
@@ -36,16 +38,38 @@ class AsyncOrderColumnsRunner() : CommonStep() {
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
                 order2!!)
 
+            val newImputationPath = moveImputed(newStep, order2.headers)
+
             newStep?.copy(
-                results = gson.toJson(
-                    OrderColumns(
-                    )
-                ),
+                imputationTablePath = newImputationPath,
+                results = gson.toJson(OrderColumns()),
                 commonResult = newStep?.commonResult?.copy(headers = order2?.headers)
             )
         }
 
         tryToRun(funToRun, newStep)
+    }
+
+    private fun moveImputed(step: AnalysisStep?, headers: List<Header>?): String? {
+        return if(step?.imputationTablePath != null){
+            val stepBefore = analysisStepRepo?.findById(step?.beforeId!!)
+
+            // move imputated as well
+            val imputed = ReadImputationTableData().getTable(
+                env?.getProperty("output.path").plus(step?.imputationTablePath),
+                stepBefore?.commonResult?.headers
+            )
+
+            val newHeaders = imputed.headers?.map{ impHead ->
+                val selIdx = headers?.find{it.name == impHead.name}?.idx
+                impHead.copy(idx = selIdx ?: throw StepException("Something messed up with the indexes.."))
+            }
+
+            val imputationFileName = step?.resultTablePath?.replace(".txt", "_imputation.txt")
+            WriteImputationTableData().write(getOutputRoot() + imputationFileName, imputed.copy(headers = newHeaders))
+
+            imputationFileName
+        } else null
     }
 
     private fun changeOrder(table: Table?, move: List<MoveCol>?): Table? {
@@ -80,7 +104,6 @@ class AsyncOrderColumnsRunner() : CommonStep() {
                 Pair(newHeaders, newCols)
             }
         }
-
 
         val newHeaders = newRes?.first?.first?.plus(newRes?.first?.second)
         val corrIdxHeaders = newHeaders?.mapIndexed{ i, h -> h.copy(idx = i)}
