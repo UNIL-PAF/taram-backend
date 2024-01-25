@@ -26,7 +26,7 @@ class OrderColumnsPdf() : PdfCommon() {
 
         // 1. parameters
         val paramsDiv = Div()
-        if(parsedParams.moveSelIntFirst == true) paramsDiv.add(getParagraph("Move default intensity [${step.columnInfo?.columnMapping?.intCol}] first."))
+        if(parsedParams.moveSelIntFirst == true) paramsDiv.add(getParagraph("Move default intensity columns [${step.columnInfo?.columnMapping?.intCol}] first."))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data
