@@ -31,19 +31,23 @@ class AsyncOrderColumnsRunner() : CommonStep() {
             )
 
             val intCol = newStep?.columnInfo?.columnMapping?.intCol
-            val order1 =  if(params.moveSelIntFirst == true) moveSelIntFirst(origTable, intCol) else origTable
-            val order2 = changeOrder(order1, params.move)
+
+            val newOrder = if(params.move !== null && params.newOrder == null){
+                // we keep this for back-compatibility
+                val order1 =  if(params.moveSelIntFirst == true) moveSelIntFirst(origTable, intCol) else origTable
+                changeOrder(order1, params.move)
+            } else getNewOrder(origTable, params.newOrder)
 
             WriteTableData().write(
                 env?.getProperty("output.path")?.plus(newStep?.resultTablePath)!!,
-                order2!!)
+                newOrder!!)
 
-            val newImputationPath = moveImputed(newStep, order2.headers)
+            val newImputationPath = moveImputed(newStep, newOrder.headers)
 
             newStep?.copy(
                 imputationTablePath = newImputationPath,
                 results = gson.toJson(OrderColumns()),
-                commonResult = newStep?.commonResult?.copy(headers = order2?.headers)
+                commonResult = newStep?.commonResult?.copy(headers = newOrder?.headers)
             )
         }
 
@@ -78,6 +82,18 @@ class AsyncOrderColumnsRunner() : CommonStep() {
             val columns =  acc?.cols?.swap(mov.from!!, mov.to!!)
             Table(newHeaders?.mapIndexed{ i, h -> h.copy(idx = i)}, columns)
         }
+    }
+
+    private fun getNewOrder(table: Table?, newOrder: List<Int>?): Table? {
+        val newCols = newOrder?.map{ a ->
+            val selIdx = table?.headers?.withIndex()?.find{it.value.idx == a}?.index
+            table?.cols?.get(selIdx!!)!!
+        }
+        val newHeaders = newOrder?.mapIndexed{ i, a ->
+            val selIdx = table?.headers?.withIndex()?.find{it.value.idx == a}?.index
+            table?.headers?.get(selIdx!!)?.copy(idx = i)!!
+        }
+        return Table(headers = newHeaders, cols = newCols)
     }
 
     private fun <T> List<T>.swap(from: Int, to: Int): List<T>? {
