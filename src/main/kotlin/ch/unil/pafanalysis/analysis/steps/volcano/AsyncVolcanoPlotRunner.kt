@@ -46,7 +46,11 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val resType = analysisStep?.analysis?.result?.type
 
         val value = readTableData.getDoubleColumn(table, "p.value$compName")
-        val foldChanges = readTableData.getDoubleColumn(table, "fold.change$compName")
+
+        // for back compatibility we look with and without log2 in name
+        val fcHeaderName = table.headers?.find{ a -> a.name?.contains("fold.change$compName") ?: false}
+        val foldChanges = readTableData.getDoubleColumn(table, fcHeaderName?.name ?: throw StepException("Could not fold change column for [$compName]."))
+
         val proteinName = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))
         val geneName = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
         val qVals = if(hasQVal) readTableData.getDoubleColumn(table, "q.value$compName") else null

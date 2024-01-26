@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.common
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ColType
 import java.io.*
 
