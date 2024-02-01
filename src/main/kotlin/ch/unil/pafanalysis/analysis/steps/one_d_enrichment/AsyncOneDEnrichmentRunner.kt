@@ -8,20 +8,18 @@ import ch.unil.pafanalysis.annotations.model.AnnotationInfo
 import ch.unil.pafanalysis.annotations.service.AnnotationRepository
 import ch.unil.pafanalysis.annotations.service.AnnotationService
 import ch.unil.pafanalysis.common.*
-import com.google.gson.*
-import com.sun.jdi.Type
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import kotlin.math.abs
 
 
 @Service
 class AsyncOneDEnrichmentRunner() : CommonStep() {
+
+    var logger: Logger = LoggerFactory.getLogger(AsyncOneDEnrichmentRunner::class.java)
 
     @Autowired
     val runner: OneDEnrichmentRunner? = null
@@ -60,12 +58,17 @@ class AsyncOneDEnrichmentRunner() : CommonStep() {
             val table: Table = readTableData.getTable(outputRoot + newStep?.resultTablePath, newStep?.commonResult?.headers)
 
             // compute
+            logger.info("1D-enrichment: computeEnrichment.")
             val res = computeEnrichment(newStep, table, anno, params, nrRows)
+            logger.info("1D-enrichment: addAnnotationsToResultTable.")
             val newHeaders = addAnnotationsToResultTable(newStep, table, newStep?.analysis?.result?.type, getAnnotationPath(anno), params)
+            logger.info("1D-enrichment: addSelResults.")
             val newParams = addSelResults(params, nrRows)
 
             // add current step to usedBy in annotation
             annotationService?.addStepId(params.annotationId, newStep?.id)
+
+            logger.info("1D-enrichment: all done.")
 
             newStep?.copy(
                 results = gson.toJson(res),

@@ -53,7 +53,7 @@ class AnnotationColumnAddTests {
         assert(selHeader2?.idx == 208)
 
         val selEntry = newTable?.cols?.get(207)?.get(0).toString()
-        assert(selEntry.contains("pheromone-dependent signal transduction involved in conjugation with cellular fusion"))
+        assert(selEntry == "pheromone-dependent signal transduction involved in conjugation with cellular fusion;cytogamy;protein complex assembly;signal transduction;cell surface receptor linked signaling pathway;G-protein coupled receptor protein signaling pathway;cellular process;cellular component organization;reproductive process in single-celled organism;reproductive process;cellular component assembly;cell projection organization;cell projection assembly;signal transduction involved in conjugation with cellular fusion;macromolecular complex subunit organization;cellular process involved in reproduction;regulation of biological process;regulation of cellular process;response to stimulus;protein oligomerization;protein homooligomerization;cellular response to stimulus;macromolecular complex assembly;biological regulation;protein complex subunit organization;cellular component organization or biogenesis;cellular component organization or biogenesis at cellular level;cellular component organization at cellular level;cellular component assembly at cellular level")
     }
 
     /*
