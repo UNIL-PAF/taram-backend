@@ -106,7 +106,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
     }
 
     private fun addDoubleCell(colTable: Table, cellVal: Double?, splitCharacters: DefaultSplitCharacters = DefaultSplitCharacters()) {
-        val n = if (cellVal == 0.0) "0" else DecimalFormat("00.##E0").format(cellVal)
+        val n = if (cellVal == null) "" else if (cellVal == 0.0) "0" else DecimalFormat("00.##E0").format(cellVal)
         addStringCell(colTable, n, splitCharacters)
     }
 

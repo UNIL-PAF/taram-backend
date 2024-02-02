@@ -17,12 +17,12 @@ class EnrichmentTableReader {
                 column = cols[0],
                 type = cols[1],
                 name = cols[2],
-                size = cols[3].toInt(),
-                score = cols[4].toDouble(),
-                pvalue = cols[5].toDouble(),
-                qvalue = cols[6].toDouble(),
-                mean = cols[7].toDouble(),
-                median = cols[8].toDouble(),
+                size = cols[3].toIntOrNull(),
+                score = cols[4].toDoubleOrNull(),
+                pvalue = cols[5].toDoubleOrNull(),
+                qvalue = cols[6].toDoubleOrNull(),
+                mean = cols[7].toDoubleOrNull(),
+                median = cols[8].toDoubleOrNull(),
             )
         }
 
