@@ -19,6 +19,9 @@ class FilterPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Filter rows", plotWidth))
 
+        val description = "Filtering step, e.g. to remove environmental contaminants and digestion enzymes."
+        stepDiv.add(descriptionDiv(description))
+
         val colTable = Table(3)
         colTable.setWidth(plotWidth)
         val cellFifth = plotWidth/5

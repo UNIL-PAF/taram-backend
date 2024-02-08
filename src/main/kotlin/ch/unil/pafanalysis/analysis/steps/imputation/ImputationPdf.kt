@@ -17,7 +17,7 @@ class ImputationPdf() : PdfCommon() {
 
     private fun getImputationText(params: ImputationParams, step: AnalysisStep): String {
         val selColTxt = getSelColTxt(params, step)
-        return when (params.imputationType){
+        return when (params.imputationType) {
             "normal" -> "Replace missing values in column(s) [$selColTxt] by random numbers drawn from a normal distribution:"
             "nan" -> "Replace missing values in column(s) [$selColTxt] by NaN."
             "value" -> "Replace missing values in column(s) [$selColTxt] by ${params.replaceValue}."
@@ -26,12 +26,13 @@ class ImputationPdf() : PdfCommon() {
     }
 
     private fun getSelColTxt(params: ImputationParams, step: AnalysisStep): String {
-        return if(params.intCol == null && params.selColIdxs == null){
+        return if (params.intCol == null && params.selColIdxs == null) {
             return step.columnInfo?.columnMapping?.intCol + "..."
-        }else if(params.intCol == null && !params.selColIdxs.isNullOrEmpty()){
-            val selColNames = step.commonResult?.headers?.filter{h -> params.selColIdxs.contains(h.idx)}?.map{it.name}
+        } else if (params.intCol == null && !params.selColIdxs.isNullOrEmpty()) {
+            val selColNames =
+                step.commonResult?.headers?.filter { h -> params.selColIdxs.contains(h.idx) }?.map { it.name }
             return selColNames?.joinToString(", ") ?: ""
-        }else{
+        } else {
             return params.intCol + "..."
         }
     }
@@ -43,9 +44,12 @@ class ImputationPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Imputation", plotWidth = plotWidth))
 
+        val description = "Imputation allows calculating fold changes (FC) and statistical tests for proteins with missing values. NaN is replaced by low-shifted random values, based on the assumption that missing values occur when signals are below detection limits."
+        stepDiv.add(descriptionDiv(description))
+
         val colTable = Table(3)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val cellFifth = plotWidth / 5
 
         // 1. parameters
         val paramsDiv = Div()
@@ -55,8 +59,8 @@ class ImputationPdf() : PdfCommon() {
             if (parsedParams.imputationType == "normal") listOf(getNormParams(parsedParams.normImputationParams))
             else emptyList()
 
-        firstParam.plus(additionalParams).forEach{ paramsDiv.add(it) }
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        firstParam.plus(additionalParams).forEach { paramsDiv.add(it) }
+        colTable.addCell(getParamsCell(paramsDiv, 2 * cellFifth))
 
         // 2. data
         val middleDiv = Div()

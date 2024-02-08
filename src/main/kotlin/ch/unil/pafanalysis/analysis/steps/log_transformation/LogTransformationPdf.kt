@@ -18,6 +18,9 @@ class LogTransformationPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Log transformation", plotWidth = plotWidth))
 
+        val description = "Log transformation facilitates plotting of data and makes distributions more “normal”, allowing application of standard statistical tests."
+        stepDiv.add(descriptionDiv(description))
+
         val colTable = Table(3)
         colTable.setWidth(plotWidth)
         val cellFifth = plotWidth/5

@@ -19,6 +19,10 @@ class BoxPlotPdf() : PdfCommon() {
     fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
         val div = Div()
         div.add(titleDiv("$stepNr - Boxplot", plotWidth))
+
+        val description = "Overview of samples. Y-axis is usually in log2 scale."
+        div.add(descriptionDiv(description))
+
         div.add(Paragraph(" "))
         val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
         div.add(plot)

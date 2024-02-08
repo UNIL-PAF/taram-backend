@@ -32,6 +32,9 @@ class TTestPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - t-test", plotWidth = plotWidth))
 
+        val description = "FDR correction adjusts thresholds for large datasets. Q-values = adjusted p-values."
+        stepDiv.add(descriptionDiv(description))
+
         val colTable = Table(3)
         colTable.setWidth(plotWidth)
         val cellFifth = plotWidth/5

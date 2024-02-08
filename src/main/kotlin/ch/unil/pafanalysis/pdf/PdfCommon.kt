@@ -53,6 +53,16 @@ open class PdfCommon {
         return table
     }
 
+    fun descriptionDiv(description: String): Div {
+        val p1 = Paragraph(description).setFont(PdfFontFactory.createFont(myFont))
+        //p1.setFontColor(DeviceRgb(0, 109, 117))
+        p1.setFontSize(fontSizeConst)
+        p1.setPaddingLeft(5f)
+        val div = Div()
+        div.add(p1)
+        return div
+    }
+
     fun titleDiv(title: String, plotWidth: Float): Div {
         val titlePadding = 5f
 
