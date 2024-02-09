@@ -26,3 +26,9 @@ data class Analysis (
     @JoinColumn(name="result_id", nullable=false)
     val result: Result? = null
 )
+
+data class AnalysisGroup(
+    val analysisList: List<Analysis>?,
+    val status: String?,
+    val stepHints: StepHints? = null
+)

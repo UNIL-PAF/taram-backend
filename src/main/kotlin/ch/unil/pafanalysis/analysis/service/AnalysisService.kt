@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
@@ -116,7 +113,7 @@ class AnalysisService {
         return sortedList
     }
 
-    fun getSortedAnalysisList(resultId: Int): Pair<List<Analysis>?, String?>? {
+    fun getSortedAnalysisList(resultId: Int): AnalysisGroup? {
         // sort the analysis steps
         val analysisList: List<Analysis>? = getByResultId(resultId)
 
@@ -159,7 +156,7 @@ class AnalysisService {
         return newAnalysis!!
     }
 
-    private fun getAnalysisWithStatus(analysis: List<Analysis>?): Pair<List<Analysis>?, String?>? {
+    private fun getAnalysisWithStatus(analysis: List<Analysis>?): AnalysisGroup? {
         val emptyString: String? = null
         val analysisWithStatus = analysis?.map {
             it.copy(status = it.analysisSteps?.fold(emptyString) { accS, s ->
@@ -170,7 +167,7 @@ class AnalysisService {
             chooseAnalysisStatus(acc, a.status, globalAnalysisStatusOrder)
         } ?: AnalysisStepStatus.IDLE.value
 
-        return Pair(analysisWithStatus, globalStatus)
+        return AnalysisGroup(analysisWithStatus, globalStatus)
     }
 
     private val analysisStatusOrder = listOf(

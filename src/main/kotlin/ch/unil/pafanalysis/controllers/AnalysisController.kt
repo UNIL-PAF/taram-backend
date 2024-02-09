@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.analysis.model.Analysis
+import ch.unil.pafanalysis.analysis.model.AnalysisGroup
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.pdf.PdfService
 import ch.unil.pafanalysis.zip.ZipDataSelection
@@ -31,7 +32,7 @@ class AnalysisController {
     private var zipService: ZipService? = null
 
     @GetMapping
-    fun getAnalysis(@RequestParam resultId: Int): Pair<List<Analysis>?, String?>? {
+    fun getAnalysis(@RequestParam resultId: Int): AnalysisGroup? {
         return analysisService?.getSortedAnalysisList(resultId)
     }
 
