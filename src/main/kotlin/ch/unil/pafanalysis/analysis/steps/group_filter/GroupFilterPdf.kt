@@ -19,7 +19,7 @@ class GroupFilterPdf() : PdfCommon() {
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr - Filter on valid", plotWidth))
 
-        val description = "Retain only proteins with a minimum of replicate measurements (i.e. well quantified) in at least one condition."
+        val description = "Retain only proteins quantified in a minimum number of samples."
         stepDiv.add(descriptionDiv(description))
 
         val colTable = Table(3)
