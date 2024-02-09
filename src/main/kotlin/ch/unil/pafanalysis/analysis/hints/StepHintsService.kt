@@ -18,8 +18,9 @@ class StepHintsService {
     @Autowired
     private var resultRepo: ResultRepository? = null
 
-    fun getOrCreate(result: Result?): StepHints? {
-       return StepHints()
+    fun getOrCreate(resultId: Int?, analysisList: List<Analysis>?): StepHints? {
+        
+        return StepHints()
     }
 
 }
