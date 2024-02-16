@@ -1,13 +1,9 @@
 package ch.unil.pafanalysis.analysis.hints
 
 import ch.unil.pafanalysis.analysis.model.*
-import ch.unil.pafanalysis.results.model.Result
-import ch.unil.pafanalysis.results.model.ResultStatus
-import ch.unil.pafanalysis.results.service.ResultRepository
-import com.google.gson.Gson
+import ch.unil.pafanalysis.analysis.service.AnalysisService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class StepHintsService {
@@ -16,11 +12,13 @@ class StepHintsService {
     private var hintsRepo: StepHintsRepository? = null
 
     @Autowired
-    private var resultRepo: ResultRepository? = null
+    private var analysisService: AnalysisService? = null
 
-    fun getOrCreate(resultId: Int?, analysisList: List<Analysis>?): StepHints? {
-        
-        return StepHints()
+    fun get(resultId: Int): StepHintInfo? {
+        val stepHints = hintsRepo?.findByResultId(resultId)
+        val stepHint = if(stepHints.isNullOrEmpty()) null else stepHints.first()
+        val analysisGroup = analysisService?.getSortedAnalysisList(resultId)
+        val stepHintInfo = CheckStepHints().check(analysisGroup, stepHint)
+        return stepHintInfo
     }
-
 }

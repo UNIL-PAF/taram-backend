@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.analysis.hints
 
+import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.StepHints
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
