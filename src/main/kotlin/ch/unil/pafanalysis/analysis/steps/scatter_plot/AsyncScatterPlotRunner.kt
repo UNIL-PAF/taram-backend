@@ -74,9 +74,9 @@ class AsyncScatterPlotRunner() : CommonStep() {
                 )
             }
 
-        val regression = ComputeRegression().computeRegression(data)
-
-        val sortedData = data?.sortedBy { it.d }
+        val fltData = data?.filter{a -> a.y != null && a.x != null}
+        val regression = ComputeRegression().computeRegression(fltData)
+        val sortedData = fltData?.sortedBy { it.d }
 
         return ScatterPlot(sortedData, linearRegression = regression)
     }
