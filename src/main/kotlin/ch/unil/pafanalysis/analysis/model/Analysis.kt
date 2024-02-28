@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference
 import java.time.LocalDateTime
 import javax.persistence.*
 
-
 @Entity
 data class Analysis (
     @Id
@@ -30,5 +29,5 @@ data class Analysis (
 data class AnalysisGroup(
     val analysisList: List<Analysis>?,
     val status: String?,
-    val stepHints: StepHints? = null
+    val hints: StepHintInfo? = null
 )

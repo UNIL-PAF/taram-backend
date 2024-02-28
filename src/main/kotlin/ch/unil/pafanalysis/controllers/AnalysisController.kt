@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.controllers
 
+import ch.unil.pafanalysis.analysis.hints.StepHintsService
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisGroup
 import ch.unil.pafanalysis.analysis.service.AnalysisService
@@ -31,9 +32,14 @@ class AnalysisController {
     @Autowired
     private var zipService: ZipService? = null
 
+    @Autowired
+    private var hintsService: StepHintsService? = null
+
     @GetMapping
     fun getAnalysis(@RequestParam resultId: Int): AnalysisGroup? {
-        return analysisService?.getSortedAnalysisList(resultId)
+        val analysisGroup = analysisService?.getSortedAnalysisList(resultId)
+        val hints = hintsService?.get(resultId, analysisGroup)
+        return analysisGroup?.copy(hints = hints)
     }
 
     @DeleteMapping("/{analysisId}")

@@ -1,12 +1,11 @@
 package ch.unil.pafanalysis.analysis.service
 
+import ch.unil.pafanalysis.analysis.hints.StepHintsService
 import ch.unil.pafanalysis.analysis.model.*
-import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultStatus
 import ch.unil.pafanalysis.results.service.ResultRepository
-import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -25,6 +24,7 @@ class AnalysisService {
 
     @Autowired
     private var analysisStepService: AnalysisStepService? = null
+
 
     private fun createNewAnalysis(result: Result?): List<Analysis>? {
         val newAnalysis = Analysis(

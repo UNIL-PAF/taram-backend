@@ -2,6 +2,8 @@ package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.analysis.hints.StepHintsService
 import ch.unil.pafanalysis.analysis.model.StepHintInfo
+import ch.unil.pafanalysis.analysis.service.AnalysisService
+import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
@@ -14,9 +16,13 @@ class HintsController {
     @Autowired
     private var hintsService: StepHintsService? = null
 
+    @Autowired
+    private var analysisService: AnalysisService? = null
+
     @GetMapping
     fun getHints(@RequestParam resultId: Int): StepHintInfo? {
-        return hintsService?.get(resultId)
+        val analysisGroup = analysisService?.getSortedAnalysisList(resultId)
+        return hintsService?.get(resultId, analysisGroup)
     }
 
 }
