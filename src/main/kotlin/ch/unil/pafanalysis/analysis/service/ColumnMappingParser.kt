@@ -72,8 +72,8 @@ class ColumnMappingParser {
         val regexMinRight = Regex(".+_DIA_\\d+min.+")
         val regexMinLeft = Regex(".+_\\d+min_DIA_.+")
 
-        val regex1 = Regex(".+_DIA_([A-Za-z0-9-]+?)_.+\\.(.+?)$")
-        val regex2 = Regex(".+_([A-Za-z0-9-]+?)_DIA_.+\\.(.+?)$")
+        val regex1 = Regex(".+_([A-Za-z0-9-]+?)_DIA_.+\\.(.+?)$")
+        val regex2 = Regex(".+_DIA_([A-Za-z0-9-]+?)_.+\\.(.+?)$")
         val regexLeft = Regex(".+_([A-Za-z0-9-]+?)_\\d+min_DIA_.+\\.(.+?)$")
 
         val cols: ColumnsParsed = columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
