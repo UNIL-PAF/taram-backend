@@ -36,9 +36,51 @@ class CheckStepHints {
         }else{
             when (hint.id) {
                 "load-dataset" -> checkLoadDataset(analysis)
+                "edit-groups" -> checkEditGroups(analysis)
+                "remove-columns" -> checkRemoveColumns(analysis)
+                "filter-rows" -> checkFilterRows(analysis)
+                "transform-log2" -> checkLogTrans(analysis)
+                "boxplot-and-stats" -> checkBoxplotAndStats(analysis)
+                "normalize" -> checkNormalization(analysis)
+                "repeat-boxplot" -> checkMultipleBoxplot(analysis)
+                "filter-on-valid" -> checkFilterOnValid(analysis)
                 else -> false
             }
         }
+    }
+
+    private fun checkFilterOnValid(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.GROUP_FILTER.value} ?: false
+    }
+
+    private fun checkMultipleBoxplot(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.count { it.type == AnalysisStepType.BOXPLOT.value} ?: 0 > 1
+    }
+
+    private fun checkNormalization(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.NORMALIZATION.value} ?: false
+    }
+
+    private fun checkBoxplotAndStats(analysis: Analysis?): Boolean {
+        val hasBoxplot = analysis?.analysisSteps?.any { it.type == AnalysisStepType.BOXPLOT.value} ?: false
+        val hasStats = analysis?.analysisSteps?.any { it.type == AnalysisStepType.SUMMARY_STAT.value} ?: false
+        return hasBoxplot && hasStats
+    }
+
+    private fun checkLogTrans(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.LOG_TRANSFORMATION.value} ?: false
+    }
+
+    private fun checkFilterRows(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.FILTER.value} ?: false
+    }
+
+    private fun checkRemoveColumns(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.REMOVE_COLUMNS.value} ?: false
+    }
+
+    private fun checkEditGroups(analysis: Analysis?): Boolean {
+        return !analysis?.analysisSteps?.first()?.columnInfo?.columnMapping?.groupsOrdered.isNullOrEmpty()
     }
 
     private fun checkLoadDataset(analysis: Analysis?): Boolean {

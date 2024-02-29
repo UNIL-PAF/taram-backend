@@ -5,7 +5,7 @@ import ch.unil.pafanalysis.analysis.model.StepHint
 class DefaultStepHints {
 
     val defaultList = listOf<StepHint>(
-        StepHint("load-dataset", "Load dataset", "Add description of experiment (for example experiment hypothesis from LIMS). It is easy to forget it otherwise."),
+        StepHint("load-dataset", "Add description", "Add description of experiment (for example experiment hypothesis from LIMS)."),
         StepHint("edit-groups", "Edit groups", "Assign groups. It should be automatically done with Spectronaut data. Choose variable to work on : iBAQ or LFQ or Quantity."),
         StepHint("remove-columns", "Columns - Remove columns", "Good to clean up dataset and make them smaller. A default choice is presented. Headers can be renamed if needed."),
         StepHint("filter-rows", "Filter rows: OIBS,  Reverse , contaminants , organism...", "Depending on dataset; sometimes CON need to be kept (ex GFP) in the first exploration steps. Display table to find out."),
