@@ -13,7 +13,6 @@ class StepHintsService {
     fun get(resultId: Int, analysisGroup: AnalysisGroup?): StepHintInfo? {
         val stepHints = hintsRepo?.findByResultId(resultId)
         val stepHint = if(stepHints.isNullOrEmpty()) null else stepHints.first()
-        //val analysisGroup = analysisService?.getSortedAnalysisList(resultId)
         val stepHintInfo = CheckStepHints().check(analysisGroup, stepHint)
         return stepHintInfo
     }

@@ -42,7 +42,7 @@ class CheckStepHints {
                 "transform-log2" -> checkLogTrans(analysis)
                 "boxplot-and-stats" -> checkBoxplotAndStats(analysis)
                 "normalize" -> checkNormalization(analysis)
-                "repeat-boxplot" -> checkMultipleBoxplot(analysis)
+                "repeat-boxplot" -> checkSecondBoxplot(analysis)
                 "filter-on-valid" -> checkFilterOnValid(analysis)
                 else -> false
             }
@@ -53,8 +53,16 @@ class CheckStepHints {
         return analysis?.analysisSteps?.any { it.type == AnalysisStepType.GROUP_FILTER.value} ?: false
     }
 
-    private fun checkMultipleBoxplot(analysis: Analysis?): Boolean {
-        return analysis?.analysisSteps?.count { it.type == AnalysisStepType.BOXPLOT.value} ?: 0 > 1
+    // check if there is a second boxplot after normalization
+    private fun checkSecondBoxplot(analysis: Analysis?): Boolean {
+        val stepsAfterNorm = analysis?.analysisSteps?.fold(Pair(false, false)){a, v ->
+            if(a.first) {
+                if (v.type == AnalysisStepType.BOXPLOT.value) Pair(a.first, true)
+                else a
+            } else if(v.type == AnalysisStepType.NORMALIZATION.value) Pair(true, false)
+            else a
+        }
+        return stepsAfterNorm?.second == true
     }
 
     private fun checkNormalization(analysis: Analysis?): Boolean {
