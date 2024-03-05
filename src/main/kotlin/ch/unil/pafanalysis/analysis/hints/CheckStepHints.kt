@@ -14,6 +14,9 @@ class CheckStepHints {
     }
 
     private fun getNextHintId(hints: List<StepHint>): String? {
+        // if last is done, we return null
+        if(hints.last().isDone == true) return null
+
         return hints.fold(Pair(hints.first().id, false)){acc, stepHint ->
             if(stepHint.isDone == true) {
                 Pair(stepHint.id, true)
