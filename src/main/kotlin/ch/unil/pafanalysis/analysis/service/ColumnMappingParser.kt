@@ -69,17 +69,39 @@ class ColumnMappingParser {
         columns: List<String>?,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-        val regexMinRight = Regex(".+_DIA_\\d+min.+")
-        val regexMinLeft = Regex(".+_\\d+min_DIA_.+")
 
         val regex1 = Regex(".+_DIA_([A-Za-z0-9-]+?)_.+\\.(.+?)$")
         val regex2 = Regex(".+_([A-Za-z0-9-]+?)_DIA_.+\\.(.+?)$")
+
+        val cols1: ColumnsParsed = parseColumn(columns, colTypes, regex1, regex2)
+        val cols2: ColumnsParsed = parseColumn(columns, colTypes, regex2, regex1)
+
+        val cols = if(cols1.expNames.size > cols2.expNames.size) cols1 else cols2
+
+        if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from spectronaut result.")
+
+        val colMapping = ColumnMapping(
+            experimentDetails = cols.expDetails,
+            experimentNames = cols.expNames.toList(),
+            intCol = if (cols.expFields.contains("Quantity")) "Quantity" else null
+        )
+
+        val commonResult = CommonResult(
+            headers = cols.headers
+        )
+        return Pair(colMapping, commonResult)
+    }
+
+    private fun parseColumn(columns: List<String>?, colTypes: List<ColType>?, regex1: Regex, regex2: Regex):ColumnsParsed {
         val regexLeft = Regex(".+_([A-Za-z0-9-]+?)_\\d+min_DIA_.+\\.(.+?)$")
 
-        val cols: ColumnsParsed = columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
+        val regexMinRight = Regex(".+_DIA_\\d+min.+")
+        val regexMinLeft = Regex(".+_\\d+min_DIA_.+")
+
+        return columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
             val matchResult = if(regexMinLeft.matches(s)){ regexLeft.matchEntire(s) }
-                        else if(regexMinRight.matches(s)){ regex2.matchEntire(s) }
-                        else { regex1.matchEntire(s) ?: regex2.matchEntire(s) }
+            else if(regexMinRight.matches(s)){ regex2.matchEntire(s) }
+            else { regex1.matchEntire(s) ?: regex2.matchEntire(s) }
 
             val accWithExp = if (matchResult != null) {
                 acc.copy(
@@ -107,20 +129,8 @@ class ColumnMappingParser {
             } else acc.copy(headers = acc.headers.plus(Header(name = s, idx = i, type = colTypes?.get(i))))
             accWithExp
         }
-
-        if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from spectronaut result.")
-
-        val colMapping = ColumnMapping(
-            experimentDetails = cols.expDetails,
-            experimentNames = cols.expNames.toList(),
-            intCol = if (cols.expFields.contains("Quantity")) "Quantity" else null
-        )
-
-        val commonResult = CommonResult(
-            headers = cols.headers
-        )
-        return Pair(colMapping, commonResult)
     }
+
 
     private fun getMaxQuantExperiments(
         columns: List<String>?,
