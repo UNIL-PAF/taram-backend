@@ -48,9 +48,27 @@ class CheckStepHints {
                 "pca" -> checkPca(analysis)
                 "t-test" -> checkTTest(analysis)
                 "volcano-plots" -> checkVolcanoPlots(analysis)
+                "remove-imputed" -> checkRemoveImputed(analysis)
+                "enrichment" -> checkEnrichment(analysis)
+                "final-formatting" -> checkFinalFormatting(analysis)
                 else -> false
             }
         }
+    }
+
+    private fun checkFinalFormatting(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any {
+            it.type == AnalysisStepType.RENAME_COLUMNS.value
+                    || it.type == AnalysisStepType.ORDER_COLUMNS.value
+        } ?: false
+    }
+
+    private fun checkEnrichment(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.ONE_D_ENRICHMENT.value} ?: false
+    }
+
+    private fun checkRemoveImputed(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.REMOVE_IMPUTED.value} ?: false
     }
 
     private fun checkTTest(analysis: Analysis?): Boolean {
