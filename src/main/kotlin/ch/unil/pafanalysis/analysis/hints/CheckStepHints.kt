@@ -44,9 +44,29 @@ class CheckStepHints {
                 "normalize" -> checkNormalization(analysis)
                 "repeat-boxplot" -> checkSecondBoxplot(analysis)
                 "filter-on-valid" -> checkFilterOnValid(analysis)
+                "impute" -> checkImputation(analysis)
+                "pca" -> checkPca(analysis)
+                "t-test" -> checkTTest(analysis)
+                "volcano-plots" -> checkVolcanoPlots(analysis)
                 else -> false
             }
         }
+    }
+
+    private fun checkTTest(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.T_TEST.value} ?: false
+    }
+
+    private fun checkVolcanoPlots(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.VOLCANO_PLOT.value} ?: false
+    }
+
+    private fun checkPca(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.PCA.value} ?: false
+    }
+
+    private fun checkImputation(analysis: Analysis?): Boolean {
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.IMPUTATION.value} ?: false
     }
 
     private fun checkFilterOnValid(analysis: Analysis?): Boolean {
