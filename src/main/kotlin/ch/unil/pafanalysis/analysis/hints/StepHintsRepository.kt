@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.analysis.hints
 
-import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.StepHints
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
@@ -11,6 +10,6 @@ interface StepHintsRepository: JpaRepository<StepHints, Integer> {
     @Query("delete from StepHints a where a.id =:id")
     fun deleteById(id: Int): Int?
 
-    fun findByResultId(resultId: Int): List<StepHints>
-    fun findById(stepHintsId: Int): StepHints
+    fun findOneByResultId(resultId: Int): StepHints?
+    fun findById(stepHintsId: Int): StepHints?
 }

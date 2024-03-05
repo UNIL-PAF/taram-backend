@@ -25,4 +25,9 @@ class HintsController {
         return hintsService?.get(resultId, analysisGroup)
     }
 
+    @PutMapping(path = ["/switch-done/{hintId}/result-id/{resultId}"])
+    fun switchHintDone(@PathVariable hintId: String, @PathVariable resultId: Int): Boolean {
+        return hintsService?.switchHintDone(resultId, hintId) ?: false
+    }
+
 }
