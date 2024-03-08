@@ -6,6 +6,7 @@ data class BoxPlot(
     val experimentNames: List<String>? = null,
     val boxPlotData: List<BoxPlotGroupData>? = null,
     val selProtData: List<SelProtData>? = null,
+    val allProtData: List<List<Double>>? = null,
     val plot: EchartsPlot? = null
 )
 

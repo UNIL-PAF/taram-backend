@@ -53,7 +53,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
         return BoxPlot(
             experimentNames = experimentNames,
             boxPlotData = boxplotGroupData,
-            selProtData = selProtData
+            selProtData = selProtData,
+            allProtData = createAllData(table, intCol)
         )
     }
 
@@ -82,6 +83,16 @@ class AsyncBoxPlotRunner() : CommonStep() {
         }
 
         return selProts.filterNotNull().ifEmpty { null }
+    }
+
+    private fun createAllData(
+        table: Table?,
+        intCol: String?,
+    ): List<List<Double>>? {
+        val allData = readTableData.getDoubleMatrix(table, intCol).second
+        return allData.map{ a ->
+            a.filter{a -> !a.isNaN() && a != Double.NaN}
+        }
     }
 
     private fun createBoxplotGroupData(
