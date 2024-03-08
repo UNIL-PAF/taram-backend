@@ -256,6 +256,7 @@ open class CommonStep {
         return when (step?.type) {
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step)?.selProts
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step)?.selProteins
+            AnalysisStepType.SCATTER_PLOT .value -> scatterPlotRunner?.getParameters(step)?.selProteins
             else -> null
         }
     }

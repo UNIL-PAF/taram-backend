@@ -57,7 +57,7 @@ class ProteinTableService {
                 else Double.NaN
             }
 
-        val sel = prots?.map { selProteins?.contains(it) ?: false }
+        val sel = prots?.zip(genes ?: prots)?.map { selProteins?.contains(it.first)?:false ||  selProteins?.contains(it.second)?: false}
 
         val proteinRows: List<ProteinGroup>? = colOrMeans?.mapIndexed { i, colOrMean ->
             ProteinGroup(ids?.get(i) ?: i, prots?.get(i), genes?.get(i), descs?.get(i), colOrMean, sel?.get(i))
