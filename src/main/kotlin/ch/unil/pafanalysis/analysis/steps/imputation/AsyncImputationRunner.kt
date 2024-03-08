@@ -50,7 +50,7 @@ class AsyncImputationRunner() : CommonStep() {
         val (selHeaders, ints) = if(params.intCol == null && params.selColIdxs.isNullOrEmpty()) {
             readTableData.getDoubleMatrix(table, step?.columnInfo?.columnMapping?.intCol, step?.columnInfo?.columnMapping?.experimentDetails)
         } else if(params.intCol != null) {
-            val selHeaders = table.headers?.filter{h -> h.experiment?.name == params.intCol}
+            val selHeaders = table.headers?.filter{h -> h.experiment?.field == params.intCol}
             Pair(selHeaders, readTableData.getDoubleMatrix(table, selHeaders ?: emptyList()))
         }else{
             val selHeaders = table.headers?.filter{h -> params.selColIdxs?.contains(h.idx) ?: false}
