@@ -4,5 +4,6 @@ data class BoxPlotParams (
     val column: String? = null,
     val logScale: Boolean? = null,
     val selProts: List<String>? = null,
-    val groupByCondition: Boolean? = null
+    val groupByCondition: Boolean? = null,
+    val showAll: Boolean? = null
 )
