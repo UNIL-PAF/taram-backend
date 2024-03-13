@@ -6,8 +6,16 @@ data class BoxPlot(
     val experimentNames: List<String>? = null,
     val boxPlotData: List<BoxPlotGroupData>? = null,
     val selProtData: List<SelProtData>? = null,
-    val allProtData: List<List<Double>>? = null,
+    val allProtData: List<List<AllProtPoint>>? = null,
     val plot: EchartsPlot? = null
+)
+
+/*
+    y position and jiiter
+ */
+data class AllProtPoint(
+    val y: Double? = null,
+    val j: Double? = null
 )
 
 data class SelProtData(

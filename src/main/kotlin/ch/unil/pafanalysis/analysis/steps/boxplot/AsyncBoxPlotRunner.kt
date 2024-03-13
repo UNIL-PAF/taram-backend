@@ -10,6 +10,7 @@ import com.google.common.math.Quantiles
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import kotlin.math.log2
+import kotlin.random.Random
 
 @Service
 class AsyncBoxPlotRunner() : CommonStep() {
@@ -88,10 +89,13 @@ class AsyncBoxPlotRunner() : CommonStep() {
     private fun createAllData(
         table: Table?,
         intCol: String?,
-    ): List<List<Double>>? {
+    ): List<List<AllProtPoint>>? {
+        val generator = Random(10)
+
         val allData = readTableData.getDoubleMatrix(table, intCol).second
         return allData.map{ a ->
-            a.filter{a -> !a.isNaN() && a != Double.NaN}
+            val yPoints = a.filter{a -> !a.isNaN() && a != Double.NaN}
+            yPoints.map{ b -> AllProtPoint(y=b, j=generator.nextDouble()-0.5) }
         }
     }
 
