@@ -55,7 +55,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             experimentNames = experimentNames,
             boxPlotData = boxplotGroupData,
             selProtData = selProtData,
-            allProtData = createAllData(table, intCol)
+            allProtData = if(params?.showAll == true) createAllData(table, intCol) else null
         )
     }
 
