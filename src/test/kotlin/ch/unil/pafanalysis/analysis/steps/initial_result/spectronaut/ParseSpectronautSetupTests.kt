@@ -12,12 +12,47 @@ class ParseSpectronautSetupTests {
     @Autowired
     private val parser: ParseSpectronautSetup? = null
 
+
+    @Test
+    fun siddeekSetup() {
+        val resPath = "./src/test/resources/results/spectronaut/"
+        val filePath = File(resPath + "Siddeek-17243-54-library-TIMS_Report.setup.txt")
+        val spectronautSetup = parser?.parseSetup(filePath)
+        println(spectronautSetup)
+    }
+
+
     @Test
     fun bockSetup() {
         val resPath = "./src/test/resources/results/spectronaut/"
         val filePath = File(resPath + "20230921_Bock_16619-42_directDIA_Report.setup.txt")
         val spectronautSetup = parser?.parseSetup(filePath)
-        println(spectronautSetup)
+
+        assert(spectronautSetup?.analysisType == "directDIA")
+        assert(spectronautSetup?.analysisDate == "21-September-2023 12:35:51 UTC+0")
+        assert(spectronautSetup?.softwareVersion == "Spectronaut 18.3.230830.50606")
+
+        // runs
+        assert(spectronautSetup?.runs?.size == 24)
+        val firstRun = spectronautSetup?.runs?.get(0)
+
+        assert(firstRun?.name == "5683_Bock_DIA_16619_140min_8ul.htrms")
+        assert(firstRun?.condition == "WT cellular extract")
+        assert(firstRun?.fileName == "5683_Bock_DIA_16619_140min_8ul")
+        assert(firstRun?.vendor == "Bruker")
+        assert(firstRun?.version == "18.3.230830.50606")
+
+        // libraries
+        assert(spectronautSetup?.libraries == null)
+
+        // DB's
+        assert(spectronautSetup?.proteinDBs?.size == 2)
+        val firstDb = spectronautSetup?.proteinDBs?.get(0)
+        assert(firstDb?.name == "Universal Contaminant Protein FASTA")
+        assert(firstDb?.fileName == "Universal Contaminant Protein FASTA.fasta")
+        assert(firstDb?.creationDate == "01-June-2022 11:47:15 UTC+0")
+        assert(firstDb?.modificationDate == "21-September-2023 08:43:18 UTC+0")
+
     }
 
 
