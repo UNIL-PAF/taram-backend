@@ -18,7 +18,21 @@ class ParseSpectronautSetupTests {
         val resPath = "./src/test/resources/results/spectronaut/"
         val filePath = File(resPath + "Siddeek-17243-54-library-TIMS_Report.setup.txt")
         val spectronautSetup = parser?.parseSetup(filePath)
-        println(spectronautSetup)
+
+        assert(spectronautSetup?.analysisType == "Peptide-Centric")
+        assert(spectronautSetup?.analysisDate == "11-April-2024 11:48:54 UTC+0")
+        assert(spectronautSetup?.softwareVersion == "Spectronaut 18.7.240325.55695")
+
+        // runs
+        assert(spectronautSetup?.runs?.size == 12)
+        val firstRun = spectronautSetup?.runs?.get(0)
+
+        assert(firstRun?.name == "6697_Siddeek_17243_15SPD.htrms")
+        assert(firstRun?.condition == "Ctrl")
+        assert(firstRun?.fileName == "6697_Siddeek_17243_15SPD")
+        assert(firstRun?.vendor == "Bruker")
+        assert(firstRun?.version == "18.7.240325.55695")
+
     }
 
 

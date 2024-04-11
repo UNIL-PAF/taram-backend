@@ -1,0 +1,1482 @@
+Spectronaut 18.7.240325.55695
+Computer Name: DCSRV-MAXQUANT
+User Domain Name: AD
+User Name: pwaridel
+Analysis Mode: UI
+Analysis Type: Peptide-Centric
+Analysis Date: 11-April-2024 11:48:54 UTC+0
+
+
+[BEGIN-SETTINGS]
+Settings Used: PAF-settings-OCT23
+   ├─ Calibration
+   │  ├─ Calibration Mode:	Automatic
+   │  ├─ MZ Extraction Strategy:	Maximum Intensity
+   │  ├─ Used Biognosys' iRT Kit:	False
+   │  ├─ Allow source specific iRT Calibration:	True
+   │  ├─ Precision iRT:	True
+   │  │  ├─ Exclude De-amidated Peptides:	True
+   │  │  └─ iRT <-> RT Regression Type:	Local (Non-Linear) Regression
+   │  ├─ Calibration Carry-Over:	False
+   │  ├─ MS1 Mass Tolerance Strategy:	System Default
+   │  └─ MS2 Mass Tolerance Strategy:	System Default
+   ├─ Identification
+   │  ├─ Precursor Qvalue Cutoff:	0.01
+   │  ├─ Precursor PEP Cutoff:	0.2
+   │  ├─ Protein Qvalue Cutoff (Experiment):	0.01
+   │  ├─ Protein Qvalue Cutoff (Run):	0.05
+   │  ├─ Protein PEP Cutoff:	0.75
+   │  ├─ Single Hit Definition:	By Stripped Sequence
+   │  ├─ Exclude Single Hit Proteins:	False
+   │  ├─ Exclude Duplicate Assays:	True
+   │  ├─ Exclude Predicted Fragment Scores:	False
+   │  ├─ Generate Decoys:	True
+   │  │  ├─ Decoy Generation Method:	Mutated
+   │  │  │  └─ Preferred Fragment Source:	NN Predicted Fragments
+   │  │  └─ Decoy Limit Strategy:	Dynamic
+   │  │     └─ Library Size Fraction:	0.1
+   │  └─ Pvalue Estimator:	Kernel Density Estimator
+   ├─ Library Filters
+   │  ├─ Fragment Ions:	
+   │  │  ├─ Ion AA Length:	True
+   │  │  │  └─ N:	3
+   │  │  ├─ Ion Charge:	False
+   │  │  ├─ Ion Loss Type:	False
+   │  │  ├─ Ion Type:	False
+   │  │  ├─ m/z :	True
+   │  │  │  ├─ Max:	3000
+   │  │  │  └─ Min:	200
+   │  │  └─ Relative Intensity:	True
+   │  │     └─ Min:	1
+   │  └─ Precursors:	
+   │     ├─ Amino Acids:	False
+   │     ├─ Best N Fragments per Peptide:	True
+   │     │  ├─ Max:	6
+   │     │  └─ Min:	3
+   │     ├─ Best N Peptides per Protein Group:	False
+   │     ├─ Channel Count:	False
+   │     ├─ FASTA Matched:	False
+   │     ├─ Missed Cleavage:	False
+   │     ├─ Modifications:	None
+   │     ├─ Peptide Charge:	False
+   │     └─ Proteotypicity:	False
+   ├─ Pipeline Mode
+   │  ├─ Export All XICs:	False
+   │  ├─ Generate SNE File:	True
+   │  │  └─ Store Ion traces in SNE:	False
+   │  ├─ Post Analysis Reports:	
+   │  │  ├─ Binned CVs:	False
+   │  │  ├─ Binned Identification:	False
+   │  │  ├─ CV Density Line Chart:	True
+   │  │  ├─ CVs Below X Bar Chart:	True
+   │  │  ├─ Data Completeness Bar Chart:	True
+   │  │  ├─ Run Identifications Bar Chart:	True
+   │  │  └─ Scoring Histograms:	True
+   │  ├─ Report Schema:	PAF_2 (Pivot), BGS Factory Report (Normal)
+   │  └─ Reporting Unit:	Across Experiment
+   ├─ Post Analysis
+   │  ├─ Differential Abundance Testing:	Unpaired t-test
+   │  │  ├─ Assume Equal Variance:	False
+   │  │  ├─ Group-Wise Testing Correction:	False
+   │  │  ├─ Log2 Ratio Candidate Filter:	0.58
+   │  │  └─ Confidence Candidate Filter:	Qvalue
+   │  │     └─ Confidence:	0.05
+   │  ├─ Differential Abundance Grouping:	Major Group (Quantification Settings)
+   │  │  └─ Smallest Quantitative Unit:	Major Group (Quantification Settings)
+   │  │     └─ Use All MS-Level Quantities:	True
+   │  ├─ Calculate Explained TIC:	None
+   │  ├─ Calculate Sample Correlation Matrix:	False
+   │  ├─ Gene Ontology:	C:\Users\pwaridel\AppData\Roaming\Spectronaut\geneOntology\Ontologies\bgs_default_go-basic.obo
+   │  └─ Hierarchical Clustering:	True
+   │     ├─ Distance Metric:	Manhattan Distance
+   │     ├─ Linkage Strategy:	Ward's Method
+   │     ├─ Order Runs by Clustering:	True
+   │     └─ Z-score Transformation:	False
+   ├─ Protein Inference
+   │  └─ Protein Inference Workflow:	Automatic
+   │     └─ Inference Algorithm:	IDPicker
+   ├─ PTM Workflow
+   │  └─ PTM Localization:	False
+   ├─ Quantification
+   │  ├─ Precursor Filtering:	Identified (Qvalue)
+   │  │  └─ Imputation Strategy:	None
+   │  ├─ Proteotypicity Filter:	None
+   │  ├─ Protein LFQ Method:	Automatic
+   │  ├─ Quantity MS Level:	MS2
+   │  ├─ Quantity Type:	Area
+   │  ├─ Cross-Run Normalization:	True
+   │  │  ├─ Normalization Filter Type:	None
+   │  │  ├─ Normalization Strategy:	Global Normalization
+   │  │  │  └─ Normalize on:	Median
+   │  │  └─ Row Selection:	Automatic
+   │  ├─ Quantification window:	Synchronized
+   │  ├─ Interference Correction:	True
+   │  │  ├─ Only Identified Peptides:	True
+   │  │  ├─ Exclude All Multi-Channel Interferences:	True
+   │  │  ├─ MS1 Min:	2
+   │  │  └─ MS2 Min:	3
+   │  ├─ Major (Protein) Grouping:	by Protein Group Id
+   │  ├─ Minor (Peptide) Grouping:	by Stripped Sequence
+   │  ├─ Major Group Quantity:	Sum peptide quantity
+   │  ├─ Major Group Top N:	True
+   │  │  ├─ Max:	3
+   │  │  └─ Min:	1
+   │  ├─ Minor Group Quantity:	Median precursor quantity
+   │  └─ Minor Group Top N:	True
+   │     ├─ Max:	3
+   │     └─ Min:	1
+   ├─ Workflow
+   │  ├─ Multi-Channel Workflow Definition:	From Library Annotation
+   │  │  └─ Fallback Option:	Labeled
+   │  ├─ Profiling Strategy:	None
+   │  ├─ In-Silico Library Optimization:	False
+   │  └─ Unify Peptide Peaks Strategy:	None
+   └─ XIC Extraction
+      ├─ XIC IM Extraction Window:	Dynamic
+      │  └─ Correction Factor:	1
+      ├─ XIC RT Extraction Window:	Dynamic
+      │  └─ Correction Factor:	1
+      ├─ MS1 Mass Tolerance Strategy:	Dynamic
+      │  └─ Correction Factor:	1
+      └─ MS2 Mass Tolerance Strategy:	Dynamic
+         └─ Correction Factor:	1
+[END-SETTINGS]
+
+[BEGIN-SETUP]
+Run: 6697_Siddeek_17243_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6697_Siddeek_17243_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6697_Siddeek_17243_15SPD.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 1
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 462
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6698_Siddeek_17244_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6698_Siddeek_17244_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6698_Siddeek_17244_15SPD.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 2
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3,423
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6699_Siddeek_17245_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6699_Siddeek_17245_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6699_Siddeek_17245_15SPD.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 3
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 3,801
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6700_Siddeek_17246_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6700_Siddeek_17246_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6700_Siddeek_17246_15SPD.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 4
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 4,179
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6701_Siddeek_17247_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6701_Siddeek_17247_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6701_Siddeek_17247_15SPD.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 5
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 4,557
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6702_Siddeek_17248_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6702_Siddeek_17248_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6702_Siddeek_17248_15SPD.htrms"
+   ├─ Condition: Ctrl
+   ├─ Replicate: 6
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 4,935
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6703_Siddeek_17249_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6703_Siddeek_17249_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6703_Siddeek_17249_15SPD.htrms"
+   ├─ Condition: Treated
+   ├─ Replicate: 1
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 5,313
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6704_Siddeek_17250_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6704_Siddeek_17250_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6704_Siddeek_17250_15SPD.htrms"
+   ├─ Condition: Treated
+   ├─ Replicate: 2
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 5,691
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6705_Siddeek_17251_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6705_Siddeek_17251_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6705_Siddeek_17251_15SPD.htrms"
+   ├─ Condition: Treated
+   ├─ Replicate: 3
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 6,069
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6706_Siddeek_17252_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6706_Siddeek_17252_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6706_Siddeek_17252_15SPD.htrms"
+   ├─ Condition: Treated
+   ├─ Replicate: 4
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 6,447
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6707_Siddeek_17253_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6707_Siddeek_17253_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6707_Siddeek_17253_15SPD.htrms"
+   ├─ Condition: Treated
+   ├─ Replicate: 5
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 6,825
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+Run: 6708_Siddeek_17254_15SPD.htrms
+   ├─ Vendor: Bruker
+   ├─ File: 6708_Siddeek_17254_15SPD
+   ├─ Path: "D:\Siddeek\DIA\6708_Siddeek_17254_15SPD.htrms"
+   ├─ Condition: Treated
+   ├─ Replicate: 6
+   ├─ HTRMS Version: 18.7.240325.55695
+   ├─ Libraries Used
+   │  ├─ Siddeek-17369-Evosep-TIMS
+   │  │  ├─ File Path: d:/spectronaut/spectronaut libraries/20240411_102116_Siddeek-17369-Evosep-TIMS.kit
+   │  │  ├─ Precursors Targeted: 101,962
+   │  │  ├─ Decoys Added: 10,148
+   │  │  └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   │  └─ Calibration Kit
+   │     ├─ File Path: C:\Users\pwaridel\AppData\Roaming\Spectronaut/18.7.240325/iRTKit\202010206_iRT-SN15.kit
+   │     ├─ Precursors Targeted: 7,203
+   │     ├─ Decoys Added: 1,008
+   │     └─ Decoy Method: Mutated - [NN Predicted Fragments]
+   ├─ Protein Databases Used
+   │  ├─ iRT
+   │  │  ├─ Protein Entries: 11
+   │  │  ├─ Original File: iRT.fasta
+   │  │  ├─ Date Created: 24-April-2017 09:27:39 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: iRT peptides-fusion.fasta Rule
+   │  ├─ RefProt_Rattus_norvegicus_20240214
+   │  │  ├─ Protein Entries: 47,933
+   │  │  ├─ Original File: RefProt_Rattus_norvegicus_20240214.fasta
+   │  │  ├─ Date Created: 11-April-2024 09:35:04 UTC+0
+   │  │  ├─ Date Modified: 11-April-2024 11:37:43 UTC+0
+   │  │  └─ Parsing Rule: UniProt FASTA
+   │  └─ Universal Contaminant Protein FASTA
+   │     ├─ Protein Entries: 381
+   │     ├─ Original File: Universal Contaminant Protein FASTA.fasta
+   │     ├─ Date Created: 01-June-2022 11:47:15 UTC+0
+   │     ├─ Date Modified: 11-April-2024 11:37:46 UTC+0
+   │     └─ Parsing Rule: UniProt FASTA
+   └─ MS2 Method
+      ├─ [400 - 425] - IM: 0.85
+      ├─ [425 - 450] - IM: 0.86
+      ├─ [450 - 475] - IM: 0.87
+      ├─ [475 - 500] - IM: 0.87
+      ├─ [500 - 525] - IM: 0.88
+      ├─ [525 - 550] - IM: 0.89
+      ├─ [550 - 575] - IM: 0.89
+      ├─ [575 - 600] - IM: 0.9
+      ├─ [600 - 625] - IM: 0.91
+      ├─ [625 - 650] - IM: 0.91
+      ├─ [650 - 675] - IM: 0.92
+      ├─ [675 - 700] - IM: 0.93
+      ├─ [700 - 725] - IM: 0.93
+      ├─ [725 - 750] - IM: 0.94
+      ├─ [750 - 775] - IM: 0.95
+      ├─ [775 - 800] - IM: 0.95
+      ├─ [800 - 825] - IM: 1.11
+      ├─ [825 - 850] - IM: 1.11
+      ├─ [850 - 875] - IM: 1.12
+      ├─ [875 - 900] - IM: 1.13
+      ├─ [900 - 925] - IM: 1.13
+      ├─ [925 - 950] - IM: 1.14
+      ├─ [950 - 975] - IM: 1.15
+      ├─ [975 - 1000] - IM: 1.15
+      ├─ [1000 - 1025] - IM: 1.16
+      ├─ [1025 - 1050] - IM: 1.17
+      ├─ [1050 - 1075] - IM: 1.17
+      ├─ [1075 - 1100] - IM: 1.18
+      ├─ [1100 - 1125] - IM: 1.19
+      ├─ [1125 - 1150] - IM: 1.19
+      ├─ [1150 - 1175] - IM: 1.2
+      └─ [1175 - 1200] - IM: 1.21
+
+[END-SETUP]
+
+[BEGIN-LOG]
+INFO:    [11/04/2024 10:33:56] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:33:56] -> Preprocessing Run #1 of 12...
+INFO:    [11/04/2024 10:33:56] -> Building Spectral Library...
+INFO:    [11/04/2024 10:33:56] -> Initializing Experiment...
+INFO:    [11/04/2024 10:33:56] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:34:13] -> Initialize Scoring...
+INFO:    [11/04/2024 10:34:13] -> Generating Scan Map...
+INFO:    [11/04/2024 10:34:13] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:34:13] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:34:13] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:34:14] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:34:15] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:34:15] -> Preprocessing Run #1 of 12...
+INFO:    [11/04/2024 10:34:15] -> Initialize Scoring...
+INFO:    [11/04/2024 10:34:15] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:34:57] -> Machine Learning...
+INFO:    [11/04/2024 10:34:57] -> Pipeline executed in 42.04s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:35:01] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:35:01] -> Preprocessing Run #1 of 12...
+INFO:    [11/04/2024 10:35:01] -> Initialize Scoring...
+INFO:    [11/04/2024 10:35:01] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:35:55] -> Machine Learning...
+INFO:    [11/04/2024 10:35:59] -> Pipeline executed in 58.32s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:36:08] -> Initialize Scoring...
+INFO:    [11/04/2024 10:36:08] -> Preprocessing Run #2 of 12...
+INFO:    [11/04/2024 10:36:08] -> Building Spectral Library...
+INFO:    [11/04/2024 10:36:08] -> Initializing Experiment...
+INFO:    [11/04/2024 10:36:08] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:36:08] -> Initialize Scoring...
+INFO:    [11/04/2024 10:36:08] -> Generating Scan Map...
+INFO:    [11/04/2024 10:36:08] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:36:08] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:36:08] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:36:08] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:36:10] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:36:10] -> Preprocessing Run #2 of 12...
+INFO:    [11/04/2024 10:36:10] -> Initialize Scoring...
+INFO:    [11/04/2024 10:36:10] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:37:05] -> Machine Learning...
+INFO:    [11/04/2024 10:37:06] -> Pipeline executed in 56.55s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:37:09] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:37:09] -> Preprocessing Run #2 of 12...
+INFO:    [11/04/2024 10:37:09] -> Initialize Scoring...
+INFO:    [11/04/2024 10:37:09] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:38:04] -> Machine Learning...
+INFO:    [11/04/2024 10:38:07] -> Pipeline executed in 57.97s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:38:15] -> Initialize Scoring...
+INFO:    [11/04/2024 10:38:15] -> Preprocessing Run #3 of 12...
+INFO:    [11/04/2024 10:38:15] -> Building Spectral Library...
+INFO:    [11/04/2024 10:38:15] -> Initializing Experiment...
+INFO:    [11/04/2024 10:38:15] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:38:15] -> Initialize Scoring...
+INFO:    [11/04/2024 10:38:15] -> Generating Scan Map...
+INFO:    [11/04/2024 10:38:15] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:38:15] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:38:16] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:38:16] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:38:18] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:38:18] -> Preprocessing Run #3 of 12...
+INFO:    [11/04/2024 10:38:18] -> Initialize Scoring...
+INFO:    [11/04/2024 10:38:18] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:39:09] -> Machine Learning...
+INFO:    [11/04/2024 10:39:09] -> Pipeline executed in 51.78s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:39:12] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:39:12] -> Preprocessing Run #3 of 12...
+INFO:    [11/04/2024 10:39:12] -> Initialize Scoring...
+INFO:    [11/04/2024 10:39:12] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:40:05] -> Machine Learning...
+INFO:    [11/04/2024 10:40:09] -> Pipeline executed in 56.38s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:40:18] -> Initialize Scoring...
+INFO:    [11/04/2024 10:40:18] -> Preprocessing Run #4 of 12...
+INFO:    [11/04/2024 10:40:18] -> Building Spectral Library...
+INFO:    [11/04/2024 10:40:18] -> Initializing Experiment...
+INFO:    [11/04/2024 10:40:18] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:40:18] -> Initialize Scoring...
+INFO:    [11/04/2024 10:40:18] -> Generating Scan Map...
+INFO:    [11/04/2024 10:40:18] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:40:18] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:40:18] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:40:18] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:40:20] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:40:20] -> Preprocessing Run #4 of 12...
+INFO:    [11/04/2024 10:40:20] -> Initialize Scoring...
+INFO:    [11/04/2024 10:40:20] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:41:03] -> Machine Learning...
+INFO:    [11/04/2024 10:41:04] -> Pipeline executed in 43.87s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:41:06] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:41:06] -> Preprocessing Run #4 of 12...
+INFO:    [11/04/2024 10:41:06] -> Initialize Scoring...
+INFO:    [11/04/2024 10:41:06] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:41:58] -> Machine Learning...
+INFO:    [11/04/2024 10:42:02] -> Pipeline executed in 55.49s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:42:10] -> Initialize Scoring...
+INFO:    [11/04/2024 10:42:10] -> Preprocessing Run #5 of 12...
+INFO:    [11/04/2024 10:42:10] -> Building Spectral Library...
+INFO:    [11/04/2024 10:42:10] -> Initializing Experiment...
+INFO:    [11/04/2024 10:42:10] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:42:10] -> Initialize Scoring...
+INFO:    [11/04/2024 10:42:10] -> Generating Scan Map...
+INFO:    [11/04/2024 10:42:10] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:42:10] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:42:11] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:42:11] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:42:12] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:42:12] -> Preprocessing Run #5 of 12...
+INFO:    [11/04/2024 10:42:12] -> Initialize Scoring...
+INFO:    [11/04/2024 10:42:12] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:43:13] -> Machine Learning...
+INFO:    [11/04/2024 10:43:14] -> Pipeline executed in 1.03m - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:43:18] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:43:18] -> Preprocessing Run #5 of 12...
+INFO:    [11/04/2024 10:43:18] -> Initialize Scoring...
+INFO:    [11/04/2024 10:43:18] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:44:13] -> Machine Learning...
+INFO:    [11/04/2024 10:44:17] -> Pipeline executed in 58.65s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:44:26] -> Initialize Scoring...
+INFO:    [11/04/2024 10:44:26] -> Preprocessing Run #6 of 12...
+INFO:    [11/04/2024 10:44:26] -> Building Spectral Library...
+INFO:    [11/04/2024 10:44:26] -> Initializing Experiment...
+INFO:    [11/04/2024 10:44:26] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:44:26] -> Initialize Scoring...
+INFO:    [11/04/2024 10:44:26] -> Generating Scan Map...
+INFO:    [11/04/2024 10:44:26] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:44:26] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:44:26] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:44:26] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:44:28] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:44:28] -> Preprocessing Run #6 of 12...
+INFO:    [11/04/2024 10:44:28] -> Initialize Scoring...
+INFO:    [11/04/2024 10:44:28] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:45:23] -> Machine Learning...
+INFO:    [11/04/2024 10:45:24] -> Pipeline executed in 56.03s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:45:27] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:45:27] -> Preprocessing Run #6 of 12...
+INFO:    [11/04/2024 10:45:27] -> Initialize Scoring...
+INFO:    [11/04/2024 10:45:27] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:46:21] -> Machine Learning...
+INFO:    [11/04/2024 10:46:24] -> Pipeline executed in 57.21s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:46:32] -> Initialize Scoring...
+INFO:    [11/04/2024 10:46:32] -> Preprocessing Run #7 of 12...
+INFO:    [11/04/2024 10:46:32] -> Building Spectral Library...
+INFO:    [11/04/2024 10:46:32] -> Initializing Experiment...
+INFO:    [11/04/2024 10:46:32] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:46:32] -> Initialize Scoring...
+INFO:    [11/04/2024 10:46:32] -> Generating Scan Map...
+INFO:    [11/04/2024 10:46:32] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:46:32] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:46:33] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:46:33] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:46:34] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:46:34] -> Preprocessing Run #7 of 12...
+INFO:    [11/04/2024 10:46:34] -> Initialize Scoring...
+INFO:    [11/04/2024 10:46:34] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:47:32] -> Machine Learning...
+INFO:    [11/04/2024 10:47:33] -> Pipeline executed in 58.23s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:47:36] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:47:36] -> Preprocessing Run #7 of 12...
+INFO:    [11/04/2024 10:47:36] -> Initialize Scoring...
+INFO:    [11/04/2024 10:47:36] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:48:30] -> Machine Learning...
+INFO:    [11/04/2024 10:48:33] -> Pipeline executed in 57.35s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:48:42] -> Initialize Scoring...
+INFO:    [11/04/2024 10:48:42] -> Preprocessing Run #8 of 12...
+INFO:    [11/04/2024 10:48:42] -> Building Spectral Library...
+INFO:    [11/04/2024 10:48:42] -> Initializing Experiment...
+INFO:    [11/04/2024 10:48:42] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:48:42] -> Initialize Scoring...
+INFO:    [11/04/2024 10:48:42] -> Generating Scan Map...
+INFO:    [11/04/2024 10:48:42] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:48:42] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:48:42] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:48:42] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:48:44] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:48:44] -> Preprocessing Run #8 of 12...
+INFO:    [11/04/2024 10:48:44] -> Initialize Scoring...
+INFO:    [11/04/2024 10:48:44] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:49:43] -> Machine Learning...
+INFO:    [11/04/2024 10:49:44] -> Pipeline executed in 1.01m - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:49:47] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:49:47] -> Preprocessing Run #8 of 12...
+INFO:    [11/04/2024 10:49:47] -> Initialize Scoring...
+INFO:    [11/04/2024 10:49:47] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:50:42] -> Machine Learning...
+INFO:    [11/04/2024 10:50:45] -> Pipeline executed in 58.06s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:50:53] -> Initialize Scoring...
+INFO:    [11/04/2024 10:50:53] -> Preprocessing Run #9 of 12...
+INFO:    [11/04/2024 10:50:53] -> Building Spectral Library...
+INFO:    [11/04/2024 10:50:53] -> Initializing Experiment...
+INFO:    [11/04/2024 10:50:53] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:50:53] -> Initialize Scoring...
+INFO:    [11/04/2024 10:50:53] -> Generating Scan Map...
+INFO:    [11/04/2024 10:50:53] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:50:53] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:50:54] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:50:54] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:50:55] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:50:55] -> Preprocessing Run #9 of 12...
+INFO:    [11/04/2024 10:50:55] -> Initialize Scoring...
+INFO:    [11/04/2024 10:50:55] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:51:44] -> Machine Learning...
+INFO:    [11/04/2024 10:51:45] -> Pipeline executed in 49.83s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:51:49] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:51:49] -> Preprocessing Run #9 of 12...
+INFO:    [11/04/2024 10:51:49] -> Initialize Scoring...
+INFO:    [11/04/2024 10:51:49] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:52:42] -> Machine Learning...
+INFO:    [11/04/2024 10:52:46] -> Pipeline executed in 56.3s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:52:55] -> Initialize Scoring...
+INFO:    [11/04/2024 10:52:55] -> Preprocessing Run #10 of 12...
+INFO:    [11/04/2024 10:52:55] -> Building Spectral Library...
+INFO:    [11/04/2024 10:52:55] -> Initializing Experiment...
+INFO:    [11/04/2024 10:52:55] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:52:55] -> Initialize Scoring...
+INFO:    [11/04/2024 10:52:55] -> Generating Scan Map...
+INFO:    [11/04/2024 10:52:55] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:52:55] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:52:55] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:52:55] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:52:57] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:52:57] -> Preprocessing Run #10 of 12...
+INFO:    [11/04/2024 10:52:57] -> Initialize Scoring...
+INFO:    [11/04/2024 10:52:57] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:53:51] -> Machine Learning...
+INFO:    [11/04/2024 10:53:52] -> Pipeline executed in 55.03s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:53:55] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:53:55] -> Preprocessing Run #10 of 12...
+INFO:    [11/04/2024 10:53:55] -> Initialize Scoring...
+INFO:    [11/04/2024 10:53:55] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:54:50] -> Machine Learning...
+INFO:    [11/04/2024 10:54:54] -> Pipeline executed in 58.58s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:55:02] -> Initialize Scoring...
+INFO:    [11/04/2024 10:55:02] -> Preprocessing Run #11 of 12...
+INFO:    [11/04/2024 10:55:02] -> Building Spectral Library...
+INFO:    [11/04/2024 10:55:02] -> Initializing Experiment...
+INFO:    [11/04/2024 10:55:02] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:55:02] -> Initialize Scoring...
+INFO:    [11/04/2024 10:55:02] -> Generating Scan Map...
+INFO:    [11/04/2024 10:55:02] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:55:02] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:55:02] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:55:02] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:55:04] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:55:04] -> Preprocessing Run #11 of 12...
+INFO:    [11/04/2024 10:55:04] -> Initialize Scoring...
+INFO:    [11/04/2024 10:55:04] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:55:46] -> Machine Learning...
+INFO:    [11/04/2024 10:55:47] -> Pipeline executed in 42.82s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:55:50] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:55:50] -> Preprocessing Run #11 of 12...
+INFO:    [11/04/2024 10:55:50] -> Initialize Scoring...
+INFO:    [11/04/2024 10:55:50] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:56:41] -> Machine Learning...
+INFO:    [11/04/2024 10:56:45] -> Pipeline executed in 54.87s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:56:54] -> Initialize Scoring...
+INFO:    [11/04/2024 10:56:54] -> Preprocessing Run #12 of 12...
+INFO:    [11/04/2024 10:56:54] -> Building Spectral Library...
+INFO:    [11/04/2024 10:56:54] -> Initializing Experiment...
+INFO:    [11/04/2024 10:56:54] -> Loading Spectral Libraries...
+INFO:    [11/04/2024 10:56:54] -> Initialize Scoring...
+INFO:    [11/04/2024 10:56:54] -> Generating Scan Map...
+INFO:    [11/04/2024 10:56:54] -> Initializing Workpackages...
+INFO:    [11/04/2024 10:56:54] -> Performing Basic Calibration...
+INFO:    [11/04/2024 10:56:54] -> Identifying Calibration Peptides...
+INFO:    [11/04/2024 10:56:54] -> Correcting Gradient Fine Structure...
+INFO:    [11/04/2024 10:56:56] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:56:56] -> Preprocessing Run #12 of 12...
+INFO:    [11/04/2024 10:56:56] -> Initialize Scoring...
+INFO:    [11/04/2024 10:56:56] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:57:48] -> Machine Learning...
+INFO:    [11/04/2024 10:57:49] -> Pipeline executed in 53.13s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:57:53] -> Initializing Pipeline...
+INFO:    [11/04/2024 10:57:53] -> Preprocessing Run #12 of 12...
+INFO:    [11/04/2024 10:57:53] -> Initialize Scoring...
+INFO:    [11/04/2024 10:57:53] -> Extracting Ion Currents...
+INFO:    [11/04/2024 10:58:47] -> Machine Learning...
+INFO:    [11/04/2024 10:58:51] -> Pipeline executed in 57.95s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 10:58:59] -> Initialize Scoring...
+INFO:    [11/04/2024 10:58:59] -> Initializing QC...
+INFO:    [11/04/2024 10:58:59] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 10:59:00] -> Assigning ML Features...
+INFO:    [11/04/2024 10:59:01] -> Generating Decoys...
+INFO:    [11/04/2024 10:59:07] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:01:18] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:01:18] -> Machine Learning...
+INFO:    [11/04/2024 11:01:48] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:01:48] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:01:49] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:01:53] -> Unique precursors: 94,309 of 101,962 | modified peptides: 82,176 of 87,737 | peptides: 72,402 of 77,262 |  protein groups: 7,219 (Qvalue <= 0.01) [6697_Siddeek_17243_15SPD.htrms]
+INFO:    [11/04/2024 11:01:53] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:01:53] -> Processed in 2.89m
+INFO:    [11/04/2024 11:01:53] -> Initializing QC...
+INFO:    [11/04/2024 11:01:53] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:01:53] -> Assigning ML Features...
+INFO:    [11/04/2024 11:01:53] -> Generating Decoys...
+INFO:    [11/04/2024 11:01:54] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:04:31] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:04:31] -> Machine Learning...
+INFO:    [11/04/2024 11:05:04] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:05:04] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:05:05] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:05:08] -> Unique precursors: 89,833 of 101,962 | modified peptides: 78,532 of 87,737 | peptides: 69,133 of 77,262 |  protein groups: 7,058 (Qvalue <= 0.01) [6698_Siddeek_17244_15SPD.htrms]
+INFO:    [11/04/2024 11:05:08] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:05:08] -> Processed in 3.25m
+INFO:    [11/04/2024 11:05:08] -> Initializing QC...
+INFO:    [11/04/2024 11:05:08] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:05:08] -> Assigning ML Features...
+INFO:    [11/04/2024 11:05:08] -> Generating Decoys...
+INFO:    [11/04/2024 11:05:09] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:07:21] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:07:21] -> Machine Learning...
+INFO:    [11/04/2024 11:07:52] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:07:52] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:07:53] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:07:57] -> Unique precursors: 92,675 of 101,962 | modified peptides: 81,053 of 87,737 | peptides: 71,392 of 77,262 |  protein groups: 7,142 (Qvalue <= 0.01) [6699_Siddeek_17245_15SPD.htrms]
+INFO:    [11/04/2024 11:07:57] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:07:57] -> Processed in 2.81m
+INFO:    [11/04/2024 11:07:57] -> Initializing QC...
+INFO:    [11/04/2024 11:07:57] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:07:57] -> Assigning ML Features...
+INFO:    [11/04/2024 11:07:57] -> Generating Decoys...
+INFO:    [11/04/2024 11:07:57] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:10:18] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:10:18] -> Machine Learning...
+INFO:    [11/04/2024 11:10:49] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:10:49] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:10:50] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:10:52] -> Unique precursors: 92,584 of 101,962 | modified peptides: 80,801 of 87,737 | peptides: 71,154 of 77,262 |  protein groups: 7,084 (Qvalue <= 0.01) [6700_Siddeek_17246_15SPD.htrms]
+INFO:    [11/04/2024 11:10:52] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:10:52] -> Processed in 2.92m
+INFO:    [11/04/2024 11:10:52] -> Initializing QC...
+INFO:    [11/04/2024 11:10:52] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:10:52] -> Assigning ML Features...
+INFO:    [11/04/2024 11:10:52] -> Generating Decoys...
+INFO:    [11/04/2024 11:10:53] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:13:15] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:13:15] -> Machine Learning...
+INFO:    [11/04/2024 11:13:47] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:13:47] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:13:48] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:13:49] -> Unique precursors: 90,258 of 101,962 | modified peptides: 78,699 of 87,737 | peptides: 69,315 of 77,262 |  protein groups: 7,045 (Qvalue <= 0.01) [6701_Siddeek_17247_15SPD.htrms]
+INFO:    [11/04/2024 11:13:49] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:13:51] -> Processed in 2.98m
+INFO:    [11/04/2024 11:13:51] -> Initializing QC...
+INFO:    [11/04/2024 11:13:51] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:13:51] -> Assigning ML Features...
+INFO:    [11/04/2024 11:13:51] -> Generating Decoys...
+INFO:    [11/04/2024 11:13:51] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:16:09] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:16:09] -> Machine Learning...
+INFO:    [11/04/2024 11:16:41] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:16:41] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:16:41] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:16:45] -> Unique precursors: 92,252 of 101,962 | modified peptides: 80,493 of 87,737 | peptides: 70,860 of 77,262 |  protein groups: 7,101 (Qvalue <= 0.01) [6702_Siddeek_17248_15SPD.htrms]
+INFO:    [11/04/2024 11:16:45] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:16:45] -> Processed in 2.9m
+INFO:    [11/04/2024 11:16:45] -> Initializing QC...
+INFO:    [11/04/2024 11:16:45] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:16:45] -> Assigning ML Features...
+INFO:    [11/04/2024 11:16:45] -> Generating Decoys...
+INFO:    [11/04/2024 11:16:45] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:19:06] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:19:06] -> Machine Learning...
+INFO:    [11/04/2024 11:19:36] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:19:36] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:19:37] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:19:40] -> Unique precursors: 92,321 of 101,962 | modified peptides: 80,410 of 87,737 | peptides: 70,847 of 77,262 |  protein groups: 7,099 (Qvalue <= 0.01) [6703_Siddeek_17249_15SPD.htrms]
+INFO:    [11/04/2024 11:19:40] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:19:40] -> Processed in 2.92m
+INFO:    [11/04/2024 11:19:40] -> Initializing QC...
+INFO:    [11/04/2024 11:19:40] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:19:40] -> Assigning ML Features...
+INFO:    [11/04/2024 11:19:40] -> Generating Decoys...
+INFO:    [11/04/2024 11:19:41] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:22:01] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:22:01] -> Machine Learning...
+INFO:    [11/04/2024 11:22:33] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:22:33] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:22:34] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:22:37] -> Unique precursors: 92,147 of 101,962 | modified peptides: 80,430 of 87,737 | peptides: 70,778 of 77,262 |  protein groups: 7,105 (Qvalue <= 0.01) [6704_Siddeek_17250_15SPD.htrms]
+INFO:    [11/04/2024 11:22:37] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:22:37] -> Processed in 2.95m
+INFO:    [11/04/2024 11:22:37] -> Initializing QC...
+INFO:    [11/04/2024 11:22:37] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:22:37] -> Assigning ML Features...
+INFO:    [11/04/2024 11:22:37] -> Generating Decoys...
+INFO:    [11/04/2024 11:22:38] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:24:59] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:24:59] -> Machine Learning...
+INFO:    [11/04/2024 11:25:30] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:25:30] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:25:31] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:25:34] -> Unique precursors: 92,391 of 101,962 | modified peptides: 80,730 of 87,737 | peptides: 71,095 of 77,262 |  protein groups: 7,128 (Qvalue <= 0.01) [6705_Siddeek_17251_15SPD.htrms]
+INFO:    [11/04/2024 11:25:34] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:25:34] -> Processed in 2.95m
+INFO:    [11/04/2024 11:25:34] -> Initializing QC...
+INFO:    [11/04/2024 11:25:34] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:25:34] -> Assigning ML Features...
+INFO:    [11/04/2024 11:25:35] -> Generating Decoys...
+INFO:    [11/04/2024 11:25:35] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:27:53] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:27:53] -> Machine Learning...
+INFO:    [11/04/2024 11:28:24] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:28:24] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:28:25] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:28:28] -> Unique precursors: 92,146 of 101,962 | modified peptides: 80,417 of 87,737 | peptides: 70,728 of 77,262 |  protein groups: 7,081 (Qvalue <= 0.01) [6706_Siddeek_17252_15SPD.htrms]
+INFO:    [11/04/2024 11:28:28] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:28:28] -> Processed in 2.89m
+INFO:    [11/04/2024 11:28:28] -> Initializing QC...
+INFO:    [11/04/2024 11:28:28] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:28:28] -> Assigning ML Features...
+INFO:    [11/04/2024 11:28:28] -> Generating Decoys...
+INFO:    [11/04/2024 11:28:28] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:30:53] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:30:53] -> Machine Learning...
+INFO:    [11/04/2024 11:31:26] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:31:26] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:31:27] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:31:27] -> Unique precursors: 92,664 of 101,962 | modified peptides: 80,948 of 87,737 | peptides: 71,205 of 77,262 |  protein groups: 7,118 (Qvalue <= 0.01) [6707_Siddeek_17253_15SPD.htrms]
+INFO:    [11/04/2024 11:31:27] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:31:27] -> Processed in 2.99m
+INFO:    [11/04/2024 11:31:27] -> Initializing QC...
+INFO:    [11/04/2024 11:31:28] -> Determining Calibration Parameter...
+INFO:    [11/04/2024 11:31:28] -> Assigning ML Features...
+INFO:    [11/04/2024 11:31:28] -> Generating Decoys...
+INFO:    [11/04/2024 11:31:28] -> Extracting Ion Currents...
+INFO:    [11/04/2024 11:33:58] -> Releasing Raw Files...
+INFO:    [11/04/2024 11:33:58] -> Machine Learning...
+INFO:    [11/04/2024 11:34:29] -> Initializing HTRMS...
+INFO:    [11/04/2024 11:34:29] -> Releasing Run Resources...
+INFO:    [11/04/2024 11:34:30] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:34:31] -> Unique precursors: 92,932 of 101,962 | modified peptides: 80,988 of 87,737 | peptides: 71,232 of 77,262 |  protein groups: 7,106 (Qvalue <= 0.01) [6708_Siddeek_17254_15SPD.htrms]
+INFO:    [11/04/2024 11:34:31] -> Collapsing Search Tree...
+INFO:    [11/04/2024 11:34:31] -> Processed in 3.05m
+INFO:    [11/04/2024 11:34:31] -> Normalizing Cscores...
+INFO:    [11/04/2024 11:34:31] -> Initializing Protein Groups...
+INFO:    [11/04/2024 11:35:00] -> Correcting Interferences...
+INFO:    [11/04/2024 11:35:48] -> Calculating Global CVs
+INFO:    [11/04/2024 11:35:49] -> Calculating Precursor Quantities...
+INFO:    [11/04/2024 11:35:49] -> Normalizing Quantification...
+INFO:    [11/04/2024 11:35:51] -> Calculating Global CVs
+INFO:    [11/04/2024 11:35:53] -> Calculating Condition CVs
+INFO:    [11/04/2024 11:35:56] -> Excluding Library Duplicates...
+INFO:    [11/04/2024 11:35:56] -> Calculating Global CVs
+INFO:    [11/04/2024 11:35:58] -> Building Protein Groups...
+INFO:    [11/04/2024 11:36:22] -> Calculating Run-Wise Protein Group FDR...
+INFO:    [11/04/2024 11:36:26] -> Annotating Protein Single Hits...
+INFO:    [11/04/2024 11:36:27] -> Calculating Global CVs
+INFO:    [11/04/2024 11:36:29] -> Updating Identification Counts...
+INFO:    [11/04/2024 11:36:31] -> Resetting existing imputation...
+INFO:    [11/04/2024 11:36:31] -> Calculating Protein Quantities...
+INFO:    [11/04/2024 11:36:32] -> Calculating Protein Quantities...
+INFO:    [11/04/2024 11:36:32] -> Calculating MaxLFQ Protein Quantities...
+INFO:    [11/04/2024 11:36:42] -> Collapsing PTM-Locations...
+INFO:    [11/04/2024 11:36:42] -> Creating Protein Map...
+INFO:    [11/04/2024 11:36:42] -> Compiling Run Summary Information...
+INFO:    [11/04/2024 11:36:42] -> Running Post Analysis Processes...
+INFO:    [11/04/2024 11:37:38] -> Saving Qc Data...
+INFO:    [11/04/2024 11:37:43] -> Writing Summary Information...
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 94,093 of 101,962 | modified peptides: 81,960 of 87,737 | peptides: 72,186 of 77,262 |  protein groups: 7,008 (Qvalue <= 0.01) for run #1 "6697_Siddeek_17243_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 89,680 of 101,962 | modified peptides: 78,379 of 87,737 | peptides: 68,980 of 77,262 |  protein groups: 6,903 (Qvalue <= 0.01) for run #2 "6698_Siddeek_17244_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,566 of 101,962 | modified peptides: 80,944 of 87,737 | peptides: 71,284 of 77,262 |  protein groups: 7,026 (Qvalue <= 0.01) for run #3 "6699_Siddeek_17245_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,400 of 101,962 | modified peptides: 80,617 of 87,737 | peptides: 70,970 of 77,262 |  protein groups: 6,904 (Qvalue <= 0.01) for run #4 "6700_Siddeek_17246_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 90,106 of 101,962 | modified peptides: 78,547 of 87,737 | peptides: 69,163 of 77,262 |  protein groups: 6,889 (Qvalue <= 0.01) for run #5 "6701_Siddeek_17247_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,108 of 101,962 | modified peptides: 80,349 of 87,737 | peptides: 70,716 of 77,262 |  protein groups: 6,955 (Qvalue <= 0.01) for run #6 "6702_Siddeek_17248_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,217 of 101,962 | modified peptides: 80,306 of 87,737 | peptides: 70,743 of 77,262 |  protein groups: 6,988 (Qvalue <= 0.01) for run #7 "6703_Siddeek_17249_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,033 of 101,962 | modified peptides: 80,316 of 87,737 | peptides: 70,664 of 77,262 |  protein groups: 6,983 (Qvalue <= 0.01) for run #8 "6704_Siddeek_17250_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,265 of 101,962 | modified peptides: 80,604 of 87,737 | peptides: 70,969 of 77,262 |  protein groups: 6,999 (Qvalue <= 0.01) for run #9 "6705_Siddeek_17251_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 91,995 of 101,962 | modified peptides: 80,266 of 87,737 | peptides: 70,577 of 77,262 |  protein groups: 6,927 (Qvalue <= 0.01) for run #10 "6706_Siddeek_17252_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,572 of 101,962 | modified peptides: 80,856 of 87,737 | peptides: 71,113 of 77,262 |  protein groups: 7,018 (Qvalue <= 0.01) for run #11 "6707_Siddeek_17253_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 92,801 of 101,962 | modified peptides: 80,857 of 87,737 | peptides: 71,102 of 77,262 |  protein groups: 6,971 (Qvalue <= 0.01) for run #12 "6708_Siddeek_17254_15SPD.htrms"
+INFO:    [11/04/2024 11:37:43] -> Unique precursors: 99,915 of 101,962 | modified peptides: 86,168 of 87,737 | peptides: 75,823 of 77,262 |  protein groups: 7,256 (Qvalue <= 0.01) for whole experiment "Siddeek-17243-54-library-TIMS"
+
+INFO:    [11/04/2024 11:37:43] -> Saving SNE File...
+INFO:    [11/04/2024 11:37:43] -> Storing SNE File: D:\SPECTRONAUT\20240411_103355_Siddeek-17243-54-library-TIMS.sne
+INFO:    [11/04/2024 11:37:43] -> Initializing Pipeline...
+INFO:    [11/04/2024 11:37:43] -> Calculating Qvalues...
+INFO:    [11/04/2024 11:37:43] -> Saving...
+INFO:    [11/04/2024 11:38:06] -> Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 11:38:06] -> Pipeline executed in 22.88s - Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 11:38:07] -> Current Experiment had 0 Warnings and 0 Errors.
+INFO:    [11/04/2024 11:38:07] -> Pipeline executed in 1.07h - Current Experiment had 0 Warnings and 0 Errors.
+[END-LOG]

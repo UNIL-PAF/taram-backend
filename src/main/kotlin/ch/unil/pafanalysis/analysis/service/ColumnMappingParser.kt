@@ -65,18 +65,12 @@ class ColumnMappingParser {
         val headers: List<Header> = emptyList()
     )
 
+
     private fun getSpectronautExperiments(
         columns: List<String>?,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-
-        val regex1 = Regex(".+_DIA_([A-Za-z0-9-]+?)_.+\\.(.+?)$")
-        val regex2 = Regex(".+_([A-Za-z0-9-]+?)_DIA_.+\\.(.+?)$")
-
-        val cols1: ColumnsParsed = parseColumn(columns, colTypes, regex1, regex2)
-        val cols2: ColumnsParsed = parseColumn(columns, colTypes, regex2, regex1)
-
-        val cols = if(cols1.expNames.size > cols2.expNames.size) cols1 else cols2
+        val cols = parseColumns2(columns, colTypes)
 
         if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from spectronaut result.")
 
@@ -90,6 +84,61 @@ class ColumnMappingParser {
             headers = cols.headers
         )
         return Pair(colMapping, commonResult)
+    }
+
+    private fun parseColumns2(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
+        // Remove trailing " (Settings)"
+        val columns = columnsOrig?.map{it.replace(Regex("\\s\\(Settings\\)$"), "")}
+
+        val allEndings = columns?.map{c -> c.split(".").last()}
+        val endingSizes = allEndings?.fold(emptyMap<String, Int>()){ a, v ->
+            a + (v to (a[v]?.plus(1) ?: 1))
+        }
+
+        val selField = endingSizes?.toList()?.maxByOrNull { it.second }!!.first
+        val selCols = columns?.filter{it.matches(Regex(".+${selField}$"))}
+
+        // remove the first part until the first_
+        val cleanSelCols = selCols.map{it.replace(Regex("^.+?_(?=([A-Z|a-z]))"), "")}
+
+        val commonStart = cleanSelCols.fold(cleanSelCols.first()){ a, v -> v.commonPrefixWith(a)}.replace(Regex("_(\\d+)$"), "")
+
+        val dynRegex = Regex("^.*?_${commonStart}_([[a-zA-Z\\-0-9]]+).*")
+
+        return columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
+            val matchResult = if(dynRegex.matches(s)){
+                val myMatch = dynRegex.matchEntire(s)
+                if(myMatch != null) myMatch.groupValues[1] else null
+            } else null
+
+            val colField = s.split(".").last()
+
+            val accWithExp = if (matchResult != null) {
+                acc.copy(
+                    expNames = acc.expNames.plus(matchResult),
+                    expFields = acc.expFields.plus(colField),
+                    headers = acc.headers.plus(
+                        Header(
+                            name = matchResult + "." + colField,
+                            idx = i,
+                            type = colTypes?.get(i),
+                            experiment = Experiment(name = matchResult, field = colField)
+                        )
+                    ),
+                    expDetails = acc.expDetails.plus(
+                        Pair(
+                            matchResult,
+                            ExpInfo(
+                                isSelected = true,
+                                name = matchResult,
+                                originalName = s.replace(colField, "")
+                            )
+                        )
+                    )
+                )
+            } else acc.copy(headers = acc.headers.plus(Header(name = s, idx = i, type = colTypes?.get(i))))
+            accWithExp
+        }
     }
 
     private fun parseColumn(columns: List<String>?, colTypes: List<ColType>?, regex1: Regex, regex2: Regex):ColumnsParsed {

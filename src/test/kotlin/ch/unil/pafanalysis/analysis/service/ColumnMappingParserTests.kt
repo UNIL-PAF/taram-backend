@@ -124,10 +124,10 @@ class ColumnMappingParserTests {
 
         // check header with experiment
         assert(commonResults.headers?.get(11)?.idx == 11)
-        assert(commonResults.headers?.get(11)?.name == "12818.TotalQuantity (Settings)")
+        assert(commonResults.headers?.get(11)?.name == "12818.TotalQuantity")
         assert(commonResults.headers?.get(11)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(11)?.experiment?.name == "12818")
-        assert(commonResults.headers?.get(11)?.experiment?.field == "TotalQuantity (Settings)")
+        assert(commonResults.headers?.get(11)?.experiment?.field == "TotalQuantity")
     }
 
     @Test
@@ -159,12 +159,24 @@ class ColumnMappingParserTests {
         val resFile = "./src/test/resources/results/spectronaut/Firsov-16431-518-library-2nd-run_Report.tsv"
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
 
+        println(colMapping.experimentNames?.size)
+        println(colMapping.experimentNames)
+
         assert(colMapping.experimentNames?.size == 96)
         assert(colMapping.experimentNames!!.contains("16432-02"))
         assert(colMapping.intCol == "Quantity")
 
-        /*
-        assert(commonResults.headers?.size == 90)
+    }
+
+    @Test
+    fun parseSpectronautSiddeek() {
+        val resFile = "./src/test/resources/results/spectronaut/Siddeek-17243-54-library-TIMS_Report.tsv"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
+        assert(colMapping.experimentNames?.size == 12)
+        assert(colMapping.experimentNames!!.contains("17252"))
+        assert(colMapping.intCol == "Quantity")
+        assert(commonResults.headers?.size == 58)
 
         // check first header
         assert(commonResults.headers?.get(0)?.idx == 0)
@@ -173,12 +185,9 @@ class ColumnMappingParserTests {
 
         // check header with experiment
         assert(commonResults.headers?.get(12)?.idx == 12)
-        assert(commonResults.headers?.get(12)?.name == "15907-d20.NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(12)?.name == "17245.NrOfPrecursorsIdentified")
         assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
-        assert(commonResults.headers?.get(12)?.experiment?.name == "15907-d20")
+        assert(commonResults.headers?.get(12)?.experiment?.name == "17245")
         assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
-
-         */
-
     }
 }
