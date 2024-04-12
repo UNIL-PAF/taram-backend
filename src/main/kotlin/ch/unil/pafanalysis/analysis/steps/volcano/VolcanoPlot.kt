@@ -15,5 +15,8 @@ data class VolcanoPoint(
     val qVal: Double? = null,
     val plotVal: Double? = null,
     val isSign: Boolean? = null,
-    val qIsSign: Boolean? = null
+    val qIsSign: Boolean? = null,
+    val other: List<VolcanoPointInfo>? = null
 )
+
+data class VolcanoPointInfo(val name: String? = null, val value: Double? = null)

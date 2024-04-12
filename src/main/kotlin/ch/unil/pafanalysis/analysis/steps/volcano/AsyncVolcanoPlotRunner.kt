@@ -57,6 +57,12 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
 
         if (foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 
+        // nr petides or precursors quantified
+        val pepOrPreHeader = table.headers?.find { a ->
+            a.experiment == null && (a.name?.contains("NrOfPrecursorsIdentified") ?: false || a.name?.contains("Razor.unique.peptides") ?: false)
+        }
+        val pepOrPreQuant = if(pepOrPreHeader?.name != null) readTableData.getDoubleColumn(table, pepOrPreHeader.name) else null
+
         val volcanoData = value?.mapIndexed { i, v ->
             val plotValTarget = if(params?.useAdjustedPVal == true) qVals?.get(i) ?: Double.NaN else v
             val plotPVal = if (params?.log10PVal == true) log10(plotValTarget) * -1 else plotValTarget
@@ -68,6 +74,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
                 ?: 10000.0) else null
 
             val qVal = qVals?.get(i)
+            val other = if(pepOrPreQuant != null) listOf(VolcanoPointInfo(pepOrPreHeader?.name, pepOrPreQuant?.get(i))) else null
 
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
@@ -77,7 +84,8 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
                 qVal = invalidToNull(qVal),
                 plotVal = invalidToNull(plotPVal),
                 isSign = isSign,
-                qIsSign = qIsSign
+                qIsSign = qIsSign,
+                other = other
             )
         }
 
