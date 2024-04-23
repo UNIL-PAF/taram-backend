@@ -99,6 +99,12 @@ class AnalysisStepController {
         return analysisStepService?.deleteStep(stepId)
     }
 
+    @DeleteMapping(path = ["/following/{stepId}"])
+    @ResponseBody
+    fun deleteFollowingSteps(@PathVariable(value = "stepId") stepId: Int): Int? {
+        return analysisStepService?.deleteFollowingSteps(stepId)
+    }
+
     @PostMapping(path = ["/switch-sel/{selId}/step-id/{stepId}"])
     @ResponseBody
     fun switchSel(

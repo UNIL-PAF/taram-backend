@@ -89,6 +89,25 @@ class AnalysisStepService {
         )
     }
 
+    fun deleteFollowingSteps(stepId: Int): Int? {
+        val step: AnalysisStep = analysisStepRepo?.findById(stepId)!!
+        var followingStepId: Int? = step.nextId
+        var nrDeleted = 0
+
+        while(followingStepId != null){
+            val thisStep = analysisStepRepo?.findById(followingStepId)
+            if(thisStep != null){
+                followingStepId = thisStep.nextId
+                deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(thisStep?.resultPath)))
+                analysisStepRepo?.deleteById(thisStep.id!!)
+                nrDeleted += 1
+            }
+        }
+
+        analysisStepRepo?.saveAndFlush(step.copy(nextId = null))
+        return nrDeleted
+    }
+
     fun deleteStep(stepId: Int, relinkRemaining: Boolean? = true): Int? {
         val step: AnalysisStep = analysisStepRepo?.findById(stepId)!!
         var after: AnalysisStep? = null
