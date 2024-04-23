@@ -190,4 +190,27 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.experiment?.name == "17245")
         assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
     }
+
+    @Test
+    fun parseSpectronautWang() {
+        val resFile = "./src/test/resources/results/spectronaut/Wang-17273-317-Library_Report.tsv"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
+        assert(colMapping.experimentNames!!.contains("01-17273"))
+        assert(colMapping.intCol == "Quantity")
+        assert(commonResults.headers?.size == 190)
+
+        // check first header
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "PG.ProteinGroups")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
+
+        // check header with experiment
+        assert(commonResults.headers?.get(12)?.idx == 12)
+        assert(commonResults.headers?.get(12)?.name == "17-17289.NrOfPrecursorsIdentified")
+        assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(12)?.experiment?.name == "17-17289")
+        assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
+
+    }
 }

@@ -70,7 +70,7 @@ class ColumnMappingParser {
         columns: List<String>?,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-        val cols = parseColumns2(columns, colTypes)
+        val cols = parseColumns(columns, colTypes)
 
         if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from spectronaut result.")
 
@@ -86,11 +86,11 @@ class ColumnMappingParser {
         return Pair(colMapping, commonResult)
     }
 
-    private fun parseColumns2(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
+    private fun parseColumns(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
         // Remove trailing " (Settings)"
         val columns = columnsOrig?.map{it.replace(Regex("\\s\\(Settings\\)$"), "")}
-
         val allEndings = columns?.map{c -> c.split(".").last()}
+
         val endingSizes = allEndings?.fold(emptyMap<String, Int>()){ a, v ->
             a + (v to (a[v]?.plus(1) ?: 1))
         }
@@ -101,7 +101,9 @@ class ColumnMappingParser {
         // remove the first part until the first_
         val cleanSelCols = selCols.map{it.replace(Regex("^.+?_(?=([A-Z|a-z]))"), "")}
 
-        val commonStart = cleanSelCols.fold(cleanSelCols.first()){ a, v -> v.commonPrefixWith(a)}.replace(Regex("_(\\d+)$"), "")
+        val commonStart = cleanSelCols.fold(cleanSelCols.first()){ a, v -> v.commonPrefixWith(a)}
+            .replace(Regex("_(\\d+)$"), "")
+            .replace(Regex("_$"), "")
 
         val dynRegex = Regex("^.*?_${commonStart}_([[a-zA-Z\\-0-9]]+).*")
 
