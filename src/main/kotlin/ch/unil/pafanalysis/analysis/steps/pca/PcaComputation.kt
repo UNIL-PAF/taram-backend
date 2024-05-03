@@ -20,17 +20,18 @@ class PcaComputation {
         val (headers, intTable) = readTableData.getDoubleMatrix(table, field, step?.columnInfo?.columnMapping?.experimentDetails)
         if(checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
         val (pcs, explVar) = rComputePc(intTable)
-
-        return createPcaRes(pcs, explVar, headers, step?.columnInfo?.columnMapping?.experimentDetails)
+        val groupNames: List<String>? = step?.columnInfo?.columnMapping?.groupsOrdered
+        return createPcaRes(pcs, explVar, headers, step?.columnInfo?.columnMapping?.experimentDetails, groupNames)
     }
 
     private fun checkIfMissingVals(intTable: List<List<Double>>?): Boolean {
         return intTable?.find { it.find{ it.isNaN()} == null } == null
     }
 
-    private fun createPcaRes(pcs: List<List<Double>>, explVar: List<Double>, headers: List<Header>, expDetails: Map<String, ExpInfo>?): PcaRes {
-        val groups: List<String> =
+    private fun createPcaRes(pcs: List<List<Double>>, explVar: List<Double>, headers: List<Header>, expDetails: Map<String, ExpInfo>?, groupNames: List<String>?): PcaRes {
+        val groups: List<String> = if(groupNames != null && groupNames.isNotEmpty()) groupNames else
             headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }.map { expDetails?.get(it.experiment?.name)?.group!! }.distinct()
+
         val pcList = pcs.mapIndexed { i, pc ->
             OnePcRow(
                 groupName = expDetails?.get(headers?.get(i).experiment?.name)?.group,
