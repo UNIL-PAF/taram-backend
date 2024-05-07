@@ -9,7 +9,8 @@ data class TTestParams (
     val multiTestCorr: String? = MulitTestCorr.BH.value,
     val signThres: Double? = 0.05,
     val altHypothesis: String? = AltHypothesis.TWO_SIDED.value,
-    val valuesAreLog: Boolean = true
+    val valuesAreLog: Boolean = true,
+    val paired: Boolean? = null
 )
 
 enum class AltHypothesis(val value: String) {

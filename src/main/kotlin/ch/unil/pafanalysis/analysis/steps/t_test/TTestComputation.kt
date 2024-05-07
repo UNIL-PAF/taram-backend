@@ -61,7 +61,7 @@ class TTestComputation {
                 readTableData.getDoubleMatrixByRow(table, field, expDetails, group).second
             }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
-        val pVals = computeTTest(rowInts)
+        val pVals = computeTTest(rowInts, params?.paired)
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
         val foldChanges = computeFoldChanges(rowInts, isLogVal)
         val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
@@ -128,14 +128,17 @@ class TTestComputation {
         return caller.parser.getAsDoubleArray("corr_p_vals").toList()
     }
 
-    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>): List<Double> {
+    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?): List<Double> {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
+
+        val myFun = if(paired == true) { first: DoubleArray, second: DoubleArray -> apacheTTest.pairedTTest(first, second)}
+                    else {first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)}
 
         return ints.map { row ->
             val first = row.first.filter{!it.isNaN()}
             val second = row.second.filter{!it.isNaN()}
 
-            val pVal = if(first.size < 2 || second.size < 2) Double.NaN else apacheTTest.homoscedasticTTest(first.toDoubleArray(), second.toDoubleArray())
+            val pVal = if(first.size < 2 || second.size < 2) Double.NaN else myFun(first.toDoubleArray(), second.toDoubleArray())
             pVal
         }
     }
