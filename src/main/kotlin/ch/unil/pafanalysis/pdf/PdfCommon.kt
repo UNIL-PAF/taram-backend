@@ -12,6 +12,7 @@ import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.Property
 import com.itextpdf.layout.properties.TextAlignment
+import com.itextpdf.layout.properties.VerticalAlignment
 import com.itextpdf.layout.renderer.CellRenderer
 
 
@@ -32,8 +33,8 @@ open class PdfCommon {
             cell1.setBorder(Border.NO_BORDER)
             table.addCell(cell1)
             val cell2Div = Div()
-            cont.forEach{ cell2Div.add(getParagraph(it))}
-            val cell2= Cell().add(cell2Div);
+            cont.forEach{ cell2Div.add(getParagraph(it).setVerticalAlignment(VerticalAlignment.TOP).setMarginTop(0.0f))}
+            val cell2= Cell().add(cell2Div)
             cell2.setBorder(Border.NO_BORDER)
             table.addCell(cell2)
         }

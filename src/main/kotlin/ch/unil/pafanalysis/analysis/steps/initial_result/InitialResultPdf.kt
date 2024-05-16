@@ -105,7 +105,8 @@ class InitialResultPdf() : PdfCommon() {
         }else{
             listOf(
                 Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
-                Pair("Fasta files:", initialResult.fastaFiles ?: emptyList())
+                Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
+                Pair("Match between runs:", listOf(if(initialResult.maxQuantParameters?.matchBetweenRuns == true) "TRUE" else if(initialResult.maxQuantParameters?.matchBetweenRuns == false) "FALSE" else ""  ))
             )
         }
     }
