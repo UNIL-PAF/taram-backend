@@ -21,6 +21,7 @@ import ch.unil.pafanalysis.analysis.steps.rename_columns.RenameColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStatRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
+import ch.unil.pafanalysis.analysis.steps.umap.UmapRunner
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.results.model.ResultType
@@ -100,6 +101,9 @@ open class CommonStep {
 
     @Autowired
     private var oneDEnrichmentRunner: OneDEnrichmentRunner? = null
+
+    @Autowired
+    private var umapRunner: UmapRunner? = null
 
     val gson = Gson()
 
@@ -187,6 +191,7 @@ open class CommonStep {
             AnalysisStepType.RENAME_COLUMNS.value -> renameColumnsRunner
             AnalysisStepType.ADD_COLUMN.value -> addColumnRunner
             AnalysisStepType.ONE_D_ENRICHMENT.value -> oneDEnrichmentRunner
+            AnalysisStepType.UMAP.value -> umapRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }
@@ -265,6 +270,7 @@ open class CommonStep {
         val filterParams = when (step?.type) {
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step).toString()
             AnalysisStepType.PCA.value -> pcaRunner?.getParameters(step).toString()
+            AnalysisStepType.UMAP.value -> umapRunner?.getParameters(step).toString()
             AnalysisStepType.FILTER.value -> filterRunner?.getParameters(step).toString()
             AnalysisStepType.GROUP_FILTER.value -> groupFilterRunner?.getParameters(step).toString()
             AnalysisStepType.T_TEST.value -> tTestRunner?.getParameters(step).toString()

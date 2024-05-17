@@ -15,7 +15,7 @@ class DefaultStepHints {
         StepHint("repeat-boxplot", "Optional: repeat boxplot", "Additional filter: min. number of peptides/precursors (usually 2)."),
         StepHint("filter-on-valid", "Filter on valid", "Filter for min values in at least one condition"),
         StepHint("impute", "Impute missing values", ""),
-        StepHint("pca", "PCA", ""),
+        StepHint("pca", "PCA / UMAP", ""),
         StepHint("t-test", "T-test", ""),
         StepHint("volcano-plots", "Volcano plots", ""),
         StepHint("remove-imputed", "Remove imputed values", ""),

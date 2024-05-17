@@ -83,7 +83,7 @@ class CheckStepHints {
     }
 
     private fun checkPca(analysis: Analysis?): Boolean {
-        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.PCA.value} ?: false
+        return analysis?.analysisSteps?.any { it.type == AnalysisStepType.PCA.value || it.type == AnalysisStepType.UMAP.value} ?: false
     }
 
     private fun checkImputation(analysis: Analysis?): Boolean {

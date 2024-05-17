@@ -12,6 +12,7 @@ object StepNames {
             "normalization"->"Normalization"
             "order-columns"->"Order columns"
             "pca"->"PCA"
+            "umap"->"UMAP"
             "remove-columns"->"Remove columns"
             "remove-imputed"->"Remove imputed"
             "rename-columns"->"Rename headers"

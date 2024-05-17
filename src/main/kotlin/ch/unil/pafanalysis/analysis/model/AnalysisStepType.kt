@@ -14,6 +14,7 @@ enum class AnalysisStepType(val value: String, val hasPlot: Boolean = false) {
     REMOVE_COLUMNS("remove-columns"),
     PCA("pca", true),
     SCATTER_PLOT("scatter-plot", true),
+    UMAP("umap", true),
     NORMALIZATION("normalization"),
     SUMMARY_STAT("summary-stat"),
     ORDER_COLUMNS("order-columns"),
