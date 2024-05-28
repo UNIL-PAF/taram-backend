@@ -19,7 +19,7 @@ class UmapComputation {
         val field = params?.column ?: step?.columnInfo?.columnMapping?.intCol
         val (headers, intTable) = readTableData.getDoubleMatrix(table, field, step?.columnInfo?.columnMapping?.experimentDetails)
         if(checkIfMissingVals(intTable)) throw StepException("Cannot perform UMAP on missing values.")
-        val umaps = rComputeUmap(intTable)
+        val umaps = rComputeUmap(intTable, params)
         val groupNames: List<String>? = step?.columnInfo?.columnMapping?.groupsOrdered
         return createUmapRes(umaps, headers, step?.columnInfo?.columnMapping?.experimentDetails, groupNames)
     }
@@ -42,11 +42,11 @@ class UmapComputation {
         return UmapRes(groups = groups, nrUmaps = umaps.size, umapList = umapList)
     }
 
-    private fun rComputeUmap(ints: List<List<Double>>): List<List<Double>> {
+    private fun rComputeUmap(ints: List<List<Double>>, params: UmapParams?): List<List<Double>> {
         val code = RCode.create()
         code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
         code.addRCode("library(umap)")
-        code.addRCode("umap_res <- umap(m, n_neighbors=2)")
+        code.addRCode("umap_res <- umap(m, n_neighbors=${params?.nrOfNeighbors ?: 2}, min_dist=${params?.minDistance ?: 0.5})")
         code.addRCode("res <- list(umaps=umap_res\$layout)")
         val caller = RCaller.create(code, RCallerOptions.create())
         caller.runAndReturnResult("res")
