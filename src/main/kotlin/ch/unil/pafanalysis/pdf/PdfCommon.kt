@@ -99,7 +99,7 @@ open class PdfCommon {
         return p
     }
 
-    fun getParamsCell(content: Div, width: Float, addTitle: Boolean = true): Cell {
+    fun getParamsCell(content: Div, width: Float, addTitle: Boolean = true, rightBorder: Boolean = true): Cell {
         val div = Div()
         div.setPaddingLeft(5f)
         val title = getParagraph("Parameters:", bold = true, underline = true)
@@ -109,9 +109,11 @@ open class PdfCommon {
         val paramsCell = Cell().add(div)
         paramsCell.setWidth(width)
         paramsCell.setBorder(Border.NO_BORDER)
-        val cellRenderer = CellRenderer(paramsCell)
-        cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
-        paramsCell.setNextRenderer(cellRenderer)
+        if(rightBorder){
+            val cellRenderer = CellRenderer(paramsCell)
+            cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
+            paramsCell.setNextRenderer(cellRenderer)
+        }
 
         return paramsCell
     }
