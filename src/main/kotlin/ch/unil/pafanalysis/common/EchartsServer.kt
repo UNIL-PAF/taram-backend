@@ -41,15 +41,27 @@ class EchartsServer {
         val echartsPlot = results.plot?.copy(outputPath = step.resultPath, width = 700.0)
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
 
-        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
+        val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build();
         val request = HttpRequest.newBuilder()
             .uri(URI.create(echartsServerUrl))
-            .timeout(Duration.ofSeconds(5))
+            .timeout(Duration.ofSeconds(30))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(echartsPlot)))
             .build();
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        val response = try{
+            client.send(request, HttpResponse.BodyHandlers.ofString())
+        } catch (e: Exception){
+            println("StepId: ${step.id} - ${step.type}")
+            println("Error while calling svg:")
+            println(echartsServerUrl)
+            println("path: ${echartsPlot?.outputPath}, width: ${echartsPlot?.width}, height: ${echartsPlot?.height}")
+            val fPath = "/tmp/echartsOptions.json"
+            println("write echartsOptions to [${fPath}].")
+            File(fPath).writeText(gson.toJson(echartsPlot))
+            throw e
+        }
 
         if(response.statusCode() != HttpStatus.OK.value()) throw Exception("Could not generate eCharts pdf graph: " + response.body())
 
