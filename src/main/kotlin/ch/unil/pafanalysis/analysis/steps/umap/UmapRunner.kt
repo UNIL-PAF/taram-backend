@@ -53,6 +53,7 @@ class UmapRunner() : CommonStep(), CommonRunner {
         // there might be differences in selected proteins, which we ignore
         val message = (if (params.column != origParams?.column) " [Column: ${params.column}]" else "")
             .plus(if (params.nrOfNeighbors != origParams?.nrOfNeighbors) " [Number of neighbors: ${params.nrOfNeighbors}]" else "")
+            .plus(if (params.minDistance != origParams?.minDistance) " [Minimum distance: ${params.minDistance}]" else "")
 
         return if(message != "") "Parameter(s) changed:".plus(message) else null
     }

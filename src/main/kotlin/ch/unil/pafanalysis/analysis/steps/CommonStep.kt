@@ -176,6 +176,7 @@ open class CommonStep {
             AnalysisStepType.INITIAL_RESULT.value -> initialResultRunner
             AnalysisStepType.BOXPLOT.value -> boxPlotRunner
             AnalysisStepType.PCA.value -> pcaRunner
+            AnalysisStepType.UMAP.value -> umapRunner
             AnalysisStepType.NORMALIZATION.value -> normalizationRunner
             AnalysisStepType.SUMMARY_STAT.value -> summaryStatRunner
             AnalysisStepType.LOG_TRANSFORMATION.value -> logTransRunner
