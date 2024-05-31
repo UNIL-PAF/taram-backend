@@ -63,7 +63,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
         val title = getParagraph("Selected results:", bold = true, underline = true)
         stepDiv.add(title)
 
-        val selResTable = Table(8)
+        val selResTable = Table(9)
         selResTable.setWidth(plotWidth)
 
         addHeaders(selResTable)
@@ -81,7 +81,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
     }
 
     private fun addHeaders(colTable: Table){
-        val headers = listOf("Type", "Name", "Size", "Score", "P-value", "Q-value", "Mean", "Median")
+        val headers = listOf("Column", "Type", "Name", "Size", "Score", "P-value", "Q-value", "Mean", "Median")
         headers.forEach{ h ->
             val headerPar = getParagraph(h, bold = true).setFontSize(cellFontSize)
             val rowNameCell = Cell().add(headerPar)
@@ -92,6 +92,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
     }
 
     private fun addRow(colTable: Table, row: EnrichmentRow) {
+        addStringCell(colTable, row.column ?: "", CustomSplitCharacters())
         addStringCell(colTable, row.type ?: "", CustomSplitCharacters())
         addStringCell(colTable, row.name ?: "")
         addStringCell(colTable, row.size?.toString() ?: "", CustomSplitCharacters())
