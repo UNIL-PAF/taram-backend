@@ -10,7 +10,9 @@ data class TTestParams (
     val signThres: Double? = 0.05,
     val altHypothesis: String? = AltHypothesis.TWO_SIDED.value,
     val valuesAreLog: Boolean = true,
-    val paired: Boolean? = null
+    val paired: Boolean? = null,
+    val filterOnValid: Boolean? = null,
+    val minNrValid: Int? = null,
 )
 
 enum class AltHypothesis(val value: String) {

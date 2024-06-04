@@ -2,15 +2,22 @@ package ch.unil.pafanalysis.analysis.steps.t_test
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.ImputationTable
+import ch.unil.pafanalysis.common.ReadImputationTableData
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import com.github.rcaller.rstuff.RCaller
 import com.github.rcaller.rstuff.RCallerOptions
 import com.github.rcaller.rstuff.RCode
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
 
 @Service
 class TTestComputation {
+
+    @Autowired
+    private var env: Environment? = null
 
     fun run(table: Table?, params: TTestParams?, step: AnalysisStep?): Triple<Table?, List<Header>?, TTest> {
 
@@ -26,6 +33,11 @@ class TTestComputation {
             throw StepException("First and second groups don't have the same number of items. Please select pairs.")
         }
 
+        val imputationTable = if(step?.imputationTablePath != null) ReadImputationTableData().getTable(
+            env?.getProperty("output.path").plus(step?.imputationTablePath),
+            step?.commonResult?.headers
+        ) else null
+
         val comparisions: List<GroupComp>? =
             params?.firstGroup?.zip(params?.secondGroup ?: emptyList())?.map { GroupComp(it.first, it.second) }
 
@@ -36,7 +48,7 @@ class TTestComputation {
             Triple(table, table?.headers, TTest(comparisions = emptyList()))
 
         val res: Triple<Table?, List<Header>?, TTest> = comparisions?.fold(initialRes) { acc, comp ->
-            computeComparision(comp, acc.first, field, acc.third, isLogVal, params, step?.columnInfo?.columnMapping?.experimentDetails)
+            computeComparision(comp, acc.first, field, acc.third, isLogVal, params, step?.columnInfo?.columnMapping?.experimentDetails, imputationTable)
         } ?: initialRes
 
         return res
@@ -51,7 +63,8 @@ class TTestComputation {
         ttest: TTest,
         isLogVal: Boolean?,
         params: TTestParams?,
-        expDetails: Map<String, ExpInfo>?
+        expDetails: Map<String, ExpInfo>?,
+        imputationTable: ImputationTable?
     ): Triple<Table?, List<Header>?, TTest> {
         val ints: Pair<List<List<Double>>, List<List<Double>>> =
             listOf(comp.group1, comp.group2).map { group ->
@@ -61,11 +74,25 @@ class TTestComputation {
                 readTableData.getDoubleMatrixByRow(table, field, expDetails, group).second
             }.zipWithNext().single()
         val rowInts: List<Pair<List<Double>, List<Double>>> = ints.first.zip(ints.second)
-        val pVals = computeTTest(rowInts, params?.paired)
+
+        fun getValids(group: String): List<Boolean> {
+            val groupIdxs = imputationTable?.headers?.withIndex()?.filter{expDetails?.get(it.value.experiment?.name)?.group == group}?.map{it.index}
+            return imputationTable?.rows?.map{ row ->
+                val selRow: List<Boolean>? = groupIdxs?.map{row[it] ?: false}
+                selRow?.count{ !it } ?: 0 >= params?.minNrValid ?: 0
+            } ?: emptyList()
+        }
+
+        val validRows: List<Boolean>? = if(params?.filterOnValid == true && imputationTable != null){
+            getValids(comp.group1).zip(getValids(comp.group2)).map{a -> a.first || a.second}
+            } else null
+
+        val pVals = computeTTest(rowInts, params?.paired, validRows)
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
-        val foldChanges = computeFoldChanges(rowInts, isLogVal)
+        val foldChanges = computeFoldChanges(rowInts, isLogVal, validRows)
         val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
+
         val (newTable, headers) = addResults(table, pVals, qVals, foldChanges, signGroups, comp)
         val newTtest = ttest.copy(
             comparisions = ttest.comparisions?.plusElement(
@@ -107,15 +134,21 @@ class TTestComputation {
         return Pair(Table(newHeaders, newCols), newHeaders)
     }
 
-    private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?): List<Double> {
-        return ints.map { row ->
+    private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?, validRows: List<Boolean>?): List<Double> {
+        return ints.mapIndexed{ i, row ->
             val first = row.first.filter{!it.isNaN()}
             val second = row.second.filter{!it.isNaN()}
-            if (isLogVal == true) {
+            val fc = if (isLogVal == true) {
                 first.average() - second.average()
             } else {
                 first.average() / second.average()
             }
+
+            if(validRows != null){
+                if(validRows[i]){
+                    fc
+                } else Double.NaN
+            } else fc
         }
     }
 
@@ -128,18 +161,23 @@ class TTestComputation {
         return caller.parser.getAsDoubleArray("corr_p_vals").toList()
     }
 
-    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?): List<Double> {
+    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?, validRows: List<Boolean>?): List<Double> {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
 
         val myFun = if(paired == true) { first: DoubleArray, second: DoubleArray -> apacheTTest.pairedTTest(first, second)}
                     else {first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)}
 
-        return ints.map { row ->
+        return ints.mapIndexed{ i, row ->
             val first = row.first.filter{!it.isNaN()}
             val second = row.second.filter{!it.isNaN()}
 
             val pVal = if(first.size < 2 || second.size < 2) Double.NaN else myFun(first.toDoubleArray(), second.toDoubleArray())
-            pVal
+
+            if(validRows != null){
+                if(validRows[i]){
+                    pVal
+                } else Double.NaN
+            } else pVal
         }
     }
 }
