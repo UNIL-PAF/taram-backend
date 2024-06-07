@@ -99,7 +99,8 @@ class TTestComputation {
                 TTestComparision(
                     comp.group1,
                     comp.group2,
-                    nrSign
+                    nrSign,
+                    nrPassedFilter = validRows?.count{ it }
                 )
             )
         )

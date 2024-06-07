@@ -5,5 +5,6 @@ data class TTest (val comparisions: List<TTestComparision>? = null)
 data class TTestComparision(
     val firstGroup: String? = null,
     val secondGroup: String? = null,
-    val numberOfSignificant: Int? = null
+    val numberOfSignificant: Int? = null,
+    val nrPassedFilter: Int? = null
 )
