@@ -62,7 +62,7 @@ class FixGroupFilterComputation() {
 
     private fun getValidGroups(table: Table?, expDetails: Map<String, ExpInfo>?, field: String?, zeroIsInvalid: Boolean?): List<List<Int>>? {
         val headerGroups: Map<String?, List<Header>>? =
-            table?.headers?.filter { it.experiment?.field == field }?.groupBy { expDetails?.get(it.experiment?.name)?.group }
+            table?.headers?.filter { it.experiment?.field == field}?.groupBy { expDetails?.get(it.experiment?.name)?.group }?.filter { it.key != null }
 
         return headerGroups?.mapValues { it ->
             it.value.fold(emptyList<Int>()) { acc, el ->

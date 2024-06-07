@@ -123,16 +123,22 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
         //val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
         val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
-        val newHeaders: List<Header>? = updateHeaders(colMapping.experimentDetails, analysisStep.commonResult?.headers)
+
+        // if there are groups defined and some experiments not in any groups, we set them as not selected.
+        val newExpDetails: Map<String, ExpInfo>?  = if(colMapping.groupsOrdered?.isNotEmpty() == true){
+            colMapping.experimentDetails?.mapValues { a -> if(a.value.group == null) a.value.copy(isSelected = false) else a.value }
+        }else colMapping.experimentDetails
+
+        val newHeaders: List<Header>? = updateHeaders(newExpDetails, analysisStep.commonResult?.headers)
         val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders)
 
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(
-                experimentDetails = colMapping.experimentDetails,
+                experimentDetails = newExpDetails,
                 intCol = colMapping.intCol,
                 groupsOrdered = colMapping.groupsOrdered
             )
-
+        
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
         val newColumnInfo: ColumnInfo? =
             analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
