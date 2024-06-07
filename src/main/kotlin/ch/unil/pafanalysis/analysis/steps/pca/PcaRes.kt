@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 
 data class PcaRes(
     val groups: List<String>? = null,
+    val groupColors: List<String>? = null,
     val explVars: List<Double>? = null,
     val nrPc: Int? = null,
     val plot: EchartsPlot? = null,

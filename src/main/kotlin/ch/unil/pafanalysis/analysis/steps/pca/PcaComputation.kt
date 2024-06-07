@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.common.DefaultColors
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import com.github.rcaller.rstuff.RCaller
@@ -17,20 +18,51 @@ class PcaComputation {
 
     fun run(table: Table?, params: PcaParams?, step: AnalysisStep?): PcaRes {
         val field = params?.column ?: step?.columnInfo?.columnMapping?.intCol
-        val (headers, intTable) = readTableData.getDoubleMatrix(table, field, step?.columnInfo?.columnMapping?.experimentDetails)
-        if(checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
+        val (headers, intTable) = readTableData.getDoubleMatrix(
+            table,
+            field,
+            step?.columnInfo?.columnMapping?.experimentDetails
+        )
+        if (checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
         val (pcs, explVar) = rComputePc(intTable)
-        val groupNames: List<String>? = step?.columnInfo?.columnMapping?.groupsOrdered
-        return createPcaRes(pcs, explVar, headers, step?.columnInfo?.columnMapping?.experimentDetails, groupNames)
+        val groupNames: List<String>? =
+            if (params?.useAllGroups == false) step?.columnInfo?.columnMapping?.groupsOrdered?.filter{params?.selGroups?.contains(it) ?: false} else step?.columnInfo?.columnMapping?.groupsOrdered
+        val groupColors: List<String> = getColors(params, step?.columnInfo?.columnMapping?.groupsOrdered)
+
+        return createPcaRes(
+            pcs,
+            explVar,
+            headers,
+            step?.columnInfo?.columnMapping?.experimentDetails,
+            groupNames,
+            groupColors
+        )
+    }
+
+    private fun getColors(params: PcaParams?, groupsOrderer: List<String>?): List<String> {
+        return if(params?.useAllGroups == false){
+            val selIdxs =  params?.selGroups?.map{group -> groupsOrderer?.indexOf(group)}
+            DefaultColors.plotColors.filterIndexed{ i, _ -> selIdxs?.contains(i) ?: false}
+        }else{
+            DefaultColors.plotColors
+        }
     }
 
     private fun checkIfMissingVals(intTable: List<List<Double>>?): Boolean {
-        return intTable?.find { it.find{ it.isNaN()} == null } == null
+        return intTable?.find { it.find { it.isNaN() } == null } == null
     }
 
-    private fun createPcaRes(pcs: List<List<Double>>, explVar: List<Double>, headers: List<Header>, expDetails: Map<String, ExpInfo>?, groupNames: List<String>?): PcaRes {
-        val groups: List<String> = if(groupNames != null && groupNames.isNotEmpty()) groupNames else
-            headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }.map { expDetails?.get(it.experiment?.name)?.group!! }.distinct()
+    private fun createPcaRes(
+        pcs: List<List<Double>>,
+        explVar: List<Double>,
+        headers: List<Header>,
+        expDetails: Map<String, ExpInfo>?,
+        groupNames: List<String>?,
+        groupColors: List<String>
+    ): PcaRes {
+        val groups: List<String> = if (groupNames != null && groupNames.isNotEmpty()) groupNames else
+            headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }
+                .map { expDetails?.get(it.experiment?.name)?.group!! }.distinct()
 
         val pcList = pcs.mapIndexed { i, pc ->
             OnePcRow(
@@ -39,7 +71,7 @@ class PcaComputation {
                 pcVals = pc
             )
         }
-        return PcaRes(groups = groups, nrPc = explVar.size, explVars = explVar, pcList = pcList)
+        return PcaRes(groups = groups, nrPc = explVar.size, explVars = explVar, pcList = pcList, groupColors = groupColors)
     }
 
     private fun rComputePc(ints: List<List<Double>>): Pair<List<List<Double>>, List<Double>> {
