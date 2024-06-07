@@ -40,10 +40,21 @@ class TTestPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsData: List<Pair<String, String>> = listOf(
+        val paramsDataOrig: List<Pair<String, String>> = listOf(
             Pair("Significance threshold:", parsedParams.signThres.toString()),
-            Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: "")
+            Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: ""),
+
         )
+
+        val paramsData = if(parsedParams.filterOnValid == true) {
+            paramsDataOrig.plusElement(
+                Pair(
+                    "Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.",
+                    ""
+                )
+            )
+        } else paramsDataOrig
+
         val paramsDiv = Div()
         paramsDiv.add(getTwoRowTable(paramsData))
         val leftCell = getParamsCell(paramsDiv, 2 * cellFifth)
@@ -53,7 +64,9 @@ class TTestPdf() : PdfCommon() {
         val middleDiv = Div()
         middleDiv.add(getParagraph("Number of significant results:", bold = true, underline = true))
         val tableData: List<Pair<String, String>> = res.comparisions?.map{ comp ->
-            Pair("${comp.firstGroup} - ${comp.secondGroup}:", comp.numberOfSignificant.toString())
+            val nrSignOrig = comp.numberOfSignificant.toString()
+            val nrSign = if(parsedParams.filterOnValid == true) nrSignOrig + " (${comp.nrPassedFilter} passed filter)" else nrSignOrig
+            Pair("${comp.firstGroup} - ${comp.secondGroup}:",  nrSign)
         } ?: emptyList()
         middleDiv.add(getTwoRowTable(tableData))
         colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
