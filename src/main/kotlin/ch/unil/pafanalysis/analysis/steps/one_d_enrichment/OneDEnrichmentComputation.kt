@@ -43,7 +43,9 @@ class OneDEnrichmentComputation() {
         val finalRes =  colIdxs.flatMap{ colIdx ->
 
         val selResVals: List<Double>? = readTableData.getDoubleColumn(resTable, colIdx)
-        val resList = proteinAcList?.zip(selResVals!!)
+        val resListOrig = proteinAcList?.zip(selResVals!!)
+        val resList = resListOrig?.filter{! it.second.isNaN()}
+
         val colName = (resTable?.headers?.find { it.idx == colIdx } ?: return null).name
 
         val res: List<List<EnrichmentRow>?>? = categoryNames?.parallelStream()?.map { category ->
