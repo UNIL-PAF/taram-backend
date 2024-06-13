@@ -24,7 +24,7 @@ Statistical functions are based on Java ([commons-math3](https://commons.apache.
 
 #### Local options
 
-Adapt ```resources/application.properties``` or add a local version ```resources/application-local.properties``` instead:
+Adapt ```resources/application.properties``` (or add a local version ```resources/application-local.properties```):
 
 - ```spring.datasource```: set your local MySQL connection URL, user and password.
 - ```result.path```: set the path were your MaxQuant and Spectronaut results are copied (we use a mounted NAS).
@@ -34,7 +34,6 @@ Adapt ```resources/application.properties``` or add a local version ```resources
 #### Run a local instance
 
 ```./mvnw spring-boot:run```
-
 
 #### Create a production server
 
