@@ -15,6 +15,8 @@ The backend of Taram is mainly written in [Kotlin](https://kotlinlang.org/) usin
 
 Statistical functions are based on Java ([commons-math3](https://commons.apache.org/proper/commons-math/)) or [R](https://www.r-project.org/) ([p.adjust](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html), [prcomp](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html), [umap](https://cran.r-project.org/web/packages/umap/index.html)).
 
+PDF exports are created with [iText 7](https://itextpdf.com/).
+
 ### Usage
 
 #### Prerequisites
