@@ -26,9 +26,16 @@ import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.VerticalAlignment
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -44,6 +51,9 @@ class PdfService {
 
     @Autowired
     private var commonStep: CommonStep? = null
+
+    @Autowired
+    private var env: Environment? = null
 
     private val fontSizeConst = 8f
     val myFont = StandardFonts.HELVETICA
@@ -97,12 +107,21 @@ class PdfService {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)
 
+        val (versionNr, backendVersion) = getBackendVersion()
+        addInfoCell("Created with TARAM ($versionNr)", backendVersion, infoTable)
+
         div.setBorder(SolidBorder(antCyan, 1f))
         div.setMarginTop(10f)
         div.setMarginBottom(20f)
         div.add(infoTable)
 
         document?.add(div)
+    }
+
+    private fun getBackendVersion(): Pair<String, String> {
+        val v = env?.getProperty("taram.version") ?: ":-/"
+        val githubBase = "https://github.com/UNIL-PAF/taram-backend/releases/tag/"
+        return Pair(v, githubBase + v)
     }
 
     private fun addInfoCell(name: String, cont: String, table: Table) {
