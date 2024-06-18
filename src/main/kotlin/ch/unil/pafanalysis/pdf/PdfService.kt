@@ -150,8 +150,8 @@ class PdfService {
         val image2Path = "/resources/images/PAF-logo-HIGH.pdf"
         val img1 = pdfToImage(imagePath, pdf)
         val img2 = pdfToImage(image2Path, pdf)
-        img1.scaleToFit(156f/2, 58f/2).setHorizontalAlignment(HorizontalAlignment.RIGHT)
-        img2.scaleToFit(156f/1.6f, 58f/1.6f)
+        img1.scaleToFit(156f/1.3f, 58f/1.3f).setHorizontalAlignment(HorizontalAlignment.RIGHT)
+        img2.scaleToFit(156f/1f, 58f/1f)
         val table = Table(2)
         table.setWidth(plotWidth)
         val cell1 = Cell().add(img2).setBorder(Border.NO_BORDER)
