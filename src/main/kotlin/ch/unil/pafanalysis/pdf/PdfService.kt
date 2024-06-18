@@ -96,6 +96,7 @@ class PdfService {
         title.setMarginTop(0f)
         div.add(title)
         div.setPaddingTop(0f)
+        div.setBackgroundColor(antCyan)
 
         val infoTable = Table(2).setPaddingLeft(5f)
 
