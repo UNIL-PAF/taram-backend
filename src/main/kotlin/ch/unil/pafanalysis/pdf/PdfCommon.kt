@@ -23,6 +23,7 @@ open class PdfCommon {
     private val myBoldFont = StandardFonts.HELVETICA_BOLD
     //private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
     private val antCyan = DeviceRgb(244, 240, 236)
+    private val antDarkGreen = DeviceRgb(145, 204, 117)
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
@@ -94,10 +95,11 @@ open class PdfCommon {
         return div
     }
 
-    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false): Paragraph {
+    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false, green: Boolean = false): Paragraph {
         val p = Paragraph(s)
         p.setFontSize(fontSizeConst)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
+        if(green) p.setFontColor(antDarkGreen)
         if(underline) p.setUnderline()
         return p
     }

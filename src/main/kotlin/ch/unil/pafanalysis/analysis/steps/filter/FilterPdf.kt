@@ -36,7 +36,7 @@ class FilterPdf() : PdfCommon() {
         // 3. results
         val rightDiv = Div()
         rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getParagraph("Table-$stepNr", bold = true, underline = true))
+        rightDiv.add(getParagraph("Table-$stepNr", bold = true, underline = true, green = true))
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)
