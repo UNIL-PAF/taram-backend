@@ -17,10 +17,8 @@ class GroupFilterPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, GroupFilter::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Filter on valid", plotWidth))
-
         val description = "Retain only proteins quantified in a minimum number of samples."
-        stepDiv.add(descriptionDiv(description))
+        stepDiv.add(titleDiv("$stepNr. Filter on valid", plotWidth, description))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

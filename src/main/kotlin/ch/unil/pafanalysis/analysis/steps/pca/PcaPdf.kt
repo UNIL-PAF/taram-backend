@@ -18,10 +18,8 @@ class PcaPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
         val div = Div()
-        div.add(titleDiv("$stepNr. PCA", plotWidth))
-
         val description = "Examines similarities between samples and groups, needs imputed values."
-        div.add(descriptionDiv(description))
+        div.add(titleDiv("$stepNr. PCA", plotWidth, description))
 
         div.add(Paragraph(" "))
         val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)

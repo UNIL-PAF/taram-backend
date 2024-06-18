@@ -22,11 +22,10 @@ class UmapPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, UmapParams::class.java)
         parsedParams.nrOfNeighbors
 
-        val div = Div()
-        div.add(titleDiv("$stepNr. UMAP", plotWidth))
-
         val description = "Examines similarities between samples and groups, needs imputed values."
-        div.add(descriptionDiv(description))
+
+        val div = Div()
+        div.add(titleDiv("$stepNr. UMAP", plotWidth, description))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

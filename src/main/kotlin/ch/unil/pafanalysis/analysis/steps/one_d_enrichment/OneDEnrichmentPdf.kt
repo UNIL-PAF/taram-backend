@@ -29,10 +29,8 @@ class OneDEnrichmentPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, OneDEnrichmentParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth))
-
         val description = "Table is first ranked by (usually) fold change. Distribution of each annotation term is then evaluated to see if it is enriched toward the top or bottom. FDR-filtered table."
-        stepDiv.add(descriptionDiv(description))
+        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)

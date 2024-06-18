@@ -16,10 +16,8 @@ class LogTransformationPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, LogTransformationParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Log transformation", plotWidth = plotWidth))
-
         val description = "Log transformation facilitates plotting of data and makes distributions more “normal”, allowing application of standard statistical tests."
-        stepDiv.add(descriptionDiv(description))
+        stepDiv.add(titleDiv("$stepNr. Log transformation", plotWidth = plotWidth, description))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

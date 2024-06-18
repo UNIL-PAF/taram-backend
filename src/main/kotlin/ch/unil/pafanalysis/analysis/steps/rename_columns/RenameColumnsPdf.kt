@@ -17,10 +17,8 @@ class RenameColumnsPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, RenameColumnsParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth))
-
         val description = "Table cleanup."
-        stepDiv.add(descriptionDiv(description))
+        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth, description))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

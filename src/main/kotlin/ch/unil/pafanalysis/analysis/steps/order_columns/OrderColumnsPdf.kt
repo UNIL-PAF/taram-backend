@@ -18,10 +18,8 @@ class OrderColumnsPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, OrderColumnsParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Order columns", plotWidth = plotWidth))
-
         val description = "Table cleanup."
-        stepDiv.add(descriptionDiv(description))
+        stepDiv.add(titleDiv("$stepNr. Order columns", plotWidth = plotWidth, description))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)
