@@ -23,7 +23,7 @@ class UmapPdf() : PdfCommon() {
         parsedParams.nrOfNeighbors
 
         val div = Div()
-        div.add(titleDiv("$stepNr - UMAP", plotWidth))
+        div.add(titleDiv("$stepNr. UMAP", plotWidth))
 
         val description = "Examines similarities between samples and groups, needs imputed values."
         div.add(descriptionDiv(description))

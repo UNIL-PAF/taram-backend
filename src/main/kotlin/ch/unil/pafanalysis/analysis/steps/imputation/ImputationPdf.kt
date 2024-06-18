@@ -42,7 +42,7 @@ class ImputationPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, ImputationParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Imputation", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Imputation", plotWidth = plotWidth))
 
         val description = "Imputation allows calculating fold changes (FC) and statistical tests for proteins with missing values. NaN is replaced by low-shifted random values, based on the assumption that missing values occur when signals are below detection limits."
         stepDiv.add(descriptionDiv(description))

@@ -17,7 +17,7 @@ class FilterPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, Filter::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Filter rows", plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Filter rows", plotWidth))
 
         val description = "Filtering step, e.g. to remove environmental contaminants and digestion enzymes."
         stepDiv.add(descriptionDiv(description))

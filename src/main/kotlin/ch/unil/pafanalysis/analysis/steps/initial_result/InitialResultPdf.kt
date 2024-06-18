@@ -21,7 +21,7 @@ class InitialResultPdf() : PdfCommon() {
         val groupsDefined = step.columnInfo?.columnMapping?.experimentDetails?.values?.find { it.group != null } != null
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Initial result", plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Initial result", plotWidth))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)

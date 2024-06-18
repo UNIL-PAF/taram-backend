@@ -17,7 +17,7 @@ class RemoveColumnsPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, RemoveColumns::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Remove columns", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Remove columns", plotWidth = plotWidth))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

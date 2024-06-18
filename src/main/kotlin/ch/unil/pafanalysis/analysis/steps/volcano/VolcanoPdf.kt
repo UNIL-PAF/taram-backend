@@ -18,7 +18,7 @@ class VolcanoPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
         val div = Div()
-        div.add(titleDiv("$stepNr - Volcano plot", plotWidth))
+        div.add(titleDiv("$stepNr. Volcano plot", plotWidth))
 
         val description = "y-axis: can be either p- or q-values (-log10)."
         div.add(descriptionDiv(description))

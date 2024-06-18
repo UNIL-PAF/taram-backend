@@ -18,7 +18,7 @@ class RemoveImputedPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, RemoveImputedParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Remove imputed", plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Remove imputed", plotWidth))
 
         val description = "FC and p-values calculated with imputed data are kept."
         stepDiv.add(descriptionDiv(description))

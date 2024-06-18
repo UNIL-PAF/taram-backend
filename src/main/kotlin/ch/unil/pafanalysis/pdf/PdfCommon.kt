@@ -2,10 +2,8 @@ package ch.unil.pafanalysis.pdf
 
 import com.google.gson.Gson
 import com.itextpdf.io.font.constants.StandardFonts
-import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.DeviceRgb
-import com.itextpdf.kernel.colors.WebColors
 import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
@@ -20,11 +18,11 @@ open class PdfCommon {
 
     val gson = Gson()
 
-    val fontSizeConst = 8f
-    val myFont = StandardFonts.HELVETICA
-    val myBoldFont = StandardFonts.HELVETICA_BOLD
-    val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
-    val antCyan = DeviceRgb(244, 240, 236)
+    private val fontSizeConst = 8f
+    private val myFont = StandardFonts.HELVETICA
+    private val myBoldFont = StandardFonts.HELVETICA_BOLD
+    //private val myGrayConst: Color = WebColors.getRGBColor("WhiteSmoke")
+    private val antCyan = DeviceRgb(244, 240, 236)
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
@@ -75,6 +73,7 @@ open class PdfCommon {
         t.setWidth(plotWidth?.minus(titlePadding))
 
         val text = Paragraph(Text(title))
+        text.setBold()
         text.setFontSize(11f)
         text.setFontColor(ColorConstants.BLACK)
         text.setFont(PdfFontFactory.createFont(myFont))

@@ -19,7 +19,7 @@ class AddColumnPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, AddColumn::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - Add column", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Add column", plotWidth = plotWidth))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

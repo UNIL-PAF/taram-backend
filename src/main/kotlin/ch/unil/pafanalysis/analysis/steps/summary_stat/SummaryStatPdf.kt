@@ -24,7 +24,7 @@ class SummaryStatPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
-        stepDiv.add(titleDiv("$stepNr - ${StepNames.getName(step?.type)}", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth))
 
         val description = "Overview of samples. “Nr of valid ” = # quantified proteins. NaN are missing values."
         stepDiv.add(descriptionDiv(description))

@@ -30,7 +30,7 @@ class TTestPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, TTestParams::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr - t-test", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. t-test", plotWidth = plotWidth))
 
         val description = "FDR correction adjusts thresholds for large datasets. Q-values = adjusted p-values."
         stepDiv.add(descriptionDiv(description))
