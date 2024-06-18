@@ -24,7 +24,7 @@ class SummaryStatPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
-        val description = "Overview of samples. “Nr of valid ” = # quantified proteins. NaN are missing values."
+        val description = "“Nr of valid ” = # quantified proteins. NaN are missing values."
         stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description))
 
         val nrEntries = res.min?.size
@@ -69,7 +69,7 @@ class SummaryStatPdf() : PdfCommon() {
         val groups = res.groups ?: res.expNames?.map{""}
 
         val table = Table(end-start + 1) //.setWidth(plotWidth)
-        addStringRow("Name", res.expNames, start, end, table)
+        addStringRow("Name", res.expNames, start, end, table, bold = true)
         addStringRow("Group", groups, start, end, table)
         addDoubleRow("Min", res.min, start, end, table)
         addDoubleRow("Max", res.max, start, end, table)
@@ -92,17 +92,18 @@ class SummaryStatPdf() : PdfCommon() {
         colTable.addCell(rowNameCell)
     }
 
-    private fun addStringCell(cellString: String, colTable: Table){
-        val cell = Cell().add(getParagraph(cellString).setFontSize(cellFontSize))
+    private fun addStringCell(cellString: String, colTable: Table, bold: Boolean = false){
+        val p = getParagraph(cellString, bold).setFontSize(cellFontSize)
+        val cell = Cell().add(p)
         cell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
         colTable.addCell(cell)
     }
 
-    private fun addStringRow(rowName: String, data: List<String>?, start: Int, end: Int, colTable: Table){
+    private fun addStringRow(rowName: String, data: List<String>?, start: Int, end: Int, colTable: Table, bold: Boolean = false){
        addFirstCol(rowName, colTable)
 
         data?.subList(start, end)?.forEach{ a ->
-            addStringCell(a, colTable)
+            addStringCell(a, colTable, bold)
         }
     }
 
