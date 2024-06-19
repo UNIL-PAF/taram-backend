@@ -34,8 +34,9 @@ class NormalizationPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, NormalizationParams::class.java)
 
         val stepDiv = Div()
-        val description = "Median subtraction is the most conservative normalization, used to compensate for global differences in sample amounts."
-        stepDiv.add(titleDiv("$stepNr. Normalization", plotWidth = plotWidth, description))
+        val description1 = "Assumption: the majority of the observed proteins remain unchanged."
+        val description2 = if(parsedParams?.normalizationType == NormalizationType.MEDIAN.value) "Median subtraction is the most conservative normalization, used to compensate for global differences in sample amounts. " else ""
+        stepDiv.add(titleDiv("$stepNr. Normalization", plotWidth = plotWidth, description2.plus(description1)))
 
 
         val colTable = Table(3)
