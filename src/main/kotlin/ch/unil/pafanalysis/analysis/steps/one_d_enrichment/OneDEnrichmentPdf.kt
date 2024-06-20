@@ -41,7 +41,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
             Pair("Annotation file:", res.annotation?.origFileName ?: ""),
             Pair("Annotation info:", getAnnotationString(res.annotation) ?: ""),
             Pair("Selected annotations:", res.annotation?.selHeaderNames?.joinToString(separator = ", ") ?: ""),
-            Pair("Selected column:", res.selColumns?.joinToString("; ") ?: ""),
+            Pair("Selected column(s):", res.selColumns?.joinToString("; ") ?: ""),
             Pair("Significance threshold:", parsedParams.threshold.toString() ?: ""),
             Pair("Multiple testing correction:", if(parsedParams.fdrCorrection == true) "Benjamini & Hochberg (FDR)" else "None"),
         )
@@ -90,15 +90,15 @@ class OneDEnrichmentPdf() : PdfCommon() {
     }
 
     private fun addRow(colTable: Table, row: EnrichmentRow) {
-        addStringCell(colTable, row.column ?: "", CustomSplitCharacters())
+        addStringCell(colTable, row.column ?: "", DefaultSplitCharacters())
         addStringCell(colTable, row.type ?: "", CustomSplitCharacters())
         addStringCell(colTable, row.name ?: "")
         addStringCell(colTable, row.size?.toString() ?: "", CustomSplitCharacters())
         addDoubleCell(colTable, row.score, CustomSplitCharacters())
         addDoubleCell(colTable, row.pvalue, CustomSplitCharacters())
         addDoubleCell(colTable, row.qvalue, CustomSplitCharacters())
-        addDoubleCell(colTable, row.mean, CustomSplitCharacters())
-        addDoubleCell(colTable, row.median, CustomSplitCharacters())
+        addDoubleCell(colTable, row.mean, CustomSplitCharacters(), scientific = false)
+        addDoubleCell(colTable, row.median, CustomSplitCharacters(), scientific = false)
     }
 
     private fun addStringCell(colTable: Table, cellString: String, splitCharacters: DefaultSplitCharacters = DefaultSplitCharacters()) {
@@ -107,8 +107,11 @@ class OneDEnrichmentPdf() : PdfCommon() {
         colTable.addCell(cell)
     }
 
-    private fun addDoubleCell(colTable: Table, cellVal: Double?, splitCharacters: DefaultSplitCharacters = DefaultSplitCharacters()) {
-        val n = if (cellVal == null) "" else if (cellVal == 0.0) "0" else DecimalFormat("00.##E0").format(cellVal)
+    private fun addDoubleCell(colTable: Table, cellVal: Double?, splitCharacters: DefaultSplitCharacters = DefaultSplitCharacters(), scientific: Boolean = true) {
+        val n = if (cellVal == null) "" else if (cellVal == 0.0) "0" else {
+            val f = if(scientific) DecimalFormat("00.##E0") else DecimalFormat("0.###")
+            f.format(cellVal)
+        }
         addStringCell(colTable, n, splitCharacters)
     }
 
