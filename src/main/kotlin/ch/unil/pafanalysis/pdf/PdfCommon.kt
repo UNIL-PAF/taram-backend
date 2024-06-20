@@ -95,9 +95,8 @@ open class PdfCommon {
         return div
     }
 
-    fun getTableParagraph(stepNr: String): Paragraph {
-        val tableName = "Table-$stepNr"
-        return getParagraph(tableName, bold = true, underline = false)
+    fun getTableParagraph(s: String): Paragraph {
+        return getParagraph(s, bold = true, underline = false)
             .setWidth(40f)
             .setBackgroundColor(lightCyan)
             .setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
