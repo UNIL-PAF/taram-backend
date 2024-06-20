@@ -22,6 +22,7 @@ import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
+import com.itextpdf.layout.properties.BorderRadius
 import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.VerticalAlignment
@@ -59,7 +60,7 @@ class PdfService {
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
     val antCyan = DeviceRgb(244, 240, 236)
-    val antDarkGreen = DeviceRgb(130, 183, 105)
+    val lightCyan = DeviceRgb(252, 250, 249)
 
     fun createPdf(analysisId: Int, zipSelection: ZipDataSelection? = null): File {
         val analysis = analysisRepo?.findById(analysisId)
@@ -166,9 +167,12 @@ class PdfService {
 
     private fun commentDiv(comment: String): Div {
         val p1 = Paragraph(comment).setFont(PdfFontFactory.createFont(myFont))
-        p1.setFontColor(antDarkGreen)
+        p1.setBackgroundColor(lightCyan)
         p1.setFontSize(fontSizeConst)
+        p1.setPadding(1f)
         p1.setPaddingLeft(5f)
+        p1.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+        p1.setBorderRadius(BorderRadius(2f))
         val div = Div()
         div.add(p1)
         return div

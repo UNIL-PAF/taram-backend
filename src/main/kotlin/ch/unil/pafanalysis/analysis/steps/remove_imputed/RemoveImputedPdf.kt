@@ -42,7 +42,7 @@ class RemoveImputedPdf() : PdfCommon() {
         // 3. results
         val rightDiv = Div()
         rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getParagraph("Table-$stepNr", bold = true, underline = true, green = true))
+        rightDiv.add(getTableParagraph(stepNr.toString()))
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         stepDiv.add(colTable)

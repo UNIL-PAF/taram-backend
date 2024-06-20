@@ -8,6 +8,7 @@ import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
+import com.itextpdf.layout.properties.BorderRadius
 import com.itextpdf.layout.properties.Property
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.VerticalAlignment
@@ -22,7 +23,7 @@ open class PdfCommon {
     private val myFont = StandardFonts.HELVETICA
     private val myBoldFont = StandardFonts.HELVETICA_BOLD
     private val antCyan = DeviceRgb(244, 240, 236)
-    private val antDarkGreen = DeviceRgb(130, 183, 105)
+    private val lightCyan = DeviceRgb(252, 250, 249)
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
@@ -94,11 +95,22 @@ open class PdfCommon {
         return div
     }
 
-    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false, green: Boolean = false): Paragraph {
-        val p = Paragraph(s)
+    fun getTableParagraph(stepNr: String): Paragraph {
+        val tableName = "Table-$stepNr"
+        return getParagraph(tableName, bold = true, underline = false)
+            .setWidth(40f)
+            .setBackgroundColor(lightCyan)
+            .setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+            .setPadding(1f)
+            .setPaddingLeft(5f)
+            .setBorderRadius(BorderRadius(2f))
+    }
+
+    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false): Paragraph {
+        val t = Text(s)
+        val p = Paragraph(t)
         p.setFontSize(fontSizeConst)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
-        if(green) p.setFontColor(antDarkGreen)
         if(underline) p.setUnderline()
         return p
     }
