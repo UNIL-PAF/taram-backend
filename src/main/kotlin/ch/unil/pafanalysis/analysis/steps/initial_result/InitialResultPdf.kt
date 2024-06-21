@@ -5,11 +5,9 @@ import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.DoubleBorder
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
-import com.itextpdf.layout.properties.BorderRadius
 import org.springframework.stereotype.Service
 
 
@@ -32,25 +30,11 @@ class InitialResultPdf() : PdfCommon() {
         if(groupsDefined){
             val (groupHeaders, groupRows) = getGroups(step.columnInfo?.columnMapping)
             if(groupHeaders != null && groupRows != null){
-                val table = Table(groupRows[0].size).setMarginBottom(10f)
-                groupHeaders.forEach{
-                    val cell = Cell().add(getParagraph(it, bold = true))
-                        .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-                        .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-                        .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
-                        .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
-
-                    table.addCell(cell)
+                val tables =  createTables(groupHeaders, groupRows, plotWidth)
+                tables.forEach{ table ->
+                    stepDiv.add(table)
+                    stepDiv.add(Paragraph(""))
                 }
-                groupRows.forEach { it.forEach{ v ->
-                    val cell = Cell().add(getParagraph(v ?: ""))
-                        .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-                        .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-                        .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
-                        .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
-                    table.addCell(cell)
-                }}
-                stepDiv.add(table)
             }
         }else{
             stepDiv.add(Paragraph("No groups are defined"))
@@ -71,6 +55,63 @@ class InitialResultPdf() : PdfCommon() {
 
         stepDiv.add(colTable)
         return stepDiv
+    }
+
+    private fun createTables(groupHeaders: List<String>, groupRows: List<List<String?>>, plotWidth: Float): List<Table> {
+        val nrEntries = groupHeaders.size
+
+        val maxChar = 110
+
+        var charsUsed = 0
+        var start = 0
+        var end = 0
+        var tables = emptyList<Table>()
+        var i = 0
+
+        while(i < nrEntries){
+            val longestChar = listOf(groupHeaders[i].length, groupRows[0][i]?.length ?: 0, 8).maxOrNull() ?: 8
+            charsUsed += longestChar
+            if(charsUsed > maxChar){
+                tables += createTable(groupHeaders, groupRows, start, end, plotWidth)
+                start = i
+                charsUsed = longestChar
+            }
+            i++
+            end = i
+        }
+
+        // add last table if necessary
+        if(end > start){
+            tables += createTable(groupHeaders, groupRows, start, end, plotWidth)
+        }
+        return tables
+    }
+
+    private fun createTable(
+        groupHeaders: List<String>,
+        groupRows: List<List<String?>>,
+        start: Int,
+        end: Int,
+        plotWidth: Float
+    ): Table {
+        val table = Table(end-start).setMarginBottom(10f).setKeepTogether(true) //.setWidth(plotWidth)
+        groupHeaders.subList(start, end).forEach{
+            val cell = Cell().add(getParagraph(it, bold = true))
+                .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+                .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+            table.addCell(cell)
+        }
+        groupRows.forEach { it.subList(start, end).forEach{ v ->
+            val cell = Cell().add(getParagraph(v ?: ""))
+                .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+                .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+            table.addCell(cell)
+        }}
+        return table
     }
 
     private fun getGroups(colMapping: ColumnMapping?): Pair<List<String>?, List<List<String?>>?> {

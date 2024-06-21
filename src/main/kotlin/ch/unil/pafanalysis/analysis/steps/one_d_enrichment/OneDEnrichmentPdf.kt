@@ -63,6 +63,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
 
         val selResTable = Table(9)
         selResTable.setWidth(plotWidth)
+        selResTable.setKeepTogether(true)
 
         addHeaders(selResTable)
         res.selResults?.forEach { row -> addRow(selResTable, row) }
