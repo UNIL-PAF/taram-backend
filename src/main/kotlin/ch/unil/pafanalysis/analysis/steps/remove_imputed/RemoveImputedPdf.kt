@@ -26,8 +26,8 @@ class RemoveImputedPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsDiv = Div()
-        paramsDiv.add(getParagraph("Replace imputed values by [${parsedParams.replaceBy?.printName}]."))
+        val paramsDiv = Div().setPaddingLeft(2f)
+        paramsDiv.add(getParagraph("Replace imputed values by [${parsedParams.replaceBy?.printName}].", dense = true))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

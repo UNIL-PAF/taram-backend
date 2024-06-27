@@ -28,27 +28,43 @@ open class PdfCommon {
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
         tableData.forEach{ (name, cont) ->
-            val cell1 = Cell().add(getParagraph(name, bold = true));
+            val cell1 = Cell().add(getParagraph(name, bold = true, dense = true));
             cell1.setBorder(Border.NO_BORDER)
+            cell1.setMarginTop(0f).setMarginBottom(0f).setPaddingTop(0f).setPaddingBottom(0f)
             table.addCell(cell1)
             val cell2Div = Div()
-            cont.forEach{ cell2Div.add(getParagraph(it).setVerticalAlignment(VerticalAlignment.TOP).setMarginTop(0.0f))}
+            cont.forEach{ cell2Div.add(getParagraph(it, dense = true).setVerticalAlignment(VerticalAlignment.TOP).setMarginTop(0.0f))}
             val cell2= Cell().add(cell2Div)
+            cell2.setMarginTop(0f).setMarginBottom(0f).setPaddingTop(0f).setPaddingBottom(0f)
             cell2.setBorder(Border.NO_BORDER)
             table.addCell(cell2)
         }
         return table
     }
 
-    fun getTwoRowTable(tableData: List<Pair<String, String>>, noBold: Boolean? = null): Table {
+    fun getTwoRowTable(tableData: List<Pair<String, String>>, noBold: Boolean? = null, leftColMinWidth: Float? = null): Table {
         val table = Table(2)
         tableData.forEach{ (name, cont) ->
-            val cell1 = Cell().add(getParagraph(name, bold = noBold != true));
+            val cell1 = Cell().add(getParagraph(name, bold = noBold != true, dense = true));
+            if(leftColMinWidth != null) cell1.setMinWidth(leftColMinWidth)
             cell1.setBorder(Border.NO_BORDER)
+            cell1.setMarginTop(0f).setMarginBottom(0f).setPaddingTop(0f).setPaddingBottom(0f)
             table.addCell(cell1)
-            val cell2= Cell().add(getParagraph(cont));
+            val cell2= Cell().add(getParagraph(cont, dense = true));
             cell2.setBorder(Border.NO_BORDER)
+            cell2.setMarginTop(0f).setMarginBottom(0f).setPaddingTop(0f).setPaddingBottom(0f)
             table.addCell(cell2)
+        }
+        return table
+    }
+
+    fun getOneRowTable(tableData: List<Paragraph>): Table {
+        val table = Table(1)
+        tableData.forEach{ cont ->
+            val cell1 = Cell().add(cont);
+            cell1.setBorder(Border.NO_BORDER)
+            cell1.setMarginTop(0f).setMarginBottom(0f).setPaddingTop(0f).setPaddingBottom(0f)
+            table.addCell(cell1)
         }
         return table
     }
@@ -105,19 +121,20 @@ open class PdfCommon {
             .setBorderRadius(BorderRadius(2f))
     }
 
-    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false): Paragraph {
+    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false, dense: Boolean = false): Paragraph {
         val t = Text(s)
         val p = Paragraph(t)
         p.setFontSize(fontSizeConst)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
         if(underline) p.setUnderline()
+        if(dense) p.setMargin(0f).setPadding(0f)
         return p
     }
 
     fun getParamsCell(content: Div, width: Float, addTitle: Boolean = true, rightBorder: Boolean = true): Cell {
         val div = Div()
         div.setPaddingLeft(5f)
-        val title = getParagraph("Parameters:", bold = true, underline = false)
+        val title = getParagraph("Parameters:", bold = true, underline = false, dense = true)
         if(addTitle) div.add(title)
         div.add(content)
 

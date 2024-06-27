@@ -26,8 +26,8 @@ class OrderColumnsPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsDiv = Div()
-        if(parsedParams.moveSelIntFirst == true) paramsDiv.add(getParagraph("Move default intensity columns [${step.columnInfo?.columnMapping?.intCol}] first."))
+        val paramsDiv = Div().setPaddingLeft(2f)
+        if(parsedParams.moveSelIntFirst == true) paramsDiv.add(getParagraph("Move default intensity columns [${step.columnInfo?.columnMapping?.intCol}] first.", dense = true))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

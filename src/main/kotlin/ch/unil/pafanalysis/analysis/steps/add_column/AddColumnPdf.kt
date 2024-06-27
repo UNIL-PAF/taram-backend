@@ -38,8 +38,8 @@ class AddColumnPdf() : PdfCommon() {
         colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
 
         // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
+        val rightDiv = Div().setPaddingLeft(2f)
+        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups", dense = true))
         rightDiv.add(getTableParagraph("Table-$stepNr"))
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 

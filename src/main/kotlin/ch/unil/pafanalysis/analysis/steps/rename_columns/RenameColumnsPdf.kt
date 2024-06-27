@@ -25,8 +25,8 @@ class RenameColumnsPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsDiv = Div()
-        if(parsedParams.addConditionNames == true) paramsDiv.add(getParagraph("Add conditions to table headers."))
+        val paramsDiv = Div().setPaddingLeft(2f)
+        if(parsedParams.addConditionNames == true) paramsDiv.add(getParagraph("Add conditions to table headers.", dense = true))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

@@ -50,8 +50,8 @@ class ImputationPdf() : PdfCommon() {
         val cellFifth = plotWidth / 5
 
         // 1. parameters
-        val paramsDiv = Div()
-        val firstParam = listOf(getParagraph(getImputationText(parsedParams, step), bold = false))
+        val paramsDiv = Div().setPaddingLeft(2f)
+        val firstParam = listOf(getParagraph(getImputationText(parsedParams, step), bold = false, dense = true))
 
         val additionalParams: List<Paragraph> =
             if (parsedParams.imputationType == "normal") listOf(getNormParams(parsedParams.normImputationParams))

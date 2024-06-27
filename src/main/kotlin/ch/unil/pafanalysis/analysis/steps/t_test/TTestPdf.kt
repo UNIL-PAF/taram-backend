@@ -38,23 +38,16 @@ class TTestPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsDataOrig: List<Pair<String, String>> = listOf(
+        val paramsData: List<Pair<String, String>> = listOf(
             Pair("Significance threshold:", parsedParams.signThres.toString()),
-            Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: ""),
-
+            Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: "")
         )
-
-        val paramsData = if(parsedParams.filterOnValid == true) {
-            paramsDataOrig.plusElement(
-                Pair(
-                    "Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.",
-                    ""
-                )
-            )
-        } else paramsDataOrig
 
         val paramsDiv = Div()
         paramsDiv.add(getTwoRowTable(paramsData))
+        if(parsedParams.filterOnValid == true){
+            paramsDiv.add(getOneRowTable(listOf(getParagraph("Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.", dense = true, bold = true))))
+        }
         val leftCell = getParamsCell(paramsDiv, 2 * cellFifth)
         colTable.addCell(leftCell)
 

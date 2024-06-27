@@ -42,8 +42,8 @@ class InitialResultPdf() : PdfCommon() {
 
         // 1. parameters
         val leftDiv = Div()
-        leftDiv.add(getTwoRowTable(listOf(Pair("Default intensity column:", step?.columnInfo?.columnMapping?.intCol ?: ""))))
-        val dataTable = getDataTable(initialResult)
+        //leftDiv.add(getTwoRowTable(listOf(Pair("Default intensity column:", step?.columnInfo?.columnMapping?.intCol ?: ""))))
+        val dataTable = getDataTable(initialResult, step?.columnInfo?.columnMapping?.intCol ?: "")
         leftDiv.add(getTwoRowTableWithList(dataTable))
         colTable.addCell(getDataCell(leftDiv, 4*cellFifth))
 
@@ -135,9 +135,10 @@ class InitialResultPdf() : PdfCommon() {
         } else Pair(null, null)
     }
 
-    private fun getDataTable(initialResult: InitialResult): List<Pair<String, List<String>>>{
+    private fun getDataTable(initialResult: InitialResult, intCol: String): List<Pair<String, List<String>>>{
         return if(initialResult?.spectronautSetup != null){
             listOf(
+                Pair("Default intensity column:", listOf(intCol)),
                 Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
                 Pair("Analysis date: ", listOf(initialResult.spectronautSetup.analysisDate ?: "")),
                 Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
@@ -145,6 +146,7 @@ class InitialResultPdf() : PdfCommon() {
             )
         }else{
             listOf(
+                Pair("Default intensity column:", listOf(intCol)),
                 Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
                 Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
                 Pair("Match between runs:", listOf(if(initialResult.maxQuantParameters?.matchBetweenRuns == true) "TRUE" else if(initialResult.maxQuantParameters?.matchBetweenRuns == false) "FALSE" else ""  ))

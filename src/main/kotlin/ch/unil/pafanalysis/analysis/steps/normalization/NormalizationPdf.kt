@@ -44,8 +44,8 @@ class NormalizationPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsDiv = Div()
-        paramsDiv.add(getParagraph(normText(parsedParams)))
+        val paramsDiv = Div().setPaddingLeft(2f)
+        paramsDiv.add(getParagraph(normText(parsedParams), dense = true))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

@@ -46,7 +46,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
             Pair("Multiple testing correction:", if(parsedParams.fdrCorrection == true) "Benjamini & Hochberg (FDR)" else "None"),
         )
         val paramsDiv = Div()
-        paramsDiv.add(getTwoRowTable(paramsData))
+        paramsDiv.add(getTwoRowTable(paramsData, leftColMinWidth=110f))
         val leftCell = getParamsCell(paramsDiv, 4 * cellFifth)
         colTable.addCell(leftCell)
         stepDiv.add(colTable)

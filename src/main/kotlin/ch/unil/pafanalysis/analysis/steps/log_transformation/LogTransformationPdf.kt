@@ -24,8 +24,8 @@ class LogTransformationPdf() : PdfCommon() {
         val cellFifth = plotWidth/5
 
         // 1. parameters
-        val paramsDiv = Div()
-        paramsDiv.add(getParagraph(parsedParams.transformationType + " transformation"))
+        val paramsDiv = Div().setPaddingLeft(2f)
+        paramsDiv.add(getParagraph(parsedParams.transformationType + " transformation", dense = true))
         colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
 
         // 2. data

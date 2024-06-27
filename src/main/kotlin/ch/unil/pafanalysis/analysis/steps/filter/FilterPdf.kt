@@ -47,17 +47,18 @@ class FilterPdf() : PdfCommon() {
         val paramDiv = Div()
         val parsedParams = gson.fromJson(step.parameters, FilterParams::class.java)
         val l = emptyList<Paragraph>()
-        val l2 = if(parsedParams.removeOnlyIdentifiedBySite == true) l.plus(getParagraph("Remove only-identified-by-site")) else l
-        val l3 = if(parsedParams.removeReverse == true) l2.plus(getParagraph("Remove reverse hits")) else l2
-        val l4 = if(parsedParams.removePotentialContaminant == true) l3.plus(getParagraph("Remove potential contaminants")) else l3
-        l4.plus(getFreeParams(parsedParams.colFilters)).forEach{paramDiv.add(it)}
+        val l2 = if(parsedParams.removeOnlyIdentifiedBySite == true) l.plus(getParagraph("Remove only-identified-by-site", dense = true)) else l
+        val l3 = if(parsedParams.removeReverse == true) l2.plus(getParagraph("Remove reverse hits", dense = true)) else l2
+        val l4 = if(parsedParams.removePotentialContaminant == true) l3.plus(getParagraph("Remove potential contaminants", dense = true)) else l3
+        val l5 = l4.plus(getFreeParams(parsedParams.colFilters))
+        paramDiv.add(getOneRowTable(l5))
         return paramDiv
     }
 
     private fun getFreeParams(colFilters: List<ColFilter>?): List<Paragraph> {
         return colFilters?.map{ flt ->
             val action = if(flt.removeSelected) "Remove" else "Only keep"
-            val p = getParagraph("$action ")
+            val p = getParagraph("$action ", dense = true)
             p.add(getText(" ${flt.colName} ", italic = true))
             p.add(getText("${flt.comparator.symbol} ${flt.compareToValue}"))
             p
