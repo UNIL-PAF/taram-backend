@@ -5,8 +5,6 @@ import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
 import com.google.common.math.Quantiles
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation
-import org.apache.commons.math3.stat.descriptive.summary.Sum
-import kotlin.math.sign
 import kotlin.math.sqrt
 
 class SummaryStatComputation {

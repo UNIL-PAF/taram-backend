@@ -143,46 +143,6 @@ class ColumnMappingParser {
         }
     }
 
-    private fun parseColumn(columns: List<String>?, colTypes: List<ColType>?, regex1: Regex, regex2: Regex):ColumnsParsed {
-        val regexLeft = Regex(".+_([A-Za-z0-9-]+?)_\\d+min_DIA_.+\\.(.+?)$")
-
-        val regexMinRight = Regex(".+_DIA_\\d+min.+")
-        val regexMinLeft = Regex(".+_\\d+min_DIA_.+")
-
-        return columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
-            val matchResult = if(regexMinLeft.matches(s)){ regexLeft.matchEntire(s) }
-            else if(regexMinRight.matches(s)){ regex2.matchEntire(s) }
-            else { regex1.matchEntire(s) ?: regex2.matchEntire(s) }
-
-            val accWithExp = if (matchResult != null) {
-                acc.copy(
-                    expNames = acc.expNames.plus(matchResult.groupValues[1]),
-                    expFields = acc.expFields.plus(matchResult.groupValues[2]),
-                    headers = acc.headers.plus(
-                        Header(
-                            name = matchResult.groupValues[1] + "." + matchResult.groupValues[2],
-                            idx = i,
-                            type = colTypes?.get(i),
-                            experiment = Experiment(name = matchResult.groupValues[1], field = matchResult.groupValues[2])
-                        )
-                    ),
-                    expDetails = acc.expDetails.plus(
-                        Pair(
-                            matchResult.groupValues[1],
-                            ExpInfo(
-                                isSelected = true,
-                                name = matchResult.groupValues[1],
-                                originalName = s.replace(matchResult.groupValues[2], "")
-                            )
-                        )
-                    )
-                )
-            } else acc.copy(headers = acc.headers.plus(Header(name = s, idx = i, type = colTypes?.get(i))))
-            accWithExp
-        }
-    }
-
-
     private fun getMaxQuantExperiments(
         columns: List<String>?,
         summaryTable: String,
