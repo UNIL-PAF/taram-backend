@@ -58,7 +58,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
         colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         // 3. Table of selected results
-        val title = getParagraph("Selected results:", bold = true, underline = true)
+        val title = getParagraph("Selected results:", bold = true, underline = false)
         stepDiv.add(title)
 
         val selResTable = Table(9)

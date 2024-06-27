@@ -117,7 +117,7 @@ open class PdfCommon {
     fun getParamsCell(content: Div, width: Float, addTitle: Boolean = true, rightBorder: Boolean = true): Cell {
         val div = Div()
         div.setPaddingLeft(5f)
-        val title = getParagraph("Parameters:", bold = true, underline = true)
+        val title = getParagraph("Parameters:", bold = true, underline = false)
         if(addTitle) div.add(title)
         div.add(content)
 

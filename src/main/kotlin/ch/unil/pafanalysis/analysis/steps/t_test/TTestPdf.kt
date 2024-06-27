@@ -60,7 +60,7 @@ class TTestPdf() : PdfCommon() {
 
         // 2. data
         val middleDiv = Div()
-        middleDiv.add(getParagraph("Number of significant results:", bold = true, underline = true))
+        middleDiv.add(getParagraph("Number of significant results:", bold = true, underline = false))
         val tableData: List<Pair<String, String>> = res.comparisions?.map{ comp ->
             val nrSignOrig = comp.numberOfSignificant.toString()
             val nrSign = if(parsedParams.filterOnValid == true) nrSignOrig + " (${comp.nrPassedFilter} passed filter)" else nrSignOrig
