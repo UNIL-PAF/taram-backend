@@ -59,8 +59,8 @@ class PdfService {
     private val fontSizeConst = 8f
     val myFont = StandardFonts.HELVETICA
     val myBoldFont = StandardFonts.HELVETICA_BOLD
-    val antCyan = DeviceRgb(244, 240, 236)
-    val lightCyan = DeviceRgb(252, 250, 249)
+    val antCyan = DeviceRgb(242, 242, 242)
+    private val lightCyan = DeviceRgb( 	251,	211,	121)
 
     fun createPdf(analysisId: Int, zipSelection: ZipDataSelection? = null): File {
         val analysis = analysisRepo?.findById(analysisId)
@@ -169,9 +169,9 @@ class PdfService {
         val p1 = Paragraph(comment).setFont(PdfFontFactory.createFont(myFont))
         p1.setBackgroundColor(lightCyan)
         p1.setFontSize(fontSizeConst)
-        p1.setPadding(1f)
+        p1.setPadding(2f)
         p1.setPaddingLeft(5f)
-        p1.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+        p1.setBorder(Border.NO_BORDER)
         p1.setBorderRadius(BorderRadius(2f))
         val div = Div()
         div.add(p1)

@@ -22,8 +22,8 @@ open class PdfCommon {
     private val fontSizeConst = 8f
     private val myFont = StandardFonts.HELVETICA
     private val myBoldFont = StandardFonts.HELVETICA_BOLD
-    private val antCyan = DeviceRgb(244, 240, 236)
-    private val lightCyan = DeviceRgb(252, 250, 249)
+    private val antCyan = DeviceRgb(242, 242, 242)
+    private val lightCyan = DeviceRgb( 	251,	211,	121)
 
     fun getTwoRowTableWithList(tableData: List<Pair<String, List<String>>>): Table {
         val table = Table(2)
@@ -99,8 +99,8 @@ open class PdfCommon {
         return getParagraph(s, bold = true, underline = false)
             .setWidth(40f)
             .setBackgroundColor(lightCyan)
-            .setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-            .setPadding(1f)
+            .setBorder(Border.NO_BORDER)
+            .setPadding(2f)
             .setPaddingLeft(5f)
             .setBorderRadius(BorderRadius(2f))
     }
