@@ -55,15 +55,15 @@ class TTestPdf() : PdfCommon() {
 
         // 2. data
         val middleDiv = Div()
-        middleDiv.add(createResTable(res).setWidth(8 * colWidth -5f))
+        middleDiv.add(createResTable(res, parsedParams.filterOnValid).setWidth(8 * colWidth -5f))
         colTable.addCell(getDataCell(middleDiv, 8 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv
     }
 
-    private fun createResTable(res: TTest): Table {
-        val table = Table(3)
+    private fun createResTable(res: TTest, filterOnValid: Boolean?): Table {
+        val table = Table(if(filterOnValid == true) 3 else 2)
 
         val header1 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
         header1.add(getParagraph("Comparison", bold = true, dense = true).setFontSize(cellFontSize))
@@ -73,9 +73,11 @@ class TTestPdf() : PdfCommon() {
         header2.add(getParagraph("Significant", bold = true, dense = true).setFontSize(cellFontSize))
         table.addCell(header2)
 
-        val header3 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-        header3.add(getParagraph("Filter passed", bold = true, dense = true).setFontSize(cellFontSize))
-        table.addCell(header3)
+        if(filterOnValid == true){
+            val header3 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+            header3.add(getParagraph("Filter passed", bold = true, dense = true).setFontSize(cellFontSize))
+            table.addCell(header3)
+        }
 
         res.comparisions?.forEach{ comp ->
             val cell1 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
@@ -86,9 +88,11 @@ class TTestPdf() : PdfCommon() {
             cell2.add(getParagraph(comp.numberOfSignificant.toString(), dense = true).setFontSize(cellFontSize))
             table.addCell(cell2)
 
-            val cell3 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-            cell3.add(getParagraph(comp.nrPassedFilter.toString(), dense = true).setFontSize(cellFontSize))
-            table.addCell(cell3)
+            if(filterOnValid == true){
+                val cell3 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+                cell3.add(getParagraph(comp.nrPassedFilter.toString(), dense = true).setFontSize(cellFontSize))
+                table.addCell(cell3)
+            }
         }
 
         return table
