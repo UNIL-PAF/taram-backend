@@ -2,9 +2,11 @@ package ch.unil.pafanalysis.pdf
 
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.zip.ZipDataSelection
 import com.itextpdf.io.font.constants.StandardFonts
@@ -17,15 +19,15 @@ import com.itextpdf.kernel.geom.PageSize
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.kernel.pdf.action.PdfAction
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.borders.Border
+import com.itextpdf.layout.borders.DashedBorder
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
-import com.itextpdf.layout.properties.BorderRadius
-import com.itextpdf.layout.properties.HorizontalAlignment
-import com.itextpdf.layout.properties.TextAlignment
-import com.itextpdf.layout.properties.VerticalAlignment
+import com.itextpdf.layout.properties.*
+import com.itextpdf.layout.renderer.CellRenderer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
@@ -39,6 +41,7 @@ import java.net.http.HttpResponse
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.min
 
 
 @Service
@@ -76,6 +79,7 @@ class PdfService {
 
         addLogo(document, pdf, plotWidth)
         addResultInfo(analysis, document)
+        addOverview(steps, document, plotWidth)
         addSteps(steps, document, pdf, plotWidth, zipSelection)
         addHeaderAndFooter(document, pdf, pageSize, plotWidth)
 
@@ -83,6 +87,59 @@ class PdfService {
         pdf.close()
 
         return filePath
+    }
+
+    private fun getParagraph(s: String, bold: Boolean = false, link: String? = null): Paragraph {
+        val p = if(link != null) Paragraph(Link(s, PdfAction.createGoTo(link))) else Paragraph(s)
+        p.setFontSize(fontSizeConst + 2f)
+        p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
+        return p
+    }
+
+    private fun addOverview(steps: List<AnalysisStep>?, document: Document?, plotWidth: Float){
+        val title = Paragraph("Overview of analysis").setFont(PdfFontFactory.createFont(myBoldFont))
+            .setFontSize(14f)
+            .setPaddingLeft(5f)
+            .setFontColor(ColorConstants.BLACK)
+
+        document?.add(title)
+
+        val table = Table(3).setWidth(plotWidth)
+
+        fun createCell(name: String, bold: Boolean = false, link: String? = null, minWidth: Float? = null): Cell {
+            val cell = Cell().setBorder(Border.NO_BORDER)
+            if(minWidth != null) cell.setMinWidth(minWidth)
+            val cellRenderer = CellRenderer(cell)
+            cellRenderer.setProperty(Property.BORDER_BOTTOM, DashedBorder(ColorConstants.LIGHT_GRAY, 0.5f))
+            cell.setNextRenderer(cellRenderer)
+            cell.add(getParagraph(name, bold = bold, link = link))
+            return cell
+        }
+
+        fun getTables(step: AnalysisStep?, stepNr: Int): String {
+            return if(step?.modifiesResult == true){
+                if(step?.type == AnalysisStepType.ONE_D_ENRICHMENT.value){
+                    "Table $stepNr, Enrichment table $stepNr"
+                }else "Table $stepNr"
+            } else ""
+        }
+
+        table.addCell(createCell("Id", bold = true, minWidth = 30f))
+        table.addCell(createCell("Step", bold = true, minWidth = 260f))
+        table.addCell(createCell("Tables", bold = true))
+
+        steps?.forEachIndexed { i, step ->
+            val stepNr = i + 1
+            val link = "$stepNr-${step.type}"
+            table.addCell(createCell(stepNr.toString(), link = link, minWidth = 30f))
+            table.addCell(createCell(StepNames.getName(step.type), link = link, minWidth = 260f))
+            table.addCell(createCell(getTables(step, stepNr), link = link))
+        }
+
+        val tableDiv = Div().setWidth(plotWidth-10f).setPaddingLeft(5f)
+        tableDiv.add(table)
+        document?.add(tableDiv)
+        document?.add(AreaBreak());
     }
 
     private fun addResultInfo(analysis: Analysis?, document: Document?){

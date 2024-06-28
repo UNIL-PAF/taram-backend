@@ -75,7 +75,7 @@ open class PdfCommon {
         return p1
     }
 
-    fun titleDiv(title: String, plotWidth: Float, description: String? = null, table: String? = null, nrProteins: Int? = null, extraParagraph: Paragraph? = null ): Div {
+    fun titleDiv(title: String, plotWidth: Float, description: String? = null, table: String? = null, nrProteins: Int? = null, extraParagraph: Paragraph? = null, link: String? = null ): Div {
         val titlePadding = 5f
 
         val p = Paragraph().setBackgroundColor(antCyan)
@@ -90,6 +90,12 @@ open class PdfCommon {
         text.setFontSize(11f)
         text.setFontColor(ColorConstants.BLACK)
         text.setFont(PdfFontFactory.createFont(myFont))
+
+        // add the link
+        if(link != null){
+            text.setProperty(Property.DESTINATION, link)
+        }
+
         val colLeft = Cell()
         //colLeft.setWidth(170f)
         colLeft.setTextAlignment(TextAlignment.LEFT)

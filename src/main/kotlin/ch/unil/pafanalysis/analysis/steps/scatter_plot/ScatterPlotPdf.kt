@@ -18,7 +18,7 @@ class ScatterPlotPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div {
         val div = Div()
-        div.add(titleDiv("$stepNr. Scatter plot", plotWidth))
+        div.add(titleDiv("$stepNr. Scatter plot", plotWidth, link = "$stepNr-${step.type}"))
         div.add(Paragraph(" "))
         val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
         div.add(plot)

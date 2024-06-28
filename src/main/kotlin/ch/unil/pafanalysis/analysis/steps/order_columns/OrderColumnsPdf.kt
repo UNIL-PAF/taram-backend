@@ -19,7 +19,7 @@ class OrderColumnsPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Table cleanup."
-        stepDiv.add(titleDiv("$stepNr. Order columns", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr. Order columns", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         val colTable = Table(1)
         colTable.setWidth(plotWidth)

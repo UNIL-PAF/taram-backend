@@ -19,7 +19,7 @@ class InitialResultPdf() : PdfCommon() {
         val groupsDefined = step.columnInfo?.columnMapping?.experimentDetails?.values?.find { it.group != null } != null
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Initial result", plotWidth, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr. Initial result", plotWidth, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         // Groups definitions
         stepDiv.add(getParagraph("Groups and experiments:", bold = true))

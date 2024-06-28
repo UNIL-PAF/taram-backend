@@ -19,7 +19,7 @@ class RemoveImputedPdf() : PdfCommon() {
 
         val description = "FC and p-values calculated with imputed data are kept."
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Remove imputed", plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr. Remove imputed", plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)

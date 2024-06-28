@@ -36,7 +36,7 @@ class NormalizationPdf() : PdfCommon() {
         val stepDiv = Div()
         val description1 = "Assumption: the majority of the observed proteins remain unchanged."
         val description2 = if(parsedParams?.normalizationType == NormalizationType.MEDIAN.value) "Median subtraction is the most conservative normalization, used to compensate for global differences in sample amounts. " else ""
-        stepDiv.add(titleDiv("$stepNr. Normalization", plotWidth = plotWidth, description = description2.plus(description1), table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr. Normalization", plotWidth = plotWidth, description = description2.plus(description1), table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)

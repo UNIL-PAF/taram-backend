@@ -25,7 +25,7 @@ class UmapPdf() : PdfCommon() {
         val description = "Examines similarities between samples and groups, needs imputed values."
 
         val div = Div()
-        div.add(titleDiv("$stepNr. UMAP", plotWidth, description))
+        div.add(titleDiv("$stepNr. UMAP", plotWidth, description = description, link = "$stepNr-${step.type}"))
 
         val colTable = Table(3)
         colTable.setWidth(plotWidth)

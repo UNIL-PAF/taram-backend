@@ -30,8 +30,8 @@ class OneDEnrichmentPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Table is first ranked by (usually) fold change. Distribution of each annotation term is then evaluated to see if it is enriched toward the top or bottom. FDR-filtered table."
-        val enrichmentTable = getTableParagraph("Enrichment-table-$stepNr").setWidth(85f)
-        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups, extraParagraph = enrichmentTable))
+        val enrichmentTable = getTableParagraph("Enrichment table $stepNr").setWidth(85f)
+        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, extraParagraph = enrichmentTable, link = "$stepNr-${step.type}"))
 
         val colTable = Table(1)
         colTable.setWidth(plotWidth)

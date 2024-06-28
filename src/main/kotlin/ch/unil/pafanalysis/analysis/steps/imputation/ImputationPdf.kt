@@ -43,7 +43,7 @@ class ImputationPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Imputation allows calculating fold changes (FC) and statistical tests for proteins with missing values. NaN is replaced by low-shifted random values, based on the assumption that missing values occur when signals are below detection limits."
-        stepDiv.add(titleDiv("$stepNr. Imputation", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr. Imputation", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)

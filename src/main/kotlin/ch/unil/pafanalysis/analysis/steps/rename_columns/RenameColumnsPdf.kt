@@ -18,7 +18,7 @@ class RenameColumnsPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Table cleanup."
-        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
+        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)
