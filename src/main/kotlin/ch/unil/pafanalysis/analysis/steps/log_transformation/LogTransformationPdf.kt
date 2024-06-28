@@ -17,16 +17,16 @@ class LogTransformationPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Log transformation facilitates plotting of data and makes distributions more “normal”, allowing application of standard statistical tests."
-        stepDiv.add(titleDiv("$stepNr. Log transformation", plotWidth = plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. Log transformation", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
         paramsDiv.add(getParagraph(parsedParams.transformationType + " transformation", dense = true))
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 10*colWidth))
 
         // 2. data
         val middleDiv = Div()
@@ -35,13 +35,7 @@ class LogTransformationPdf() : PdfCommon() {
             "Max:" to String.format("%.2f", res.max),
         )
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 2 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

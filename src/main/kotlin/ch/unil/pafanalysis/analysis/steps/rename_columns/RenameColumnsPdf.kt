@@ -18,26 +18,20 @@ class RenameColumnsPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Table cleanup."
-        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
         if(parsedParams.addConditionNames == true) paramsDiv.add(getParagraph("Add conditions to table headers.", dense = true))
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 8*colWidth))
 
         // 2. data
         val middleDiv = Div()
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

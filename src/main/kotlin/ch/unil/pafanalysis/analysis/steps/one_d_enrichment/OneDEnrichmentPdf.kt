@@ -30,11 +30,11 @@ class OneDEnrichmentPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Table is first ranked by (usually) fold change. Distribution of each annotation term is then evaluated to see if it is enriched toward the top or bottom. FDR-filtered table."
-        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description))
+        val enrichmentTable = getTableParagraph("Enrichment-table-$stepNr").setWidth(85f)
+        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups, extraParagraph = enrichmentTable))
 
-        val colTable = Table(2)
+        val colTable = Table(1)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
 
         // 1. parameters
         val paramsData: List<Pair<String, String>> = listOf(
@@ -47,15 +47,9 @@ class OneDEnrichmentPdf() : PdfCommon() {
         )
         val paramsDiv = Div()
         paramsDiv.add(getTwoRowTable(paramsData, leftColMinWidth=110f))
-        val leftCell = getParamsCell(paramsDiv, 4 * cellFifth)
+        val leftCell = getParamsCell(paramsDiv, plotWidth)
         colTable.addCell(leftCell)
         stepDiv.add(colTable)
-
-        // 2.
-        val rightDiv = Div()
-        rightDiv.add(getTableParagraph("Enrichment-table-$stepNr").setWidth(85f))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
 
         // 3. Table of selected results
         val title = getParagraph("Selected results:", bold = true, underline = false)

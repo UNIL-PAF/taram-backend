@@ -19,16 +19,16 @@ class RemoveImputedPdf() : PdfCommon() {
 
         val description = "FC and p-values calculated with imputed data are kept."
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Remove imputed", plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. Remove imputed", plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
         paramsDiv.add(getParagraph("Replace imputed values by [${parsedParams.replaceBy?.printName}].", dense = true))
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 7*colWidth))
 
         // 2. data
         val middleDiv = Div()
@@ -37,13 +37,7 @@ class RemoveImputedPdf() : PdfCommon() {
             "Nr of protein groups with replacements:" to res.nrProteinGroupsReplaced.toString()
         )
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 5 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

@@ -36,17 +36,16 @@ class NormalizationPdf() : PdfCommon() {
         val stepDiv = Div()
         val description1 = "Assumption: the majority of the observed proteins remain unchanged."
         val description2 = if(parsedParams?.normalizationType == NormalizationType.MEDIAN.value) "Median subtraction is the most conservative normalization, used to compensate for global differences in sample amounts. " else ""
-        stepDiv.add(titleDiv("$stepNr. Normalization", plotWidth = plotWidth, description2.plus(description1)))
+        stepDiv.add(titleDiv("$stepNr. Normalization", plotWidth = plotWidth, description = description2.plus(description1), table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
         paramsDiv.add(getParagraph(normText(parsedParams), dense = true))
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 10*colWidth))
 
         // 2. data
         val middleDiv = Div()
@@ -55,13 +54,7 @@ class NormalizationPdf() : PdfCommon() {
             "Max:" to String.format("%.2f", res.max),
         )
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 2 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

@@ -17,27 +17,21 @@ class FilterPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, Filter::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Filter rows", plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Filter rows", plotWidth, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val params = getParams(step)
-        colTable.addCell(getParamsCell(params, 2*cellFifth))
+        colTable.addCell(getParamsCell(params, 8*colWidth))
 
         // 2. data
         val middleDiv = Div()
         val tableData = listOf(Pair("Protein groups removed:", res.nrRowsRemoved.toString()))
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

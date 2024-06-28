@@ -7,6 +7,7 @@ import com.itextpdf.layout.element.Cell
 import com.itextpdf.layout.element.Div
 import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
+import com.itextpdf.layout.properties.HorizontalAlignment
 import org.springframework.stereotype.Service
 
 
@@ -17,16 +18,16 @@ class RemoveColumnsPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, RemoveColumns::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Remove columns", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Remove columns", plotWidth = plotWidth, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = Div()
         paramsDiv.add(getTwoRowTable(listOf(Pair("Nr of columns to remove:", res.nrOfColumnsRemoved.toString()))))
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 8*colWidth))
 
         // 2. data
         val tableData: List<Pair<String, String>> = listOf(
@@ -34,13 +35,7 @@ class RemoveColumnsPdf() : PdfCommon() {
         )
         val middleDiv = Div()
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

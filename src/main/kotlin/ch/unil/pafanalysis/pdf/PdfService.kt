@@ -182,7 +182,7 @@ class PdfService {
         steps?.forEachIndexed { i, step ->
             val div = commonStep?.getRunner(step.type)?.createPdf(step, pdf, plotWidth, i + 1)
             if(step.comments != null) div?.add(commentDiv(step.comments))
-            div?.setMarginBottom(15f)
+            div?.setMarginBottom(30f)
             div?.isKeepTogether = true
             // only add the step if it is in the zipSelection
             if(zipSelection?.steps === null || zipSelection?.steps.contains(step.id!!)){

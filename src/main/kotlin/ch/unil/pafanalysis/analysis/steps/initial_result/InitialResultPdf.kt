@@ -19,11 +19,7 @@ class InitialResultPdf() : PdfCommon() {
         val groupsDefined = step.columnInfo?.columnMapping?.experimentDetails?.values?.find { it.group != null } != null
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Initial result", plotWidth))
-
-        val colTable = Table(2)
-        colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        stepDiv.add(titleDiv("$stepNr. Initial result", plotWidth, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
         // Groups definitions
         stepDiv.add(getParagraph("Groups and experiments:", bold = true))
@@ -42,18 +38,10 @@ class InitialResultPdf() : PdfCommon() {
 
         // 1. parameters
         val leftDiv = Div()
-        //leftDiv.add(getTwoRowTable(listOf(Pair("Default intensity column:", step?.columnInfo?.columnMapping?.intCol ?: ""))))
         val dataTable = getDataTable(initialResult, step?.columnInfo?.columnMapping?.intCol ?: "")
-        leftDiv.add(getTwoRowTableWithList(dataTable))
-        colTable.addCell(getDataCell(leftDiv, 4*cellFifth))
+        leftDiv.add(getTwoRowTableWithList(dataTable).setWidth(plotWidth))
+        stepDiv.add(leftDiv)
 
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
-
-        stepDiv.add(colTable)
         return stepDiv
     }
 

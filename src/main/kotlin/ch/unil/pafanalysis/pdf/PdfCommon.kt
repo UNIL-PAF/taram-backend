@@ -8,10 +8,7 @@ import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.layout.borders.Border
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
-import com.itextpdf.layout.properties.BorderRadius
-import com.itextpdf.layout.properties.Property
-import com.itextpdf.layout.properties.TextAlignment
-import com.itextpdf.layout.properties.VerticalAlignment
+import com.itextpdf.layout.properties.*
 import com.itextpdf.layout.renderer.CellRenderer
 
 
@@ -78,14 +75,14 @@ open class PdfCommon {
         return p1
     }
 
-    fun titleDiv(title: String, plotWidth: Float, description: String? = null): Div {
+    fun titleDiv(title: String, plotWidth: Float, description: String? = null, table: String? = null, nrProteins: Int? = null, extraParagraph: Paragraph? = null ): Div {
         val titlePadding = 5f
 
         val p = Paragraph().setBackgroundColor(antCyan)
         p.setPaddingLeft(titlePadding)
         p.setPaddingTop(5f)
 
-        val t = Table(1)
+        val t = Table(2)
         t.setWidth(plotWidth?.minus(titlePadding))
 
         val text = Paragraph(Text(title))
@@ -94,7 +91,7 @@ open class PdfCommon {
         text.setFontColor(ColorConstants.BLACK)
         text.setFont(PdfFontFactory.createFont(myFont))
         val colLeft = Cell()
-        colLeft.setWidth(170f)
+        //colLeft.setWidth(170f)
         colLeft.setTextAlignment(TextAlignment.LEFT)
         colLeft.setBorder(Border.NO_BORDER)
         colLeft.add(text)
@@ -104,6 +101,26 @@ open class PdfCommon {
         }
 
         t.addCell(colLeft)
+
+        val colRight = Cell()
+        colRight.setBorder(Border.NO_BORDER)
+        colRight.setWidth(plotWidth/5)
+        colRight.setTextAlignment(TextAlignment.LEFT)
+
+        if(table != null){
+            colRight.add(getTableParagraph(table).setHorizontalAlignment(HorizontalAlignment.RIGHT).setMarginRight(5f).setMarginTop(3f))
+        }
+
+        if(extraParagraph != null){
+            colRight.add(extraParagraph.setHorizontalAlignment(HorizontalAlignment.RIGHT).setMarginRight(5f).setMarginTop(5f))
+        }
+
+        if(nrProteins != null){
+            colRight.add(getParagraph("$nrProteins protein groups", bold = true).setTextAlignment(TextAlignment.RIGHT).setMarginRight(5f).setMarginTop(5f))
+        }
+
+        t.addCell(colRight)
+
         p.add(t)
 
         val div = Div()
@@ -141,12 +158,6 @@ open class PdfCommon {
         val paramsCell = Cell().add(div)
         paramsCell.setWidth(width)
         paramsCell.setBorder(Border.NO_BORDER)
-        if(rightBorder){
-            val cellRenderer = CellRenderer(paramsCell)
-            cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
-            paramsCell.setNextRenderer(cellRenderer)
-        }
-
         return paramsCell
     }
 
@@ -155,9 +166,6 @@ open class PdfCommon {
         cell.add(div)
         cell.setWidth(width)
         cell.setBorder(Border.NO_BORDER)
-        val cellRenderer = CellRenderer(cell)
-        cellRenderer.setProperty(Property.BORDER_RIGHT, SolidBorder(ColorConstants.LIGHT_GRAY, 0.5f))
-        cell.setNextRenderer(cellRenderer)
         cell.setPaddingLeft(5f)
         return cell
     }

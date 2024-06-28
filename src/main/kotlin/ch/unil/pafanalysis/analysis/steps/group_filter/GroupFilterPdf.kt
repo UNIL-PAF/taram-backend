@@ -18,27 +18,21 @@ class GroupFilterPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Retain only proteins quantified in a minimum number of samples."
-        stepDiv.add(titleDiv("$stepNr. Filter on valid", plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. Filter on valid", plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = getParams(step)
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 8*colWidth))
 
         // 2. data
         val middleDiv = Div()
         val tableData = listOf(Pair("Protein groups removed:", res.nrRowsRemoved.toString()))
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div().setPaddingLeft(2f)
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups", dense = true))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv
@@ -51,7 +45,7 @@ class GroupFilterPdf() : PdfCommon() {
 
         val myIntField = if(parsedParams.field != null) parsedParams.field else step.columnInfo?.columnMapping?.intCol
 
-        val p = getParagraph("Only keep rows where ")
+        val p = getParagraph("Only keep rows where ", dense = true)
         p.add(getText(myIntField ?: "", italic = true))
         p.add(getText(" has at least ${parsedParams.minNrValid} valid value(s) in ${groupTxt[parsedParams.filterInGroup]}."))
 

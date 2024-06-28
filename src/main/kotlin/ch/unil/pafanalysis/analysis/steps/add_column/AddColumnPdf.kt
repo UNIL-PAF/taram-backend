@@ -19,15 +19,15 @@ class AddColumnPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, AddColumn::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Add column", plotWidth = plotWidth))
+        stepDiv.add(titleDiv("$stepNr. Add column", plotWidth = plotWidth, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = getParamsDiv(params, res)
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 8*colWidth))
 
         // 2. data
         val tableData: List<Pair<String, String>> = listOf(
@@ -35,13 +35,7 @@ class AddColumnPdf() : PdfCommon() {
         )
         val middleDiv = Div()
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div().setPaddingLeft(2f)
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups", dense = true))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv
@@ -51,7 +45,7 @@ class AddColumnPdf() : PdfCommon() {
         val paramDiv = Div()
 
         val paramPara = if(params.type == SelColType.CHAR){
-            val p = getParagraph("Mark each row with ")
+            val p = getParagraph("Mark each row with ", dense = true)
             p.add(getText("+ ", italic = true))
             p.add(getText("where "))
             p.add(getText(params.charColParams?.compSel?.value!! + " ", italic = true))
@@ -69,7 +63,7 @@ class AddColumnPdf() : PdfCommon() {
             p.add(getText("${params.charColParams.compVal}.", italic = true))
             p
         }else{
-            val p = getParagraph("Compute the ")
+            val p = getParagraph("Compute the ", dense = true)
             p.add(getText("${params.numColParams?.mathOp?.value} ", italic = true))
             p.add(getText("of columns "))
             p.add(getText("[${res.selColNames?.joinToString(separator = ", ")}].", italic = true))

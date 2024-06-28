@@ -43,11 +43,11 @@ class ImputationPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Imputation allows calculating fold changes (FC) and statistical tests for proteins with missing values. NaN is replaced by low-shifted random values, based on the assumption that missing values occur when signals are below detection limits."
-        stepDiv.add(titleDiv("$stepNr. Imputation", plotWidth = plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. Imputation", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth / 5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
@@ -58,7 +58,7 @@ class ImputationPdf() : PdfCommon() {
             else emptyList()
 
         firstParam.plus(additionalParams).forEach { paramsDiv.add(it) }
-        colTable.addCell(getParamsCell(paramsDiv, 2 * cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, 7 * colWidth))
 
         // 2. data
         val middleDiv = Div()
@@ -67,13 +67,7 @@ class ImputationPdf() : PdfCommon() {
             "Nr of protein groups with imputation:" to res.nrOfImputedGroups.toString()
         )
         middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getDataCell(middleDiv, 5 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv

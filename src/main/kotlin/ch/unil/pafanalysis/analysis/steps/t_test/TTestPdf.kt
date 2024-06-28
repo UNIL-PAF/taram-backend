@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service
 @Service
 class TTestPdf() : PdfCommon() {
 
+    val cellFontSize = 8f
+
     val multiTestCorrText = mapOf(
         "BH" to "Benjamin & Hochberg (FDR)",
         "none" to "None"
@@ -31,11 +33,11 @@ class TTestPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "FDR correction adjusts thresholds for large datasets. Q-values = adjusted p-values."
-        stepDiv.add(titleDiv("$stepNr. t-test", plotWidth = plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. t-test", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(2)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
+        val colWidth = plotWidth/12
 
         // 1. parameters
         val paramsData: List<Pair<String, String>> = listOf(
@@ -48,28 +50,49 @@ class TTestPdf() : PdfCommon() {
         if(parsedParams.filterOnValid == true){
             paramsDiv.add(getOneRowTable(listOf(getParagraph("Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.", dense = true, bold = true))))
         }
-        val leftCell = getParamsCell(paramsDiv, 2 * cellFifth)
+        val leftCell = getParamsCell(paramsDiv, 4 * colWidth)
         colTable.addCell(leftCell)
 
         // 2. data
         val middleDiv = Div()
-        middleDiv.add(getParagraph("Number of significant results:", bold = true, underline = false))
-        val tableData: List<Pair<String, String>> = res.comparisions?.map{ comp ->
-            val nrSignOrig = comp.numberOfSignificant.toString()
-            val nrSign = if(parsedParams.filterOnValid == true) nrSignOrig + " (${comp.nrPassedFilter} passed filter)" else nrSignOrig
-            Pair("${comp.firstGroup} - ${comp.secondGroup}:",  nrSign)
-        } ?: emptyList()
-        middleDiv.add(getTwoRowTable(tableData))
-        colTable.addCell(getDataCell(middleDiv, 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        middleDiv.add(createResTable(res).setWidth(8 * colWidth -5f))
+        colTable.addCell(getDataCell(middleDiv, 8 * colWidth))
 
         stepDiv.add(colTable)
         return stepDiv
+    }
+
+    private fun createResTable(res: TTest): Table {
+        val table = Table(3)
+
+        val header1 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+        header1.add(getParagraph("Comparison", bold = true, dense = true).setFontSize(cellFontSize))
+        table.addCell(header1)
+
+        val header2 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+        header2.add(getParagraph("Significant", bold = true, dense = true).setFontSize(cellFontSize))
+        table.addCell(header2)
+
+        val header3 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+        header3.add(getParagraph("Filter passed", bold = true, dense = true).setFontSize(cellFontSize))
+        table.addCell(header3)
+
+        res.comparisions?.forEach{ comp ->
+            val cell1 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+            cell1.add(getParagraph("${comp.firstGroup} - ${comp.secondGroup}", dense = true).setFontSize(cellFontSize))
+            table.addCell(cell1)
+
+            val cell2 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+            cell2.add(getParagraph(comp.numberOfSignificant.toString(), dense = true).setFontSize(cellFontSize))
+            table.addCell(cell2)
+
+            val cell3 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
+            cell3.add(getParagraph(comp.nrPassedFilter.toString(), dense = true).setFontSize(cellFontSize))
+            table.addCell(cell3)
+        }
+
+        return table
+
     }
 
 }

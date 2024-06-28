@@ -19,25 +19,15 @@ class OrderColumnsPdf() : PdfCommon() {
 
         val stepDiv = Div()
         val description = "Table cleanup."
-        stepDiv.add(titleDiv("$stepNr. Order columns", plotWidth = plotWidth, description))
+        stepDiv.add(titleDiv("$stepNr. Order columns", plotWidth = plotWidth, description = description, table = "Table-$stepNr", nrProteins = step.nrProteinGroups))
 
-        val colTable = Table(3)
+        val colTable = Table(1)
         colTable.setWidth(plotWidth)
-        val cellFifth = plotWidth/5
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
         if(parsedParams.moveSelIntFirst == true) paramsDiv.add(getParagraph("Move default intensity columns [${step.columnInfo?.columnMapping?.intCol}] first.", dense = true))
-        colTable.addCell(getParamsCell(paramsDiv, 2*cellFifth))
-
-        // 2. data
-        colTable.addCell(getDataCell(Div(), 2 * cellFifth))
-
-        // 3. results
-        val rightDiv = Div()
-        rightDiv.add(getParagraph("${step.nrProteinGroups} protein groups"))
-        rightDiv.add(getTableParagraph("Table-$stepNr"))
-        colTable.addCell(getResultCell(rightDiv, cellFifth))
+        colTable.addCell(getParamsCell(paramsDiv, plotWidth))
 
         stepDiv.add(colTable)
         return stepDiv
