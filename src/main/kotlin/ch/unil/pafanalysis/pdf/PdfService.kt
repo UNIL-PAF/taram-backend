@@ -97,7 +97,7 @@ class PdfService {
     }
 
     private fun addOverview(steps: List<AnalysisStep>?, document: Document?, plotWidth: Float){
-        val title = Paragraph("Overview of analysis").setFont(PdfFontFactory.createFont(myBoldFont))
+        val title = Paragraph("Overview of data analysis").setFont(PdfFontFactory.createFont(myBoldFont))
             .setFontSize(14f)
             .setPaddingLeft(5f)
             .setFontColor(ColorConstants.BLACK)
