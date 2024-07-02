@@ -88,14 +88,14 @@ class ZipService {
             steps?.forEachIndexed { i, step ->
                 if (zipSelection?.steps != null && zipSelection.steps?.contains(step.id!!)) {
                     val idx = i + 1
-                    val mainTable = if (zipSelection.mainTables?.contains(step.id) == true) "tables/Table-$idx.txt" else ""
-                    val specialTable = if (zipSelection.specialTables?.contains(step.id) == true) "tables/" + commonStep?.getRunner(step?.type)?.getOtherTableName(idx) else ""
+                    val mainTable = if (zipSelection.mainTables?.contains(step.id) == true) listOf("tables/Table-$idx.txt") else emptyList()
+                    val specialTable = if (zipSelection.specialTables?.contains(step.id) == true) listOf("tables/" + commonStep?.getRunner(step?.type)?.getOtherTableName(idx)) else emptyList()
                     val plots = if (zipSelection.plots?.contains(step.id) == true) {
                         val plotBase = "plots/$idx-${step.type}"
                         "$plotBase.png;$plotBase.svg"
                     } else ""
                     val row =
-                        listOf(idx.toString(), StepNames.getName(step.type), mainTable + specialTable, plots).joinToString(separator = sep)
+                        listOf(idx.toString(), StepNames.getName(step.type), mainTable.plus(specialTable).joinToString(separator = ";"), plots).joinToString(separator = sep)
                     out.println(row)
                 }
             }
