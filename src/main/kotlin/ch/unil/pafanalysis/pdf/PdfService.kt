@@ -91,7 +91,7 @@ class PdfService {
 
     private fun getParagraph(s: String, bold: Boolean = false, link: String? = null): Paragraph {
         val p = if(link != null) Paragraph(Link(s, PdfAction.createGoTo(link))) else Paragraph(s)
-        p.setFontSize(fontSizeConst + 2f)
+        p.setFontSize(fontSizeConst)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
         return p
     }
@@ -256,12 +256,13 @@ class PdfService {
         val yPosNum = 60f
 
         // left header pos
-        val xPosLeft = 55f
+        val xPosLeft = 78f
+
         val yPosTop = pageSize?.height.minus(8f)
         val leftHeader = Paragraph("PAF - UNIL").setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
         // right header
-        val xPosRight= pageSize?.width.minus(15f)
+        val xPosRight= pageSize?.width.minus(36f)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val rightHeader = Paragraph(LocalDateTime.now().format(formatter)).setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
