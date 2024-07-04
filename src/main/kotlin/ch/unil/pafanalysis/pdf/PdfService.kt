@@ -10,12 +10,11 @@ import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.zip.ZipDataSelection
 import com.itextpdf.io.font.constants.StandardFonts
-import com.itextpdf.kernel.colors.Color
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.DeviceRgb
-import com.itextpdf.kernel.colors.WebColors
 import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.geom.PageSize
+import com.itextpdf.kernel.pdf.PdfAnnotationBorder
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.PdfWriter
@@ -31,17 +30,10 @@ import com.itextpdf.layout.renderer.CellRenderer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.io.File
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.min
 
 
 @Service
@@ -90,7 +82,11 @@ class PdfService {
     }
 
     private fun getParagraph(s: String, bold: Boolean = false, link: String? = null): Paragraph {
-        val p = if(link != null) Paragraph(Link(s, PdfAction.createGoTo(link))) else Paragraph(s)
+        val p = if(link != null){
+            val link = Link(s, PdfAction.createGoTo(link))
+            link.linkAnnotation.setBorder(PdfAnnotationBorder(0f, 0f, 0f))
+            Paragraph(link)
+        } else Paragraph(s)
         p.setFontSize(fontSizeConst)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
         return p
