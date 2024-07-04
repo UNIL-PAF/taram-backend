@@ -16,6 +16,8 @@ data class Analysis (
     val isLocked: Boolean? = null,
     val copyFromIdx: Int? =  null,
     val lastModifDate: LocalDateTime? = null,
+    @Lob
+    val conclusion: String? = null,
 
     @OneToMany(mappedBy="analysis", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     @JsonManagedReference
