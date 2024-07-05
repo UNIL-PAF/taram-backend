@@ -42,6 +42,26 @@ class AnalysisService {
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>
     }
 
+    fun setConclusion(analysisId: Int, conclusion: String): Int? {
+        val analysis = analysisRepo?.findById(analysisId)
+        val newAnalysis = analysis?.copy(conclusion = conclusion)
+        if(newAnalysis != null){
+            val updatedAnalysis: Analysis? = analysisRepo?.saveAndFlush(newAnalysis)
+            return updatedAnalysis?.id
+        }
+        return null
+    }
+
+    fun deleteConclusion(analysisId: Int): Int? {
+        val analysis = analysisRepo?.findById(analysisId)
+        val newAnalysis = analysis?.copy(conclusion = null)
+        if(newAnalysis != null){
+            val updatedAnalysis: Analysis? = analysisRepo?.saveAndFlush(newAnalysis)
+            return updatedAnalysis?.id
+        }
+        return null
+    }
+
     fun switchLock(analysisId: Int): Boolean {
         val analysis = analysisRepo?.findById(analysisId)
         val isLocked = analysis?.isLocked != true

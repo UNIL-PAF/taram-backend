@@ -67,6 +67,16 @@ class AnalysisController {
         return analysisService?.switchLock(analysisId)
     }
 
+    @PostMapping(path = ["/conclusion/{analysisId}"])
+    fun setConclusion(@PathVariable(value = "analysisId") analysisId: Int, @RequestBody conclusion: String): Int? {
+        return analysisService?.setConclusion(analysisId, conclusion)
+    }
+
+    @DeleteMapping(path = ["/conclusion/{analysisId}"])
+    fun deleteConclusion(@PathVariable(value = "analysisId") analysisId: Int): Int? {
+        return analysisService?.deleteConclusion(analysisId)
+    }
+
     @GetMapping(path = ["/pdf/{analysisId}"])
     fun createPdf(@PathVariable(value = "analysisId") analysisId: Int): ResponseEntity<ByteArray>? {
         val pdfFile =  pdfService?.createPdf(analysisId)
