@@ -71,7 +71,12 @@ class PdfService {
 
         addLogo(document, pdf, plotWidth)
         addResultInfo(analysis, document)
+
         addOverview(steps, document, plotWidth)
+        addConclusion(analysis, document)
+        // make a page break
+        document?.add(AreaBreak());
+
         addSteps(steps, document, pdf, plotWidth, zipSelection)
         addHeaderAndFooter(document, pdf, pageSize, plotWidth)
 
@@ -90,6 +95,21 @@ class PdfService {
         p.setFontSize(fontSizeConst)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
         return p
+    }
+
+    private fun addConclusion(analysis: Analysis?, document: Document?){
+        if(analysis?.conclusion != null){
+            val conclusionDiv = Div().setMarginTop(20f)
+
+            val title = Paragraph("Conclusion").setFont(PdfFontFactory.createFont(myBoldFont))
+                .setFontSize(14f)
+                .setPaddingLeft(5f)
+                .setFontColor(ColorConstants.BLACK)
+            val conclusion = commentDiv(analysis.conclusion)
+            conclusionDiv.add(title)
+            conclusionDiv.add(conclusion)
+            document?.add(conclusionDiv)
+        }
     }
 
     private fun addOverview(steps: List<AnalysisStep>?, document: Document?, plotWidth: Float){
@@ -135,7 +155,6 @@ class PdfService {
         val tableDiv = Div().setWidth(plotWidth-10f).setPaddingLeft(5f)
         tableDiv.add(table)
         document?.add(tableDiv)
-        document?.add(AreaBreak());
     }
 
     private fun addResultInfo(analysis: Analysis?, document: Document?){
