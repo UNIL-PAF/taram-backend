@@ -1,9 +1,8 @@
-package ch.unil.pafanalysis.analysis.steps.initial_result
+package ch.unil.pafanalysis.analysis.steps.initial_result.maxquant
 
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.Table
-import org.springframework.stereotype.Service
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
+import ch.unil.pafanalysis.analysis.steps.initial_result.MaxQuantParameters
 import java.io.File
 
 class InitialMaxQuantRunner() {

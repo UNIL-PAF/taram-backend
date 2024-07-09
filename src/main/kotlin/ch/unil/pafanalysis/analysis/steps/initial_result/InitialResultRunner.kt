@@ -5,6 +5,8 @@ import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.AdaptMaxQuantTable
+import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.InitialMaxQuantRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.AdaptSpectronautTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.InitialSpectronautRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -68,6 +70,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
             val adaptedTable = if(resultType == ResultType.Spectronaut){
                 AdaptSpectronautTable.adaptTable(origTable)
+            } else if(resultType == ResultType.MaxQuant){
+                AdaptMaxQuantTable.adaptTable(origTable)
             } else origTable
 
             val adaptedCommonRes = commonResOrig?.copy(headers = adaptedTable?.headers)
