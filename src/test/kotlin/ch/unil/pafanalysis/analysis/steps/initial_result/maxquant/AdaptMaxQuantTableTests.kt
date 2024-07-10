@@ -21,22 +21,28 @@ class AdaptMaxQuantTableTests {
 
     @Test
     fun scherlerTable() {
-        val resPath = "./src/test/resources/results/maxquant/Scherler_17824-25/"
+        val resPath = "./src/test/resources/results/maxquant/Scherler_17824-25_with_genes/"
         val filePath = resPath + "proteinGroups.txt"
         val (_, commonRes)  = columnMappingParser?.parse(filePath, resPath, ResultType.MaxQuant)!!
 
         val resTable = readTableData.getTable(filePath, commonRes?.headers)
         val newTable = AdaptMaxQuantTable.adaptTable(resTable)
 
-        assert(resTable?.headers?.size?.plus(1) == newTable?.headers?.size)
-        assert(resTable?.cols?.size?.plus(1) == newTable?.cols?.size)
+        assert(resTable?.headers?.size == newTable?.headers?.size)
+        assert(resTable?.cols?.size == newTable?.cols?.size)
 
         val geneHeader = newTable?.headers?.find{it.name == HeaderTypeMapping().getCol("geneNames", ResultType.MaxQuant.value)}
         assert(geneHeader?.name == "Gene.names")
-
         val geneCol = newTable?.cols?.get(geneHeader?.idx!!)
-        assert(geneCol?.first() as? String  == "Krt31")
+        assert(geneCol?.first() as? String  == "Ddx17")
+        assert(geneCol?.get(26) as? String == "Pdlim3")
 
+        val protHeader = newTable?.headers?.find{it.name == HeaderTypeMapping().getCol("description", ResultType.MaxQuant.value)}
+        assert(protHeader?.name == "Protein.names")
+        val protCol = newTable?.cols?.get(protHeader?.idx!!)
+        assert(protCol?.first() as? String  == "DEAD box helicase 17;RNA helicase")
+        assert(protCol?.get(1) as? String == "Troponin I, slow skeletal muscle")
+        assert(protCol?.get(26) as? String == "PDZ and LIM domain protein 3")
     }
 
     @Test
