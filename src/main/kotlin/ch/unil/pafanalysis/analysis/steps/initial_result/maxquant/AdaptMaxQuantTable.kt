@@ -12,7 +12,9 @@ object AdaptMaxQuantTable {
 
     private val readTable = ReadTableData()
 
-    private val fastaRegex = Regex("(?<=GN=)(.+?)(?=$|\\s)")
+    private val fastaGeneRegex = Regex("(?<=GN=)(.+?)(?=$|\\s)")
+    private val fastaTypeRegex = Regex("^((tr)|(sp))")
+    private val fastaProtRegex = Regex("")
 
     fun adaptTable(table: Table?): Table? {
         val fastaHeaders = readTable.getStringColumn(table, "Fasta.headers")
@@ -31,7 +33,15 @@ object AdaptMaxQuantTable {
 
     private fun parseAllGenesFromFasta(table: Table?, fastaHeaders: List<String>): Table? {
         val genes = fastaHeaders.map { fasta ->
-            fastaRegex.find(fasta)?.value ?: ""
+            val all = fasta.split(";")
+            val types = all.map{
+                val matches = fastaTypeRegex.find(fasta)
+                matches?.groups?.map{it?.value}
+            }
+
+            println(fasta)
+
+            fastaGeneRegex.find(fasta)?.value ?: ""
         }
 
         val headers = table?.headers
@@ -52,7 +62,7 @@ object AdaptMaxQuantTable {
         val geneIdx = table?.headers?.map{it.name}?.indexOf(HeaderTypeMapping().getCol("geneNames", ResultType.MaxQuant.value))!!
         val newGenes = genes.zip(fastaHeader).map{ (gene, fasta) ->
             if(gene.isEmpty()){
-                fastaRegex.find(fasta)?.value ?: ""
+                fastaGeneRegex.find(fasta)?.value ?: ""
             } else gene
         }
 
