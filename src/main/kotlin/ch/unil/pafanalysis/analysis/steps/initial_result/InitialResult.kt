@@ -3,7 +3,9 @@ package ch.unil.pafanalysis.analysis.steps.initial_result
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.SpectronautSetup
 
 data class MaxQuantParameters(
-    val matchBetweenRuns: Boolean? = null
+    val matchBetweenRuns: Boolean? = null,
+    val someGenesParsedFromFasta: Boolean? = null,
+    val allGenesParsedFromFasta: Boolean? = null
 )
 
 data class InitialResult(

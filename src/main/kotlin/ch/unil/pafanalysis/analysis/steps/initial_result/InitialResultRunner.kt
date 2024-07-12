@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.AdaptMaxQuantTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.InitialMaxQuantRunner
+import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.MaxQuantGeneParsing
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.AdaptSpectronautTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.InitialSpectronautRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
@@ -68,11 +69,11 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)!!
             val origTable = readTable.getTable(newTable.path, commonResOrig?.headers)
 
-            val adaptedTable = if(resultType == ResultType.Spectronaut){
-                AdaptSpectronautTable.adaptTable(origTable)
+            val (maxQuantGeneParsingStatus, adaptedTable) = if(resultType == ResultType.Spectronaut){
+                Pair(null, AdaptSpectronautTable.adaptTable(origTable))
             } else if(resultType == ResultType.MaxQuant){
                 AdaptMaxQuantTable.adaptTable(origTable)
-            } else origTable
+            } else Pair(null, origTable)
 
             val adaptedCommonRes = commonResOrig?.copy(headers = adaptedTable?.headers)
 
@@ -94,12 +95,20 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 columnInfoRepository?.saveAndFlush(newColumnInfo!!)
             } else columnInfo
 
+            val newInitialResult = if(initialResult?.maxQuantParameters != null && maxQuantGeneParsingStatus != null){
+                val newMaxQuantParams = initialResult?.maxQuantParameters.copy(
+                    someGenesParsedFromFasta = if(maxQuantGeneParsingStatus == MaxQuantGeneParsing.Some) true else null,
+                    allGenesParsedFromFasta = if(maxQuantGeneParsingStatus == MaxQuantGeneParsing.All) true else null
+                )
+                initialResult.copy(maxQuantParameters = newMaxQuantParams)
+            } else initialResult
+
             emptyStep?.copy(
                 resultPath = stepPath,
                 resultTablePath = "$stepPath/${newTable?.name}",
                 resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
-                results = gson.toJson(initialResult),
+                results = gson.toJson(newInitialResult),
                 columnInfo = emptyStep?.columnInfo ?: newColInfo,
                 commonResult = emptyStep?.commonResult ?: adaptedCommonRes,
                 tableNr = 1,

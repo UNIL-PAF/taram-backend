@@ -26,7 +26,9 @@ class AdaptMaxQuantTableTests {
         val (_, commonRes)  = columnMappingParser?.parse(filePath, resPath, ResultType.MaxQuant)!!
 
         val resTable = readTableData.getTable(filePath, commonRes?.headers)
-        val newTable = AdaptMaxQuantTable.adaptTable(resTable)
+        val (parsingStatus, newTable) = AdaptMaxQuantTable.adaptTable(resTable)
+
+        assert(parsingStatus == MaxQuantGeneParsing.All)
 
         assert(resTable?.headers?.size?.plus(2) == newTable?.headers?.size)
         assert(resTable?.cols?.size?.plus(2) == newTable?.cols?.size)
@@ -53,7 +55,9 @@ class AdaptMaxQuantTableTests {
         val (_, commonRes)  = columnMappingParser?.parse(filePath, resPath, ResultType.MaxQuant)!!
 
         val resTable = readTableData.getTable(filePath, commonRes?.headers)
-        val newTable = AdaptMaxQuantTable.adaptTable(resTable)
+        val (parsingStatus, newTable) = AdaptMaxQuantTable.adaptTable(resTable)
+
+        assert(parsingStatus == MaxQuantGeneParsing.Some)
 
         assert(resTable?.headers?.size == newTable?.headers?.size)
         assert(resTable?.cols?.size == newTable?.cols?.size)
@@ -79,7 +83,9 @@ class AdaptMaxQuantTableTests {
         val (_, commonRes) = columnMappingParser?.parse(filePath, resPath, ResultType.MaxQuant)!!
 
         val resTable = readTableData.getTable(filePath, commonRes?.headers)
-        val newTable = AdaptMaxQuantTable.adaptTable(resTable)
+        val (parsingStatus, newTable) = AdaptMaxQuantTable.adaptTable(resTable)
+
+        assert(parsingStatus == MaxQuantGeneParsing.Some)
 
         assert(resTable?.headers?.size == newTable?.headers?.size)
         assert(resTable?.cols?.size == newTable?.cols?.size)

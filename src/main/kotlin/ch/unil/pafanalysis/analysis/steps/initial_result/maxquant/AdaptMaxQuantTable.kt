@@ -7,6 +7,11 @@ import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.results.model.ResultType
 
+enum class MaxQuantGeneParsing(val value: String) {
+    None("none"),
+    Some("some"),
+    All("all")
+}
 
 object AdaptMaxQuantTable {
 
@@ -15,7 +20,7 @@ object AdaptMaxQuantTable {
     private val fastaGeneRegex = Regex("(?<=GN=)(.+?)(?=$|\\s)")
     private val fastaProtRegex = Regex(".+?\\s(.+?)\\s[A-Z]{2}=")
 
-    fun adaptTable(table: Table?): Table? {
+    fun adaptTable(table: Table?): Pair<MaxQuantGeneParsing, Table?> {
         val fastaHeaders = readTable.getStringColumn(table, "Fasta.headers")
         val genes = readTable.getStringColumn(table, HeaderTypeMapping().getCol("geneNames", ResultType.MaxQuant.value))
         val prots =
@@ -24,8 +29,8 @@ object AdaptMaxQuantTable {
         val newTable = if (fastaHeaders != null){
             if(genes != null && prots != null) {
                 completeGenesFromFasta(table, genes, prots, fastaHeaders)
-            } else parseAllGenesFromFasta(table, fastaHeaders)
-        } else table
+            } else Pair(MaxQuantGeneParsing.All, parseAllGenesFromFasta(table, fastaHeaders))
+        } else Pair(MaxQuantGeneParsing.None, table)
 
         return newTable
     }
@@ -74,7 +79,9 @@ object AdaptMaxQuantTable {
         genes: List<String>,
         prots: List<String>,
         fastaHeader: List<String>
-    ): Table? {
+    ): Pair<MaxQuantGeneParsing, Table?> {
+        var anyCompleted = false
+
         val geneIdx = table?.headers?.map { it.name }
             ?.indexOf(HeaderTypeMapping().getCol("geneNames", ResultType.MaxQuant.value))!!
         val newGenes = genes.zip(fastaHeader).map { (gene, fasta) ->
@@ -82,6 +89,7 @@ object AdaptMaxQuantTable {
                 val fastaList = fasta.split(";")
                 val matches =
                     fastaList.map { oneFasta -> fastaGeneRegex.find(oneFasta)?.value }.filterNotNull().distinct()
+                if(!anyCompleted && matches.isNotEmpty()) anyCompleted = true
                 matches.joinToString(";")
             } else gene
         }
@@ -101,6 +109,7 @@ object AdaptMaxQuantTable {
 
         val newCols = table?.cols?.take(geneIdx)?.plusElement(newGenes)?.plus(table?.cols?.drop(geneIdx + 1))
         val newCols2 = newCols?.take(protsIdx)?.plusElement(newProts)?.plus(newCols?.drop(protsIdx + 1))
-        return table.copy(cols = newCols2)
+        val geneParsingStatus = if(anyCompleted) MaxQuantGeneParsing.Some else MaxQuantGeneParsing.None
+        return Pair(geneParsingStatus, table.copy(cols = newCols2))
     }
 }
