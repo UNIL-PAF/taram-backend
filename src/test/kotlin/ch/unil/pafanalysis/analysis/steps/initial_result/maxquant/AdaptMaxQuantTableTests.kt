@@ -20,6 +20,33 @@ class AdaptMaxQuantTableTests {
     val columnMappingParser: ColumnMappingParser? = null
 
     @Test
+    fun tomczynskaTable() {
+        val resPath = "./src/test/resources/results/maxquant/Tomczynska_17742-45/"
+        val filePath = resPath + "proteinGroups.txt"
+        val (_, commonRes)  = columnMappingParser?.parse(filePath, resPath, ResultType.MaxQuant)!!
+
+        val resTable = readTableData.getTable(filePath, commonRes?.headers)
+        val newTable = AdaptMaxQuantTable.adaptTable(resTable)
+
+        assert(resTable?.headers?.size?.plus(2) == newTable?.headers?.size)
+        assert(resTable?.cols?.size?.plus(2) == newTable?.cols?.size)
+
+        val geneHeader = newTable?.headers?.find{it.name == HeaderTypeMapping().getCol("geneNames", ResultType.MaxQuant.value)}
+        assert(geneHeader?.name == "Gene.names")
+
+        val geneCol = newTable?.cols?.get(geneHeader?.idx!!)
+        assert(geneCol?.first() as? String  == "dnaK")
+        assert(geneCol?.get(9) as? String == "AGR4C_Lc50272")
+
+        val protHeader = newTable?.headers?.find{it.name == HeaderTypeMapping().getCol("description", ResultType.MaxQuant.value)}
+        assert(protHeader?.name == "Protein.names")
+
+        val protCol = newTable?.cols?.get(protHeader?.idx!!)
+        assert(protCol?.first() as? String  == "Chaperone protein DnaK")
+        assert(protCol?.get(9) as? String == "Putative transcriptional regulator protein, LacI family")
+    }
+
+    @Test
     fun scherlerTable() {
         val resPath = "./src/test/resources/results/maxquant/Scherler_17824-25_with_genes/"
         val filePath = resPath + "proteinGroups.txt"
