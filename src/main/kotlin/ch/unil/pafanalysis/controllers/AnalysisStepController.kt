@@ -82,7 +82,10 @@ class AnalysisStepController {
     @ResponseBody
     fun addTo(@RequestBody stepParams: AnalysisStepParams, @PathVariable(value = "stepId") stepId: Int): String? {
         val step = analysisStepRepository?.findById(stepId)
-        asyncAnaysisStepService?.setAllStepsStatus(step, AnalysisStepStatus.IDLE)
+        if(step?.nextId != null){
+            val nextStep = analysisStepRepository?.findById(step.nextId)
+            asyncAnaysisStepService?.setAllStepsStatus(nextStep, AnalysisStepStatus.IDLE)
+        }
         return commonStep?.addStep(stepId, stepParams)?.status
     }
 
