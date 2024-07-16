@@ -43,17 +43,17 @@ class AsyncBoxPlotRunner() : CommonStep() {
             analysisStep?.commonResult?.headers
         )
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
-
         val groupNames = analysisStep?.columnInfo?.columnMapping?.groupsOrdered ?: groupedExpDetails?.keys
 
         val boxplotGroupData = if(groupNames?.size?:0 > 0)
                 groupNames?.map { createBoxplotGroupData(it, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
             else  listOf(createBoxplotGroupData(null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
+
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
 
         return BoxPlot(
             experimentNames = experimentNames,
-            boxPlotData = boxplotGroupData,
+            boxPlotData = boxplotGroupData?.filterNotNull(),
             selProtData = selProtData,
             allProtData = if(params?.showAll == true) createAllData(table, intCol) else null
         )
@@ -104,7 +104,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
         table: Table?,
         intCol: String?,
         expDetails: Map<String, ExpInfo>?
-    ): BoxPlotGroupData {
+    ): BoxPlotGroupData? {
+        if(expDetails?.entries?.any{it.value.group == group} == false) return null
+
         val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails, group)
 
         val listOfBoxplots =
