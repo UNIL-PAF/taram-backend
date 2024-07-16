@@ -59,7 +59,11 @@ class AsyncAnalysisStepService {
     }
 
     fun setAnalysisStepStatus(id: Int, status: AnalysisStepStatus): Int? {
-        return analysisStepRepository?.setStatusById(status.value, id)
+        val step = analysisStepRepository?.findById(id)
+        if(step != null){
+            analysisStepRepository?.saveAndFlush(step.copy(status = status.value))
+        }
+        return step?.id
     }
 
 
