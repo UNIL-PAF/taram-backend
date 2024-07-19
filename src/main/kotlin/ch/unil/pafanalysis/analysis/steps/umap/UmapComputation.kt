@@ -73,8 +73,10 @@ class UmapComputation {
                 expName = headers?.get(i).experiment?.name,
                 umapVals = umap
             )
-        }
-        return UmapRes(groups = groups, nrUmaps = umaps.size, umapList = umapList, groupColors = groupColors)
+        }.filter{it.groupName != null}
+        val existingGroups = groups.filter{a -> umapList.find{it.groupName == a} != null}
+
+        return UmapRes(groups = existingGroups, nrUmaps = umaps.size, umapList = umapList, groupColors = groupColors)
     }
 
     private fun rComputeUmap(ints: List<List<Double>>, params: UmapParams?): List<List<Double>> {

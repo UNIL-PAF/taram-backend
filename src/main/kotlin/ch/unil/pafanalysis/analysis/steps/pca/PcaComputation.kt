@@ -70,8 +70,10 @@ class PcaComputation {
                 expName = headers?.get(i).experiment?.name,
                 pcVals = pc
             )
-        }
-        return PcaRes(groups = groups, nrPc = explVar.size, explVars = explVar, pcList = pcList, groupColors = groupColors)
+        }.filter{it.groupName != null}
+
+        val existingGroups = groups.filter{a -> pcList.find{it.groupName == a} != null}
+        return PcaRes(groups = existingGroups, nrPc = explVar.size, explVars = explVar, pcList = pcList, groupColors = groupColors)
     }
 
     private fun rComputePc(ints: List<List<Double>>): Pair<List<List<Double>>, List<Double>> {
