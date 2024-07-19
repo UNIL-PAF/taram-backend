@@ -134,7 +134,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         val runningStep =
             analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
-        //val expDetailsType: Type = object : TypeToken<HashMap<String, ExpInfo>>() {}.type
+        val oldExpDetails = analysisStep.columnInfo?.columnMapping?.experimentDetails
         val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
 
         // if there are groups defined and some experiments not in any groups, we set them as not selected.
@@ -142,14 +142,15 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
             colMapping.experimentDetails?.mapValues { a -> if(a.value.group == null) a.value.copy(isSelected = false) else a.value }
         }else colMapping.experimentDetails
 
-        val newHeaders: List<Header>? = updateHeaders(newExpDetails, analysisStep.commonResult?.headers)
+        val newHeaders: List<Header>? = updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails)
         val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders)
 
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(
                 experimentDetails = newExpDetails,
                 intCol = colMapping.intCol,
-                groupsOrdered = colMapping.groupsOrdered
+                groupsOrdered = colMapping.groupsOrdered,
+                experimentNames = colMapping.experimentNames
             )
         
         val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
@@ -185,9 +186,10 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         )
     }
 
-    private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Header>? {
+    private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?, oldExpDetails: Map<String, ExpInfo>?): List<Header>? {
         return headers?.map { h ->
-            val expInfo = experimentDetails?.get(h.experiment?.name)
+            val oldExpInfo = oldExpDetails?.values?.find{ expD -> h.experiment?.name == expD.name}
+            val expInfo = experimentDetails?.values?.find{ expD -> oldExpInfo?.originalName == expD.originalName}
             val exp = h.experiment?.copy(name = expInfo?.name)
             val headerName = if (exp != null) "${expInfo?.name}.${h.experiment?.field}" else h.name
             h.copy(experiment = exp, name = headerName)
