@@ -43,8 +43,10 @@ class ProteinTableService {
         resType: String?,
         expDetails: Map<String, ExpInfo>?
     ): ProteinTable {
-        val prots = readTable.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")?.get(0) }
-        val genes = readTable.getStringColumn(table, hMap.getCol("geneNames", resType))?.map { it.split(";")?.get(0) }
+        val protTable = readTable.getStringColumn(table, hMap.getCol("proteinIds", resType))
+        val prots = protTable?.map { it.split(";")?.get(0) }
+        val allProts = protTable
+        val genes = readTable.getStringColumn(table, hMap.getCol("geneNames", resType))//?.map { it.split(";")?.get(0) }
         val descs = readTable.getStringColumn(table, hMap.getCol("description", resType))
         val intCol = readTable.getDoubleColumn(table, defaultInt!!)
         val ids: List<Int>? = if (resType == ResultType.MaxQuant.value) {
@@ -60,7 +62,7 @@ class ProteinTableService {
         val sel = prots?.zip(genes ?: prots)?.map { selProteins?.contains(it.first)?:false ||  selProteins?.contains(it.second)?: false}
 
         val proteinRows: List<ProteinGroup>? = colOrMeans?.mapIndexed { i, colOrMean ->
-            ProteinGroup(ids?.get(i) ?: i, prots?.get(i), genes?.get(i), descs?.get(i), colOrMean, sel?.get(i))
+            ProteinGroup(ids?.get(i) ?: i, prots?.get(i), allProts?.get(i), genes?.get(i), descs?.get(i), colOrMean, sel?.get(i))
         }
 
         val fltRows = proteinRows?.filter { it.int?.isNaN() != true }
