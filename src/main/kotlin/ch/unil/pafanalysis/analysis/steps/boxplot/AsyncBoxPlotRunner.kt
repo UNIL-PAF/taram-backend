@@ -68,7 +68,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val sortedIntMatrix = intMatrix.withIndex().sortedBy { (index, _) -> orderById?.get(index) }.map{it.value}
 
         val protGroup = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")?.get(0) }
-        val genes = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))?.map { it.split(";")?.get(0) }
+        val geneCol = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
+        val genes = geneCol?.map { it.split(";")?.get(0) }
+        val geneNr = geneCol?.map { it.split(";").size }
 
         val selProts = params?.selProts.map { p ->
             val i = protGroup?.indexOf(p)
@@ -77,7 +79,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
                 val logInts = ints.map { if (it != null && !it.isNaN() && it > 0.0) log2(it) else null }
 
                 val gene = if (i == null) "" else genes?.get(i)
-                SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene)
+                val multipleGeneNames = (geneNr?.get(i)?:0 > 1)
+                SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene, multiGenes = multipleGeneNames)
             }else{
                 null
             }
