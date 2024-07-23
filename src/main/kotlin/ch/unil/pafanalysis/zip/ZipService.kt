@@ -49,7 +49,7 @@ class ZipService {
         val analysis = analysisRepo?.findById(analysisId)
         val steps = analysisService?.sortAnalysisSteps(analysis?.analysisSteps)
 
-        val zipName = prettyName(analysis?.result?.name + if(analysis?.name != null) "-"+analysis?.name else "")
+        val zipName = prettyName(analysis?.result?.name + if(analysis?.name != null) ("-"+analysis?.name) else "")
         val zipDir = createZipDir(zipName)
 
         createPdf(analysisId, zipSelection, "$zipDir/$zipName.pdf")
