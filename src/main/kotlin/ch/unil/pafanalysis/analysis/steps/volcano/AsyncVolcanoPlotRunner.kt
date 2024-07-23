@@ -76,9 +76,12 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
             val qVal = qVals?.get(i)
             val other = if(pepOrPreQuant != null) listOf(VolcanoPointInfo(pepOrPreHeader?.name, pepOrPreQuant?.get(i))) else null
 
+            val genes = geneName?.get(i)
+
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
-                gene = geneName?.get(i)?.split(";")?.get(0),
+                gene = genes?.split(";")?.get(0),
+                multiGenes= genes?.split(";")?.size ?: 0 > 1,
                 fc = invalidToNull(foldChanges?.get(i)),
                 pVal = invalidToNull(v),
                 qVal = invalidToNull(qVal),

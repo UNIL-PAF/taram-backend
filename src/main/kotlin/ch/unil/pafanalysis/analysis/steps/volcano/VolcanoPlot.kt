@@ -10,6 +10,7 @@ data class VolcanoPlot(
 data class VolcanoPoint(
     val prot: String? = null,
     val gene: String? = null,
+    val multiGenes: Boolean? = null,
     val fc: Double? = null,
     val pVal: Double? = null,
     val qVal: Double? = null,
