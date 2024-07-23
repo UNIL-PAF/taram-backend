@@ -146,7 +146,8 @@ open class CommonStep {
                     imputationTablePath = oldStep?.imputationTablePath,
                     tableNr = if (stepWithParams?.modifiesResult == true) {
                         oldStep?.tableNr?.plus(1)
-                    } else oldStep?.tableNr
+                    } else oldStep?.tableNr,
+                    version = version
                 )
             return analysisStepRepository?.saveAndFlush(newStep!!)
         } catch (e: Exception) {
