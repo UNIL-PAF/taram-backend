@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class ScatterPlotRunner() : CommonStep(), CommonRunner {
 
-    val version = "1.0"
+    val version = "2.0"
 
     override var type: AnalysisStepType? = AnalysisStepType.SCATTER_PLOT
 

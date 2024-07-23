@@ -17,7 +17,7 @@ class ComputeRegressionTests {
         val xList = listOf(151, 174, 138, 186, 128, 136, 179, 163, 152, 131).map{it.toDouble()}
         val yList = listOf(63, 81, 56, 91, 47, 57, 76, 72, 62, 48).map{it.toDouble()}
 
-        val data = xList.zip(yList).map{ a -> ScatterPoint(x = a.first, y=a.second, d = null, n=null)}
+        val data = xList.zip(yList).map{ a -> ScatterPoint(x = a.first, y=a.second, d = null, n=null, ac=null)}
         val regression = computeRegression.computeRegression(data)
 
         assert(roundNumber(regression?.slope ?: Double.NaN) == roundNumber(0.67461))
