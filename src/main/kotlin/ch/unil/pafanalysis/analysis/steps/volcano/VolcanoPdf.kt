@@ -1,6 +1,8 @@
 package ch.unil.pafanalysis.analysis.steps.volcano
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlot
+import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotParams
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -24,6 +26,14 @@ class VolcanoPdf() : PdfCommon() {
         div.add(Paragraph(" "))
         val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
         div.add(plot)
+
+        val volcanoParams = gson.fromJson(step?.parameters, VolcanoPlotParams().javaClass)
+        val volcanoPlot = gson.fromJson(step?.results, VolcanoPlot().javaClass)
+        val hasMultiGene = volcanoPlot.data?.any{ a ->
+            volcanoParams.selProteins?.contains(a.prot) ?: false && a.multiGenes ?: false
+        }
+        if(hasMultiGene == true) div.add(getParagraph("* only the first of multiple gene names is displayed."))
+
         return div
     }
 
