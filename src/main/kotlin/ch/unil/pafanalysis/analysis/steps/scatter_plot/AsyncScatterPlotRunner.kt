@@ -84,11 +84,8 @@ class AsyncScatterPlotRunner() : CommonStep() {
         val fltData = data?.filter{a -> a.y != null && a.x != null}
         val regression = ComputeRegression().computeRegression(fltData)
         val sortedData = fltData?.sortedBy { it.d }
-        val anyMultiGeneSel = if(genes != null && protGroup != null){
-                protGroup.zip(geneNames).any{ a -> a.second.size > 1 && params?.selProteins?.contains(a.first) == true}
-            }else false
 
-        return ScatterPlot(sortedData, linearRegression = regression, anyMultiGeneSel = anyMultiGeneSel)
+        return ScatterPlot(sortedData, linearRegression = regression)
 
         }
 

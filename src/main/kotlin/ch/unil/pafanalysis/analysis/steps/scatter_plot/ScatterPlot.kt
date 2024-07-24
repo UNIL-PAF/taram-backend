@@ -6,7 +6,6 @@ data class ScatterPlot(
     val data: List<ScatterPoint>? = null,
     val plot: EchartsPlot? = null,
     val linearRegression: LinearRegression? = null,
-    val anyMultiGeneSel: Boolean? = null,
 )
 
 data class ScatterPoint(
