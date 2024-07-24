@@ -67,13 +67,18 @@ class UmapComputation {
             headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }
                 .map { expDetails?.get(it.experiment?.name)?.group!! }.distinct()
 
-        val umapList = umaps.mapIndexed { i, umap ->
+        val groupsDefined: Boolean = expDetails?.values?.any{it.group != null} ?: false
+
+        val umapListOrig = umaps.mapIndexed { i, umap ->
             OneUmapRow(
                 groupName = expDetails?.get(headers?.get(i).experiment?.name)?.group,
                 expName = headers?.get(i).experiment?.name,
                 umapVals = umap
             )
-        }.filter{it.groupName != null}
+        }
+
+        val umapList = if(groupsDefined) umapListOrig.filter{it.groupName != null} else umapListOrig
+
         val existingGroups = groups.filter{a -> umapList.find{it.groupName == a} != null}
 
         return UmapRes(groups = existingGroups, nrUmaps = umaps.size, umapList = umapList, groupColors = groupColors)

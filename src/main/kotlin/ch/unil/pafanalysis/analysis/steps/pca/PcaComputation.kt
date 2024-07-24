@@ -64,13 +64,16 @@ class PcaComputation {
             headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }
                 .map { expDetails?.get(it.experiment?.name)?.group!! }.distinct()
 
-        val pcList = pcs.mapIndexed { i, pc ->
+        val groupsDefined: Boolean = expDetails?.values?.any{it.group != null} ?: false
+
+        val pcListOrig = pcs.mapIndexed { i, pc ->
             OnePcRow(
                 groupName = expDetails?.get(headers?.get(i).experiment?.name)?.group,
                 expName = headers?.get(i).experiment?.name,
                 pcVals = pc
             )
-        }.filter{it.groupName != null}
+        }
+        val pcList = if(groupsDefined) pcListOrig.filter{it.groupName != null} else pcListOrig
 
         val existingGroups = groups.filter{a -> pcList.find{it.groupName == a} != null}
         return PcaRes(groups = existingGroups, nrPc = explVar.size, explVars = explVar, pcList = pcList, groupColors = groupColors)
