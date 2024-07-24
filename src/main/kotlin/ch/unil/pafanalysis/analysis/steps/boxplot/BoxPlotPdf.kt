@@ -24,6 +24,11 @@ class BoxPlotPdf() : PdfCommon() {
         div.add(Paragraph(" "))
         val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
         div.add(plot)
+            
+        val boxplotData = gson.fromJson(step?.results, BoxPlot().javaClass)
+        val hasMultiGene = boxplotData.selProtData?.any{it.multiGenes == true}
+        if(hasMultiGene == true) div.add(getParagraph("* only the first of multiple gene names is displayed."))
+
         return div
     }
 
