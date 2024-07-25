@@ -4,6 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPointInfo
 import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
@@ -37,8 +38,14 @@ class AsyncScatterPlotRunner() : CommonStep() {
             analysisStep?.commonResult?.headers
         )
 
+        if(params.xAxis == null || params.yAxis == null) throw StepException("Please choose valid columns for x and y-axis.")
+
         val xId = table.headers?.find { h -> h.name == params.xAxis!! }
         val yId = table.headers?.find { h -> h.name == params.yAxis!! }
+
+        if(xId == null) throw StepException("Column [${params.xAxis}] does not exist.")
+        if(yId == null) throw StepException("Column [${params.yAxis}] does not exist.")
+
         val xList = readTableData.getDoubleColumn(table, xId?.name!!)
         val yList = readTableData.getDoubleColumn(table, yId?.name!!)
 
