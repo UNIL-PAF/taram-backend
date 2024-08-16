@@ -9,7 +9,6 @@ class ComputeRegression {
         val rData: Array<DoubleArray>? = data?.map{a -> doubleArrayOf(a.x ?: Double.NaN, a.y ?: Double.NaN) }?.toTypedArray()
         return if(rData != null){
             regression.addData(rData)
-            val intercept = regression.intercept
            LinearRegression(slope = regression.slope, intercept = regression.intercept, rSquare = regression.rSquare)
         } else null
     }
