@@ -9,6 +9,8 @@ It consists of 3 different parts:
 - [Taram user interface](https://github.com/UNIL-PAF/taram-ui): the web interface, based on [ReactJS](https://react.dev/).
 - [Taram SVG](https://github.com/UNIL-PAF/taram-svg): a simple NodeJS API which is used to render the plots for the PDF exports.
 
+A detailed description of the data analysis steps and the methods employed can be found in [TARAM_description.pdf](https://github.com/UNIL-PAF/taram-backend/tree/main/src/main/resources/docs/TARAM_description.pdf).
+
 ## Taram backend
 
 The backend of Taram is mainly written in [Kotlin](https://kotlinlang.org/) using [SpringBoot](https://spring.io/projects/spring-boot).
