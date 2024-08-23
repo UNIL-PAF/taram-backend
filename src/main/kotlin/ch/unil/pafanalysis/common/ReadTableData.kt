@@ -139,7 +139,7 @@ class ReadTableData {
     }
 
     fun getDoubleMatrix(table: Table?, field: String?, expDetails: Map<String, ExpInfo>? = null, group: String? = null): Pair<List<Header>, List<List<Double>>> {
-        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group) &&  expDetails?.get(it.experiment?.name) !== null}
+        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group) && (expDetails == null || expDetails?.get(it.experiment?.name) !== null)}
         if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
         if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
         return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
