@@ -49,7 +49,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
                 groupNames?.map { createBoxplotGroupData(it, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
             else  listOf(createBoxplotGroupData(null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
 
-        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, analysisStep?.columnInfo?.columnMapping?.experimentNames, analysisStep?.columnInfo?.columnMapping?.experimentDetails)
+        val selExpDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails?.filterValues{it.isSelected == true}
+        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, experimentNames, selExpDetails)
 
         return BoxPlot(
             experimentNames = experimentNames,
