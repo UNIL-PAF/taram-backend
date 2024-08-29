@@ -105,12 +105,20 @@ class ColumnMappingParser {
             .replace(Regex("_(\\d+)$"), "")
             .replace(Regex("_$"), "")
 
-        val dynRegex = Regex("^.*?_${commonStart}_([[a-zA-Z\\-0-9]]+).*")
+        val commonEnd = cleanSelCols.fold(cleanSelCols.first()){a, v -> v.commonSuffixWith(a)}.replace(selField, "")
+
+        val dynRegex = Regex("^.*?_${commonStart}_(.+)${commonEnd}.+")
 
         return columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
             val matchResult = if(dynRegex.matches(s)){
                 val myMatch = dynRegex.matchEntire(s)
-                if(myMatch != null) myMatch.groupValues[1] else null
+                if(myMatch != null){
+                    val a = myMatch.groupValues[1]
+                    // remove all "min" and "DIA"
+                    val b = a.replace(Regex("_\\d+min_.*"), "")
+                    val c = b.replace(Regex("_DIA.*"), "")
+                    c
+                } else null
             } else null
 
             val colField = s.split(".").last()

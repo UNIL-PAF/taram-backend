@@ -159,9 +159,6 @@ class ColumnMappingParserTests {
         val resFile = "./src/test/resources/results/spectronaut/Firsov-16431-518-library-2nd-run_Report.tsv"
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
 
-        println(colMapping.experimentNames?.size)
-        println(colMapping.experimentNames)
-
         assert(colMapping.experimentNames?.size == 96)
         assert(colMapping.experimentNames!!.contains("16432-02"))
         assert(colMapping.intCol == "Quantity")
@@ -211,6 +208,29 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(12)?.experiment?.name == "17-17289")
         assert(commonResults.headers?.get(12)?.experiment?.field == "NrOfPrecursorsIdentified")
+
+    }
+
+    @Test
+    fun parseSpectronautLiu() {
+        val resFile = "./src/test/resources/results/spectronaut/20240827_Liu-17984-90-directDIA-Peptides_Report.tsv"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
+        assert(colMapping.experimentNames == listOf("17984", "17985", "17986", "17987", "17988", "17989", "17990", "17985_dil8", "17985_dil7", "17985_dil6", "17985_dil5", "17985_dil4", "17985_dil3", "17985_dil2", "17985_dil1"))
+        assert(colMapping.intCol == null)
+        assert(commonResults.headers?.size == 16)
+
+        // check first header
+        assert(commonResults.headers?.get(0)?.idx == 0)
+        assert(commonResults.headers?.get(0)?.name == "EG.PrecursorId")
+        assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
+
+        // check header with experiment
+        assert(commonResults.headers?.get(12)?.idx == 12)
+        assert(commonResults.headers?.get(12)?.name == "17985_dil4.TotalQuantity")
+        assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(12)?.experiment?.name == "17985_dil4")
+        assert(commonResults.headers?.get(12)?.experiment?.field == "TotalQuantity")
 
     }
 }
