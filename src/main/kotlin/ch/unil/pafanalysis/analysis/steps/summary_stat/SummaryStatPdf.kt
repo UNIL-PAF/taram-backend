@@ -12,6 +12,7 @@ import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
 import org.springframework.stereotype.Service
 import java.text.DecimalFormat
+import kotlin.math.abs
 
 
 @Service
@@ -119,9 +120,12 @@ class SummaryStatPdf() : PdfCommon() {
         addFirstCol(rowName, colTable)
 
         data?.subList(start, end)?.forEach{ a ->
-            val n = if(a == 0.0) "0" else DecimalFormat("00.##E0").format(a)
+            val n = when {
+                a == 0.0 -> "0"
+                abs(a) > 1e4 || abs(a) < 1e-2 -> DecimalFormat("#.###E0").format(a)
+                else -> DecimalFormat("#.###").format(a)
+            }
             addStringCell(n, colTable)
         }
     }
-
 }
