@@ -182,14 +182,14 @@ class PdfService {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)
 
-        val (versionNr, backendVersion) = getBackendVersion()
-        addInfoCell("Created with TARAM ($versionNr)", backendVersion, infoTable)
+        val (versionNr, _) = getBackendVersion()
+        addInfoCell("Report created with", "TARAM $versionNr", infoTable)
 
         div.setBorder(SolidBorder(antCyan, 1f))
         div.setMarginTop(10f)
         div.setMarginBottom(20f)
         div.add(infoTable)
-
+        
         document?.add(div)
     }
 
