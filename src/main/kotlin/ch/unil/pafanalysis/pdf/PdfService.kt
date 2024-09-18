@@ -189,7 +189,7 @@ class PdfService {
         div.setMarginTop(10f)
         div.setMarginBottom(20f)
         div.add(infoTable)
-        
+
         document?.add(div)
     }
 

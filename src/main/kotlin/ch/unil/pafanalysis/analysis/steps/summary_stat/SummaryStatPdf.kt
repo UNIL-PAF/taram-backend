@@ -77,9 +77,9 @@ class SummaryStatPdf() : PdfCommon() {
         addDoubleRow("Mean", res.mean, start, end, table)
         addDoubleRow("Median", res.median, start, end, table)
         addDoubleRow("Sum", res.sum, start, end, table)
-        addDoubleRow("Std dev", res.stdDev, start, end, table)
+        /*addDoubleRow("Std dev", res.stdDev, start, end, table)
         addDoubleRow("Std err", res.stdErr, start, end, table)
-        addDoubleRow("Coef of var", res.coefOfVar, start, end, table)
+        addDoubleRow("Coef of var", res.coefOfVar, start, end, table)*/
         addIntRow("Nr of valid", res.nrValid, start, end, table)
         addIntRow("Nr of NaN", res.nrNaN, start, end, table)
         table.isKeepTogether = true
