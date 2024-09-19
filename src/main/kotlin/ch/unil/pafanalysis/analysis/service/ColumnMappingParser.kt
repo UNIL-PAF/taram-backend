@@ -172,9 +172,15 @@ class ColumnMappingParser {
 
         }
 
+        // sort experimentNames
+        val oneField = cols?.expFields?.first()
+        val selHeaders = cols?.headers?.filter{h -> h.experiment?.field == oneField}
+        val expNames = selHeaders?.map{ h -> h.experiment?.name ?: throw StepException("Could find experiment name in [${h.name}].") }
+        if(expNames?.size != cols?.expNames?.size) throw StepException("Could not find all experiment names in header [$oneField].")
+
         val colMapping = ColumnMapping(
             experimentDetails = cols?.expDetails,
-            experimentNames = cols?.expNames?.toList(),
+            experimentNames = expNames, //cols?.expNames?.toList(),
             intCol = if (cols?.expFields?.contains("iBAQ") == true) "iBAQ" else null
         )
 

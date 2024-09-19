@@ -18,7 +18,7 @@ class ColumnMappingParserTests {
         val resFile = resultPath + "proteinGroups.txt"
         val colMapping = colParser!!.parse(resFile, resultPath, ResultType.MaxQuant).first
 
-        assert(colMapping.experimentNames == listOf("14611", "14613", "14615", "14610", "14612", "14614"))
+        assert(colMapping.experimentNames == listOf("14610", "14611", "14612", "14613", "14614", "14615"))
     }
 
     @Test
@@ -60,6 +60,17 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
         assert(commonResults.headers?.get(12)?.experiment?.name == "KO-13704")
         assert(commonResults.headers?.get(12)?.experiment?.field == "Mutation.names")
+    }
+
+    @Test
+    fun parseMaxQuantWang() {
+        val resultPath = "./src/test/resources/results/maxquant/Wang-17859-63/"
+        val resFile = resultPath + "proteinGroups.txt"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, resultPath, ResultType.MaxQuant)
+
+        assert(colMapping.experimentNames?.size == 7)
+        assert(colMapping.experimentNames?.first() == "17857")
+
     }
 
     @Test

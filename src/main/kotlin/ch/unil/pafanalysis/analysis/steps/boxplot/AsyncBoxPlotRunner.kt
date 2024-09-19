@@ -56,7 +56,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             experimentNames = experimentNames,
             boxPlotData = boxplotGroupData?.filterNotNull(),
             selProtData = selProtData,
-            allProtData = if(params?.showAll == true) createAllData(table, intCol) else null
+            allProtData = if(params?.showAll == true) createAllData(table, intCol, selExpDetails) else null
         )
     }
 
@@ -93,10 +93,12 @@ class AsyncBoxPlotRunner() : CommonStep() {
     private fun createAllData(
         table: Table?,
         intCol: String?,
+        selExpDetails: Map<String, ExpInfo>?
     ): List<List<AllProtPoint>>? {
         val generator = Random(10)
 
-        val allData = readTableData.getDoubleMatrix(table, intCol).second
+        val (headers, allData) = readTableData.getDoubleMatrix(table, intCol, selExpDetails)
+
         return allData.map{ a ->
             val yPoints = a.filter{a -> !a.isNaN() && a != Double.NaN}
             yPoints.map{ b -> AllProtPoint(y=b, j=generator.nextDouble()-0.5) }
