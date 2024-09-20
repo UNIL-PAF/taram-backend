@@ -85,11 +85,16 @@ class AsyncOrderColumnsRunner() : CommonStep() {
     }
 
     private fun getNewOrder(table: Table?, newOrder: List<Int>?): Table? {
-        val newCols = newOrder?.map{ a ->
+        // add new columns to the end if necessary
+        val newOrder2 = if(table?.headers != null && newOrder != null && table.headers.size > newOrder.size){
+            newOrder.plus(newOrder.size until table.headers.size)
+        } else newOrder
+
+        val newCols = newOrder2?.map{ a ->
             val selIdx = table?.headers?.withIndex()?.find{it.value.idx == a}?.index
             table?.cols?.get(selIdx!!)!!
         }
-        val newHeaders = newOrder?.mapIndexed{ i, a ->
+        val newHeaders = newOrder2?.mapIndexed{ i, a ->
             val selIdx = table?.headers?.withIndex()?.find{it.value.idx == a}?.index
             table?.headers?.get(selIdx!!)?.copy(idx = i)!!
         }
