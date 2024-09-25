@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.service
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.ParseSpectronautColNames
 import ch.unil.pafanalysis.common.CheckTypes
 import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.stereotype.Service
@@ -70,7 +71,7 @@ class ColumnMappingParser {
         columns: List<String>?,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-        val cols = parseColumns(columns, colTypes)
+        val cols = parseSpectronautColumns(columns, colTypes)
 
         if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from spectronaut result.")
 
@@ -86,7 +87,7 @@ class ColumnMappingParser {
         return Pair(colMapping, commonResult)
     }
 
-    private fun parseColumns(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
+    private fun parseSpectronautColumns(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
         // Remove trailing " (Settings)"
         val columns = columnsOrig?.map{it.replace(Regex("\\s\\(Settings\\)$"), "")}
         val allEndings = columns?.map{c -> c.split(".").last()}
@@ -97,16 +98,7 @@ class ColumnMappingParser {
 
         val selField = endingSizes?.toList()?.maxByOrNull { it.second }!!.first
         val selCols = columns?.filter{it.matches(Regex(".+${selField}$"))}
-
-        // remove the first part until the first_
-        val cleanSelCols = selCols.map{it.replace(Regex("^.+?_(?=([A-Z|a-z]))"), "")}
-
-        val commonStart = cleanSelCols.fold(cleanSelCols.first()){ a, v -> v.commonPrefixWith(a)}
-            .replace(Regex("_(\\d+)$"), "")
-            .replace(Regex("_$"), "")
-
-        val commonEnd = cleanSelCols.fold(cleanSelCols.first()){a, v -> v.commonSuffixWith(a)}.replace(selField, "")
-
+        val (commonStart, commonEnd) = ParseSpectronautColNames.getCommonStartAndEnd(selCols, selField)
         val dynRegex = Regex("^.*?_${commonStart}_(.+)${commonEnd}.+")
 
         return columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->

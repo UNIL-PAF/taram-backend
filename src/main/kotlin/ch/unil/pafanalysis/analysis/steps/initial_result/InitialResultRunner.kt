@@ -10,6 +10,8 @@ import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.InitialMaxQuan
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.MaxQuantGeneParsing
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.AdaptSpectronautTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.InitialSpectronautRunner
+import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.ParseSpectronautColNames
+import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.SpectronautSetup
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
@@ -83,15 +85,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
             // for spectronaut we can try to get the groups from the setup
             val newColInfo = if(initialResult?.spectronautSetup != null){
-                val newExpDetails = columnInfo?.columnMapping?.experimentNames?.fold(emptyMap<String, ExpInfo>()){ acc, expName ->
-                    val matched = initialResult.spectronautSetup.runs?.filter{ it.name?.contains(expName) == true }
-                    val condition = if(matched?.size == 1) matched?.get(0).condition else null
-                    val newEntry = columnInfo?.columnMapping?.experimentDetails?.get(expName)?.copy(group = condition)
-                    acc.plus(Pair(expName, newEntry!!))
-                }
-                val groupsOrdered = initialResult.spectronautSetup.runs?.map{it.condition}?.filterNotNull()?.distinct()?.sorted()
-                val newColMapping = columnInfo?.columnMapping?.copy(experimentDetails = newExpDetails, groupsOrdered = groupsOrdered)
-                val newColumnInfo = columnInfo?.copy(columnMapping = newColMapping)
+                val newColumnInfo = matchSpectronautGroups(columnInfo, initialResult.spectronautSetup)
                 columnInfoRepository?.saveAndFlush(newColumnInfo!!)
             } else columnInfo
 
@@ -128,6 +122,26 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
         throw Exception("InitialResultRunner does not implement getCopyDifference function.")
+    }
+
+    fun matchSpectronautGroups(columnInfo: ColumnInfo?, spectronautSetup: SpectronautSetup):ColumnInfo? {
+        val newExpDetails = columnInfo?.columnMapping?.experimentNames?.fold(emptyMap<String, ExpInfo>()){ acc, expName ->
+
+            val matched = spectronautSetup.runs?.filter{ it.name?.contains(expName) == true }
+
+            val condition = if(matched?.size == 1) {
+                matched?.get(0).condition
+            } else if(!matched.isNullOrEmpty() && matched.all{!it.name.isNullOrEmpty()}){
+                val (commonStart, commonEnd) = ParseSpectronautColNames.getCommonStartAndEnd(matched.map{it.name!!} )
+                matched.find{a -> a.name?.matches(Regex(".*$commonStart$commonEnd.*")) ?: false }?.condition
+            } else null
+
+            val newEntry = columnInfo?.columnMapping?.experimentDetails?.get(expName)?.copy(group = condition)
+            acc.plus(Pair(expName, newEntry!!))
+        }
+        val groupsOrdered = spectronautSetup.runs?.map{it.condition}?.filterNotNull()?.distinct()?.sorted()
+        val newColMapping = columnInfo?.columnMapping?.copy(experimentDetails = newExpDetails, groupsOrdered = groupsOrdered)
+        return columnInfo?.copy(columnMapping = newColMapping)
     }
 
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {

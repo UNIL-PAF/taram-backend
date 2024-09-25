@@ -224,7 +224,7 @@ class ColumnMappingParserTests {
 
     @Test
     fun parseSpectronautLiu() {
-        val resFile = "./src/test/resources/results/spectronaut/20240827_Liu-17984-90-directDIA-Peptides_Report.tsv"
+        val resFile = "./src/test/resources/results/spectronaut/Liu-17984-90/20240827_Liu-17984-90-directDIA-Peptides_Report.tsv"
         val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
 
         assert(colMapping.experimentNames == listOf("17984", "17985", "17986", "17987", "17988", "17989", "17990", "17985_dil8", "17985_dil7", "17985_dil6", "17985_dil5", "17985_dil4", "17985_dil3", "17985_dil2", "17985_dil1"))
@@ -244,4 +244,5 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(12)?.experiment?.field == "TotalQuantity")
 
     }
+
 }

@@ -12,6 +12,15 @@ class ParseSpectronautSetupTests {
     @Autowired
     private val parser: ParseSpectronautSetup? = null
 
+    @Test
+    fun liuSetup() {
+        val resPath = "./src/test/resources/results/spectronaut/Liu-17984-90/"
+        val filePath = File(resPath + "20240827_Liu-17984-90-directDIA-Peptides_Report.setup.txt")
+        val spectronautSetup = parser?.parseSetup(filePath)
+        val selRun = spectronautSetup?.runs?.find{it.condition == "5191"}
+        assert(selRun?.name == "7288_Liu_DIA_17985_15SPD.d")
+    }
+
 
     @Test
     fun siddeekSetup() {
