@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.pca
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.ColumnMapping
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.StepException
@@ -18,13 +19,18 @@ class PcaComputation {
 
     fun run(table: Table?, params: PcaParams?, step: AnalysisStep?): PcaRes {
         val field = params?.column ?: step?.columnInfo?.columnMapping?.intCol
+
         val (headers, intTable) = readTableData.getDoubleMatrix(
             table,
             field,
             step?.columnInfo?.columnMapping?.experimentDetails
         )
         if (checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
-        val (pcs, explVar) = rComputePc(intTable)
+
+        val fltHeaders = if(params?.useAllGroups == false) fltHeadersByGroup(params?.selGroups, headers, step?.columnInfo?.columnMapping) else headers
+        val fltIntTable = if(params?.useAllGroups == false) readTableData.getDoubleMatrix(table, fltHeaders) else intTable
+
+        val (pcs, explVar) = rComputePc(fltIntTable)
         val groupNames: List<String>? =
             if (params?.useAllGroups == false) step?.columnInfo?.columnMapping?.groupsOrdered?.filter{params?.selGroups?.contains(it) ?: false} else step?.columnInfo?.columnMapping?.groupsOrdered
         val groupColors: List<String> = getColors(params, step?.columnInfo?.columnMapping?.groupsOrdered)
@@ -32,11 +38,18 @@ class PcaComputation {
         return createPcaRes(
             pcs,
             explVar,
-            headers,
+            fltHeaders,
             step?.columnInfo?.columnMapping?.experimentDetails,
             groupNames,
             groupColors
         )
+    }
+
+    private fun fltHeadersByGroup(selGroups: List<String>?, headers: List<Header>, columnMapping: ColumnMapping?): List<Header> {
+        val expInfos = columnMapping?.experimentDetails?.values
+        return headers.filter { header ->
+            selGroups?.contains(expInfos?.find{it.name == header.experiment?.name}?.group) ?: false
+        }
     }
 
     private fun getColors(params: PcaParams?, groupsOrderer: List<String>?): List<String> {
@@ -74,7 +87,6 @@ class PcaComputation {
             )
         }
         val pcList = if(groupsDefined) pcListOrig.filter{it.groupName != null} else pcListOrig
-
         val existingGroups = groups.filter{a -> pcList.find{it.groupName == a} != null}
         return PcaRes(groups = existingGroups, nrPc = explVar.size, explVars = explVar, pcList = pcList, groupColors = groupColors)
     }
