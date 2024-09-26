@@ -158,7 +158,7 @@ class PdfService {
     }
 
     private fun addResultInfo(analysis: Analysis?, document: Document?){
-        val div = Div()
+        val div = Div().setMarginTop(0f).setPaddingTop(0f)
 
         val result: Result? = analysis?.result
 
@@ -169,7 +169,6 @@ class PdfService {
             .setFontColor(ColorConstants.BLACK)
         title.setMarginTop(0f)
         div.add(title)
-        div.setPaddingTop(0f)
         div.setBackgroundColor(antCyan)
 
         val infoTable = Table(2).setPaddingLeft(5f)
@@ -186,7 +185,7 @@ class PdfService {
         addInfoCell("Report created with", "TARAM $versionNr", infoTable)
 
         div.setBorder(SolidBorder(antCyan, 1f))
-        div.setMarginTop(10f)
+        //div.setMarginTop(10f)
         div.setMarginBottom(20f)
         div.add(infoTable)
 
@@ -221,17 +220,12 @@ class PdfService {
     }
 
     private fun addLogo(document: Document?, pdf: PdfDocument, plotWidth: Float){
-        val imagePath = "/resources/images/lo_unil06_bleu.pdf"
-        val image2Path = "/resources/images/PAF-logo-HIGH.pdf"
-        val img1 = pdfToImage(imagePath, pdf)
-        val img2 = pdfToImage(image2Path, pdf)
-        img1.scaleToFit(156f/1.3f, 58f/1.3f).setHorizontalAlignment(HorizontalAlignment.RIGHT)
-        img2.scaleToFit(156f/1f, 58f/1f)
-        val table = Table(2)
+        val imagePath = "/resources/images/personalized_logo_blue_cropped.pdf"
+        val img1 = pdfToImage(imagePath, pdf).setBorder(Border.NO_BORDER)
+        img1.setHorizontalAlignment(HorizontalAlignment.RIGHT).setBorder(Border.NO_BORDER)
+        val table = Table(1)
         table.setWidth(plotWidth)
-        val cell1 = Cell().add(img2).setBorder(Border.NO_BORDER)
         val cell2 = Cell().add(img1).setBorder(Border.NO_BORDER)
-        table.addCell(cell1)
         table.addCell(cell2)
         val p = Paragraph().add(table)
         document?.add(p)
