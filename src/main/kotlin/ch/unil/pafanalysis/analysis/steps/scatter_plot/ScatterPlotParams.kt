@@ -8,5 +8,6 @@ data class ScatterPlotParams (
     val logTrans: Boolean? = null,
     val showXYLine: Boolean? = null,
     val showRegrLine: Boolean? = null,
-    val selProteins: List<String>? = null
+    val selProteins: List<String>? = null,
+    val title: String? = null,
 )
