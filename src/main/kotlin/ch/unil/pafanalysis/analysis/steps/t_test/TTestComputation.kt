@@ -123,7 +123,7 @@ class TTestComputation {
             Header(name = "log2.fold.change.$compName", idx = nrHeaders + 1 + idxOffset, ColType.NUMBER, Experiment(comp = comp)),
             Header(name = "is.significant.$compName", idx = nrHeaders + 2 + idxOffset, ColType.CHARACTER, Experiment(comp = comp))
         )
-        val qValHeader = if(qVals == null) emptyList() else listOf(Header(name = "q.value.$compName", idx = nrHeaders + 1, ColType.NUMBER, Experiment(comp = comp)))
+        val qValHeader = if(qVals == null) emptyList() else listOf(Header(name = "adj.p.value.$compName", idx = nrHeaders + 1, ColType.NUMBER, Experiment(comp = comp)))
         val newHeaders: List<Header>? = table?.headers.plus(pValHeader).plus(qValHeader).plus(foldHeader)
 
         val pValCol = listOf<List<Any>>(pVals)

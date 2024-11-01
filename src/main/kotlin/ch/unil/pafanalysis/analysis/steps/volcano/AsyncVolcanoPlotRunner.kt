@@ -40,8 +40,8 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val params = gson.fromJson(analysisStep?.parameters, VolcanoPlotParams().javaClass)
         val compName = "." + params.comparison?.group1?.trim().plus("-" + params.comparison?.group2?.trim())
 
-        val hasQVal: Boolean = (table.headers?.find { it.name == "q.value$compName" }) != null
-        if (params?.useAdjustedPVal == true && !hasQVal) throw StepException("There are no q-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
+        val hasQVal: Boolean = (table.headers?.find { it.name == "q.value$compName" || it.name == "adj.p.value$compName"}) != null
+        if (params?.useAdjustedPVal == true && !hasQVal) throw StepException("There are no adjusted p-values for this comparison. Please make sure you use a multiple test correction in your statistical test.")
 
         val resType = analysisStep?.analysis?.result?.type
 
@@ -53,7 +53,10 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
 
         val proteinName = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))
         val geneName = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
-        val qVals = if(hasQVal) readTableData.getDoubleColumn(table, "q.value$compName") else null
+        val qVals = if(hasQVal) {
+            val qVals1 = readTableData.getDoubleColumn(table, "q.value$compName")
+            if(qVals1 != null) qVals1 else readTableData.getDoubleColumn(table, "adj.p.value$compName")
+        } else null
 
         if (foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 

@@ -96,7 +96,7 @@ class MaryamTTestComputationTests {
 
 
         // verify q-values
-        val qValHeader = resTable?.headers?.find { it.name?.contains("q.value") ?: false }
+        val qValHeader = resTable?.headers?.find { it.name?.contains("adj.p.value") ?: false }
         val qVals = resTable?.cols?.get(qValHeader?.idx!!)
             ?.map { if (qValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
 
