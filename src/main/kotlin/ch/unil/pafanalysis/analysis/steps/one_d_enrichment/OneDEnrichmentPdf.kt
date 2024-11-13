@@ -74,7 +74,7 @@ class OneDEnrichmentPdf() : PdfCommon() {
     }
 
     private fun addHeaders(colTable: Table){
-        val headers = listOf("Column", "Type", "Name", "Size", "Score", "P-value", "Q-value", "Mean", "Median")
+        val headers = listOf("Column", "Type", "Name", "Size", "Score", "P-value", "Adj. p-value", "Mean", "Median")
         headers.forEach{ h ->
             val headerPar = getParagraph(h, bold = true).setFontSize(cellFontSize)
             val rowNameCell = Cell().add(headerPar)

@@ -6,7 +6,7 @@ import java.io.FileWriter
 class EnrichmentTableWriter {
 
     private val headers =
-        listOf("Column", "Type", "Name", "Size", "Score", "P value", "Benj. Hoch. FDR", "Mean", "Median")
+        listOf("Column", "Type", "Name", "Size", "Score", "P-value", "Adj. p-value", "Mean", "Median")
 
     fun write(filePath: String, rows: List<EnrichmentRow>): String {
         val writer = BufferedWriter(FileWriter(filePath))
