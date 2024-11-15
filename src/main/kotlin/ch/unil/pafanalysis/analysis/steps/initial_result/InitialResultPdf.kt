@@ -35,6 +35,12 @@ class InitialResultPdf() : PdfCommon() {
             )
         )
 
+        // 1. parameters
+        val leftDiv = Div()
+        val dataTable = getDataTable(initialResult, step?.columnInfo?.columnMapping?.intCol ?: "")
+        leftDiv.add(getTwoRowTableWithList(dataTable).setWidth(plotWidth))
+        stepDiv.add(leftDiv)
+
         // Groups definitions
         stepDiv.add(getParagraph("Groups and sample identities:", bold = true))
         if (groupsDefined) {
@@ -49,12 +55,6 @@ class InitialResultPdf() : PdfCommon() {
         } else {
             stepDiv.add(Paragraph("No groups are defined"))
         }
-
-        // 1. parameters
-        val leftDiv = Div()
-        val dataTable = getDataTable(initialResult, step?.columnInfo?.columnMapping?.intCol ?: "")
-        leftDiv.add(getTwoRowTableWithList(dataTable).setWidth(plotWidth))
-        stepDiv.add(leftDiv)
 
         return stepDiv
     }
