@@ -35,10 +35,6 @@ class TTestPdf() : PdfCommon() {
         val description = "FDR correction adjusts thresholds for large datasets."
         stepDiv.add(titleDiv("$stepNr. t-test", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
-        val colTable = Table(2)
-        colTable.setWidth(plotWidth)
-        val colWidth = plotWidth/12
-
         // 1. parameters
         val paramsData: List<Pair<String, String>> = listOf(
             Pair("Significance threshold:", parsedParams.signThres.toString()),
@@ -50,15 +46,9 @@ class TTestPdf() : PdfCommon() {
         if(parsedParams.filterOnValid == true){
             paramsDiv.add(getOneRowTable(listOf(getParagraph("Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.", dense = true, bold = true))))
         }
-        val leftCell = getParamsCell(paramsDiv, 4 * colWidth)
-        colTable.addCell(leftCell)
 
-        // 2. data
-        val middleDiv = Div()
-        middleDiv.add(createResTable(res, parsedParams.filterOnValid).setWidth(8 * colWidth -5f))
-        colTable.addCell(getDataCell(middleDiv, 8 * colWidth))
-
-        stepDiv.add(colTable)
+        stepDiv.add(paramsDiv)
+        stepDiv.add(createResTable(res, parsedParams.filterOnValid).setWidth(plotWidth -5f).setMarginTop(10f))
         return stepDiv
     }
 
