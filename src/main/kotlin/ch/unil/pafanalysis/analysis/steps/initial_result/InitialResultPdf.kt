@@ -12,6 +12,9 @@ import com.itextpdf.layout.element.*
 import com.itextpdf.layout.properties.HorizontalAlignment
 import com.itextpdf.layout.properties.TextAlignment
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 @Service
@@ -143,13 +146,19 @@ class InitialResultPdf() : PdfCommon() {
 
     private fun getDataTable(initialResult: InitialResult, intCol: String): List<Pair<String, List<String>>> {
         return if (initialResult?.spectronautSetup != null) {
-            listOf(
+            val analysisDate = initialResult.spectronautSetup.analysisDate?.replace(Regex("\\s+\\d+.+UTC.+"), "")
+
+            val myList = listOf(
                 Pair("Default intensity column:", listOf(intCol)),
                 Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
-                Pair("Analysis date: ", listOf(initialResult.spectronautSetup.analysisDate ?: "")),
+                Pair("Analysis date: ", listOf(analysisDate ?: "")),
                 Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
-                Pair("Libraries:", initialResult.spectronautSetup.libraries?.map { it.name ?: "" } ?: emptyList())
             )
+
+            if(initialResult.spectronautSetup.libraries?.isNotEmpty() == true){
+                myList.plusElement(Pair("Libraries:", initialResult.spectronautSetup.libraries?.map { it.name ?: "" } ?: emptyList()))
+            } else myList
+
         } else {
             val mainList = listOf(
                 Pair("Default intensity column:", listOf(intCol)),
