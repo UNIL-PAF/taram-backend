@@ -17,7 +17,7 @@ class RemoveImputedPdf() : PdfCommon() {
         val res = gson.fromJson(step.results, RemoveImputed::class.java)
         val parsedParams = gson.fromJson(step.parameters, RemoveImputedParams::class.java)
 
-        val description = "FC and p-values calculated with imputed data are kept."
+        val description = "Fold changes and p-values calculated with imputed data are kept."
         val stepDiv = Div()
         stepDiv.add(titleDiv("$stepNr. Remove imputed", plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
