@@ -74,9 +74,9 @@ class SummaryStatPdf() : PdfCommon() {
         addStringRow("Group", groups, start, end, table)
         addDoubleRow("Min", res.min, start, end, table)
         addDoubleRow("Max", res.max, start, end, table)
-        addDoubleRow("Mean", res.mean, start, end, table)
+        //addDoubleRow("Mean", res.mean, start, end, table)
         addDoubleRow("Median", res.median, start, end, table)
-        addDoubleRow("Sum", res.sum, start, end, table)
+        //addDoubleRow("Sum", res.sum, start, end, table)
         /*addDoubleRow("Std dev", res.stdDev, start, end, table)
         addDoubleRow("Std err", res.stdErr, start, end, table)
         addDoubleRow("Coef of var", res.coefOfVar, start, end, table)*/
@@ -122,8 +122,8 @@ class SummaryStatPdf() : PdfCommon() {
         data?.subList(start, end)?.forEach{ a ->
             val n = when {
                 a == 0.0 -> "0"
-                abs(a) > 1e4 || abs(a) < 1e-2 -> DecimalFormat("#.###E0").format(a)
-                else -> DecimalFormat("#.###").format(a)
+                abs(a) > 1e4 || abs(a) < 1e-2 -> DecimalFormat("#.##E0").format(a)
+                else -> DecimalFormat("#.##").format(a)
             }
             addStringCell(n, colTable)
         }
