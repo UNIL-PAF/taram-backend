@@ -134,15 +134,20 @@ class PdfService {
 
         fun getTables(step: AnalysisStep?, stepNr: Int): String {
             return if(step?.modifiesResult == true){
-                if(step?.type == AnalysisStepType.ONE_D_ENRICHMENT.value){
-                    "Table $stepNr, Enrichment table $stepNr"
-                }else "Table $stepNr"
-            } else ""
+                when(step?.type){
+                    AnalysisStepType.ONE_D_ENRICHMENT.value -> "Table $stepNr, Enrichment table $stepNr"
+                    else -> "Table $stepNr"
+                }
+            } else when(step?.type){
+                AnalysisStepType.SUMMARY_STAT.value -> "Summary table $stepNr"
+                AnalysisStepType.UMAP.value -> "UMAP plot $stepNr"
+                AnalysisStepType.SCATTER_PLOT.value -> "Scatter plot $stepNr"
+                AnalysisStepType.VOLCANO_PLOT.value -> "Volcano plot $stepNr"
+                AnalysisStepType.PCA.value -> "PCA plot $stepNr"
+                AnalysisStepType.BOXPLOT.value -> "Boxplot $stepNr"
+                else -> ""
+            }
         }
-
-        table.addCell(createCell("Id", bold = true, minWidth = 30f))
-        table.addCell(createCell("Step", bold = true, minWidth = 260f))
-        table.addCell(createCell("Tables", bold = true))
 
         steps?.forEachIndexed { i, step ->
             val stepNr = i + 1

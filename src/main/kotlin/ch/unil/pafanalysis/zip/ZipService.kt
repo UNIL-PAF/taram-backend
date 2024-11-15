@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.zip
 
 import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
@@ -129,17 +130,24 @@ class ZipService {
         }
     }
 
+    private fun getPlotNames(type: String?): String?{
+        return when(type){
+            AnalysisStepType.UMAP.value -> "UMAP-plot"
+            AnalysisStepType.PCA.value -> "PCA-plot"
+            else -> StepNames.getName(type)
+        }.replace(" ", "-")
+    }
+
     private fun getPlot(step: AnalysisStep?, idx: Int, path: String){
-        val fileName = "$idx-${step?.type}"
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
-        val resName = step?.id.toString()?.plus("-")?.plus(step?.type)
+        val resName = getPlotNames(step?.type).plus("-").plus(idx)
 
         echartsServer?.getSvgPlot(step, "${step?.resultPath}/$resName.svg")
         echartsServer?.getPngPlot(step, "${step?.resultPath}/$resName.png")
 
         // move generated files
-        File("$resultDir/$resName.svg").copyTo(File("$path/$fileName.svg"))
-        File("$resultDir/$resName.png").copyTo(File("$path/$fileName.png"))
+        File("$resultDir/$resName.svg").copyTo(File("$path/$resName.svg"))
+        File("$resultDir/$resName.png").copyTo(File("$path/$resName.png"))
 
         // delete original files
         File("$resultDir/$resName.svg").delete()
