@@ -17,12 +17,15 @@ class RenameColumnsPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, RenameColumnsParams::class.java)
 
         val stepDiv = Div()
-        val description = "Table cleanup."
-        stepDiv.add(titleDiv("$stepNr. Rename columns", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
+        val description = "Add conditions to table headers."
+        stepDiv.add(titleDiv("$stepNr. Rename headers", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
+
+        /*
 
         val colTable = Table(2)
         colTable.setWidth(plotWidth)
         val colWidth = plotWidth/12
+
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
@@ -34,6 +37,8 @@ class RenameColumnsPdf() : PdfCommon() {
         colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
+
+         */
         return stepDiv
     }
 
