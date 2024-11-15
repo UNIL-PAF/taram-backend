@@ -55,12 +55,12 @@ class OneDEnrichmentPdf() : PdfCommon() {
         val title = getParagraph("Selected results:", bold = true, underline = false)
         stepDiv.add(title)
 
-        val selResTable = Table(9)
+        val selResTable = Table(7)
         selResTable.setWidth(plotWidth)
         selResTable.setKeepTogether(true)
 
-        addHeaders(selResTable)
-        res.selResults?.forEach { row -> addRow(selResTable, row) }
+        addHeaders(selResTable, parsedParams.fdrCorrection)
+        res.selResults?.forEach { row -> addRow(selResTable, row, parsedParams.fdrCorrection) }
 
         stepDiv.add(selResTable)
         return stepDiv
@@ -73,8 +73,9 @@ class OneDEnrichmentPdf() : PdfCommon() {
                 annotation?.nrEntries + " entries."
     }
 
-    private fun addHeaders(colTable: Table){
-        val headers = listOf("Column", "Type", "Name", "Size", "Score", "P-value", "Adj. p-value", "Mean", "Median")
+    private fun addHeaders(colTable: Table, multiTestCorr: Boolean?){
+        val pVal = if(multiTestCorr == true) "Adj. p-value" else "P-value"
+        val headers = listOf("Column", "Type", "Name", "Size", "Score", pVal, "Median")
         headers.forEach{ h ->
             val headerPar = getParagraph(h, bold = true).setFontSize(cellFontSize)
             val rowNameCell = Cell().add(headerPar)
@@ -84,15 +85,14 @@ class OneDEnrichmentPdf() : PdfCommon() {
 
     }
 
-    private fun addRow(colTable: Table, row: EnrichmentRow) {
+    private fun addRow(colTable: Table, row: EnrichmentRow, multiTestCorr: Boolean?) {
+        val pVal = if(multiTestCorr == true) row.qvalue else row.pvalue
         addStringCell(colTable, row.column ?: "", DefaultSplitCharacters())
         addStringCell(colTable, row.type ?: "", CustomSplitCharacters())
         addStringCell(colTable, row.name ?: "")
         addStringCell(colTable, row.size?.toString() ?: "", CustomSplitCharacters())
         addDoubleCell(colTable, row.score, CustomSplitCharacters())
-        addDoubleCell(colTable, row.pvalue, CustomSplitCharacters())
-        addDoubleCell(colTable, row.qvalue, CustomSplitCharacters())
-        addDoubleCell(colTable, row.mean, CustomSplitCharacters(), scientific = false)
+        addDoubleCell(colTable, pVal, CustomSplitCharacters())
         addDoubleCell(colTable, row.median, CustomSplitCharacters(), scientific = false)
     }
 
