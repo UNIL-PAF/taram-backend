@@ -9,6 +9,8 @@ import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.borders.DoubleBorder
 import com.itextpdf.layout.borders.SolidBorder
 import com.itextpdf.layout.element.*
+import com.itextpdf.layout.properties.HorizontalAlignment
+import com.itextpdf.layout.properties.TextAlignment
 import org.springframework.stereotype.Service
 
 
@@ -31,11 +33,11 @@ class InitialResultPdf() : PdfCommon() {
         )
 
         // Groups definitions
-        stepDiv.add(getParagraph("Groups and experiments:", bold = true))
+        stepDiv.add(getParagraph("Groups and sample identities:", bold = true))
         if (groupsDefined) {
             val (groupHeaders, groupRows) = getGroups(step.columnInfo?.columnMapping)
             if (groupHeaders != null && groupRows != null) {
-                val tables = createTables(groupHeaders, groupRows, plotWidth)
+                val tables = createTables(groupHeaders, groupRows)
                 tables.forEach { table ->
                     stepDiv.add(table)
                     stepDiv.add(Paragraph(""))
@@ -56,8 +58,7 @@ class InitialResultPdf() : PdfCommon() {
 
     private fun createTables(
         groupHeaders: List<String>,
-        groupRows: List<List<String?>>,
-        plotWidth: Float
+        groupRows: List<List<String?>>
     ): List<Table> {
         val nrEntries = groupHeaders.size
 
@@ -96,20 +97,22 @@ class InitialResultPdf() : PdfCommon() {
     ): Table {
         val table = Table(end - start).setMarginBottom(10f).setKeepTogether(true) //.setWidth(plotWidth)
         groupHeaders.subList(start, end).forEach {
-            val cell = Cell().add(getParagraph(it, bold = true))
+            val cell = Cell().add(getParagraph(it, bold = true).setTextAlignment(TextAlignment.CENTER))
                 .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
                 .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
                 .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
                 .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+                .setHorizontalAlignment(HorizontalAlignment.CENTER)
             table.addCell(cell)
         }
         groupRows.forEach {
             it.subList(start, end).forEach { v ->
-                val cell = Cell().add(getParagraph(v ?: ""))
+                val cell = Cell().add(getParagraph(v ?: "").setTextAlignment(TextAlignment.CENTER))
                     .setBorderTop(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
                     .setBorderBottom(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
                     .setBorderLeft(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
                     .setBorderRight(DoubleBorder(ColorConstants.LIGHT_GRAY, 2f))
+                    .setHorizontalAlignment(HorizontalAlignment.CENTER)
                 table.addCell(cell)
             }
         }
