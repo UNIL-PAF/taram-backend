@@ -15,11 +15,13 @@ import org.springframework.stereotype.Service
 class RemoveColumnsPdf() : PdfCommon() {
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
-        val res = gson.fromJson(step.results, RemoveColumns::class.java)
+        //val res = gson.fromJson(step.results, RemoveColumns::class.java)
 
         val stepDiv = Div()
-        stepDiv.add(titleDiv("$stepNr. Remove columns", plotWidth = plotWidth, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
+        val description = "Columns not necessary for analysis are removed."
+        stepDiv.add(titleDiv("$stepNr. Remove columns", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
+        /*
         val colTable = Table(2)
         colTable.setWidth(plotWidth)
         val colWidth = plotWidth/12
@@ -38,6 +40,7 @@ class RemoveColumnsPdf() : PdfCommon() {
         colTable.addCell(getDataCell(middleDiv, 4 * colWidth))
 
         stepDiv.add(colTable)
+         */
         return stepDiv
     }
 
