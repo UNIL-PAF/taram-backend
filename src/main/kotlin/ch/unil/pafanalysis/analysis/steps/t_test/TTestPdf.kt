@@ -23,7 +23,7 @@ class TTestPdf() : PdfCommon() {
     val cellFontSize = 8f
 
     val multiTestCorrText = mapOf(
-        "BH" to "Benjamin & Hochberg (FDR)",
+        "BH" to "Benjamini-Hochberg (FDR)",
         "none" to "None"
     )
 
@@ -32,7 +32,7 @@ class TTestPdf() : PdfCommon() {
         val parsedParams = gson.fromJson(step.parameters, TTestParams::class.java)
 
         val stepDiv = Div()
-        val description = "FDR correction adjusts thresholds for large datasets."
+        val description = "Benjamini-Hochberg correction adjusts thresholds for large datasets."
         stepDiv.add(titleDiv("$stepNr. t-test", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         // 1. parameters
