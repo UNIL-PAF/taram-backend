@@ -13,7 +13,9 @@ import ch.unil.pafanalysis.common.ZipTool
 import ch.unil.pafanalysis.pdf.PdfService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service
+import org.springframework.util.ResourceUtils
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -57,8 +59,16 @@ class ZipService {
         createPlots(steps, zipSelection, zipDir)
         createTables(steps, zipSelection, zipDir)
         createSummary(steps, zipSelection, zipDir)
+        addDocs(zipDir)
 
         return File(ZipTool().zipDir(zipDir, "$zipName.zip", createTempDirectory().pathString, true))
+    }
+
+    private fun addDocs(zipDir: String){
+        val docName = "MS_guide_2024_v5.pdf"
+        val docPath = "docs/$docName"
+        val docFile = ResourceUtils.getFile("classpath:$docPath");
+        docFile.copyTo(File("$zipDir/$docName"))
     }
 
     private fun prettyName(s: String): String {
