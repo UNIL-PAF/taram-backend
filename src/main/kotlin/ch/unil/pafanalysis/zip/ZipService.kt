@@ -66,8 +66,9 @@ class ZipService {
 
     private fun addDocs(zipDir: String){
         val docName = "MS_guide_2024_v5.pdf"
-        val docPath = "docs/$docName"
-        val docFile = ResourceUtils.getFile("classpath:$docPath");
+        val docPath = "/resources/docs/$docName"
+        val serverFile = File(ClassPathResource(docPath).path)
+        val docFile = if(serverFile.exists()) serverFile else File(ClassPathResource("/src/main$docPath").path)
         docFile.copyTo(File("$zipDir/$docName"))
     }
 
