@@ -12,6 +12,7 @@ import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.AdaptSpectr
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.InitialSpectronautRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.ParseSpectronautColNames
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.SpectronautSetup
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.AsyncOneDEnrichmentRunner
 import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
@@ -20,6 +21,8 @@ import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.io.File
@@ -43,6 +46,8 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
 
     private val readTable = ReadTableData()
     private val writeTable = WriteTableData()
+
+    var logger: Logger = LoggerFactory.getLogger(AsyncOneDEnrichmentRunner::class.java)
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, pageWidth: Float, stepNr: Int): Div? {
         return initialResultPdf?.createPdf(step, pdf, pageWidth, stepNr)
@@ -145,11 +150,20 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     }
 
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
-        val runningStep =
-            analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
-
         val oldExpDetails = analysisStep.columnInfo?.columnMapping?.experimentDetails
         val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
+
+        val allExpNamesExist = colMapping.experimentNames?.all { expNames ->
+            analysisStep.columnInfo?.columnMapping?.experimentNames?.contains(expNames) == true
+        }
+
+        if(allExpNamesExist != true) {
+            logger.info("Warning: some experiment names are not in this analysis.")
+            return analysisStep
+        }
+
+        val runningStep =
+            analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
 
         // if there are groups defined and some experiments not in any groups, we set them as not selected.
         val newExpDetails: Map<String, ExpInfo>?  = if(colMapping.groupsOrdered?.isNotEmpty() == true){

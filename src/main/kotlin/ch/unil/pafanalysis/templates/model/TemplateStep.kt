@@ -11,7 +11,6 @@ data class TemplateStep (
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Int? = null,
-    val nextId: Int? = null,
     val type: String? = null,
     val lastModifDate: LocalDateTime? = null,
 
