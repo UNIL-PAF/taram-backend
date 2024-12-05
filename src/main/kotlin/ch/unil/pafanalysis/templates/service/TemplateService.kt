@@ -4,9 +4,7 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
 import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
-import ch.unil.pafanalysis.analysis.service.AnalysisRepository
-import ch.unil.pafanalysis.analysis.service.AnalysisService
-import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
+import ch.unil.pafanalysis.analysis.service.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -14,11 +12,16 @@ import ch.unil.pafanalysis.templates.model.Template
 import ch.unil.pafanalysis.templates.model.TemplateStep
 import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
 class TemplateService {
+
+    @Autowired
+    private lateinit var analysisStepService: AnalysisStepService
 
     @Autowired
     private var templateStepRepo: TemplateStepRepository? = null
@@ -40,6 +43,9 @@ class TemplateService {
 
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null
+
+    @Autowired
+    private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
 
     private val gson = Gson()
 
@@ -82,7 +88,7 @@ class TemplateService {
         return res != null
     }
 
-    private fun waitTillDone(step: AnalysisStep?,) {
+    private fun waitTillDone(step: AnalysisStep?,): AnalysisStep? {
         var reloadedStatus: String?
         var running = true
         var emergencyBreak = 1
@@ -96,8 +102,13 @@ class TemplateService {
                 emergencyBreak ++
             } else running = false
         }
+
+        println(analysisStepRepo?.getStepStatusById(step?.id!!))
+        println(analysisStepRepo?.getStepById(step?.id!!)?.status)
+        return analysisStepRepo?.getStepById(step?.id!!)
     }
 
+    @Async
     fun runTemplate(templateId: Int, analysisId: Int): Int? {
         val analysis = analysisRepo?.findById(analysisId)
         val lastStep: AnalysisStep? =  analysisService?.sortAnalysisSteps(analysis?.analysisSteps)?.last()
@@ -111,25 +122,20 @@ class TemplateService {
             initialResultRunner?.updateColumnParams(lastStep, columnMappingParams)
         }
 
-        /*val nextStep =
-        asyncAnaysisStepService?.setAllStepsStatus(nextStep, AnalysisStepStatus.IDLE)
-
-         */
-
         template?.templateSteps?.fold(lastStep){ acc, tmpl ->
             println("template: ${tmpl.id}")
+            println("lastStep:  ${acc?.type} - ${acc?.status}")
             if(tmpl.type != AnalysisStepType.INITIAL_RESULT.value){
                 println("${acc?.id} - ${acc?.status}")
                 val newStep = commonStep?.addStep(acc!!.id!!, AnalysisStepParams(type = tmpl.type, params = tmpl.parameters))
                 println("new step: ${newStep?.id}")
-                waitTillDone(newStep)
-                println("run finished")
-                newStep
+                val doneStep = waitTillDone(newStep)
+                println("${doneStep?.type} - ${doneStep?.status}")
+                doneStep
             } else acc
         }
 
         println("finish")
-
         return analysis?.id
     }
 

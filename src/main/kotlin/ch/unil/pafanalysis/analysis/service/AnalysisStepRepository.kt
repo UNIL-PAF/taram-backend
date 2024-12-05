@@ -12,6 +12,9 @@ interface AnalysisStepRepository: JpaRepository<AnalysisStep, Integer> {
     @Query("SELECT a.status FROM analysis_step a WHERE a.id = :id", nativeQuery = true)
     fun getStepStatusById(@Param("id") analysisStepId: Int?): String?
 
+    @Query("SELECT * FROM analysis_step a WHERE a.id = :id", nativeQuery = true)
+    fun getStepById(@Param("id") id: Int?): AnalysisStep?
+
     fun existsById(id: Int): Boolean
 
     @Modifying
