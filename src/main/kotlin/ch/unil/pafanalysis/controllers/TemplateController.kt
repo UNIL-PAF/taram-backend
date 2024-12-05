@@ -1,7 +1,6 @@
 package ch.unil.pafanalysis.controllers
 
 import ch.unil.pafanalysis.templates.model.Template
-import ch.unil.pafanalysis.templates.model.TemplateStep
 import ch.unil.pafanalysis.templates.service.TemplateRepository
 import ch.unil.pafanalysis.templates.service.TemplateService
 import org.springframework.beans.factory.annotation.Autowired
