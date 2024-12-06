@@ -28,69 +28,30 @@ class SummaryStatPdf() : PdfCommon() {
         val description = "\"Nr of valid\" = Number of quantified proteins. \n\"NaN\" (Not a Number) = missing values."
         stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description = description, link = "$stepNr-${step.type}"))
 
-        val nrEntries = res.min?.size
-
-        if(nrEntries != null){
-            //val totChar = res.expNames?.joinToString("")?.length ?: 0
-            val maxChar = 110
-
-            var charsUsed = 0
-            var start = 0
-            var end = 0
-            var tables = emptyList<Table>()
-            var i = 0
-
-            while(i < nrEntries){
-                val longestChar = listOf(res.expNames?.get(i)?.length ?: 0, res.groups?.get(i)?.length ?: 0, 8).maxOrNull() ?: 8
-                charsUsed += longestChar
-                if(charsUsed > maxChar){
-                    tables += createTable(res, start, end, plotWidth)
-                    start = i
-                    charsUsed = longestChar
-                }
-                i++
-                end = i
-            }
-
-            // add last table if necessary
-            if(end > start){
-                tables += createTable(res, start, end, plotWidth)
-            }
-
-            tables.forEach{
-                stepDiv.add(it)
-                stepDiv.add(Paragraph(""))
-            }
-
+        val table = Table(7)
+        addHeader(table)
+        res.expNames?.mapIndexed { i, name ->
+            addStringCell(name, table)
+            addStringCell(res.groups?.get(i) ?: "", table)
+            addDoubleCell(res.min?.get(i), table)
+            addDoubleCell(res.max?.get(i), table)
+            addDoubleCell(res.median?.get(i), table)
+            addStringCell(res.nrValid?.get(i).toString(), table)
+            addStringCell(res.nrNaN?.get(i).toString(), table)
         }
+
+        stepDiv.add(table)
         return stepDiv
     }
 
-    private fun createTable(res: SummaryStat, start: Int, end: Int, plotWidth: Float): Table {
-        val groups = res.groups ?: res.expNames?.map{""}
-
-        val table = Table(end-start + 1) //.setWidth(plotWidth)
-        addStringRow("Name", res.expNames, start, end, table, bold = true)
-        addStringRow("Group", groups, start, end, table)
-        addDoubleRow("Min", res.min, start, end, table)
-        addDoubleRow("Max", res.max, start, end, table)
-        //addDoubleRow("Mean", res.mean, start, end, table)
-        addDoubleRow("Median", res.median, start, end, table)
-        //addDoubleRow("Sum", res.sum, start, end, table)
-        /*addDoubleRow("Std dev", res.stdDev, start, end, table)
-        addDoubleRow("Std err", res.stdErr, start, end, table)
-        addDoubleRow("Coef of var", res.coefOfVar, start, end, table)*/
-        addIntRow("Nr of valid", res.nrValid, start, end, table)
-        addIntRow("Nr of NaN", res.nrNaN, start, end, table)
-        table.isKeepTogether = true
-        return table
-    }
-
-    private fun addFirstCol(rowName: String, colTable: Table){
-        val rowNamePar = getParagraph(rowName, bold = true, dense = true).setFontSize(cellFontSize)
-        val rowNameCell = Cell().add(rowNamePar)
-        rowNameCell.setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))
-        colTable.addCell(rowNameCell)
+    private fun addHeader(table: Table) {
+        addStringCell("Name", table, bold = true)
+        addStringCell("Group", table, bold = true)
+        addStringCell("Min", table, bold = true)
+        addStringCell("Max", table, bold = true)
+        addStringCell("Median", table, bold = true)
+        addStringCell("Nr of valid", table, bold = true)
+        addStringCell("Nr of NaN", table, bold = true)
     }
 
     private fun addStringCell(cellString: String, colTable: Table, bold: Boolean = false){
@@ -100,32 +61,14 @@ class SummaryStatPdf() : PdfCommon() {
         colTable.addCell(cell)
     }
 
-    private fun addStringRow(rowName: String, data: List<String>?, start: Int, end: Int, colTable: Table, bold: Boolean = false){
-       addFirstCol(rowName, colTable)
-
-        data?.subList(start, end)?.forEach{ a ->
-            addStringCell(a, colTable, bold)
+    private fun addDoubleCell(data: Double?, table: Table){
+        val n = when {
+            data == null -> "NaN"
+            data == 0.0 -> "0"
+            abs(data) > 1e4 || abs(data) < 1e-2 -> DecimalFormat("#.##E0").format(data)
+            else -> DecimalFormat("#.##").format(data)
         }
+        addStringCell(n, table)
     }
 
-    private fun addIntRow(rowName: String, data: List<Int>?, start: Int, end: Int, colTable: Table){
-        addFirstCol(rowName, colTable)
-
-        data?.subList(start, end)?.forEach{ a ->
-            addStringCell(a.toString(), colTable)
-        }
-    }
-
-    private fun addDoubleRow(rowName: String, data: List<Double>?, start: Int, end: Int, colTable: Table){
-        addFirstCol(rowName, colTable)
-
-        data?.subList(start, end)?.forEach{ a ->
-            val n = when {
-                a == 0.0 -> "0"
-                abs(a) > 1e4 || abs(a) < 1e-2 -> DecimalFormat("#.##E0").format(a)
-                else -> DecimalFormat("#.##").format(a)
-            }
-            addStringCell(n, colTable)
-        }
-    }
 }
