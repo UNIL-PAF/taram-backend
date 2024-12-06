@@ -1,9 +1,6 @@
 package ch.unil.pafanalysis.templates.service
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepParams
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
@@ -102,6 +99,8 @@ class TemplateService {
     @Async
     fun runTemplate(templateId: Int, analysisId: Int): Int? {
         val analysis = analysisRepo?.findById(analysisId)
+        analysisRepo?.saveAndFlush(analysis?.copy(status = AnalysisStatus.RUNNING.value)!!)
+
         val lastStep: AnalysisStep? =  analysisService?.sortAnalysisSteps(analysis?.analysisSteps)?.last()
         val template = templateRepo?.findById(templateId)
 
@@ -118,6 +117,10 @@ class TemplateService {
                 doneStep
             } else acc
         }
+
+        // rechange analysis status
+        val newAnalysis = analysisRepo?.findById(analysisId)
+        analysisRepo?.saveAndFlush(newAnalysis?.copy(status = AnalysisStatus.IDLE.value)!!)
 
         return analysis?.id
     }

@@ -178,11 +178,17 @@ class AnalysisService {
 
     private fun getAnalysisWithStatus(analysis: List<Analysis>?): AnalysisGroup? {
         val emptyString: String? = null
-        val analysisWithStatus = analysis?.map {
-            it.copy(status = it.analysisSteps?.fold(emptyString) { accS, s ->
-                chooseAnalysisStatus(accS, s.status, analysisStatusOrder)
-            })
+        val analysisWithStatus = analysis?.map { a ->
+            val newStatus = if(a.status == AnalysisStatus.IDLE.value){
+                a.analysisSteps?.fold(emptyString) { accS, s ->
+                    chooseAnalysisStatus(accS, s.status, analysisStatusOrder)
+                }
+            } else {
+                a.status
+            }
+            a.copy(status = newStatus)
         }
+
         val globalStatus = analysisWithStatus?.fold(emptyString) { acc, a ->
             chooseAnalysisStatus(acc, a.status, globalAnalysisStatusOrder)
         } ?: AnalysisStepStatus.IDLE.value
