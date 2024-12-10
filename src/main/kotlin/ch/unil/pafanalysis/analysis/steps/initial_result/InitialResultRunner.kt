@@ -113,7 +113,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
                 tableNr = 1,
                 nrProteinGroups = initialResult?.nrProteinGroups
             )
-        } catch (e: StepException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             emptyStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
         }
