@@ -7,10 +7,10 @@ import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.common.EchartsServer
+import ch.unil.pafanalysis.html_plot.HtmlPlot
 import ch.unil.pafanalysis.common.ZipTool
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
@@ -38,6 +38,10 @@ class AnalysisStepService {
 
     @Autowired
     private var echartsServer: EchartsServer? = null
+
+    @Autowired
+    private var htmlPlot: HtmlPlot? = null
+
 
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
         return if(analysisStepRepo?.existsById(stepId) == true){
@@ -180,6 +184,8 @@ class AnalysisStepService {
         if(png == true){
             echartsServer?.getPngPlot(step, "${step?.resultPath}/$name/$name.png")
         }
+
+        htmlPlot?.getHtmlPlot(step, "${step?.resultPath}/$name/$name.html", name)
 
         return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, true)
     }

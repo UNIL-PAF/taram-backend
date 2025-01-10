@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>__TITLE__</title>
+    <script>__ECHARTS_LIB__</script>
+</head>
+<body>
+<div id="main" style="width: __WIDTH__; height: __HEIGHT__;">
+    __ERROR__
+</div>
+
+<script>
+    // Initialize the ECharts instance
+    var chart = echarts.init(document.getElementById('main'));
+
+    // Define the data and configuration for the chart
+    var option = __OPTION__;
+
+    // Set the chart option
+    chart.setOption(option);
+</script>
+
+<script>
+__SCRIPT__
+</script>
+
+</body>
+</html>
