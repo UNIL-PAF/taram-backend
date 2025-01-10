@@ -84,6 +84,7 @@ class HtmlPlot {
         return when (step?.type){
             AnalysisStepType.VOLCANO_PLOT.value -> HtmlVolcanoPlot.addScript(html)
             AnalysisStepType.BOXPLOT.value -> HtmlBoxPlot.addScript(html, step)
+            AnalysisStepType.PCA.value -> HtmlPcaPlot.addScript(html)
             else -> html?.replace("__SCRIPT__", "")
         }
     }
