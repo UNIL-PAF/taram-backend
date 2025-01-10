@@ -86,6 +86,7 @@ class HtmlPlot {
             AnalysisStepType.BOXPLOT.value -> HtmlBoxPlot.addScript(html, step)
             AnalysisStepType.PCA.value -> HtmlPcaPlot.addScript(html)
             AnalysisStepType.UMAP.value -> HtmlUmapPlot.addScript(html)
+            AnalysisStepType.SCATTER_PLOT.value -> HtmlScatterPlot.addScript(html, step)
             else -> html?.replace("__SCRIPT__", "")
         }
     }
