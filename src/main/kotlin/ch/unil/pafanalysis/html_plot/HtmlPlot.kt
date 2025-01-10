@@ -83,6 +83,7 @@ class HtmlPlot {
     private fun addSpecificScripts(step: AnalysisStep?, html: String?): String? {
         return when (step?.type){
             AnalysisStepType.VOLCANO_PLOT.value -> HtmlVolcanoPlot.addScript(html)
+            AnalysisStepType.BOXPLOT.value -> HtmlBoxPlot.addScript(html, step)
             else -> html?.replace("__SCRIPT__", "")
         }
     }
