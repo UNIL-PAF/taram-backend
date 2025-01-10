@@ -171,7 +171,7 @@ class AnalysisStepService {
         return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
     }
 
-    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?): String? {
+    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, html: Boolean?): String? {
         val step = analysisStepRepo?.findById(stepId)
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
         val name = step?.id.toString()?.plus("-")?.plus(step?.type)
@@ -185,9 +185,13 @@ class AnalysisStepService {
             echartsServer?.getPngPlot(step, "${step?.resultPath}/$name/$name.png")
         }
 
-        htmlPlot?.getHtmlPlot(step, "${step?.resultPath}/$name/$name.html", name)
+        if(html == true){
+            htmlPlot?.getHtmlPlot(step, "${step?.resultPath}/$name/$name.html", name)
+        }
 
-        return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, true)
+        
+
+        return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, false)
     }
 
     fun filterExisting(stepIds: List<Int?>): List<Int> {
