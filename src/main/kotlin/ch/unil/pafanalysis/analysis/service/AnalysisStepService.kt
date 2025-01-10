@@ -46,7 +46,7 @@ class AnalysisStepService {
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
         return if(analysisStepRepo?.existsById(stepId) == true){
             val step = analysisStepRepo?.findById(stepId)!!
-            return commonStep?.getRunner(step?.type)?.updatePlotOptions(step, echartsPlot)
+            return commonStep?.getRunner(step.type)?.updatePlotOptions(step, echartsPlot)
         }else null
     }
 
@@ -66,7 +66,7 @@ class AnalysisStepService {
         }
 
         val analysisSteps = setCorrectNextIds(copiedSteps)
-        asyncAnaysisStepService?.copyDuplicatedStepFiles(analysisSteps, newAnalysis?.id)
+        asyncAnaysisStepService?.copyDuplicatedStepFiles(analysisSteps, newAnalysis.id)
     }
 
     fun setCorrectNextIds(copiedSteps: List<AnalysisStep?>): List<AnalysisStep> {
@@ -102,7 +102,7 @@ class AnalysisStepService {
             val thisStep = analysisStepRepo?.findById(followingStepId)
             if(thisStep != null){
                 followingStepId = thisStep.nextId
-                deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(thisStep?.resultPath)))
+                deleteDirectory(Path.of(getOutputRoot(step.analysis?.result?.type)?.plus(thisStep.resultPath)))
                 analysisStepRepo?.deleteById(thisStep.id!!)
                 nrDeleted += 1
             }
@@ -122,7 +122,7 @@ class AnalysisStepService {
 
             if (before != null) {
                 if (after != null) {
-                    analysisStepRepo?.saveAndFlush(after.copy(beforeId = before?.id))
+                    analysisStepRepo?.saveAndFlush(after.copy(beforeId = before.id))
                     analysisStepRepo?.saveAndFlush(before.copy(nextId = after.id))
                 } else {
                     analysisStepRepo?.saveAndFlush(before.copy(nextId = null))
@@ -130,14 +130,14 @@ class AnalysisStepService {
             }
         }
 
-        deleteDirectory(Path.of(getOutputRoot(step?.analysis?.result?.type)?.plus(step.resultPath)))
+        deleteDirectory(Path.of(getOutputRoot(step.analysis?.result?.type)?.plus(step.resultPath)))
         val res: Int? = analysisStepRepo?.deleteById(stepId)
 
         if (relinkRemaining == true && after !== null) {
             asyncAnaysisStepService?.setAllStepsStatus(after, AnalysisStepStatus.IDLE)
 
-            commonStep?.getRunner(after?.type)?.run(
-                after?.beforeId!!,
+            commonStep?.getRunner(after.type)?.run(
+                after.beforeId!!,
                 after
             )
         }
@@ -150,7 +150,7 @@ class AnalysisStepService {
     }
 
     fun deleteDirectory(directory: Path?): List<Boolean> {
-        return if (directory != null && directory?.exists()) {
+        return if (directory != null && directory.exists()) {
             Files.walk(directory)
                 .sorted(Comparator.reverseOrder())
                 .map { it.toFile() }
@@ -174,7 +174,7 @@ class AnalysisStepService {
     fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, html: Boolean?): String? {
         val step = analysisStepRepo?.findById(stepId)
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
-        val name = step?.id.toString()?.plus("-")?.plus(step?.type)
+        val name = step?.id.toString().plus("-").plus(step?.type)
         val dataDir: Path = Files.createDirectories(Path("$resultDir/$name"))
 
         if(svg == true){
@@ -188,8 +188,6 @@ class AnalysisStepService {
         if(html == true){
             htmlPlot?.getHtmlPlot(step, "${step?.resultPath}/$name/$name.html", name)
         }
-
-        
 
         return ZipTool().zipDir(dataDir.pathString, "$name.zip", resultDir, false)
     }
