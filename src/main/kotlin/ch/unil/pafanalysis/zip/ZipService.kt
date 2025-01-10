@@ -10,6 +10,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
+import ch.unil.pafanalysis.html_plot.HtmlPlot
 import ch.unil.pafanalysis.pdf.PdfService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
@@ -48,11 +49,14 @@ class ZipService {
     @Autowired
     private var env: Environment? = null
 
+    @Autowired
+    private var htmlPlot: HtmlPlot? = null
+
     fun createZip(analysisId: Int, zipSelection: ZipDataSelection): File {
         val analysis = analysisRepo?.findById(analysisId)
         val steps = analysisService?.sortAnalysisSteps(analysis?.analysisSteps)
 
-        val zipName = prettyName(analysis?.result?.name + if(analysis?.name != null) ("-"+analysis?.name) else "")
+        val zipName = prettyName(analysis?.result?.name + if(analysis?.name != null) ("-" + analysis.name) else "")
         val zipDir = createZipDir(zipName)
 
         createPdf(analysisId, zipSelection, "$zipDir/$zipName.pdf")
@@ -98,10 +102,12 @@ class ZipService {
             out.println(header)
 
             steps?.forEachIndexed { i, step ->
-                if (zipSelection?.steps != null && zipSelection.steps?.contains(step.id!!)) {
+                if (zipSelection.steps != null && zipSelection.steps.contains(step.id!!)) {
                     val idx = i + 1
                     val mainTable = if (zipSelection.mainTables?.contains(step.id) == true) listOf("tables/Table-$idx.txt") else emptyList()
-                    val specialTable = if (zipSelection.specialTables?.contains(step.id) == true) listOf("tables/" + commonStep?.getRunner(step?.type)?.getOtherTableName(idx)) else emptyList()
+                    val specialTable = if (zipSelection.specialTables?.contains(step.id) == true) listOf("tables/" + commonStep?.getRunner(
+                        step.type
+                    )?.getOtherTableName(idx)) else emptyList()
                     val plots = if (zipSelection.plots?.contains(step.id) == true) {
                         val plotBase = "plots/$idx-${step.type}"
                         "$plotBase.png;$plotBase.svg"
@@ -125,7 +131,7 @@ class ZipService {
                 File(origTableFile).copyTo(File("$tableDir/Table-$idx.txt"))
             }
             if(zipSelection.specialTables?.contains(step.id) == true) {
-                commonStep?.getRunner(step?.type)?.getOtherTable(step, tableDir, idx)
+                commonStep?.getRunner(step.type)?.getOtherTable(step, tableDir, idx)
             }
         }
     }
@@ -133,6 +139,9 @@ class ZipService {
     private fun createPlots(steps: List<AnalysisStep>?, zipSelection: ZipDataSelection, zipDir: String){
         val plotDir = "$zipDir/plots"
         File(plotDir).mkdir()
+        File("$plotDir/svg").mkdir()
+        File("$plotDir/png").mkdir()
+        File("$plotDir/html").mkdir()
 
         steps?.forEachIndexed{ i, step ->
             if(zipSelection.plots?.contains(step.id) == true){
@@ -141,7 +150,7 @@ class ZipService {
         }
     }
 
-    private fun getPlotNames(type: String?): String?{
+    private fun getPlotNames(type: String?): String {
         return when(type){
             AnalysisStepType.UMAP.value -> "UMAP-plot"
             AnalysisStepType.PCA.value -> "PCA-plot"
@@ -155,14 +164,17 @@ class ZipService {
 
         echartsServer?.getSvgPlot(step, "${step?.resultPath}/$resName.svg")
         echartsServer?.getPngPlot(step, "${step?.resultPath}/$resName.png")
+        htmlPlot?.getHtmlPlot(step, "${step?.resultPath}/$resName.html", resName)
 
         // move generated files
-        File("$resultDir/$resName.svg").copyTo(File("$path/$resName.svg"))
-        File("$resultDir/$resName.png").copyTo(File("$path/$resName.png"))
+        File("$resultDir/$resName.svg").copyTo(File("$path/svg/$resName.svg"))
+        File("$resultDir/$resName.png").copyTo(File("$path/png/$resName.png"))
+        File("$resultDir/$resName.html").copyTo(File("$path/html/$resName.html"))
 
         // delete original files
         File("$resultDir/$resName.svg").delete()
         File("$resultDir/$resName.png").delete()
+        File("$resultDir/$resName.html").delete()
     }
 
 }
