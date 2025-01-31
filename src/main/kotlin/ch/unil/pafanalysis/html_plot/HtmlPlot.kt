@@ -4,7 +4,6 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import com.google.gson.Gson
-import org.bouncycastle.asn1.x500.style.RFC4519Style.title
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
@@ -65,9 +64,7 @@ class HtmlPlot {
         }
 
         html = html?.replace("__TITLE__", title)
-
         html = html?.replace("__WIDTH__", "100%")?.replace("__HEIGHT__", "100vh")
-        html = html?.replace("__ECHARTS_LIB__", getEchartsLibrary())
 
         // remove ERROR tag if not used
         html = if(html?.contains("__ERROR__") == true) {
@@ -75,6 +72,8 @@ class HtmlPlot {
         } else html
 
         html = addSpecificScripts(step, html)
+
+        html = html?.replace("__ECHARTS_LIB__", getEchartsLibrary())
 
         File(env?.getProperty("output.path") + path).writeText(html ?: "HTML template not found")
 
