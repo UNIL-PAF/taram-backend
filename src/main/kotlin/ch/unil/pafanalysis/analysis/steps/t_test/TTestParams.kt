@@ -13,6 +13,7 @@ data class TTestParams (
     val paired: Boolean? = null,
     val filterOnValid: Boolean? = null,
     val minNrValid: Int? = null,
+    val equalVariance: Boolean? = null
 )
 
 enum class AltHypothesis(val value: String) {

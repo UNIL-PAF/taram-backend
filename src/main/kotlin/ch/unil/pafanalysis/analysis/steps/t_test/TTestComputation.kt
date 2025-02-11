@@ -87,7 +87,7 @@ class TTestComputation {
             getValids(comp.group1).zip(getValids(comp.group2)).map{a -> a.first || a.second}
             } else null
 
-        val pVals = computeTTest(rowInts, params?.paired, validRows)
+        val pVals = computeTTest(rowInts, params?.paired, validRows, params?.equalVariance)
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
         val foldChanges = computeFoldChanges(rowInts, isLogVal, validRows)
         val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
@@ -162,11 +162,28 @@ class TTestComputation {
         return caller.parser.getAsDoubleArray("corr_p_vals").toList()
     }
 
-    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?, validRows: List<Boolean>?): List<Double> {
+    private fun computePairedHomoscedasticTest(first: DoubleArray, second: DoubleArray): Double {
+        val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
+        val differences = first.zip(second).map{ a -> a.first - a.second}.toDoubleArray()
+        return apacheTTest.pairedTTest(List(differences.size){_ -> 0.0}.toDoubleArray(), differences)
+    }
+
+    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?, validRows: List<Boolean>?, equalVariance: Boolean? = null): List<Double> {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
 
-        val myFun = if(paired == true) { first: DoubleArray, second: DoubleArray -> apacheTTest.pairedTTest(first, second)}
-                    else {first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)}
+        val myFun: (DoubleArray, DoubleArray) -> Double = if(paired == true) {
+            if(equalVariance == true){
+                first: DoubleArray, second: DoubleArray -> computePairedHomoscedasticTest(first, second)
+            }else{
+                first: DoubleArray, second: DoubleArray -> apacheTTest.pairedTTest(first, second)
+            }
+        } else {
+            if(equalVariance == true) {
+                first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)
+            }else{
+                first: DoubleArray, second: DoubleArray -> apacheTTest.tTest(first, second)
+            }
+        }
 
         return ints.mapIndexed{ i, row ->
             val first = row.first.filter{!it.isNaN()}
