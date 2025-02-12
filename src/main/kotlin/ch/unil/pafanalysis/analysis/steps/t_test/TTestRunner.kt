@@ -36,6 +36,10 @@ class TTestRunner() : CommonStep(), CommonRunner {
         return newStep!!
     }
 
+    private fun getTestString(equalVariance: Boolean?): String {
+        return if(equalVariance == false) "Welch's t-test" else "Student's t-test"
+    }
+
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
         val params = getParameters(step)
         val origParams = getParameters(origStep)
@@ -44,6 +48,7 @@ class TTestRunner() : CommonStep(), CommonRunner {
             .plus(if (params.field != origParams?.field) " [Use intensity column: ${params.field}]" else "")
             .plus(if (params.signThres != origParams?.signThres) " [Significance threshold: ${params.field}]" else "")
             .plus(if (params.multiTestCorr != origParams?.multiTestCorr) " [Multiple testing correction: ${params.multiTestCorr}]" else "")
+            .plus(if (params.equalVariance != origParams?.equalVariance) " [${getTestString(params.equalVariance)}]" else "")
     }
 
 }

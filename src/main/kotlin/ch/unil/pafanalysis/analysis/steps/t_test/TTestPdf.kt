@@ -41,7 +41,12 @@ class TTestPdf() : PdfCommon() {
             Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: "")
         )
 
+        val testType = if(parsedParams.equalVariance == false) {
+            "Welch's t-test (assumes unequal variances)"
+        } else "Student's t-test (assumes equal variances)"
+
         val paramsDiv = Div()
+        paramsDiv.add(getOneRowTable(listOf(getParagraph(testType, dense = true, bold = true))))
         paramsDiv.add(getTwoRowTable(paramsData))
         if(parsedParams.filterOnValid == true){
             paramsDiv.add(getOneRowTable(listOf(getParagraph("Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.", dense = true, bold = true))))

@@ -172,16 +172,16 @@ class TTestComputation {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
 
         val myFun: (DoubleArray, DoubleArray) -> Double = if(paired == true) {
-            if(equalVariance == true){
-                first: DoubleArray, second: DoubleArray -> computePairedHomoscedasticTest(first, second)
-            }else{
+            if(equalVariance == false){
                 first: DoubleArray, second: DoubleArray -> apacheTTest.pairedTTest(first, second)
+            }else{
+                first: DoubleArray, second: DoubleArray -> computePairedHomoscedasticTest(first, second)
             }
         } else {
-            if(equalVariance == true) {
-                first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)
-            }else{
+            if(equalVariance == false) {
                 first: DoubleArray, second: DoubleArray -> apacheTTest.tTest(first, second)
+            }else{
+                first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)
             }
         }
 
