@@ -58,7 +58,7 @@ class GrepperTTestComputationTests {
         val (resTable, headers, tTestRes) = runner?.run(table, params, step)!!
 
         // check if headers are added
-        val nrNewCols = 4
+        val nrNewCols = 5
         assert(table?.headers?.size?.plus(nrNewCols) == resTable?.headers?.size)
         // check if columns are added
         assert(table?.cols?.size?.plus(nrNewCols) == resTable?.cols?.size)
