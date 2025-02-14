@@ -87,13 +87,14 @@ class TTestComputation {
             getValids(comp.group1).zip(getValids(comp.group2)).map{a -> a.first || a.second}
             } else null
 
-        val pVals = computeTTest(rowInts, params?.paired, validRows, params?.equalVariance)
+        val pValAndTStat = computeTTest(rowInts, params?.paired, validRows, params?.equalVariance)
+        val pVals = pValAndTStat.map { it.first }
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
         val foldChanges = computeFoldChanges(rowInts, isLogVal, validRows)
         val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
 
-        val (newTable, headers) = addResults(table, pVals, qVals, foldChanges, signGroups, comp)
+        val (newTable, headers) = addResults(table, pVals, qVals, foldChanges, signGroups,  pValAndTStat.map { it.second }, comp)
         val newTtest = ttest.copy(
             comparisions = ttest.comparisions?.plusElement(
                 TTestComparision(
@@ -113,6 +114,7 @@ class TTestComputation {
         qVals: List<Double>?,
         foldChanges: List<Double>,
         signGroups: List<Boolean>,
+        tStatistics: List<Double>,
         comp: GroupComp
     ): Pair<Table?, List<Header>?> {
         val nrHeaders = table?.headers?.size!!
@@ -121,14 +123,15 @@ class TTestComputation {
         val idxOffset = if(qVals == null) 0 else 1
         val foldHeader = listOf(
             Header(name = "log2.fold.change.$compName", idx = nrHeaders + 1 + idxOffset, ColType.NUMBER, Experiment(comp = comp)),
-            Header(name = "is.significant.$compName", idx = nrHeaders + 2 + idxOffset, ColType.CHARACTER, Experiment(comp = comp))
+            Header(name = "is.significant.$compName", idx = nrHeaders + 2 + idxOffset, ColType.CHARACTER, Experiment(comp = comp)),
+            Header(name = "t.statistic.$compName", idx = nrHeaders + 3 + idxOffset, ColType.NUMBER, Experiment(comp = comp)),
         )
         val qValHeader = if(qVals == null) emptyList() else listOf(Header(name = "adj.p.value.$compName", idx = nrHeaders + 1, ColType.NUMBER, Experiment(comp = comp)))
         val newHeaders: List<Header>? = table?.headers.plus(pValHeader).plus(qValHeader).plus(foldHeader)
 
         val pValCol = listOf<List<Any>>(pVals)
         val qValCol = if(qVals == null) emptyList<List<Any>>() else listOf(qVals)
-        val foldCols = listOf<List<Any>>(foldChanges, signGroups.map { it.toString() })
+        val foldCols = listOf<List<Any>>(foldChanges, signGroups.map { it.toString() }, tStatistics)
         val addCols = pValCol.plus(qValCol).plus(foldCols)
 
         val newCols = table.cols?.plus(addCols)
@@ -162,26 +165,26 @@ class TTestComputation {
         return caller.parser.getAsDoubleArray("corr_p_vals").toList()
     }
 
-    private fun computePairedHomoscedasticTest(first: DoubleArray, second: DoubleArray): Double {
+    private fun computePairedHomoscedasticTest(first: DoubleArray, second: DoubleArray): Pair<Double, Double> {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
-        val differences = first.zip(second).map{ a -> a.first - a.second}.toDoubleArray()
-        return apacheTTest.pairedTTest(List(differences.size){_ -> 0.0}.toDoubleArray(), differences)
+        val differences = first.zip(second).map{ a -> a.second - a.first}.toDoubleArray()
+        return Pair(apacheTTest.pairedTTest(List(differences.size){_ -> 0.0}.toDoubleArray(), differences), apacheTTest.pairedT(List(differences.size){_ -> 0.0}.toDoubleArray(), differences))
     }
 
-    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?, validRows: List<Boolean>?, equalVariance: Boolean? = null): List<Double> {
+    private fun computeTTest(ints: List<Pair<List<Double>, List<Double>>>, paired: Boolean?, validRows: List<Boolean>?, equalVariance: Boolean? = null): List<Pair<Double, Double>> {
         val apacheTTest = org.apache.commons.math3.stat.inference.TTest()
 
-        val myFun: (DoubleArray, DoubleArray) -> Double = if(paired == true) {
+        val myFun: (DoubleArray, DoubleArray) -> Pair<Double, Double> = if(paired == true) {
             if(equalVariance == false){
-                first: DoubleArray, second: DoubleArray -> apacheTTest.pairedTTest(first, second)
+                first: DoubleArray, second: DoubleArray -> Pair(apacheTTest.pairedTTest(first, second), apacheTTest.pairedT(first, second))
             }else{
                 first: DoubleArray, second: DoubleArray -> computePairedHomoscedasticTest(first, second)
             }
         } else {
             if(equalVariance == false) {
-                first: DoubleArray, second: DoubleArray -> apacheTTest.tTest(first, second)
+                first: DoubleArray, second: DoubleArray -> Pair(apacheTTest.tTest(first, second), apacheTTest.t(first, second))
             }else{
-                first: DoubleArray, second: DoubleArray -> apacheTTest.homoscedasticTTest(first, second)
+                first: DoubleArray, second: DoubleArray -> Pair(apacheTTest.homoscedasticTTest(first, second), apacheTTest.t(first, second))
             }
         }
 
@@ -189,13 +192,13 @@ class TTestComputation {
             val first = row.first.filter{!it.isNaN()}
             val second = row.second.filter{!it.isNaN()}
 
-            val pVal = if(first.size < 2 || second.size < 2) Double.NaN else myFun(first.toDoubleArray(), second.toDoubleArray())
+            val res = if(first.size < 2 || second.size < 2) Pair(Double.NaN, Double.NaN) else myFun(first.toDoubleArray(), second.toDoubleArray())
 
             if(validRows != null){
                 if(validRows[i]){
-                    pVal
-                } else Double.NaN
-            } else pVal
+                    res
+                } else Pair(Double.NaN, Double.NaN)
+            } else res
         }
     }
 }

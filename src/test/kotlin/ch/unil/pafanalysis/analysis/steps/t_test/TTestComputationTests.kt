@@ -74,6 +74,26 @@ class TTestComputationTests {
     }
 
     @Test
+    fun computeStudentTestStatistics() {
+        val params = TTestParams("iBAQ", firstGroup = listOf("KO"), secondGroup = listOf("WT"), equalVariance = true, paired = false)
+        val rResPath = "./src/test/resources/results/t_test/student_statistics.txt"
+
+        val (resTable, _, _) = runner?.run(table, params, step)!!
+
+        // verify p-values
+        val pValHeader = resTable?.headers?.find { it.name?.contains("t.statistic")?:false }
+        val pVals = resTable?.cols?.get(pValHeader?.idx!!)
+            ?.map { if (pValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
+
+        val rResults: List<Double> = File(rResPath).readLines()  // Read file line by line
+            .mapNotNull { it.toDoubleOrNull() }
+
+        assert(
+            roundNumbers(pVals?.filter{!it.isNaN()}) == roundNumbers(rResults.filter{!it.isNaN()})
+        )
+    }
+
+    @Test
     fun computePairedStudentTest() {
         val params = TTestParams("iBAQ", firstGroup = listOf("KO"), secondGroup = listOf("WT"), equalVariance = true, paired = true)
         val rResPath = "./src/test/resources/results/t_test/paired_student.txt"
@@ -94,6 +114,26 @@ class TTestComputationTests {
     }
 
     @Test
+    fun computePairedStudentTestStatistics() {
+        val params = TTestParams("iBAQ", firstGroup = listOf("KO"), secondGroup = listOf("WT"), equalVariance = true, paired = true)
+        val rResPath = "./src/test/resources/results/t_test/paired_student_statistics.txt"
+
+        val (resTable, _, _) = runner?.run(table, params, step)!!
+
+        // verify p-values
+        val pValHeader = resTable?.headers?.find { it.name?.contains("t.statistic")?:false }
+        val pVals = resTable?.cols?.get(pValHeader?.idx!!)
+            ?.map { if (pValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
+
+        val rResults: List<Double> = File(rResPath).readLines()  // Read file line by line
+            .mapNotNull { it.toDoubleOrNull() }
+
+        assert(
+            roundNumbers(pVals?.filter{!it.isNaN()}) == roundNumbers(rResults.filter{!it.isNaN()})
+        )
+    }
+
+    @Test
     fun computePairedWelchTest() {
         val params = TTestParams("iBAQ", firstGroup = listOf("KO"), secondGroup = listOf("WT"), equalVariance = false, paired = true)
         val rResPath = "./src/test/resources/results/t_test/paired_welch.txt"
@@ -102,6 +142,26 @@ class TTestComputationTests {
 
         // verify p-values
         val pValHeader = resTable?.headers?.find { it.name?.contains("p.value")?:false }
+        val pVals = resTable?.cols?.get(pValHeader?.idx!!)
+            ?.map { if (pValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
+
+        val rResults: List<Double> = File(rResPath).readLines()  // Read file line by line
+            .mapNotNull { it.toDoubleOrNull() }
+
+        assert(
+            roundNumbers(pVals?.filter{!it.isNaN()}) == roundNumbers(rResults.filter{!it.isNaN()})
+        )
+    }
+
+    @Test
+    fun computePairedWelchTestStatistics() {
+        val params = TTestParams("iBAQ", firstGroup = listOf("KO"), secondGroup = listOf("WT"), equalVariance = false, paired = true)
+        val rResPath = "./src/test/resources/results/t_test/paired_welch_statistics.txt"
+
+        val (resTable, _, _) = runner?.run(table, params, step)!!
+
+        // verify p-values
+        val pValHeader = resTable?.headers?.find { it.name?.contains("t.statistic")?:false }
         val pVals = resTable?.cols?.get(pValHeader?.idx!!)
             ?.map { if (pValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
 
@@ -138,9 +198,32 @@ class TTestComputationTests {
             println(roundNumber(rResults[i]))
 
             val comp = roundNumbers(pVals?.filter{!it.isNaN()})?.zip(roundNumbers(rResults.filter{!it.isNaN()}) ?: emptyList())
-            comp?.forEachIndexed { index, pair ->  if(pair.first != pair.second){println(index); println(pair)} }
-
+            comp?.forEachIndexed { index, pair ->  if(pair.first != pair.second){
+                println(index)
+                println("${pVals?.get(index) ?: "NaN"} - " + rResults[index])}
+                println(pair)
+            }
          */
+
+        assert(
+            roundNumbers(pVals?.filter{!it.isNaN()}) == roundNumbers(rResults.filter{!it.isNaN()})
+        )
+    }
+
+    @Test
+    fun computeWelchTestStatistic() {
+        val params = TTestParams("iBAQ", firstGroup = listOf("KO"), secondGroup = listOf("WT"), equalVariance = false, paired = false)
+        val rResPath = "./src/test/resources/results/t_test/welch_statistics.txt"
+
+        val (resTable, _, _) = runner?.run(table, params, step)!!
+
+        // verify p-values
+        val pValHeader = resTable?.headers?.find { it.name?.contains("t.statistic")?:false }
+        val pVals = resTable?.cols?.get(pValHeader?.idx!!)
+            ?.map { if (pValHeader.type == ColType.NUMBER) it as? Double ?: Double.NaN else Double.NaN }
+
+        val rResults: List<Double> = File(rResPath).readLines()  // Read file line by line
+            .mapNotNull { it.toDoubleOrNull() }
 
         assert(
             roundNumbers(pVals?.filter{!it.isNaN()}) == roundNumbers(rResults.filter{!it.isNaN()})
@@ -152,8 +235,8 @@ class TTestComputationTests {
     }
 
     private fun roundNumber(n: Double): Double {
-        val intermed = String.format("%." + (ROUNDING_PRECISION + 2) + "f", n).toDouble()
-        return String.format("%." + ROUNDING_PRECISION + "f", intermed).toDouble()
+        //val intermed = String.format("%." + (ROUNDING_PRECISION + 2) + "f", n).toDouble()
+        return String.format("%." + ROUNDING_PRECISION + "f", n).toDouble()
     }
 
 }
