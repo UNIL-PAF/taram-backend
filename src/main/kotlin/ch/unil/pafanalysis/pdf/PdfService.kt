@@ -73,6 +73,7 @@ class PdfService {
         addResultInfo(analysis, document)
 
         addOverview(steps, document, plotWidth)
+        addZipDescription(document)
         addConclusion(analysis, document)
         // make a page break
         document?.add(AreaBreak());
@@ -99,7 +100,7 @@ class PdfService {
 
     private fun addConclusion(analysis: Analysis?, document: Document?){
         if(analysis?.conclusion != null){
-            val conclusionDiv = Div().setMarginTop(20f)
+            val conclusionDiv = Div().setMarginTop(20f).setKeepTogether(true)
 
             val title = Paragraph("Conclusion").setFont(PdfFontFactory.createFont(myBoldFont))
                 .setFontSize(14f)
@@ -110,6 +111,51 @@ class PdfService {
             conclusionDiv.add(conclusion)
             document?.add(conclusionDiv)
         }
+    }
+
+    private fun addZipDescription(document: Document?){
+        val myDiv = Div()
+            .setMarginTop(15f)
+            .setWidth(280f)
+            .setBackgroundColor(lightCyan)
+            .setBorder(Border.NO_BORDER)
+            .setPadding(2f)
+            .setPaddingLeft(5f)
+            .setBorderRadius(BorderRadius(2f))
+
+        val list = com.itextpdf.layout.element.List()
+
+        val item1 = ListItem()
+        val item1Title = Text("plots: ").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
+        val item1Text = Text("Contains all plots in PNG, SVG and ").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        val item1Text2 = Text("interactive HTML").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
+        val item1Text3 = Text(" formats.").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        val item1Para = Paragraph().setMargin(0.0f)
+        item1Para.add(item1Title)
+        item1Para.add(item1Text)
+        item1Para.add(item1Text2)
+        item1Para.add(item1Text3)
+        item1.add(item1Para)
+        list.add(item1)
+
+        val item2 = ListItem()
+        val item2Title = Text("tables: ").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
+        val item2Text = Text("Contains all tables in tab-separated format.").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        val item2Para = Paragraph().setMargin(0.0f)
+        item2Para.add(item2Title)
+        item2Para.add(item2Text)
+        item2.add(item2Para)
+        list.add(item2)
+
+        val p1 = Paragraph().setMargin(0.0f)
+        val t1 = Text("The ZIP file includes two folders:").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        p1.add(t1)
+        myDiv.add(p1)
+        val p2 = Paragraph()
+        p2.add(list)
+        myDiv.add(list)
+
+        document?.add(myDiv)
     }
 
     private fun addOverview(steps: List<AnalysisStep>?, document: Document?, plotWidth: Float){
