@@ -245,4 +245,12 @@ class ColumnMappingParserTests {
 
     }
 
+    @Test
+    fun parseSpectronautTestHelaWhisper() {
+        val resFile = "./src/test/resources/results/spectronaut/Test-Hela_Whisper/20250307_Test-DIA-Hela-Whisper_Report.tsv"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
+        assert(colMapping.experimentNames == listOf("long1", "short1", "long2", "short2"))
+    }
+
 }
