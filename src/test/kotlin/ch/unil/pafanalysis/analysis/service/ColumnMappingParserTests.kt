@@ -253,4 +253,15 @@ class ColumnMappingParserTests {
         assert(colMapping.experimentNames == listOf("long1", "short1", "long2", "short2"))
     }
 
+    @Test
+    fun parseTestsHelaWhisper() {
+        val resultPath = "./src/test/resources/results/maxquant/Tests-Hela-Whisper/"
+        val resFile = resultPath + "proteinGroups.txt"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, resultPath, ResultType.MaxQuant)
+
+        assert(colMapping.experimentNames?.size == 5)
+        assert(colMapping.experimentNames?.first() == "100ng")
+
+    }
+
 }

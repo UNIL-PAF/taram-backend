@@ -151,8 +151,11 @@ class ColumnMappingParser {
     ): Pair<ColumnMapping, CommonResult> {
         val expsParsed = parseMaxQuantExperiments(summaryTable)
 
+        // we want to first look for the longest expName, otherwise we might get wrong subsets..
+        val sortedExpNames = expsParsed.expNames.toList().sortedByDescending { it.length }
+
         val cols = columns?.foldIndexed(expsParsed){ i, acc, col ->
-            val expName: String? = acc.expNames.find{ col.contains(it) }
+            val expName: String? = sortedExpNames.find{ col.contains(it) }
             if(expName != null){
                 val field = col.replace(expName, "").trim().replace(Regex("[^A-Za-z0-9]+"), ".").replace(Regex("^\\.*|\\.*\$"), "")
                 val expFields = acc.expFields.plus(field)
