@@ -223,8 +223,8 @@ open class CommonStep {
 
     fun getCopyDifference(step: AnalysisStep?): String? {
         return if (step?.parametersHash != null && step?.copyFromId != null) {
-            val origStep = analysisStepRepository?.findById(step.copyFromId)
-            if (step.parametersHash != origStep?.parametersHash) {
+            val origStep = try{ analysisStepRepository?.findById(step.copyFromId)} catch(e: Exception) {null}
+            if (origStep !== null && step.parametersHash != origStep.parametersHash) {
                 getRunner(step.type)?.getCopyDifference(step, origStep)
             } else null
         } else null
