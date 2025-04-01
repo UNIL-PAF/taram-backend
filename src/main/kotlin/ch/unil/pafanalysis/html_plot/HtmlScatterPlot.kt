@@ -49,7 +49,7 @@ object HtmlScatterPlot {
                 const text2 = p.data[3] + "<br>"
                 const text3 = params.xAxis + ": <strong>" + String(p.data[0].length > 5 ? p.data[0].toExponential(1) : p.data[0].toFixed(1)) + "</strong><br>"
                 const text4 = params.yAxis + ": <strong>" + String(p.data[1].length > 5 ? p.data[1].toExponential(1) : p.data[1].toFixed(1)) + "</strong><br>"
-                const text5 = (params.colorBy) ? (params.colorBy + ": <strong>" + p.data[4].toFixed(1) + "</strong><br>") : ""
+                const text5 = (params.colorBy && params.colorBy !== "null") ? (params.colorBy + ": <strong>" + p.data[4].toFixed(1) + "</strong><br>") : ""
                 const text6 = otherField ? (otherField + ": <strong>" + p.data[6] + "</strong><br>") : ""
                 return text1 + text2 + text3 + text4 + text5 + text6
             }
