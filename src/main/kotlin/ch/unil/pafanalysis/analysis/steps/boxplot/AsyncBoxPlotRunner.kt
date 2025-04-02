@@ -68,26 +68,25 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val orderById = colOrder?.withIndex()?.associate { (index, it) -> it to index }
         val sortedIntMatrix = intMatrix.withIndex().sortedBy { (index, _) -> orderById?.get(index) }.map{it.value}
 
-        val protGroup = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")?.get(0) }
+        val protGroup = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")[0] }
         val geneCol = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
-        val genes = geneCol?.map { it.split(";")?.get(0) }
+        val genes = geneCol?.map { it.split(";").get(0) }
         val geneNr = geneCol?.map { it.split(";").size }
 
-        val selProts = params?.selProts.map { p ->
+        val selProts = params.selProts.map { p ->
             val i = protGroup?.indexOf(p)
             if(i != null && i >= 0){
-                val ints = sortedIntMatrix.map { if (i == null || it[i].isNaN()) null else it[i] }
+                val ints = sortedIntMatrix.map { if (it[i].isNaN()) null else it[i] }
                 val logInts = ints.map { if (it != null && !it.isNaN() && it > 0.0) log2(it) else null }
 
-                val gene = if (i == null) "" else genes?.get(i)
-                val multipleGeneNames = (geneNr?.get(i)?:0 > 1)
+                val gene = genes?.get(i)
+                val multipleGeneNames = (((geneNr?.get(i) ?: 0) > 1))
                 SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene, multiGenes = multipleGeneNames)
             }else{
                 null
             }
         }
-
-        return selProts.filterNotNull().ifEmpty { null }
+        return selProts.filterNotNull().ifEmpty { null }?.sortedByDescending { a -> a.ints?.map{d -> d ?: 0.0 }?.average()}
     }
 
     private fun createAllData(
@@ -100,7 +99,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val (headers, allData) = readTableData.getDoubleMatrix(table, intCol, selExpDetails)
 
         return allData.map{ a ->
-            val yPoints = a.filter{a -> !a.isNaN() && a != Double.NaN}
+            val yPoints = a.filter{a -> !a.isNaN() && !a.isNaN() }
             yPoints.map{ b -> AllProtPoint(y=b, j=generator.nextDouble()-0.5) }
         }
     }
