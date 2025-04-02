@@ -6,9 +6,8 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.ColumnInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.common.EchartsServer
+import ch.unil.pafanalysis.common.*
 import ch.unil.pafanalysis.html_plot.HtmlPlot
-import ch.unil.pafanalysis.common.ZipTool
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
@@ -166,9 +165,18 @@ class AnalysisStepService {
         return step != null
     }
 
-    fun getTable(analysisStepId: Int): String? {
+    fun getTable(analysisStepId: Int, selCols: List<Int>? = null): String? {
         val analysisStep = analysisStepRepo?.findById(analysisStepId)
-        return env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
+        val origTable = env?.getProperty("output.path").plus(analysisStep?.resultTablePath)
+        return if(selCols != null){
+            val tableContent = ReadTableData().getTableWithoutHeaders(origTable)
+            val newTable = Table(
+                headers = tableContent?.headers?.filterIndexed{ i, _ -> selCols.contains(i)}?.mapIndexed{i, a -> a.copy(idx = i)},
+                cols = tableContent?.cols?.filterIndexed{ i, _ -> selCols.contains(i)})
+            val newTablePath = kotlin.io.path.createTempFile().toString()
+            WriteTableData().write(newTablePath, newTable)
+            newTablePath
+        } else origTable
     }
 
     fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, html: Boolean?): String? {

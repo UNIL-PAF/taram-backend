@@ -171,8 +171,8 @@ class AnalysisStepController {
     }
 
     @GetMapping(path = ["/table/{stepId}"])
-    fun getTable(@PathVariable(value = "stepId") stepId: Int): ResponseEntity<ByteArray>? {
-        val tableFile = analysisStepService?.getTable(stepId)
+    fun getTable(@PathVariable(value = "stepId") stepId: Int, @RequestParam(value = "sel-cols") selCols: String? = null): ResponseEntity<ByteArray>? {
+        val tableFile = analysisStepService?.getTable(stepId, selCols?.split(",")?.map { it.toInt() })
         val inputStream: InputStream = FileInputStream(tableFile)
         val contents = inputStream.readAllBytes()
 
