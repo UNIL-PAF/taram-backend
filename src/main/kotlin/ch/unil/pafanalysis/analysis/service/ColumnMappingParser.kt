@@ -32,7 +32,7 @@ class ColumnMappingParser {
                 c.mapIndexed { i, s ->
                     if(s.isEmpty() && acc[i] == ColType.EMPTY){
                         ColType.EMPTY
-                    }else if ((checkTypes.isNumerical(s) || s.isEmpty() || s == "Filtered") && acc[i] == ColType.NUMBER) {
+                    }else if ((checkTypes.isNumerical(s) || s.isEmpty() || s == "Filtered") && (acc[i] == ColType.NUMBER || acc[i] == ColType.EMPTY)) {
                         ColType.NUMBER
                     } else ColType.CHARACTER
                 }

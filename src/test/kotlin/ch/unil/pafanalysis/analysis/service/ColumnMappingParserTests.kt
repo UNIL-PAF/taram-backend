@@ -55,11 +55,11 @@ class ColumnMappingParserTests {
         assert(commonResults.headers?.get(0)?.type == ColType.CHARACTER)
 
         // check header with experiment
-        assert(commonResults.headers?.get(12)?.idx == 12)
-        assert(commonResults.headers?.get(12)?.name == "KO-13704.Mutation.names")
-        assert(commonResults.headers?.get(12)?.type == ColType.NUMBER)
-        assert(commonResults.headers?.get(12)?.experiment?.name == "KO-13704")
-        assert(commonResults.headers?.get(12)?.experiment?.field == "Mutation.names")
+        assert(commonResults.headers?.get(13)?.idx == 13)
+        assert(commonResults.headers?.get(13)?.name == "KO-13705.Mutated.peptide.count")
+        assert(commonResults.headers?.get(13)?.type == ColType.NUMBER)
+        assert(commonResults.headers?.get(13)?.experiment?.name == "KO-13705")
+        assert(commonResults.headers?.get(13)?.experiment?.field == "Mutated.peptide.count")
     }
 
     @Test

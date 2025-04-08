@@ -93,7 +93,8 @@ class TransformationRunnerTests {
         val tempFile = kotlin.io.path.createTempFile()
         val fileName = writeTableData.write(tempFile.pathString, table!!.copy(cols = newCols))
         val fileHash = Crc32HashComputations().computeFileHash(File(fileName))
-        assert(fileHash == (458642479).toLong())
+        println(fileHash)
+        assert(fileHash == (3066847215).toLong())
     }
 
 }
