@@ -32,5 +32,6 @@ data class GroupComp(val group1: String, val group2: String)
 
 enum class ColType(val value: String) {
     CHARACTER("character"),
-    NUMBER("number")
+    NUMBER("number"),
+    EMPTY("empty"),
 }

@@ -27,14 +27,16 @@ class ColumnMappingParser {
         val headerNames: List<String> = reader.readLine().split("\t")
 
         val headerTypes: List<ColType> =
-            reader.readLines().fold(Collections.nCopies(headerNames.size, ColType.NUMBER)) { acc, r ->
+            reader.readLines().fold(Collections.nCopies(headerNames.size, ColType.EMPTY)) { acc, r ->
                 val c = r.split("\t")
                 c.mapIndexed { i, s ->
-                    if ((checkTypes.isNumerical(s) || s.isEmpty() || s == "Filtered") && acc[i] == ColType.NUMBER) {
+                    if(s.isEmpty() && acc[i] == ColType.EMPTY){
+                        ColType.EMPTY
+                    }else if ((checkTypes.isNumerical(s) || s.isEmpty() || s == "Filtered") && acc[i] == ColType.NUMBER) {
                         ColType.NUMBER
                     } else ColType.CHARACTER
                 }
-            }
+            }.map{ a -> if(a == ColType.EMPTY) ColType.CHARACTER else a }
 
         val headerTypesWithCustom = headerNames.mapIndexed { i, s ->
             val typeMatch: Pair<Regex, ColType>? = customTypeMatch.find{ a -> a.first.matches(s)}
