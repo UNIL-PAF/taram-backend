@@ -170,8 +170,10 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
             colMapping.experimentDetails?.mapValues { a -> if(a.value.group == null) a.value.copy(isSelected = false) else a.value }
         }else colMapping.experimentDetails
 
-        val newHeaders: List<Header>? = updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails)
-        val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders)
+        val newHeaderOrder: List<Int>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
+
+        val newHeaders: List<Header>? = updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails, newHeaderOrder)
+        val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders, newHeaderOrder)
 
         val newColumnMapping: ColumnMapping? =
             analysisStep.columnInfo?.columnMapping?.copy(
@@ -200,10 +202,16 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         return runningStep!!
     }
 
-    private fun updateResFile(analysisStep: AnalysisStep?, newHeaders: List<Header>?): Pair<String?, Long?> {
+    private fun updateResFile(analysisStep: AnalysisStep?,
+                              newHeaders: List<Header>?,
+                              headerOrder: List<Int>?): Pair<String?, Long?> {
         val resFilePath = getOutputRoot() + analysisStep?.resultTablePath
         val oldTable = ReadTableData().getTable(resFilePath, analysisStep?.commonResult?.headers)
-        WriteTableData().write(resFilePath, oldTable.copy(headers = newHeaders))
+
+        val newCols = oldTable.cols?.mapIndexed { i, h -> headerOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: oldTable.cols
+
+        WriteTableData().write(resFilePath, Table(headers = newHeaders, cols = newCols))
+
         val resultType = getResultType(analysisStep?.analysis?.result?.type)
         return getResultTablePath(
             modifiesResult = true,
@@ -214,14 +222,45 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         )
     }
 
-    private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?, oldExpDetails: Map<String, ExpInfo>?): List<Header>? {
-        return headers?.map { h ->
+    private fun getNewHeaderOrder(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Int>? {
+        var expType: String? = null
+        var fieldPos: Int? = null
+
+        val newOrder: List<Int>? = headers?.fold(emptyList()){acc, h ->
+            val newIdx = if(h.experiment != null){
+                val fieldIdx = experimentDetails?.get(h.experiment.name)?.idx
+                if(expType == null || expType != h.experiment.field) {
+                    expType = h.experiment.field
+                    fieldPos = h.idx
+                }
+                val a = (fieldIdx ?: return null) + (fieldPos ?: return null)
+                a
+            }else{
+                if(expType != null){
+                    expType = null
+                    fieldPos = null
+                }
+                h.idx
+            }
+            acc.plus(newIdx)
+        }
+        return newOrder
+    }
+
+    private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?,
+                              headers: List<Header>?,
+                              oldExpDetails: Map<String, ExpInfo>?,
+                              headerOrder: List<Int>?): List<Header>? {
+        val newHeaders = headers?.map { h ->
             val oldExpInfo = oldExpDetails?.values?.find{ expD -> h.experiment?.name == expD.name}
             val expInfo = experimentDetails?.values?.find{ expD -> oldExpInfo?.originalName == expD.originalName}
             val exp = h.experiment?.copy(name = expInfo?.name)
-            val headerName = if (exp != null) "${expInfo?.name}.${h.experiment?.field}" else h.name
+            val headerName = if (exp != null) "${expInfo?.name}.${h.experiment.field}" else h.name
             h.copy(experiment = exp, name = headerName)
         }
+
+        val orderedHeaders = newHeaders?.mapIndexed { i, h -> headerOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: newHeaders
+        return orderedHeaders?.mapIndexed{ i, h -> h.copy(idx = i) }
     }
 
     private fun createEmptyInitialResult(analysis: Analysis?): AnalysisStep? {

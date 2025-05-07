@@ -5,7 +5,8 @@ data class ExpInfo(
     val isSelected: Boolean? = null,
     val name: String? = null,
     val originalName: String? = null,
-    val group: String? = null
+    val group: String? = null,
+    val idx: Int? = null,
 )
 
 data class ColumnMapping(
