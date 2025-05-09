@@ -122,7 +122,7 @@ class AsyncInitialResultRunner(): CommonStep(){
                 colMapping.experimentDetails?.mapValues { a -> if (a.value.group == null) a.value.copy(isSelected = false) else a.value }
             } else colMapping.experimentDetails
 
-            val newHeaderOrder: List<Int>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
+            val newHeaderOrder: List<Int?>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
 
             val newHeaders: List<Header>? =
                 updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails, newHeaderOrder)
@@ -161,11 +161,14 @@ class AsyncInitialResultRunner(): CommonStep(){
 
     private fun updateResFile(analysisStep: AnalysisStep?,
                               newHeaders: List<Header>?,
-                              headerOrder: List<Int>?): Pair<String?, Long?> {
+                              headerOrder: List<Int?>?): Pair<String?, Long?> {
         val resFilePath = getOutputRoot() + analysisStep?.resultTablePath
         val oldTable = ReadTableData().getTable(resFilePath, analysisStep?.commonResult?.headers)
 
-        val newCols = oldTable.cols?.mapIndexed { i, h -> headerOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: oldTable.cols
+        // remove headerOrder positions with null
+        val usedCols = oldTable.cols?.filterIndexed { i, _ ->  headerOrder!![i] != null}
+        val usedOrder = headerOrder?.filterNotNull()
+        val newCols = usedCols?.mapIndexed { i, h -> usedOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: oldTable.cols
 
         WriteTableData().write(resFilePath, Table(headers = newHeaders, cols = newCols))
 
@@ -179,19 +182,18 @@ class AsyncInitialResultRunner(): CommonStep(){
         )
     }
 
-    private fun getNewHeaderOrder(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Int>? {
+    private fun getNewHeaderOrder(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Int?>? {
         var expType: String? = null
         var fieldPos: Int? = null
 
-        val newOrder: List<Int>? = headers?.fold(emptyList()){acc, h ->
+        val newOrder: List<Int?>? = headers?.fold(emptyList()){acc, h ->
             val newIdx = if(h.experiment != null){
                 val fieldIdx = experimentDetails?.get(h.experiment.name)?.idx
                 if(expType == null || expType != h.experiment.field) {
                     expType = h.experiment.field
                     fieldPos = h.idx
                 }
-                val a = (fieldIdx ?: return null) + (fieldPos ?: return null)
-                a
+                if(fieldIdx == null) null else fieldIdx + (fieldPos ?: return null)
             }else{
                 if(expType != null){
                     expType = null
@@ -207,7 +209,7 @@ class AsyncInitialResultRunner(): CommonStep(){
     private fun updateHeaders(experimentDetails: Map<String, ExpInfo>?,
                               headers: List<Header>?,
                               oldExpDetails: Map<String, ExpInfo>?,
-                              headerOrder: List<Int>?): List<Header>? {
+                              headerOrder: List<Int?>?): List<Header>? {
         val newHeaders = headers?.map { h ->
             val oldExpInfo = oldExpDetails?.values?.find{ expD -> h.experiment?.name == expD.name}
             val expInfo = experimentDetails?.values?.find{ expD -> oldExpInfo?.originalName == expD.originalName}
@@ -216,7 +218,11 @@ class AsyncInitialResultRunner(): CommonStep(){
             h.copy(experiment = exp, name = headerName)
         }
 
-        val orderedHeaders = newHeaders?.mapIndexed { i, h -> headerOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: newHeaders
+        // remove headerOrder positions with null
+        val usedHeaders = newHeaders?.filterIndexed { i, _ ->  headerOrder!![i] != null}
+        val usedOrder = headerOrder?.filterNotNull()
+
+        val orderedHeaders = usedHeaders?.mapIndexed { i, h -> usedOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: usedHeaders
         return orderedHeaders?.mapIndexed{ i, h -> h.copy(idx = i) }
     }
 
