@@ -100,57 +100,63 @@ class AsyncInitialResultRunner(): CommonStep(){
     }
 
     @Async
-    fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
+    fun updateColumnParams(analysisStep: AnalysisStep, params: String) {
 
-        val logger: Logger = LoggerFactory.getLogger(AsyncInitialResultRunner::class.java)
+        try {
 
-        val oldExpDetails = analysisStep.columnInfo?.columnMapping?.experimentDetails
-        val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
+            val logger: Logger = LoggerFactory.getLogger(AsyncInitialResultRunner::class.java)
 
-        val allExpNamesExist = colMapping.experimentNames?.all { expNames ->
-            analysisStep.columnInfo?.columnMapping?.experimentNames?.contains(expNames) == true
-        }
+            val oldExpDetails = analysisStep.columnInfo?.columnMapping?.experimentDetails
+            val colMapping: ColumnMapping = gson.fromJson(params, ColumnMapping::class.java)
 
-        if(allExpNamesExist != true) {
-            logger.info("Warning: some experiment names are not in this analysis.")
-            return analysisStep
-        }
+            val allExpNamesExist = colMapping.experimentNames?.all { expNames ->
+                analysisStep.columnInfo?.columnMapping?.experimentNames?.contains(expNames) == true
+            }
 
-        // if there are groups defined and some experiments not in any groups, we set them as not selected.
-        val newExpDetails: Map<String, ExpInfo>?  = if(colMapping.groupsOrdered?.isNotEmpty() == true){
-            colMapping.experimentDetails?.mapValues { a -> if(a.value.group == null) a.value.copy(isSelected = false) else a.value }
-        }else colMapping.experimentDetails
+            if (allExpNamesExist != true) {
+                logger.info("Warning: some experiment names are not in this analysis.")
+            }
 
-        val newHeaderOrder: List<Int>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
+            // if there are groups defined and some experiments not in any groups, we set them as not selected.
+            val newExpDetails: Map<String, ExpInfo>? = if (colMapping.groupsOrdered?.isNotEmpty() == true) {
+                colMapping.experimentDetails?.mapValues { a -> if (a.value.group == null) a.value.copy(isSelected = false) else a.value }
+            } else colMapping.experimentDetails
 
-        val newHeaders: List<Header>? = updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails, newHeaderOrder)
-        val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders, newHeaderOrder)
+            val newHeaderOrder: List<Int>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
 
-        val newColumnMapping: ColumnMapping? =
-            analysisStep.columnInfo?.columnMapping?.copy(
-                experimentDetails = newExpDetails,
-                intCol = colMapping.intCol,
-                groupsOrdered = colMapping.groupsOrdered,
-                experimentNames = colMapping.experimentNames
+            val newHeaders: List<Header>? =
+                updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails, newHeaderOrder)
+            val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders, newHeaderOrder)
+
+            val newColumnMapping: ColumnMapping? =
+                analysisStep.columnInfo?.columnMapping?.copy(
+                    experimentDetails = newExpDetails,
+                    intCol = colMapping.intCol,
+                    groupsOrdered = colMapping.groupsOrdered,
+                    experimentNames = colMapping.experimentNames
+                )
+
+            val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
+            val newColumnInfo: ColumnInfo? =
+                analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
+            columnInfoRepository?.saveAndFlush(newColumnInfo!!)
+            val newCommonRes = analysisStep.commonResult?.copy(headers = newHeaders)
+
+            val finalStep = analysisStep.copy(
+                status = AnalysisStepStatus.DONE.value,
+                commonResult = newCommonRes,
+                resultTableHash = newTableHash,
+                resultTablePath = newTablePath
             )
 
-        val columnHash = Crc32HashComputations().computeStringHash(newColumnMapping.toString())
-        val newColumnInfo: ColumnInfo? =
-            analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
-        columnInfoRepository?.saveAndFlush(newColumnInfo!!)
-        val newCommonRes = analysisStep.commonResult?.copy(headers = newHeaders)
+            analysisStepRepository?.saveAndFlush(finalStep)
 
-        val finalStep = analysisStep.copy(
-            status = AnalysisStepStatus.DONE.value,
-            commonResult = newCommonRes,
-            resultTableHash = newTableHash,
-            resultTablePath = newTablePath
-        )
-
-        analysisStepRepository?.saveAndFlush(finalStep)
-
-        updateNextStep(finalStep)
-        return finalStep
+            updateNextStep(finalStep)
+        }catch (e: Exception) {
+            e.printStackTrace()
+            val stepWithError = analysisStep.copy(status = AnalysisStepStatus.ERROR.value, error = "Something went wrong while changing groups.")
+            analysisStepRepository?.saveAndFlush(stepWithError)
+        }
     }
 
     private fun updateResFile(analysisStep: AnalysisStep?,
