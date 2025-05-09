@@ -26,6 +26,9 @@ class ResultController {
     private var resultService: ResultService? = null
 
     @Autowired
+    private var analysisService: AnalysisService? = null
+
+    @Autowired
     private var env: Environment? = null
 
     private fun getResultPaths(): ResultPaths = ResultPaths(
@@ -37,7 +40,12 @@ class ResultController {
     @ResponseBody
     fun addResult(@RequestBody res: Result): Int?{
         val newRes = res.copy(lastModifDate = LocalDateTime.now(), status = ResultStatus.RUNNING.value)
-        return resultRepository?.save(newRes)?.id
+        val newResId = resultRepository?.save(newRes)?.id
+
+        // create new Analysis
+        analysisService?.createNewAnalysis(newRes)
+
+        return newResId
     }
 
     @GetMapping("/list")

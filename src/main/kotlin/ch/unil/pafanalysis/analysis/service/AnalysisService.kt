@@ -26,7 +26,7 @@ class AnalysisService {
     private var analysisStepService: AnalysisStepService? = null
 
 
-    private fun createNewAnalysis(result: Result?): List<Analysis>? {
+    fun createNewAnalysis(result: Result?): List<Analysis>? {
         val newAnalysis = Analysis(
             idx = 0,
             result = result,
@@ -92,19 +92,10 @@ class AnalysisService {
 
     fun getByResultId(resultId: Int): List<Analysis>? {
         // check first if this result really exists
-        val result = resultRepo?.findById(resultId)
+        resultRepo?.findById(resultId)
             ?: throw RuntimeException("There is no result for resultId [$resultId]")
 
-        val analysisInDb: List<Analysis>? = analysisRepo?.findByResultId(resultId)?.toList()
-
-        val analysis = if (analysisInDb == null || analysisInDb!!.isEmpty()) {
-            createNewAnalysis(result)
-            analysisRepo?.findByResultId(resultId)?.toList()
-        } else {
-            analysisInDb
-        }
-
-        return analysis
+        return analysisRepo?.findByResultId(resultId)?.toList()
     }
 
     fun sortAnalysisSteps(oldList: List<AnalysisStep>?): List<AnalysisStep>? {
