@@ -22,16 +22,16 @@ class InitialSpectronautRunner() {
             val matched = spectronautSetup.runs?.filter{ it.name?.contains(expName) == true }
 
             val condition = if(matched?.size == 1) {
-                matched?.get(0).condition
+                matched[0].condition
             } else if(!matched.isNullOrEmpty() && matched.all{!it.name.isNullOrEmpty()}){
                 val (commonStart, commonEnd) = ParseSpectronautColNames.getCommonStartAndEnd(matched.map{it.name!!} )
                 matched.find{a -> a.name?.matches(Regex(".*$commonStart$commonEnd.*")) ?: false }?.condition
             } else null
 
-            val newEntry = columnInfo?.columnMapping?.experimentDetails?.get(expName)?.copy(group = condition)
+            val newEntry = columnInfo.columnMapping.experimentDetails?.get(expName)?.copy(group = condition)
             acc.plus(Pair(expName, newEntry!!))
         }
-        val groupsOrdered = spectronautSetup.runs?.map{it.condition}?.filterNotNull()?.distinct()?.sorted()
+        val groupsOrdered = spectronautSetup.runs?.mapNotNull { it.condition }?.distinct()?.sorted()
         val newColMapping = columnInfo?.columnMapping?.copy(experimentDetails = newExpDetails, groupsOrdered = groupsOrdered)
         return columnInfo?.copy(columnMapping = newColMapping)
     }

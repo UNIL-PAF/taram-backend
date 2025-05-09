@@ -69,7 +69,7 @@ class AsyncInitialResultRunner(): CommonStep(){
             } else columnInfo
 
             val newInitialResult = if(initialResult?.maxQuantParameters != null && maxQuantGeneParsingStatus != null){
-                val newMaxQuantParams = initialResult?.maxQuantParameters.copy(
+                val newMaxQuantParams = initialResult.maxQuantParameters.copy(
                     someGenesParsedFromFasta = if(maxQuantGeneParsingStatus == MaxQuantGeneParsing.Some) true else null,
                     allGenesParsedFromFasta = if(maxQuantGeneParsingStatus == MaxQuantGeneParsing.All) true else null
                 )
@@ -78,12 +78,12 @@ class AsyncInitialResultRunner(): CommonStep(){
 
             emptyStep?.copy(
                 resultPath = stepPath,
-                resultTablePath = "$stepPath/${newTable?.name}",
+                resultTablePath = "$stepPath/${newTable.name}",
                 resultTableHash = newTableHash,
                 status = AnalysisStepStatus.DONE.value,
                 results = gson.toJson(newInitialResult),
-                columnInfo = emptyStep?.columnInfo ?: newColInfo,
-                commonResult = emptyStep?.commonResult ?: adaptedCommonRes,
+                columnInfo = emptyStep.columnInfo ?: newColInfo,
+                commonResult = emptyStep.commonResult ?: adaptedCommonRes,
                 tableNr = 1,
                 nrProteinGroups = initialResult?.nrProteinGroups
             )
