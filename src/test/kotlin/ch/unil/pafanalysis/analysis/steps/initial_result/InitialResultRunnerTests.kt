@@ -1,7 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
+import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.InitialSpectronautRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.ParseSpectronautSetup
 import ch.unil.pafanalysis.results.model.ResultType
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ import java.io.File
 class InitialResultRunnerTests {
 
     @Autowired
-    private val runner: InitialResultRunner? = null
+    private val spectronautRunner: InitialSpectronautRunner? = null
 
     @Autowired
     private val spectronautSetupParser: ParseSpectronautSetup? = null
@@ -32,7 +32,7 @@ class InitialResultRunnerTests {
         val (columnInfo, _) =
             columnInfoService?.createAndSaveColumnInfo(filePath.path, resPath, ResultType.Spectronaut)!!
 
-        val newColumnInfo = runner?.matchSpectronautGroups(columnInfo, spectronautSetup!!)
+        val newColumnInfo = spectronautRunner?.matchSpectronautGroups(columnInfo, spectronautSetup!!)
         val selExp = newColumnInfo?.columnMapping?.experimentDetails?.values?.find{it.name == "17985"}
 
         assert(selExp?.group == "5191")
