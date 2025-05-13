@@ -45,8 +45,12 @@ class TTestPdf() : PdfCommon() {
             "Welch's t-test (assumes unequal variances)"
         } else "Student's t-test (assumes equal variances)"
 
+        val testName = if(parsedParams.paired == true){
+            "Paired $testType"
+        } else testType
+
         val paramsDiv = Div()
-        paramsDiv.add(getOneRowTable(listOf(getParagraph(testType, dense = true, bold = true))))
+        paramsDiv.add(getOneRowTable(listOf(getParagraph(testName, dense = true, bold = true))))
         paramsDiv.add(getTwoRowTable(paramsData))
         if(parsedParams.filterOnValid == true){
             paramsDiv.add(getOneRowTable(listOf(getParagraph("Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.", dense = true, bold = true))))
