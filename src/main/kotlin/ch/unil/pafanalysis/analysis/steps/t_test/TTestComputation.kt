@@ -21,7 +21,7 @@ class TTestComputation {
 
     fun run(table: Table?, params: TTestParams?, step: AnalysisStep?): Triple<Table?, List<Header>?, TTest> {
 
-        if (step?.columnInfo?.columnMapping?.experimentDetails == null || step?.columnInfo?.columnMapping?.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
+        if (step?.columnInfo?.columnMapping?.experimentDetails == null || step.columnInfo.columnMapping.experimentDetails.values.any { it.isSelected == true && it.group == null }) throw StepException(
             "Please specify your groups in the Analysis parameters."
         )
 
@@ -33,16 +33,16 @@ class TTestComputation {
             throw StepException("First and second groups don't have the same number of items. Please select pairs.")
         }
 
-        val imputationTable = if(step?.imputationTablePath != null) ReadImputationTableData().getTable(
-            env?.getProperty("output.path").plus(step?.imputationTablePath),
-            step?.commonResult?.headers
+        val imputationTable = if(step.imputationTablePath != null) ReadImputationTableData().getTable(
+            env?.getProperty("output.path").plus(step.imputationTablePath),
+            step.commonResult?.headers
         ) else null
 
         val comparisions: List<GroupComp>? =
-            params?.firstGroup?.zip(params?.secondGroup ?: emptyList())?.map { GroupComp(it.first, it.second) }
+            params?.firstGroup?.zip(params.secondGroup ?: emptyList())?.map { GroupComp(it.first, it.second) }
 
-        val isLogVal = step?.commonResult?.intColIsLog
-        val field = params?.field ?: step?.columnInfo?.columnMapping?.intCol
+        val isLogVal = step.commonResult?.intColIsLog
+        val field = params?.field ?: step.columnInfo.columnMapping.intCol
 
         val initialRes: Triple<Table?, List<Header>?, TTest> =
             Triple(table, table?.headers, TTest(comparisions = emptyList()))
@@ -79,7 +79,7 @@ class TTestComputation {
             val groupIdxs = imputationTable?.headers?.withIndex()?.filter{expDetails?.get(it.value.experiment?.name)?.group == group}?.map{it.index}
             return imputationTable?.rows?.map{ row ->
                 val selRow: List<Boolean>? = groupIdxs?.map{row[it] ?: false}
-                selRow?.count{ !it } ?: 0 >= params?.minNrValid ?: 0
+                (selRow?.count { !it } ?: 0) >= (params?.minNrValid ?: 0)
             } ?: emptyList()
         }
 
@@ -90,7 +90,7 @@ class TTestComputation {
         val pValAndTStat = computeTTest(rowInts, params?.paired, validRows, params?.equalVariance)
         val pVals = pValAndTStat.map { it.first }
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
-        val foldChanges = computeFoldChanges(rowInts, isLogVal, validRows)
+        val foldChanges = if(params?.paired == true) computePairedFoldChanges(rowInts, isLogVal, validRows) else computeFoldChanges(rowInts, isLogVal, validRows)
         val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
 
@@ -136,6 +136,33 @@ class TTestComputation {
 
         val newCols = table.cols?.plus(addCols)
         return Pair(Table(newHeaders, newCols), newHeaders)
+    }
+
+    private fun computePairedFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?, validRows: List<Boolean>?): List<Double> {
+
+        val pairedVals: List<List<Pair<Double, Double>>> = ints.map{ (first, second) ->
+            first.zip(second)
+        }
+
+        return pairedVals.mapIndexed{ i, row ->
+            val fc = row.map{ (first, second) ->
+                if(first.isNaN() || second.isNaN()){
+                    Double.NaN
+                }else{
+                    if (isLogVal == true) {
+                        first - second
+                    } else {
+                        first / second
+                    }
+                }
+            }.average()
+
+            if(validRows != null){
+                if(validRows[i]){
+                    fc
+                } else Double.NaN
+            } else fc
+        }
     }
 
     private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?, validRows: List<Boolean>?): List<Double> {

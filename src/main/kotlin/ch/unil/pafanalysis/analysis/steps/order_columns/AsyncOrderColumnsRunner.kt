@@ -92,7 +92,7 @@ class AsyncOrderColumnsRunner() : CommonStep() {
 
         val newCols = newOrder2?.map{ a ->
             val selIdx = table?.headers?.withIndex()?.find{it.value.idx == a}?.index
-            table?.cols?.get(selIdx!!)!!
+                table?.cols?.get(selIdx!!)!!
         }
         val newHeaders = newOrder2?.mapIndexed{ i, a ->
             val selIdx = table?.headers?.withIndex()?.find{it.value.idx == a}?.index
