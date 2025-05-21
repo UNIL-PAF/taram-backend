@@ -51,7 +51,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             else  listOf(createBoxplotGroupData(null, null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
 
         val selExpDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails?.filterValues{it.isSelected == true}
-        val nrGroups = analysisStep?.columnInfo?.columnMapping?.groupsOrdered?.size ?: 1
+        val nrGroups = analysisStep?.columnInfo?.columnMapping?.groupsOrdered?.size ?: 0
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, experimentNames, selExpDetails, nrGroups)
 
         return BoxPlot(
@@ -72,6 +72,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
         if (params?.selProts == null) return null
         val (headers, intMatrix) = readTableData.getDoubleMatrix(table, intCol, expDetails)
 
+        val nrGroupsMin = if(nrGroups < 1) 1 else nrGroups
+
         val colOrder = expNames?.map{ n -> headers.indexOf(headers.find{it.experiment?.name == n}) }
         val orderById = colOrder?.withIndex()?.associate { (index, it) -> it to index }
         val sortedIntMatrix = intMatrix.withIndex().sortedBy { (index, _) -> orderById?.get(index) }.map{it.value}
@@ -89,7 +91,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
                 val gene = genes?.get(i)
                 val multipleGeneNames = (((geneNr?.get(i) ?: 0) > 1))
-                val protColor = DefaultColors.plotColors[j + nrGroups]
+                val protColor = DefaultColors.plotColors[j + nrGroupsMin]
 
                 SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene, multiGenes = multipleGeneNames, color = protColor)
             }else{
