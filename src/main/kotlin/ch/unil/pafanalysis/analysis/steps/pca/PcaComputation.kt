@@ -27,13 +27,13 @@ class PcaComputation {
         )
         if (checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
 
-        val fltHeaders = if(params?.useAllGroups == false) fltHeadersByGroup(params?.selGroups, headers, step?.columnInfo?.columnMapping) else headers
+        val fltHeaders = if(params?.useAllGroups == false) fltHeadersByGroup(params.selGroups, headers, step?.columnInfo?.columnMapping) else headers
         val fltIntTable = if(params?.useAllGroups == false) readTableData.getDoubleMatrix(table, fltHeaders) else intTable
 
         val (pcs, explVar) = rComputePc(fltIntTable)
         val groupNames: List<String>? =
-            if (params?.useAllGroups == false) step?.columnInfo?.columnMapping?.groupsOrdered?.filter{params?.selGroups?.contains(it) ?: false} else step?.columnInfo?.columnMapping?.groupsOrdered
-        val groupColors: List<String> = getColors(params, step?.columnInfo?.columnMapping?.groupsOrdered)
+            if (params?.useAllGroups == false) step?.columnInfo?.columnMapping?.groupsOrdered?.filter{ params.selGroups?.contains(it) ?: false} else step?.columnInfo?.columnMapping?.groupsOrdered
+        val groupColors: List<String>? = getColors(params, step?.columnInfo?.columnMapping?.groupsOrdered, step?.columnInfo?.columnMapping?.experimentDetails)
 
         return createPcaRes(
             pcs,
@@ -52,12 +52,17 @@ class PcaComputation {
         }
     }
 
-    private fun getColors(params: PcaParams?, groupsOrderer: List<String>?): List<String> {
-        return if(params?.useAllGroups == false){
-            val selIdxs =  params?.selGroups?.map{group -> groupsOrderer?.indexOf(group)}
+    private fun getColors(params: PcaParams?, groupsOrderer: List<String>?, experimentDetails: Map<String, ExpInfo>?): List<String>? {
+        val defaultColors =  if(params?.useAllGroups == false){
+            val selIdxs =  params.selGroups?.map{ group -> groupsOrderer?.indexOf(group)}
             DefaultColors.plotColors.filterIndexed{ i, _ -> selIdxs?.contains(i) ?: false}
         }else{
             DefaultColors.plotColors
+        }
+
+        val orderedSelGroups = if(params?.useAllGroups == false) groupsOrderer?.filter{params.selGroups?.contains(it) == true} else groupsOrderer
+        return orderedSelGroups?.zip(defaultColors)?.map{(groupName, color) ->
+            experimentDetails?.entries?.find{ it.value.group == groupName }?.value?.color ?: color
         }
     }
 
@@ -71,7 +76,7 @@ class PcaComputation {
         headers: List<Header>,
         expDetails: Map<String, ExpInfo>?,
         groupNames: List<String>?,
-        groupColors: List<String>
+        groupColors: List<String>?
     ): PcaRes {
         val groups: List<String> = if (groupNames != null && groupNames.isNotEmpty()) groupNames else
             headers.filter { h -> expDetails?.get(h.experiment?.name)?.group != null }
@@ -81,8 +86,8 @@ class PcaComputation {
 
         val pcListOrig = pcs.mapIndexed { i, pc ->
             OnePcRow(
-                groupName = expDetails?.get(headers?.get(i).experiment?.name)?.group,
-                expName = headers?.get(i).experiment?.name,
+                groupName = expDetails?.get(headers[i].experiment?.name)?.group,
+                expName = headers[i].experiment?.name,
                 pcVals = pc
             )
         }
