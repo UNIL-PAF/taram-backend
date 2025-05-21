@@ -28,10 +28,8 @@ class AsyncInitialResultRunner(): CommonStep(){
     private val readTable = ReadTableData()
     private val writeTable = WriteTableData()
 
-
     @Autowired
     private var initialSpectronautRunner: InitialSpectronautRunner? = null
-
 
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
@@ -123,9 +121,9 @@ class AsyncInitialResultRunner(): CommonStep(){
             } else colMapping.experimentDetails
 
             val newHeaderOrder: List<Int?>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
-
             val newHeaders: List<Header>? =
                 updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails, newHeaderOrder)
+
             val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders, newHeaderOrder)
 
             val newColumnMapping: ColumnMapping? =
@@ -193,7 +191,7 @@ class AsyncInitialResultRunner(): CommonStep(){
                     expType = h.experiment.field
                     fieldPos = h.idx
                 }
-                if(fieldIdx == null) null else fieldIdx + (fieldPos ?: return null)
+                if(fieldIdx == null) h.idx else fieldIdx + (fieldPos ?: return null)
             }else{
                 if(expType != null){
                     expType = null
