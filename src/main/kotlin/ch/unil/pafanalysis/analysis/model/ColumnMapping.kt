@@ -7,6 +7,7 @@ data class ExpInfo(
     val originalName: String? = null,
     val group: String? = null,
     val idx: Int? = null,
+    val color: String? = null
 )
 
 data class ColumnMapping(

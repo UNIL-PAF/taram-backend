@@ -29,6 +29,7 @@ data class SelProtData(
 data class BoxPlotGroupData(
     val group: String? = null,
     val groupData: List<BoxPlotData>? = null,
+    val color: String? = null
 )
 
 data class BoxPlotData(

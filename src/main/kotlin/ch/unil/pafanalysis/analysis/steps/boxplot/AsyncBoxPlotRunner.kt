@@ -31,7 +31,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {
         val expDetailsTable = analysisStep?.columnInfo?.columnMapping?.experimentNames?.map { name ->
-            analysisStep?.columnInfo?.columnMapping?.experimentDetails?.get(name)
+            analysisStep.columnInfo.columnMapping.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
 
         val experimentNames = expDetailsTable?.map { it?.name!! }
@@ -45,7 +45,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
         val groupNames = analysisStep?.columnInfo?.columnMapping?.groupsOrdered ?: groupedExpDetails?.keys
 
-        val boxplotGroupData = if(groupNames?.size?:0 > 0)
+        val boxplotGroupData = if((groupNames?.size ?: 0) > 0)
                 groupNames?.map { createBoxplotGroupData(it, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
             else  listOf(createBoxplotGroupData(null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
 
@@ -123,7 +123,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
                 )
             }
 
-        return BoxPlotGroupData(group = group, groupData = listOfBoxplots)
+        val groupColor = expDetails?.entries?.find{it.value.group == group}?.value?.color
+
+        return BoxPlotGroupData(group = group, groupData = listOfBoxplots, color=groupColor)
     }
 
 
