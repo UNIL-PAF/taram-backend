@@ -1,6 +1,9 @@
 package ch.unil.pafanalysis.analysis.steps.imputation
 
 import ch.unil.pafanalysis.analysis.steps.StepException
+import com.github.rcaller.rstuff.RCaller
+import com.github.rcaller.rstuff.RCallerOptions
+import com.github.rcaller.rstuff.RCode
 import org.apache.commons.math3.distribution.NormalDistribution
 import org.apache.commons.math3.random.RandomGenerator
 import org.apache.commons.math3.random.Well1024a
@@ -21,6 +24,7 @@ class ImputationComputation() {
             ImputationType.NAN.value -> replaceMissingBy(ints, Double.NaN)
             ImputationType.VALUE.value -> replaceMissingBy(ints, params.replaceValue)
             ImputationType.NORMAL.value -> replaceByNormal(ints, params.normImputationParams)
+            ImputationType.FOREST.value -> randomForestImputation(ints, params.forestImputationParams?.nTree, params.forestImputationParams?.maxIter, params.forestImputationParams?.fixedRes)
             else -> {
                 throw StepException("${params.imputationType} is not implemented.")
             }
@@ -58,14 +62,6 @@ class ImputationComputation() {
         }
     }
 
-    /*
-    fun standardDevitation(ints: List<Double>): Double {
-        val mean = ints.average()
-        val sum = ints.fold(0.0) { acc, d -> (d - mean).pow(2) + acc }
-        return sqrt(sum / ints.size)
-    }
-     */
-
     fun replaceMissingBy(
         ints: List<List<Double>>,
         replaceValue: Double?
@@ -74,6 +70,26 @@ class ImputationComputation() {
         return ints.map { col ->
             col.map { i -> if (i.isNaN() || i == 0.0) replaceValue else i }
         }
+    }
+
+    fun randomForestImputation(
+        ints: List<List<Double>>,
+        nTree: Int? = null,
+        maxIter: Int? = null,
+        fixedRes: Boolean? = false
+    ): List<List<Double>> {
+        val code = RCode.create()
+        code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
+        code.addInt("max_iter", maxIter ?: 10)
+        code.addInt("n_tree", nTree ?: 100)
+        code.R_require("missForest")
+        if(fixedRes == true) code.addRCode("set.seed(123, kind = \"L'Ecuyer-CMRG\")")
+        code.addRCode("m[m == 0] <- NA")
+        code.addRCode("forest <- missForest(as.data.frame(t(m)), maxiter = max_iter, ntree = n_tree)")
+        code.addRCode("res <- list(forest = t(forest\$ximp))")
+        val caller = RCaller.create(code, RCallerOptions.create())
+        caller.runAndReturnResult("res")
+        return caller.parser.getAsDoubleMatrix("forest").map { it.toList() }
     }
 
 }

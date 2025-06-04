@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.io.File
 import java.math.BigDecimal
 
 
@@ -65,6 +66,19 @@ class ImputationRunnerTests {
         val oneRes = res!!.first[0][22]
         assert(ints!![0][22] == 0.0)
         assert(oneRes.isNaN())
+    }
+
+
+    @Test
+    fun randomForestImputation() {
+        val forestParams = ForestImputationParams(maxIter = 2, nTree = 5, fixedRes = true)
+        val params = ImputationParams(imputationType = ImputationType.FOREST.value, forestImputationParams = forestParams)
+
+        val subsetInts = ints?.map{it.take(100)}!!
+        val res = imputationComput?.runImputation(subsetInts, params)
+
+        val oneRes = BigDecimal(res!!.first[0][22])
+        assert(oneRes == BigDecimal(38607440))
     }
 
 }
