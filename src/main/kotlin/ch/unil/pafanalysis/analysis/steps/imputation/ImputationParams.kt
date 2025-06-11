@@ -7,6 +7,7 @@ data class ImputationParams(
     val normImputationParams: NormImputationParams? = null,
     val replaceValue: Double? = null,
     val forestImputationParams: ForestImputationParams? = null,
+    val qrilcImputationParams: QrilcImputationParams? = null
 )
 
 data class NormImputationParams(
@@ -21,10 +22,15 @@ data class ForestImputationParams(
     val fixedRes: Boolean? = false
 )
 
+data class QrilcImputationParams(
+    val fixedRes: Boolean? = false
+)
+
 enum class ImputationType(val value: String) {
     NAN("nan"),
     NORMAL("normal"),
     VALUE("value"),
     NONE("none"),
     FOREST("forest"),
+    QRILC("qrilc"),
 }

@@ -25,6 +25,7 @@ class ImputationComputation() {
             ImputationType.VALUE.value -> replaceMissingBy(ints, params.replaceValue)
             ImputationType.NORMAL.value -> replaceByNormal(ints, params.normImputationParams)
             ImputationType.FOREST.value -> randomForestImputation(ints, params.forestImputationParams?.nTree, params.forestImputationParams?.maxIter, params.forestImputationParams?.fixedRes)
+            ImputationType.QRILC.value -> qrilcImpuation(ints, params.qrilcImputationParams?.fixedRes)
             else -> {
                 throw StepException("${params.imputationType} is not implemented.")
             }
@@ -72,6 +73,21 @@ class ImputationComputation() {
         }
     }
 
+    fun qrilcImpuation(ints: List<List<Double>>, fixedRes: Boolean? = false): List<List<Double>> {
+        val code = RCode.create()
+        code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
+        code.R_require("imputeLCMD")
+        code.addRCode("m[m == 0] <- NA")
+        if(fixedRes == true) code.addRCode("set.seed(123)")
+        code.addRCode("qrilc_res <- impute.QRILC(t(m))")
+        code.addRCode("res <- list(qrilc = t(qrilc_res[[1]]))")
+        val caller = RCaller.create(code, RCallerOptions.create())
+        caller.runAndReturnResult("res")
+
+        return caller.parser.getAsDoubleMatrix("qrilc").map { it.toList() }
+    }
+
+
     fun randomForestImputation(
         ints: List<List<Double>>,
         nTree: Int? = null,
@@ -85,16 +101,32 @@ class ImputationComputation() {
         code.R_require("missForest")
         code.R_require("parallel")
         code.R_require("doParallel")
-        if(fixedRes == true) code.addRCode("set.seed(123, kind = \"L'Ecuyer-CMRG\")")
         code.addRCode("m[m == 0] <- NA")
         code.addRCode("n_cores <- detectCores() - 1")
         code.addRCode("cl <- makeCluster(n_cores)")
         code.addRCode("registerDoParallel(cl)")
-        code.addRCode("forest <- missForest(as.data.frame(t(m)), maxiter = max_iter, ntree = n_tree, parallelize = \"variables\")")
+        if(fixedRes == true) code.addRCode("set.seed(123, kind = \"L'Ecuyer-CMRG\")")
+        code.addRCode("forest_res <- missForest(as.data.frame(m), maxiter = max_iter, ntree = n_tree, parallelize = \"variables\")")
         code.addRCode("stopCluster(cl)")
-        code.addRCode("res <- list(forest = t(forest\$ximp))")
+
+
+        /* DEBUG R CODE
+        code.addRCode("r_output <- capture.output(summary(t(forest\$ximp)))")
+        code.addRCode("r_output");
         val caller = RCaller.create(code, RCallerOptions.create())
-        caller.runAndReturnResult("res")
+        caller.runAndReturnResult("r_output")
+
+
+        val outputLines = caller.parser.getAsStringArray("r_output")
+        for (line in outputLines) {
+            println("R said: $line")
+        }
+         */
+
+        code.addRCode("forest <- data.matrix(forest_res\$ximp)")
+        code.addRCode("forest")
+        val caller = RCaller.create(code, RCallerOptions.create())
+        caller.runAndReturnResult("forest")
         return caller.parser.getAsDoubleMatrix("forest").map { it.toList() }
     }
 
