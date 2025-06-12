@@ -6,6 +6,8 @@ data class ImputationParams(
     val selColIdxs: List<Int>? = null,
     val normImputationParams: NormImputationParams? = null,
     val replaceValue: Double? = null,
+    val forestImputationParams: ForestImputationParams? = null,
+    val qrilcImputationParams: QrilcImputationParams? = null
 )
 
 data class NormImputationParams(
@@ -14,9 +16,21 @@ data class NormImputationParams(
     val seed: Int? = 1
 )
 
+data class ForestImputationParams(
+    val maxIter: Int? = null,
+    val nTree: Int? = null,
+    val fixedRes: Boolean? = false
+)
+
+data class QrilcImputationParams(
+    val fixedRes: Boolean? = false
+)
+
 enum class ImputationType(val value: String) {
     NAN("nan"),
     NORMAL("normal"),
     VALUE("value"),
-    NONE("none")
+    NONE("none"),
+    FOREST("forest"),
+    QRILC("qrilc"),
 }

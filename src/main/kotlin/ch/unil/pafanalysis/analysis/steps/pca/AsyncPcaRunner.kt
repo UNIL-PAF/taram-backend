@@ -1,15 +1,11 @@
 package ch.unil.pafanalysis.analysis.steps.pca
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
-import ch.unil.pafanalysis.common.Table
-import com.google.common.math.Quantiles
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import kotlin.math.log2
 
 @Service
 class AsyncPcaRunner() : CommonStep() {
