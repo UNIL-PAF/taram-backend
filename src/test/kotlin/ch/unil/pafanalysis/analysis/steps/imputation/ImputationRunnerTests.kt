@@ -83,7 +83,7 @@ class ImputationRunnerTests {
 
     @Test
     fun randomForestImputation() {
-        val forestParams = ForestImputationParams(maxIter = 2, nTree = 5, fixedRes = true)
+        val forestParams = ForestImputationParams(maxIter = 10, nTree = 100, fixedRes = true)
         val params = ImputationParams(imputationType = ImputationType.FOREST.value, forestImputationParams = forestParams)
 
         val subsetInts = ints?.map{it.take(100)}!!
@@ -91,6 +91,9 @@ class ImputationRunnerTests {
 
         val oneRes = res!!.first[0][22]
         assert(roundNumber(oneRes) == roundNumber(21.318434684724))
+
+        val secondRes = res.first[13][80]
+        assert(roundNumber(secondRes) == roundNumber(19.0151783985302))
     }
 
     @Test
@@ -101,6 +104,10 @@ class ImputationRunnerTests {
         val res = imputationComput?.runImputation(subsetInts, params)
         val oneRes = res!!.first[0][22]
         assert(roundNumber(oneRes) == roundNumber(18.5511393511435))
+
+        val secondRes = res.first[13][80]
+        assert(roundNumber(secondRes) == roundNumber(17.8870635847231))
+
     }
 
 }

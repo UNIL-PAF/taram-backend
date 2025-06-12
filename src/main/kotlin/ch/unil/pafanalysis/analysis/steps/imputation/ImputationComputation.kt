@@ -76,14 +76,32 @@ class ImputationComputation() {
     fun qrilcImpuation(ints: List<List<Double>>, fixedRes: Boolean? = false): List<List<Double>> {
         val code = RCode.create()
         code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
+
         code.R_require("imputeLCMD")
-        code.addRCode("m[m == 0] <- NA")
         if(fixedRes == true) code.addRCode("set.seed(123)")
         code.addRCode("qrilc_res <- impute.QRILC(t(m))")
+
+        /*
+        // DEBUG R CODE
+        code.addRCode("sel_ids <- which(is.na(m[14,]))")
+        code.addRCode("r_output <- capture.output(qrilc_res[[1]][sel_ids, 14])")
+        code.addRCode("r_output");
+        val caller = RCaller.create(code, RCallerOptions.create())
+
+        println(caller.rCallerOptions.getrExecutable())
+
+        caller.runAndReturnResult("r_output")
+
+
+        val outputLines = caller.parser.getAsStringArray("r_output")
+        for (line in outputLines) {
+            println("R said: $line")
+        }
+         */
+
         code.addRCode("res <- list(qrilc = t(qrilc_res[[1]]))")
         val caller = RCaller.create(code, RCallerOptions.create())
         caller.runAndReturnResult("res")
-
         return caller.parser.getAsDoubleMatrix("qrilc").map { it.toList() }
     }
 
@@ -101,33 +119,18 @@ class ImputationComputation() {
         code.R_require("missForest")
         code.R_require("parallel")
         code.R_require("doParallel")
-        code.addRCode("m[m == 0] <- NA")
         code.addRCode("n_cores <- detectCores() - 1")
         code.addRCode("cl <- makeCluster(n_cores)")
         code.addRCode("registerDoParallel(cl)")
-        if(fixedRes == true) code.addRCode("set.seed(123, kind = \"L'Ecuyer-CMRG\")")
+        if(fixedRes == true) code.addRCode("set.seed(123)")
         code.addRCode("forest_res <- missForest(as.data.frame(m), maxiter = max_iter, ntree = n_tree, parallelize = \"variables\")")
         code.addRCode("stopCluster(cl)")
-
-
-        /* DEBUG R CODE
-        code.addRCode("r_output <- capture.output(summary(t(forest\$ximp)))")
-        code.addRCode("r_output");
-        val caller = RCaller.create(code, RCallerOptions.create())
-        caller.runAndReturnResult("r_output")
-
-
-        val outputLines = caller.parser.getAsStringArray("r_output")
-        for (line in outputLines) {
-            println("R said: $line")
-        }
-         */
-
         code.addRCode("forest <- data.matrix(forest_res\$ximp)")
         code.addRCode("forest")
         val caller = RCaller.create(code, RCallerOptions.create())
         caller.runAndReturnResult("forest")
         return caller.parser.getAsDoubleMatrix("forest").map { it.toList() }
+
     }
 
 }
