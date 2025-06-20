@@ -25,9 +25,10 @@ class PcaComputation {
             field,
             step?.columnInfo?.columnMapping?.experimentDetails
         )
+
         if (checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
 
-        val fltHeaders = if(params?.useAllGroups == false) fltHeadersByGroup(params?.selGroups, headers, step?.columnInfo?.columnMapping) else headers
+        val fltHeaders = if(params?.useAllGroups == false) fltHeadersByGroup(params.selGroups, headers, step?.columnInfo?.columnMapping) else headers
         val fltIntTable = if(params?.useAllGroups == false) readTableData.getDoubleMatrix(table, fltHeaders) else intTable
 
         val (pcs, explVar) = rComputePc(fltIntTable)

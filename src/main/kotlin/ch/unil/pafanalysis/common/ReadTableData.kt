@@ -139,10 +139,12 @@ class ReadTableData {
     }
 
     fun getDoubleMatrix(table: Table?, field: String?, expDetails: Map<String, ExpInfo>? = null, group: String? = null): Pair<List<Header>, List<List<Double>>> {
-        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group) && (expDetails == null || expDetails?.get(it.experiment?.name) !== null)}
-        if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
-        if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
-        return Pair(headers, headers.map{ h -> table!!.cols!![h.idx].map { it as? Double ?: Double.NaN }})
+        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group) && (expDetails == null || expDetails.get(it.experiment?.name) !== null)}
+        // ignore experiments that are deactivated.
+        val fltHeaders = if(headers?.any{expDetails?.get(it.experiment?.name)?.group != null} == true) headers.filter{expDetails?.get(it.experiment?.name)?.group != null} else headers
+        if(fltHeaders.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
+        if(! fltHeaders.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
+        return Pair(fltHeaders, fltHeaders.map{ h -> table?.cols!![h.idx].map { it as? Double ?: Double.NaN }})
     }
 
     fun getDoubleMatrix(table: Table?, headers: List<Header>): List<List<Double>> {

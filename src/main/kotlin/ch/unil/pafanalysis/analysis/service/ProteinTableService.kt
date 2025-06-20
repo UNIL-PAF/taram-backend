@@ -44,7 +44,7 @@ class ProteinTableService {
         expDetails: Map<String, ExpInfo>?
     ): ProteinTable {
         val protTable = readTable.getStringColumn(table, hMap.getCol("proteinIds", resType))
-        val prots = protTable?.map { it.split(";")?.get(0) }
+        val prots = protTable?.map { it.split(";")[0] }
         val allProts = protTable
         val genes = readTable.getStringColumn(table, hMap.getCol("geneNames", resType))//?.map { it.split(";")?.get(0) }
         val descs = readTable.getStringColumn(table, hMap.getCol("description", resType))

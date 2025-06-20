@@ -32,6 +32,9 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import kotlin.io.path.Path
+import kotlin.io.path.copyTo
+import kotlin.io.path.pathString
 
 @Service
 open class CommonStep {
@@ -254,7 +257,7 @@ open class CommonStep {
 
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
-            val nextStep = analysisStepRepository?.findById(step.nextId!!)
+            val nextStep = analysisStepRepository?.findById(step.nextId)
             update(nextStep!!, step)
         }
     }
@@ -295,21 +298,24 @@ open class CommonStep {
 
     fun tryToRun(runFun: () -> AnalysisStep?, step: AnalysisStep?) {
         try {
-            val step = runFun()
+            val newStep = runFun()
 
-            val stepBefore = analysisStepRepository?.findById(step!!.beforeId!!)
+            val stepBefore = analysisStepRepository?.findById(newStep!!.beforeId!!)
 
-            val stepWithFileHash = step?.copy(
-                resultTableHash = hashComp.computeFileHash(File(getOutputRoot() + step.resultTablePath)),
-                parametersHash = paramToHash(step)
+            val newResultTableHash = hashComp.computeFileHash(File(getOutputRoot() + newStep?.resultTablePath))
+            val newParametersHash = paramToHash(newStep)
+
+            val stepWithFileHash = newStep?.copy(
+                resultTableHash = newResultTableHash,
+                parametersHash = newParametersHash
             )
 
-            val newHash = computeStepHash(stepWithFileHash, stepBefore)
+            val newStepHash = computeStepHash(stepWithFileHash, stepBefore)
 
             val updatedStep =
                 stepWithFileHash?.copy(
                     status = AnalysisStepStatus.DONE.value,
-                    stepHash = newHash,
+                    stepHash = newStepHash,
                     copyDifference = getCopyDifference(stepWithFileHash),
                     nrProteinGroups = getNrProteinGroups(stepWithFileHash.resultTablePath)
                 )
@@ -385,19 +391,20 @@ open class CommonStep {
     ): Pair<String?, Long?> {
         val pathAndHash = if (modifiesResult != null && modifiesResult) {
             val oldTab = getOutputRoot()?.plus("/") + oldStep?.resultTablePath
+
             val tabName = if (resultType == ResultType.MaxQuant) {
                 "/proteinGroups_"
             } else {
                 "/Report_"
             }
             val newTab = stepPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
-            val newFile = File(getOutputRoot()?.plus(newTab))
-            File(oldTab).copyTo(newFile)
+            val newFile = Path(getOutputRoot()?.plus(newTab)!!)
+            Path(oldTab).copyTo(newFile, overwrite = true)
 
             // remove old if exists
             if (oldTablePath != null) File(getOutputRoot()?.plus("/")?.plus(oldTablePath)).delete()
 
-            Pair(newTab, Crc32HashComputations().computeFileHash(newFile))
+            Pair(newTab, Crc32HashComputations().computeFileHash(newFile.toFile()))
         } else {
             Pair(oldStep?.resultTablePath, oldStep?.resultTableHash)
         }
