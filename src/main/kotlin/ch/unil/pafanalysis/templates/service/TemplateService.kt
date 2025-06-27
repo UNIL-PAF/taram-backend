@@ -10,7 +10,9 @@ import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 @Service
 class TemplateService {
@@ -35,9 +37,6 @@ class TemplateService {
 
     @Autowired
     private var initialResultRunner: InitialResultRunner? = null
-
-    @Autowired
-    private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
 
     private val gson = Gson()
 
@@ -106,19 +105,23 @@ class TemplateService {
 
         // try to set groups and default value
         val columnMappingParams = template?.templateSteps?.first()?.parameters
-        if(lastStep?.type == AnalysisStepType.INITIAL_RESULT.value && columnMappingParams !== null){
+        val groupsDefined = lastStep?.columnInfo?.columnMapping?.experimentDetails?.any{ a -> a.value.group != null } ?: false
+
+        if(lastStep?.type == AnalysisStepType.INITIAL_RESULT.value && !groupsDefined && columnMappingParams !== null){
             initialResultRunner?.updateColumnParams(lastStep, columnMappingParams)
         }
 
         template?.templateSteps?.fold(lastStep){ acc, tmpl ->
             if(tmpl.type != AnalysisStepType.INITIAL_RESULT.value){
                 val newStep = commonStep?.addStep(acc!!.id!!, AnalysisStepParams(type = tmpl.type, params = tmpl.parameters))
+                // we need a little sleep to make things run smoothly..
+                TimeUnit.MILLISECONDS.sleep(500)
                 val doneStep = waitTillDone(newStep)
                 doneStep
             } else acc
         }
 
-        // rechange analysis status
+        // re-change analysis status
         val newAnalysis = analysisRepo?.findById(analysisId)
         analysisRepo?.saveAndFlush(newAnalysis?.copy(status = AnalysisStatus.IDLE.value)!!)
 

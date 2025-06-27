@@ -147,7 +147,7 @@ open class CommonStep {
                     status = AnalysisStepStatus.RUNNING.value,
                     commonResult = oldStep?.commonResult,
                     imputationTablePath = oldStep?.imputationTablePath,
-                    tableNr = if (stepWithParams?.modifiesResult == true) {
+                    tableNr = if (stepWithParams.modifiesResult == true) {
                         oldStep?.tableNr?.plus(1)
                     } else oldStep?.tableNr,
                     version = version
@@ -250,7 +250,7 @@ open class CommonStep {
             modifiesResult = modifiesResult
         )
         val insertedStep = analysisStepRepository?.saveAndFlush(newStep)
-        if (oldStep?.nextId != null) setNextStepBeforeId(oldStep?.nextId, insertedStep?.id)
+        if (oldStep?.nextId != null) setNextStepBeforeId(oldStep.nextId, insertedStep?.id)
         updateOldStep(oldStep, insertedStep?.id)
         return insertedStep
     }
@@ -354,7 +354,7 @@ open class CommonStep {
             }
         } else {
             analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.DONE.value))
-            updateNextStep(step!!)
+            updateNextStep(step)
         }
     }
 
