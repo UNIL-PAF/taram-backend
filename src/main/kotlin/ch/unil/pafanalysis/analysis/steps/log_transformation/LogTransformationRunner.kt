@@ -26,7 +26,7 @@ class LogTransformationRunner() : CommonStep(), CommonRunner {
 
     fun getParameters(step: AnalysisStep?): LogTransformationParams {
         return if (step?.parameters != null) gson.fromJson(
-            step?.parameters,
+            step.parameters,
             LogTransformationParams().javaClass
         ) else LogTransformationParams()
     }

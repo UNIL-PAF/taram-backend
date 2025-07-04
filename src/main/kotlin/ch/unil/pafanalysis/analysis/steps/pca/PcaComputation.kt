@@ -25,6 +25,7 @@ class PcaComputation {
             field,
             step?.columnInfo?.columnMapping?.experimentDetails
         )
+
         if (checkIfMissingVals(intTable)) throw StepException("Cannot perform PCA on missing values.")
 
         val fltHeaders = if(params?.useAllGroups == false) fltHeadersByGroup(params.selGroups, headers, step?.columnInfo?.columnMapping) else headers

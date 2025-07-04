@@ -14,12 +14,12 @@ class ReadTableData {
         outputRoot: String?,
         intColumn: String? = null
     ): List<Pair<String, List<Double>>> {
-        val intColumn = intColumn ?: analysisStep?.columnInfo?.columnMapping?.intCol
+        val myIntCol = intColumn ?: analysisStep?.columnInfo?.columnMapping?.intCol
 
         val intColumnNames = expInfoList?.map { exp ->
             if (analysisStep?.analysis?.result?.type == ResultType.MaxQuant.value) {
-                intColumn + " " + exp?.originalName
-            } else exp?.originalName + intColumn
+                myIntCol + " " + exp?.originalName
+            } else exp?.originalName + myIntCol
         }
 
         val filterTerms: List<String>? = if (analysisStep?.analysis?.result?.type == ResultType.Spectronaut.value) {
@@ -35,7 +35,7 @@ class ReadTableData {
         return columnInts.mapIndexed { i, ints -> Pair(expInfoList[i]!!.name!!, ints) }
     }
 
-    fun getColumnNumbers(
+    private fun getColumnNumbers(
         resultTablePath: String?,
         selColumns: List<String>,
         nanStrings: List<String>? = null
@@ -97,9 +97,9 @@ class ReadTableData {
             }
             val newHeaders = acc.headers?.mapIndexed { i, header ->
                 val col = row[i]
-                if(col.isEmpty() || header?.type == ColType.CHARACTER) header
-                else if(col.toDoubleOrNull() != null) header?.copy(type = ColType.NUMBER)
-                else header?.copy(type = ColType.CHARACTER)
+                if(col.isEmpty() || header.type == ColType.CHARACTER) header
+                else if(col.toDoubleOrNull() != null) header.copy(type = ColType.NUMBER)
+                else header.copy(type = ColType.CHARACTER)
             }
             Table(cols = newCols, headers = newHeaders)
         }
@@ -129,7 +129,7 @@ class ReadTableData {
 
         val cols: List<List<Any>> = rowsStrings.fold(Collections.nCopies(headers!!.size, emptyList<Any>())) { acc, r ->
             r.mapIndexed { i, c ->
-                val colVal = if (headers?.get(i)?.type == ColType.NUMBER) {
+                val colVal = if (headers[i].type == ColType.NUMBER) {
                     if (c.isNotEmpty() && c != "Filtered") c.toDouble() else Double.NaN
                 } else c
                 acc[i].plus(colVal)
@@ -139,10 +139,12 @@ class ReadTableData {
     }
 
     fun getDoubleMatrix(table: Table?, field: String?, expDetails: Map<String, ExpInfo>? = null, group: String? = null): Pair<List<Header>, List<List<Double>>> {
-        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group) && (expDetails == null || expDetails?.get(it.experiment?.name) !== null)}
-        if(headers.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
-        if(! headers.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
-        return Pair(headers, headers.map{ h -> table.cols!![h.idx].map { it as? Double ?: Double.NaN }})
+        val headers = table?.headers?.filter { it.experiment?.field == field && (group == null || expDetails?.get(it.experiment?.name)?.group == group) && (expDetails == null || expDetails.get(it.experiment?.name) !== null)}
+        // ignore experiments that are deactivated.
+        val fltHeaders = if(headers?.any{expDetails?.get(it.experiment?.name)?.group != null} == true) headers.filter{expDetails?.get(it.experiment?.name)?.group != null} else headers
+        if(fltHeaders.isNullOrEmpty()) throw Exception("No entries for [$field] found.")
+        if(! fltHeaders.all{it.type == ColType.NUMBER}) throw Exception("Entries for [$field] are not numerical.")
+        return Pair(fltHeaders, fltHeaders.map{ h -> table?.cols!![h.idx].map { it as? Double ?: Double.NaN }})
     }
 
     fun getDoubleMatrix(table: Table?, headers: List<Header>): List<List<Double>> {
@@ -206,13 +208,13 @@ class ReadTableData {
     fun getStringColumn(table: Table?, headerName: String): List<String>? {
         val header = table?.headers?.find { it.name == headerName } ?: return null
         if(header.type != ColType.CHARACTER) throw Exception("Cannot extract string from non-character column.")
-        return table?.cols?.get(header.idx)?.map { it as? String ?: "" }
+        return table.cols?.get(header.idx)?.map { it as? String ?: "" }
     }
 
     fun getStringColumn(table: Table?, headerIdx: Int): List<String>? {
         val header = table?.headers?.find { it.idx == headerIdx } ?: return null
         if(header.type != ColType.CHARACTER) throw Exception("Cannot extract string from non-character column.")
-        return table?.cols?.get(header.idx)?.map { it as? String ?: "" }
+        return table.cols?.get(header.idx)?.map { it as? String ?: "" }
     }
 
 }

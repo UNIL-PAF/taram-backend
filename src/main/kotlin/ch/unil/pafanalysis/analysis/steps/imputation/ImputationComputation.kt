@@ -123,9 +123,15 @@ class ImputationComputation() {
         code.addRCode("cl <- makeCluster(n_cores)")
         code.addRCode("registerDoParallel(cl)")
         if(fixedRes == true) code.addRCode("set.seed(123)")
-        code.addRCode("forest_res <- missForest(as.data.frame(m), maxiter = max_iter, ntree = n_tree, parallelize = \"variables\")")
+        code.addRCode("all_na_rows <- apply(m, 2, function(r) all(is.na(r)))")
+        code.addRCode("forest_res <- missForest(as.data.frame(m[, !all_na_rows]), maxiter = max_iter, ntree = n_tree, parallelize = \"variables\")")
         code.addRCode("stopCluster(cl)")
-        code.addRCode("forest <- data.matrix(forest_res\$ximp)")
+        code.addRCode("all_rows <- t(m)")
+        code.addRCode("all_rows[!all_na_rows,] <- t(forest_res\$ximp)")
+        code.addRCode("forest <- t(all_rows)")
+
+        code.addRCode("save(m, max_iter, n_tree, forest_res, forest, file=\"/tmp/a.Rdata\")")
+
         code.addRCode("forest")
         val caller = RCaller.create(code, RCallerOptions.create())
         caller.runAndReturnResult("forest")

@@ -21,12 +21,14 @@ class ImputationPdf() : PdfCommon() {
             "normal" -> "Replace missing values in column(s) [$selColTxt] by random numbers drawn from a normal distribution:"
             "nan" -> "Replace missing values in column(s) [$selColTxt] by NaN."
             "value" -> "Replace missing values in column(s) [$selColTxt] by ${params.replaceValue}."
+            "forest" -> "Replace missing values in column(s) [$selColTxt] by predictions with random forest models (missForest):"
+            "qrilc" -> "Replace missing values in column(s) [$selColTxt] by QRILC (Quantile Regression Imputation of Left-Censored data)."
             else -> throw Exception("Imputation type [${params.imputationType}] is not implemented.")
         }
     }
 
     private fun getSelColTxt(params: ImputationParams, step: AnalysisStep): String {
-        return if (params.intCol == null && params.selColIdxs == null) {
+        if (params.intCol == null && params.selColIdxs == null) {
             return step.columnInfo?.columnMapping?.intCol + "..."
         } else if (params.intCol == null && !params.selColIdxs.isNullOrEmpty()) {
             val selColNames =
@@ -56,6 +58,7 @@ class ImputationPdf() : PdfCommon() {
 
         val additionalParams: List<Paragraph> =
             if (parsedParams.imputationType == "normal") listOf(getNormParams(parsedParams.normImputationParams))
+            else if(parsedParams.imputationType == "forest") listOf(getForestParams(parsedParams.forestImputationParams))
             else emptyList()
 
         firstParam.plus(additionalParams).forEach { paramsDiv.add(it) }
@@ -79,6 +82,17 @@ class ImputationPdf() : PdfCommon() {
             Pair("Width:", params?.width.toString()),
             Pair("Downshift:", params?.downshift.toString()),
             Pair("Seed:", params?.seed.toString())
+        )
+        val table = getTwoRowTable(normParams, noBold = true)
+        val p = Paragraph()
+        p.add(table)
+        return p
+    }
+
+    private fun getForestParams(params: ForestImputationParams?): Paragraph {
+        val normParams = listOf(
+            Pair("Max nr of iterations:", params?.maxIter.toString()),
+            Pair("Number of trees:", params?.nTree.toString()),
         )
         val table = getTwoRowTable(normParams, noBold = true)
         val p = Paragraph()
