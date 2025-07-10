@@ -266,10 +266,9 @@ open class CommonStep {
         return when (step?.type) {
             AnalysisStepType.BOXPLOT.value -> {
                 val boxPlotParams = boxPlotRunner?.getParameters(step)
-                if(boxPlotParams?.selProtColors != null){
-                    boxPlotParams.selProts?.zip(boxPlotParams.selProtColors)
-                } else boxPlotParams?.selProts?.map{Pair(it, null)}
-
+                boxPlotParams?.selProts?.mapIndexed { i, s ->
+                    Pair(s, boxPlotParams.selProtColors?.getOrNull(i))
+                }
             }
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step)?.selProteins?.map{Pair(it, null)}
             AnalysisStepType.SCATTER_PLOT .value -> scatterPlotRunner?.getParameters(step)?.selProteins?.map{Pair(it, null)}

@@ -80,6 +80,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         val protGroup = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")[0] }
         val geneCol = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
+
         val genes = geneCol?.map { it.split(";").get(0) }
         val geneNr = geneCol?.map { it.split(";").size }
 
@@ -91,7 +92,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
                 val gene = genes?.get(i)
                 val multipleGeneNames = (((geneNr?.get(i) ?: 0) > 1))
-                val protColor = DefaultColors.plotColors[j + nrGroupsMin]
+                val protColor = if(params.selProtColors?.size == params.selProts.size) params.selProtColors[j] else DefaultColors.plotColors[j + nrGroupsMin]
 
                 SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene, multiGenes = multipleGeneNames, color = protColor)
             }else{
