@@ -25,6 +25,8 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.Duration
 
 
@@ -40,6 +42,10 @@ class EchartsServer {
         val results = gson.fromJson(step.results, BoxPlot::class.java)
         val echartsPlot = results.plot?.copy(outputPath = step.resultPath, width = 700.0)
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
+
+        // create outputPath if it doesn't exist
+        val outputPath = Path.of(env?.getProperty("output.path")?.plus(step.resultPath))
+        Files.createDirectories(outputPath)
 
         val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(30)).build();
         val request = HttpRequest.newBuilder()
