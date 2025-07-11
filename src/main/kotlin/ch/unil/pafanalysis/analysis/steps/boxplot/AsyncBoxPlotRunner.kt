@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.boxplot
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.common.DefaultColors
 import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
@@ -31,7 +32,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
     private fun createBoxplotObj(analysisStep: AnalysisStep?): BoxPlot {
         val expDetailsTable = analysisStep?.columnInfo?.columnMapping?.experimentNames?.map { name ->
-            analysisStep?.columnInfo?.columnMapping?.experimentDetails?.get(name)
+            analysisStep.columnInfo.columnMapping.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
 
         val experimentNames = expDetailsTable?.map { it?.name!! }
@@ -43,14 +44,15 @@ class AsyncBoxPlotRunner() : CommonStep() {
             analysisStep?.commonResult?.headers
         )
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
-        val groupNames = analysisStep?.columnInfo?.columnMapping?.groupsOrdered ?: groupedExpDetails?.keys
+        val groupNames = analysisStep?.columnInfo?.columnMapping?.groupsOrdered ?: groupedExpDetails?.keys?.toList()
 
-        val boxplotGroupData = if(groupNames?.size?:0 > 0)
-                groupNames?.map { createBoxplotGroupData(it, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
-            else  listOf(createBoxplotGroupData(null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
+        val boxplotGroupData = if((groupNames?.size ?: 0) > 0)
+                groupNames?.mapIndexed() { i, groupName -> createBoxplotGroupData(i, groupName, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
+            else  listOf(createBoxplotGroupData(null, null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
 
         val selExpDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails?.filterValues{it.isSelected == true}
-        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, experimentNames, selExpDetails)
+        val nrGroups = analysisStep?.columnInfo?.columnMapping?.groupsOrdered?.size ?: 0
+        val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, experimentNames, selExpDetails, nrGroups)
 
         return BoxPlot(
             experimentNames = experimentNames,
@@ -60,9 +62,17 @@ class AsyncBoxPlotRunner() : CommonStep() {
         )
     }
 
-    private fun getSelProtData(table: Table?, intCol: String?, params: BoxPlotParams?, resType: String?, expNames: List<String>?, expDetails: Map<String, ExpInfo>?): List<SelProtData>? {
+    private fun getSelProtData(table: Table?,
+                               intCol: String?,
+                               params: BoxPlotParams?,
+                               resType: String?,
+                               expNames: List<String>?,
+                               expDetails: Map<String, ExpInfo>?,
+                               nrGroups: Int): List<SelProtData>? {
         if (params?.selProts == null) return null
         val (headers, intMatrix) = readTableData.getDoubleMatrix(table, intCol, expDetails)
+
+        val nrGroupsMin = if(nrGroups < 1) 1 else nrGroups
 
         val colOrder = expNames?.map{ n -> headers.indexOf(headers.find{it.experiment?.name == n}) }
         val orderById = colOrder?.withIndex()?.associate { (index, it) -> it to index }
@@ -70,10 +80,11 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
         val protGroup = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")[0] }
         val geneCol = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
+
         val genes = geneCol?.map { it.split(";").get(0) }
         val geneNr = geneCol?.map { it.split(";").size }
 
-        val selProts = params.selProts.map { p ->
+        val selProts = params.selProts.mapIndexed{ j, p ->
             val i = protGroup?.indexOf(p)
             if(i != null && i >= 0){
                 val ints = sortedIntMatrix.map { if (it[i].isNaN()) null else it[i] }
@@ -81,7 +92,9 @@ class AsyncBoxPlotRunner() : CommonStep() {
 
                 val gene = genes?.get(i)
                 val multipleGeneNames = (((geneNr?.get(i) ?: 0) > 1))
-                SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene, multiGenes = multipleGeneNames)
+                val protColor = if(params.selProtColors?.size == params.selProts.size) params.selProtColors[j] else DefaultColors.plotColors[j + nrGroupsMin]
+
+                SelProtData(prot = p, ints = ints, logInts = logInts, gene = gene, multiGenes = multipleGeneNames, color = protColor)
             }else{
                 null
             }
@@ -93,18 +106,19 @@ class AsyncBoxPlotRunner() : CommonStep() {
         table: Table?,
         intCol: String?,
         selExpDetails: Map<String, ExpInfo>?
-    ): List<List<AllProtPoint>>? {
+    ): List<List<AllProtPoint>> {
         val generator = Random(10)
 
-        val (headers, allData) = readTableData.getDoubleMatrix(table, intCol, selExpDetails)
+        val (_, allData) = readTableData.getDoubleMatrix(table, intCol, selExpDetails)
 
         return allData.map{ a ->
-            val yPoints = a.filter{a -> !a.isNaN() && !a.isNaN() }
+            val yPoints = a.filter{y -> !y.isNaN() && !y.isNaN() }
             yPoints.map{ b -> AllProtPoint(y=b, j=generator.nextDouble()-0.5) }
         }
     }
 
     private fun createBoxplotGroupData(
+        i: Int?,
         group: String?,
         table: Table?,
         intCol: String?,
@@ -115,15 +129,18 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails, group)
 
         val listOfBoxplots =
-            headers.mapIndexed { i, h ->
+            headers.mapIndexed { j, h ->
                 BoxPlotData(
                     h.experiment?.name,
-                    computeBoxplotData(ints[i], false),
-                    computeBoxplotData(ints[i], true)
+                    computeBoxplotData(ints[j], false),
+                    computeBoxplotData(ints[j], true)
                 )
             }
 
-        return BoxPlotGroupData(group = group, groupData = listOfBoxplots)
+        DefaultColors.plotColors
+        val groupColor = expDetails?.entries?.find{it.value.group == group}?.value?.color ?: (if(i != null) DefaultColors.plotColors[i] else null)
+
+        return BoxPlotGroupData(group = group, groupData = listOfBoxplots, color=groupColor)
     }
 
 

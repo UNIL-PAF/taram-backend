@@ -101,8 +101,8 @@ class AnalysisService {
     fun sortAnalysisSteps(oldList: List<AnalysisStep>?): List<AnalysisStep>? {
         var emergencyBreak = 99
         val first: AnalysisStep? = oldList?.find { it.type == AnalysisStepType.INITIAL_RESULT.value }
-        var sortedList = if (first != null) {
-            mutableListOf<AnalysisStep>(first!!)
+        val sortedList = if (first != null) {
+            mutableListOf<AnalysisStep>(first)
         } else {
             return oldList
         }
@@ -110,7 +110,7 @@ class AnalysisService {
         var nextEl: AnalysisStep? = first
 
         while (nextEl?.nextId != null && emergencyBreak > 0) {
-            nextEl = oldList?.find { it.id == nextEl?.nextId }
+            nextEl = oldList.find { it.id == nextEl?.nextId }
             if(nextEl != null){
                 sortedList.add(nextEl)
             }

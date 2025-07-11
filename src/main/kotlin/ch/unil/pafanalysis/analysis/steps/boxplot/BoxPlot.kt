@@ -23,12 +23,14 @@ data class SelProtData(
     val gene: String? = null,
     val ints: List<Double?>? = null,
     val logInts: List<Double?>? = null,
-    val multiGenes: Boolean? = null
+    val multiGenes: Boolean? = null,
+    val color: String? = null,
 )
 
 data class BoxPlotGroupData(
     val group: String? = null,
     val groupData: List<BoxPlotData>? = null,
+    val color: String? = null
 )
 
 data class BoxPlotData(

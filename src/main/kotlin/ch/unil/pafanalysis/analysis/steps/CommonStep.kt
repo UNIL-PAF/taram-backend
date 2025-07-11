@@ -262,11 +262,16 @@ open class CommonStep {
         }
     }
 
-    fun getSelProts(step: AnalysisStep?): List<String>? {
+    fun getSelProts(step: AnalysisStep?): List<Pair<String, String?>>? {
         return when (step?.type) {
-            AnalysisStepType.BOXPLOT.value -> boxPlotRunner?.getParameters(step)?.selProts
-            AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step)?.selProteins
-            AnalysisStepType.SCATTER_PLOT .value -> scatterPlotRunner?.getParameters(step)?.selProteins
+            AnalysisStepType.BOXPLOT.value -> {
+                val boxPlotParams = boxPlotRunner?.getParameters(step)
+                boxPlotParams?.selProts?.mapIndexed { i, s ->
+                    Pair(s, boxPlotParams.selProtColors?.getOrNull(i))
+                }
+            }
+            AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step)?.selProteins?.map{Pair(it, null)}
+            AnalysisStepType.SCATTER_PLOT .value -> scatterPlotRunner?.getParameters(step)?.selProteins?.map{Pair(it, null)}
             else -> null
         }
     }
