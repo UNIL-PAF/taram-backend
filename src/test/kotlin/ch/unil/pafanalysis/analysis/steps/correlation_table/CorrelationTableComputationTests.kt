@@ -56,16 +56,16 @@ class CorrelationTableComputationTests {
     @Test
     fun runCorrelation() {
         val params = CorrelationTableParams(correlationType = CorrelationType.PEARSON.value)
-        val corr = corrComp?.runCorrelation(ints, selHeaders, expDetails, params)
+        val corr = corrComp?.runCorrelation(ints, selHeaders, params)
+        val expectedNr = if(selHeaders?.size != null) selHeaders!!.size.toDouble() * (selHeaders!!.size.toDouble()+1) / 2 else 0.0
+        assert(corr?.correlationMatrix?.size?.toDouble() == expectedNr)
 
-        assert(corr?.correlationMatrix?.size == selHeaders?.size)
-        assert(corr?.correlationMatrix?.first()?.size == selHeaders?.size)
-        assert(corr?.correlationMatrix?.first()?.first() == 1.0)
-        assert(roundNumber(corr?.correlationMatrix?.first()?.get(1)) == roundNumber(0.926948787944895))
-        assert(roundNumber(corr?.correlationMatrix?.get(1)?.get(3)) == roundNumber(0.946984778783149))
-        assert(corr?.groupNames?.size == 4)
-        println(corr?.experimentNames)
+        assert(corr?.groupNames == null)
         assert(corr?.experimentNames == listOf("KO-13703", "KO-13704", "KO-13705", "KO-13706"))
+
+        assert(corr?.correlationMatrix?.first() == OneCorrelation(x=0, y=0, v=1.0))
+        assert(roundNumber(corr?.correlationMatrix?.get(1)?.v) == roundNumber(0.926948787944895))
+        assert(roundNumber(corr?.correlationMatrix?.get(3)?.v) == roundNumber(0.946079978718819))
     }
 
 }

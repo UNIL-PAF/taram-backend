@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisStepRepository
 import ch.unil.pafanalysis.analysis.service.ColumnInfoRepository
 import ch.unil.pafanalysis.analysis.steps.add_column.AddColumnRunner
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotRunner
+import ch.unil.pafanalysis.analysis.steps.correlation_table.CorrelationTableRunner
 import ch.unil.pafanalysis.analysis.steps.filter.FilterRunner
 import ch.unil.pafanalysis.analysis.steps.group_filter.GroupFilterRunner
 import ch.unil.pafanalysis.analysis.steps.imputation.ImputationRunner
@@ -108,6 +109,9 @@ open class CommonStep {
     @Autowired
     private var umapRunner: UmapRunner? = null
 
+    @Autowired
+    private var corrTableRunner: CorrelationTableRunner? = null
+
     val gson = Gson()
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
@@ -197,6 +201,7 @@ open class CommonStep {
             AnalysisStepType.ADD_COLUMN.value -> addColumnRunner
             AnalysisStepType.ONE_D_ENRICHMENT.value -> oneDEnrichmentRunner
             AnalysisStepType.UMAP.value -> umapRunner
+            AnalysisStepType.CORRELATION_TABLE.value -> corrTableRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }
@@ -296,6 +301,7 @@ open class CommonStep {
             AnalysisStepType.RENAME_COLUMNS.value -> renameColumnsRunner?.getParameters(step).toString()
             AnalysisStepType.ADD_COLUMN.value -> addColumnRunner?.getParameters(step).toString()
             AnalysisStepType.ONE_D_ENRICHMENT.value -> oneDEnrichmentRunner?.getParameters(step).toString()
+            AnalysisStepType.CORRELATION_TABLE.value -> corrTableRunner?.getParameters(step).toString()
             else -> throw RuntimeException("Cannot parse parameters for type [${step?.type}]")
         }
         return hashComp.computeStringHash(filterParams)

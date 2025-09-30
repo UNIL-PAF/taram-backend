@@ -1,12 +1,10 @@
 package ch.unil.pafanalysis.analysis.steps.correlation_table
 
-import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.StepException
 import com.github.rcaller.rstuff.RCaller
 import com.github.rcaller.rstuff.RCallerOptions
 import com.github.rcaller.rstuff.RCode
-import com.google.common.math.Quantiles
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,23 +13,22 @@ class CorrelationTableComputation() {
     fun runCorrelation(
         ints: List<List<Double>>?,
         selHeaders: List<Header>?,
-        expDetails: Map<String, ExpInfo>?,
         params: CorrelationTableParams
     ): CorrelationTable {
+        if(ints == null || selHeaders == null) throw StepException("No intensities or headers found.")
 
-        val corrMatrix: List<List<Double>>? = ints?.mapIndexed{ i, col1 ->
+        val corrMatrix: List<OneCorrelation> = ints.flatMapIndexed { i, col1 ->
             ints.mapIndexed{ k, col2 ->
-                if(k == i) 1.0
-                else if(k < i) Double.NaN
-                else computeCorrR(col1, col2, params.correlationType)
+                if(k == i) OneCorrelation(i, k, 1.0)
+                else if(k < i) null
+                else OneCorrelation(k, i, computeCorrR(col1, col2, params.correlationType))
             }
-        }
+        }.filterNotNull()
 
         return CorrelationTable(
             correlationMatrix = corrMatrix,
-            experimentNames = selHeaders?.map{it.experiment?.name ?: ""},
-            groupNames = selHeaders?.map{expDetails?.get(it.experiment?.name)?.group ?: ""}
-        )
+            experimentNames = selHeaders.map{it.experiment?.name ?: ""},
+            )
     }
 
     private fun computeCorrR(x: List<Double>, y: List<Double>, method: String?): Double {
