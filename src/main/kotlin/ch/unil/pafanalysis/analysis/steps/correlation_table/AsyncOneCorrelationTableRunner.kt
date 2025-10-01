@@ -34,7 +34,7 @@ class AsyncOneCorrelationTableRunner() : CommonStep() {
 
             val selExpDetails = newStep?.columnInfo?.columnMapping?.experimentDetails?.filterValues{it.isSelected == true}
             val intCol = params?.column ?: newStep?.columnInfo?.columnMapping?.intCol
-            
+
             val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, selExpDetails)
             val (orderedInts, orderedHeaders) = groupByGroups(ints, headers, selExpDetails, newStep?.columnInfo?.columnMapping)
 
