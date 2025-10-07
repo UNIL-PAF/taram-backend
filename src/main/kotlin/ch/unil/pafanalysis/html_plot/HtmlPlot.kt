@@ -49,7 +49,7 @@ class HtmlPlot {
     }
 
     private fun getEchartsLibrary(): String {
-        val templatePath = "/resources/html_plot/echarts_5.3.1.min.js"
+        val templatePath = "/resources/html_plot/echarts_6.0.0.min.js"
         val serverFile = File(ClassPathResource(templatePath).path)
         val templateFile = if(serverFile.exists()) serverFile else File(ClassPathResource("/src/main$templatePath").path)
         return templateFile.readText()
