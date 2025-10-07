@@ -22,6 +22,7 @@ object StepNames {
             "volcano-plot"->"Volcano plot"
             "one-d-enrichment"->"1D Enrichment"
             "add-column"->"Add column"
+            "correlation-table"->"Correlations"
             else -> throw Exception("Type [$type] doesnt exist.")
         }
     }

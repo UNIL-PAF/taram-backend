@@ -40,6 +40,7 @@ class EchartsServer {
 
     fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float): Image? {
         val results = gson.fromJson(step.results, BoxPlot::class.java)
+
         val echartsPlot = results.plot?.copy(outputPath = step.resultPath, width = 700.0)
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
 

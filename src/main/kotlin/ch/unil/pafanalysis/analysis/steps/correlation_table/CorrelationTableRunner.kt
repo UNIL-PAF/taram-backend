@@ -4,6 +4,8 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
@@ -60,14 +62,20 @@ class CorrelationTableRunner() : CommonStep(), CommonRunner {
     }
 
     override fun getOtherTableName(idx: Int): String? {
-        return "Enrichment-table-$idx.txt"
+        return "Correlation-table-$idx.txt"
     }
-
 
     override fun getResultByteArray(step: AnalysisStep?): ByteArray? {
         val result: CorrelationTable = gson.fromJson(step?.results, CorrelationTable().javaClass)
         val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + result.correlationTable
         val inputStream: InputStream = FileInputStream(enrichmentResFilePath)
         return inputStream.readAllBytes()
+    }
+
+    override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {
+        val newResults = gson.fromJson(step.results, CorrelationTable().javaClass).copy(plot = echartsPlot)
+        val newStep = step.copy(results = gson.toJson(newResults))
+        analysisStepRepository?.saveAndFlush(newStep)
+        return echartsPlot.echartsHash.toString()
     }
 }
