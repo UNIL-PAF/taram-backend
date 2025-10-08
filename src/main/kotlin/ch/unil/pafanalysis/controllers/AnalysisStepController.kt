@@ -5,13 +5,9 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType.*
 import ch.unil.pafanalysis.analysis.service.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.FullEnrichmentTable
 import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichmentRunner
-import ch.unil.pafanalysis.analysis.steps.pca.PcaRunner
-import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
-import ch.unil.pafanalysis.analysis.steps.volcano.VolcanoPlotRunner
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus

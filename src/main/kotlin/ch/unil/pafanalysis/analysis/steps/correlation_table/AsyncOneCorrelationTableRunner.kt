@@ -67,7 +67,7 @@ class AsyncOneCorrelationTableRunner() : CommonStep() {
 
         val headers: List<String>? = if(correlationTable.groupNames != null && correlationTable.groupNames.any { it.isNotBlank() }) {
             correlationTable.groupNames.mapIndexed { i, a ->
-                a + " - " + (correlationTable.experimentNames?.get(i) ?: "")
+                (correlationTable.experimentNames?.get(i) ?: "") + " - " + a
             }
         } else correlationTable.experimentNames
 
@@ -79,9 +79,10 @@ class AsyncOneCorrelationTableRunner() : CommonStep() {
         for(i in 0 until matrixSize) {
             val row = (0 until matrixSize).map { j ->
                 val corr = correlationTable.correlationMatrix?.find { a -> a.x == i && a.y == j }
-                corr?.v?.toString() ?: ""
+                val corrVal = corr?.v?.toString()
+                corrVal ?: (correlationTable.correlationMatrix?.find { a -> a.y == i && a.x == j }?.v ?: "")
             }
-            writer.write(row.joinToString(sep))
+            writer.write((headers?.get(i) ?: "") + sep + row.joinToString(sep))
             writer.newLine()
         }
 
