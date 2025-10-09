@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
 import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
+import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichment
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
@@ -63,6 +64,14 @@ class CorrelationTableRunner() : CommonStep(), CommonRunner {
 
     override fun getOtherTableName(idx: Int): String? {
         return "Correlation-table-$idx.txt"
+    }
+
+    override fun getOtherTable(step: AnalysisStep?, tableDir: String, idx: Int): File {
+        val result: CorrelationTable = gson.fromJson(step?.results, CorrelationTable().javaClass)
+        val enrichmentResFilePath = getOutputPath() + step?.resultPath + "/" + result.correlationTable
+        val outFile = File("$tableDir/Correlation-table-$idx.txt")
+        File(enrichmentResFilePath).copyTo(outFile)
+        return outFile
     }
 
     override fun getResultByteArray(step: AnalysisStep?): ByteArray? {
