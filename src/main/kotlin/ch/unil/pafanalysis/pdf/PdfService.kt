@@ -191,6 +191,7 @@ class PdfService {
                 AnalysisStepType.VOLCANO_PLOT.value -> "Volcano plot $stepNr"
                 AnalysisStepType.PCA.value -> "PCA plot $stepNr"
                 AnalysisStepType.BOXPLOT.value -> "Boxplot $stepNr"
+                AnalysisStepType.CORRELATION_TABLE.value -> "Correlation plot and table $stepNr"
                 else -> ""
             }
         }

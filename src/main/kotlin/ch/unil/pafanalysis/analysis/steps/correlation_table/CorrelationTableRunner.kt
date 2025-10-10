@@ -58,8 +58,9 @@ class CorrelationTableRunner() : CommonStep(), CommonRunner {
     override fun getCopyDifference(step: AnalysisStep, origStep: AnalysisStep?): String? {
         val params = getParameters(step)
         val origParams = getParameters(origStep)
+        val corrType = if(params.correlationType == CorrelationType.PEARSON.value) "Pearson" else "Spearman"
 
-        return "Parameter(s) changed:"
+        return if (params.correlationType != origParams.correlationType) "Parameter(s) changed: [Correlation method: ${corrType}]" else ""
     }
 
     override fun getOtherTableName(idx: Int): String? {

@@ -58,14 +58,14 @@ class OneDEnrichmentRunner() : CommonStep(), CommonRunner {
         val params = getParameters(step)
         val origParams = getParameters(origStep)
 
-        return "Parameter(s) changed:"
+        return ""
     }
 
-    override fun switchSel(step: AnalysisStep?, idString: String): List<String>? {
+    override fun switchSel(step: AnalysisStep?, selId: String): List<String>? {
         val origParams = gson.fromJson(step?.parameters, OneDEnrichmentParams().javaClass)
         val origList = origParams.selResults ?: emptyList()
-        val id = idString.toInt()
-        val remove: Boolean? = origList.contains(id)
+        val id = selId.toInt()
+        val remove: Boolean = origList.contains(id)
         val newList = if(origList.contains(id)) origList.filter{it != id} else origList.plus(id)
         val newParams = origParams.copy(selResults = newList)
         val newRes = addOrRemoveNewRow(step, id, remove)
