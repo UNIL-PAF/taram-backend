@@ -88,4 +88,10 @@ class CorrelationTableRunner() : CommonStep(), CommonRunner {
         analysisStepRepository?.saveAndFlush(newStep)
         return echartsPlot.echartsHash.toString()
     }
+
+    override fun getResult(step: AnalysisStep?): String? {
+        val res = gson.fromJson(step?.results, CorrelationTable().javaClass)
+        val withoutPlot = res.copy(plot = null)
+        return gson.toJson(withoutPlot)
+    }
 }
