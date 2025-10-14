@@ -6,7 +6,7 @@ class DefaultStepHints {
 
     val defaultList = listOf<StepHint>(
         StepHint("load-dataset", "Add description", "Add description of experiment (for example experiment hypothesis from LIMS)."),
-        StepHint("edit-groups", "Edit groups", "Assign groups. It should be automatically done with Spectronaut data. Choose variable to work on : iBAQ or LFQ or Quantity."),
+        StepHint("edit-groups", "Edit and order groups", "Assign groups. It should be automatically done with Spectronaut data (groups order is by default alphabetically). Choose variable to work on : iBAQ or LFQ or Quantity."),
         StepHint("remove-columns", "Columns - Remove columns", "Good to clean up dataset and make them smaller. A default choice is presented. Headers can be renamed if needed."),
         StepHint("filter-rows", "Filter rows: OIBS,  Reverse , contaminants , organism...", "Depending on dataset; sometimes CON need to be kept (ex GFP) in the first exploration steps. Display table to find out."),
         StepHint("transform-log2", "Transform - log2", "Tip: possible also transform total IBAQ, tot intensity. Add \"log2\" to headers."),
