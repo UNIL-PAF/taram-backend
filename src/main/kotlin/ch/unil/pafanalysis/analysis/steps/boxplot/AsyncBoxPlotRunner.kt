@@ -43,19 +43,24 @@ class AsyncBoxPlotRunner() : CommonStep() {
             getOutputRoot().plus(analysisStep?.resultTablePath),
             analysisStep?.commonResult?.headers
         )
+
         val intCol = params?.column ?: analysisStep?.columnInfo?.columnMapping?.intCol
         val groupNames = analysisStep?.columnInfo?.columnMapping?.groupsOrdered ?: groupedExpDetails?.keys?.toList()
+        val expDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails
+
+        val (selHeaders, _) = readTableData.getDoubleMatrix(table, intCol, expDetails)
+        println(selHeaders)
 
         val boxplotGroupData = if((groupNames?.size ?: 0) > 0)
-                groupNames?.mapIndexed() { i, groupName -> createBoxplotGroupData(i, groupName, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails) }
+                groupNames?.mapIndexed() { i, groupName -> createBoxplotGroupData(i, groupName, table, intCol, expDetails) }
             else  listOf(createBoxplotGroupData(null, null, table, intCol, analysisStep?.columnInfo?.columnMapping?.experimentDetails))
 
-        val selExpDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails?.filterValues{it.isSelected == true}
+        val selExpDetails = expDetails?.filterValues{it.isSelected == true}
         val nrGroups = analysisStep?.columnInfo?.columnMapping?.groupsOrdered?.size ?: 0
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, experimentNames, selExpDetails, nrGroups)
 
         return BoxPlot(
-            experimentNames = experimentNames,
+            experimentNames = selHeaders.mapIndexed{ i, a -> a.experiment?.name ?: experimentNames?.get(i) ?: "" },
             boxPlotData = boxplotGroupData?.filterNotNull(),
             selProtData = selProtData,
             allProtData = if(params?.showAll == true) createAllData(table, intCol, selExpDetails) else null
