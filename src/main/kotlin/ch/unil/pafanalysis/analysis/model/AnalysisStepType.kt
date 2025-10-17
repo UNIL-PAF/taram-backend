@@ -21,5 +21,5 @@ enum class AnalysisStepType(val value: String, val hasPlot: Boolean = false) {
     RENAME_COLUMNS("rename-columns"),
     ADD_COLUMN("add-column"),
     ONE_D_ENRICHMENT("one-d-enrichment"),
-    CORRELATION_TABLE("correlation-table"),
+    CORRELATION_TABLE("correlation-table", true),
 }
