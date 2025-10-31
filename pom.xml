@@ -10,7 +10,7 @@
     </parent>
     <groupId>ch.unil</groupId>
     <artifactId>taram-backend</artifactId>
-    <version>v2.9.0</version>
+    <version>v2.10.0</version>
     <name>taram-backend</name>
     <description>The backend of Taram, a proteomics analysis pipeline.</description>
     <properties>
