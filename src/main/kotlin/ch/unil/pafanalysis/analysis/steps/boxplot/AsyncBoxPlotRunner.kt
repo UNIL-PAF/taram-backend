@@ -35,7 +35,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
             analysisStep.columnInfo.columnMapping.experimentDetails?.get(name)
         }?.filter { it?.isSelected ?: false }
 
-        val experimentNames = expDetailsTable?.map { it?.name!! }
+        //val experimentNames = expDetailsTable?.map { it?.name!! }
         val groupedExpDetails: Map<String?, List<ExpInfo?>>? = expDetailsTable?.groupBy { it?.group }
         val params = gson.fromJson(analysisStep?.parameters, BoxPlotParams().javaClass)
 
@@ -49,6 +49,8 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val expDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails
 
         val (selHeaders, _) = readTableData.getDoubleMatrix(table, intCol, expDetails)
+        val expDetailNames = expDetailsTable?.map { it?.name!! }
+        val experimentNames = selHeaders.mapIndexed{ i, a -> a.experiment?.name ?: expDetailNames?.get(i) ?: "" }
 
         val boxplotGroupData = if((groupNames?.size ?: 0) > 0)
                 groupNames?.mapIndexed() { i, groupName -> createBoxplotGroupData(i, groupName, table, intCol, expDetails) }
@@ -59,7 +61,7 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val selProtData = getSelProtData(table, intCol, params, analysisStep?.analysis?.result?.type, experimentNames, selExpDetails, nrGroups)
 
         return BoxPlot(
-            experimentNames = selHeaders.mapIndexed{ i, a -> a.experiment?.name ?: experimentNames?.get(i) ?: "" },
+            experimentNames = experimentNames,
             boxPlotData = boxplotGroupData?.filterNotNull(),
             selProtData = selProtData,
             allProtData = if(params?.showAll == true) createAllData(table, intCol, selExpDetails) else null
