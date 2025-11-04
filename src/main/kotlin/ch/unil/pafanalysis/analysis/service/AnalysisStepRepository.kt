@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
 interface AnalysisStepRepository: JpaRepository<AnalysisStep, Integer> {
-    fun findById(id: Int): AnalysisStep
+    fun findById(id: Int): AnalysisStep?
 
     @Query("SELECT a.status FROM analysis_step a WHERE a.id = :id", nativeQuery = true)
     fun getStepStatusById(@Param("id") analysisStepId: Int?): String?

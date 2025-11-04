@@ -262,7 +262,9 @@ open class CommonStep {
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId)
-            update(nextStep!!, step)
+            if(nextStep != null) {
+                update(nextStep, step)
+            }
         }
     }
 
@@ -388,8 +390,10 @@ open class CommonStep {
 
     private fun setNextStepBeforeId(nextStepId: Int, currentStepId: Int?) {
         val nextStep = analysisStepRepository?.findById(nextStepId)
-        val newNextStep = nextStep?.copy(beforeId = currentStepId)
-        analysisStepRepository?.saveAndFlush(newNextStep!!)
+        if(nextStep != null) {
+            val newNextStep = nextStep.copy(beforeId = currentStepId)
+            analysisStepRepository?.saveAndFlush(newNextStep)
+        }
     }
 
     fun getResultTablePath(

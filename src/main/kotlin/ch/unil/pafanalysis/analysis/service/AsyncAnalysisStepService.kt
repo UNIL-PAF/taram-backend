@@ -51,10 +51,14 @@ class AsyncAnalysisStepService {
 
     @Transactional
     fun setAllStepsStatus(analysisStep: AnalysisStep?, status: AnalysisStepStatus) {
-        setAnalysisStepStatus(analysisStep?.id!!, status)
-        if (analysisStep.nextId != null) {
+        if(analysisStep?.id !== null){
+            setAnalysisStepStatus(analysisStep.id, status)
+        }
+        if (analysisStep?.nextId != null) {
             val nextStep = analysisStepRepository?.findById(analysisStep.nextId)
-            setAllStepsStatus(nextStep, status)
+            if(nextStep != null) {
+                setAllStepsStatus(nextStep, status)
+            }
         }
     }
 

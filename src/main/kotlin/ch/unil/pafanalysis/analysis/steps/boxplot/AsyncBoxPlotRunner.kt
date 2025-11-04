@@ -49,7 +49,6 @@ class AsyncBoxPlotRunner() : CommonStep() {
         val expDetails = analysisStep?.columnInfo?.columnMapping?.experimentDetails
 
         val (selHeaders, _) = readTableData.getDoubleMatrix(table, intCol, expDetails)
-        println(selHeaders)
 
         val boxplotGroupData = if((groupNames?.size ?: 0) > 0)
                 groupNames?.mapIndexed() { i, groupName -> createBoxplotGroupData(i, groupName, table, intCol, expDetails) }
