@@ -40,15 +40,15 @@ class TTestComputation {
 
         val comparisions: List<GroupComp>? =
             params?.firstGroup?.zip(params.secondGroup ?: emptyList())?.map { GroupComp(it.first, it.second) }
-
-        val isLogVal = step.commonResult?.intColIsLog
+        
         val field = params?.field ?: step.columnInfo.columnMapping.intCol
 
         val initialRes: Triple<Table?, List<Header>?, TTest> =
             Triple(table, table?.headers, TTest(comparisions = emptyList()))
 
         val res: Triple<Table?, List<Header>?, TTest> = comparisions?.fold(initialRes) { acc, comp ->
-            computeComparision(comp, acc.first, field, acc.third, isLogVal, params, step?.columnInfo?.columnMapping?.experimentDetails, imputationTable)
+            computeComparision(comp, acc.first, field, acc.third, params,
+                step.columnInfo.columnMapping.experimentDetails, imputationTable)
         } ?: initialRes
 
         return res
@@ -61,7 +61,6 @@ class TTestComputation {
         table: Table?,
         field: String?,
         ttest: TTest,
-        isLogVal: Boolean?,
         params: TTestParams?,
         expDetails: Map<String, ExpInfo>?,
         imputationTable: ImputationTable?
@@ -90,7 +89,7 @@ class TTestComputation {
         val pValAndTStat = computeTTest(rowInts, params?.paired, validRows, params?.equalVariance)
         val pVals = pValAndTStat.map { it.first }
         val qVals: List<Double>? = if(params?.multiTestCorr != MulitTestCorr.NONE.value) multiTestCorr(pVals, params) else null
-        val foldChanges = if(params?.paired == true) computePairedFoldChanges(rowInts, isLogVal, validRows) else computeFoldChanges(rowInts, isLogVal, validRows)
+        val foldChanges = if(params?.paired == true) computePairedFoldChanges(rowInts, validRows) else computeFoldChanges(rowInts, validRows)
         val signGroups = (qVals ?: pVals).map { it <= params?.signThres!! }
         val nrSign = signGroups.map { if (it) 1 else 0 }.sum()
 
@@ -138,7 +137,7 @@ class TTestComputation {
         return Pair(Table(newHeaders, newCols), newHeaders)
     }
 
-    private fun computePairedFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?, validRows: List<Boolean>?): List<Double> {
+    private fun computePairedFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, validRows: List<Boolean>?): List<Double> {
 
         val pairedVals: List<List<Pair<Double, Double>>> = ints.map{ (first, second) ->
             first.zip(second)
@@ -149,11 +148,15 @@ class TTestComputation {
                 if(first.isNaN() || second.isNaN()){
                     Double.NaN
                 }else{
+                    // we assume it's always log
+                    first - second
+                    /*
                     if (isLogVal == true) {
                         first - second
                     } else {
                         first / second
                     }
+                     */
                 }
             }.average()
 
@@ -165,15 +168,19 @@ class TTestComputation {
         }
     }
 
-    private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, isLogVal: Boolean?, validRows: List<Boolean>?): List<Double> {
+    private fun computeFoldChanges(ints: List<Pair<List<Double>, List<Double>>>, validRows: List<Boolean>?): List<Double> {
         return ints.mapIndexed{ i, row ->
             val first = row.first.filter{!it.isNaN()}
             val second = row.second.filter{!it.isNaN()}
+            // we assume it's always log
+            val fc = first.average() - second.average()
+            /*
             val fc = if (isLogVal == true) {
                 first.average() - second.average()
             } else {
                 first.average() / second.average()
             }
+             */
 
             if(validRows != null){
                 if(validRows[i]){
