@@ -6,5 +6,6 @@ data class BoxPlotParams (
     val selProts: List<String>? = null,
     val selProtColors: List<String?>? = null,
     val groupByCondition: Boolean? = null,
-    val showAll: Boolean? = null
+    val showAll: Boolean? = null,
+    val showProteinACs: Boolean? = null,
 )
