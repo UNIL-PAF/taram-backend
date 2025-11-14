@@ -7,7 +7,8 @@ data class VolcanoPlotParams(
     val log10PVal: Boolean = true,
     val selProteins: List<String>? = null,
     val comparison: ComparisonParams? = null,
-    val showQVal: Boolean? = null
+    val showQVal: Boolean? = null,
+    val showProteinACs: Boolean? = null
 )
 
 data class ComparisonParams (val group1: String, val group2: String)
