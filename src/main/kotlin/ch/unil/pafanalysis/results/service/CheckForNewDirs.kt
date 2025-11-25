@@ -35,8 +35,8 @@ class CheckForNewDirs {
             val maxQuantDirs = checkMaxQuant(existingRes)
             val spectronautDirs = checkSpectronaut(existingRes)
             val allDirs =  maxQuantDirs.plus(spectronautDirs)
-            val allUniqueDirs = allDirs.distinctBy { it.path }
-            return allUniqueDirs.sortedBy { it.fileCreationDate }.reversed()
+            val distinctDirs = allDirs.distinctBy { a -> a.path + a.type }
+            return distinctDirs.sortedBy { it.fileCreationDate }.reversed()
         }
 
         private fun checkMaxQuant(existingRes: Sequence<Result>?): List<AvailableDir>{
@@ -93,6 +93,7 @@ class CheckForNewDirs {
                     resFileList = filesAll.reversed()
                 )
             }.toList()
+
             return newResults
         }
 
