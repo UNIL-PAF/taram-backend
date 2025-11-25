@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.summary_stat
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.pdf.PdfCommon
+import ch.unil.pafanalysis.results.model.ResultType
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.colors.DeviceRgb
 import com.itextpdf.kernel.pdf.PdfDocument
@@ -26,11 +27,18 @@ class SummaryStatPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
-        val description = "\"Nr of valid\" = Number of quantified proteins. \n\"NaN\" (Not a Number) = missing values."
-        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step?.type)}", plotWidth = plotWidth, description = description, link = "$stepNr-${step.type}"))
+        val nrPepDescription = if(res.nrOfPeps != null){
+            "\n\"Nr of peptides\" = sum of " + if(step.analysis?.result?.type == ResultType.Spectronaut.value) {
+                "\"NrOfPrecursorsIdentified\""
+            } else "\"Razor.unique.peptides\""
+        } else ""
 
-        val table = Table(7)
-        addHeader(table)
+
+        val description = "\"Nr of valid\" = number of quantified proteins. \n\"NaN\" (Not a Number) = missing values.$nrPepDescription"
+        stepDiv.add(titleDiv("$stepNr. ${StepNames.getName(step.type)}", plotWidth = plotWidth, description = description, link = "$stepNr-${step.type}"))
+
+        val table = Table(7 + (if(res.nrOfPeps != null) 1 else 0))
+        addHeader(table, res)
 
         val groupSizes = res.groups?.groupingBy { it }?.eachCount()
         val selGroups = emptySet<String>().toMutableSet()
@@ -49,13 +57,14 @@ class SummaryStatPdf() : PdfCommon() {
             addDoubleCell(res.median?.get(i), table)
             addStringCell(res.nrValid?.get(i).toString(), table, color = red)
             addStringCell(res.nrNaN?.get(i).toString(), table)
+            if(res.nrOfPeps != null) addStringCell(res.nrOfPeps[i].toString(), table)
         }
 
         stepDiv.add(table)
         return stepDiv
     }
 
-    private fun addHeader(table: Table) {
+    private fun addHeader(table: Table, res: SummaryStat) {
         addStringCell("Name", table, bold = true)
         addStringCell("Group", table, bold = true)
         addStringCell("Min", table, bold = true)
@@ -63,6 +72,7 @@ class SummaryStatPdf() : PdfCommon() {
         addStringCell("Median", table, bold = true)
         addStringCell("Nr of valid", table, bold = true, color = red)
         addStringCell("Nr of NaN", table, bold = true)
+        if(res.nrOfPeps != null) addStringCell("Nr of peptides", table, bold = true)
     }
 
     private fun addStringCell(cellString: String, colTable: Table, bold: Boolean = false, rowSpan: Int? = null, color: DeviceRgb? = null) {

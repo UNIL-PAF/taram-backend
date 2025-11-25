@@ -12,5 +12,6 @@ data class SummaryStat(
     val sum: List<Double>? = null,
     val stdDev: List<Double>? = null,
     val stdErr: List<Double>? = null,
-    val coefOfVar: List<Double>? = null
+    val coefOfVar: List<Double>? = null,
+    val nrOfPeps: List<Int>? = null,
 )

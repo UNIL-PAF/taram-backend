@@ -6,6 +6,8 @@ import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.SummaryStatComputation
+import ch.unil.pafanalysis.common.Table
+import ch.unil.pafanalysis.results.model.ResultType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
@@ -51,6 +53,18 @@ class AsyncSummaryStatRunner() : CommonStep() {
         }
     }
 
+    private fun getNrPeps(step: AnalysisStep?, table: Table?): List<Int>? {
+        val selHeaders: List<Header>? = if(step?.analysis?.result?.type == ResultType.MaxQuant.value){
+            step.commonResult?.headers?.filter{it.experiment?.field == "Razor.unique.peptides"}
+        }else if(step?.analysis?.result?.type == ResultType.Spectronaut.value){
+            step.commonResult?.headers?.filter{it.experiment?.field == "NrOfPrecursorsIdentified"}
+        } else null
+
+        return if(!selHeaders.isNullOrEmpty()){
+            readTableData.getDoubleMatrix(table, selHeaders).map{a -> a.sumOf { it.toInt() } }
+        } else null
+    }
+
     fun transformTable(
         step: AnalysisStep?,
         params: SummaryStatParams,
@@ -62,8 +76,9 @@ class AsyncSummaryStatRunner() : CommonStep() {
         val groupsOrdered = step?.columnInfo?.columnMapping?.groupsOrdered
         val orderedHeaders = orderHeaders(headers, params.orderByGroups, groupsOrdered, expDetails)
         val orderedInts = orderInts(headers, orderedHeaders, ints)
-        val summaryStatComp = SummaryStatComputation()
-        return summaryStatComp.getSummaryStat(orderedInts, orderedHeaders, expDetails)
+        val summaryStat = SummaryStatComputation().getSummaryStat(orderedInts, orderedHeaders, expDetails)
+        val nrPeps = getNrPeps(step, table)
+        return summaryStat.copy(nrOfPeps = nrPeps)
     }
 
 }

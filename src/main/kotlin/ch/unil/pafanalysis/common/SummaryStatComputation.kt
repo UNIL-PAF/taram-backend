@@ -31,11 +31,11 @@ class SummaryStatComputation {
             min = if(min != null) (old.min?: emptyList()).plus(min) else old.min,
             max = if(max != null) (old.max?: emptyList()).plus(max) else old.max,
             mean = if(max != null) (old.mean?: emptyList()).plus(mean) else old.mean,
-            median = if(median != null) (old.median?: emptyList()).plus(median) else old.median,
-            stdDev = if(stdDev != null) (old.stdDev?: emptyList()).plus(stdDev) else old.stdDev,
-            sum = if(sum != null) (old.sum?: emptyList()).plus(sum) else old.sum,
-            stdErr = if(stdErr != null) (old.stdErr?: emptyList()).plus(stdErr) else old.stdErr,
-            coefOfVar = if(coefOfVar != null) (old.coefOfVar?: emptyList()).plus(coefOfVar) else old.coefOfVar,
+            median = (old.median?: emptyList()).plus(median),
+            stdDev = (old.stdDev?: emptyList()).plus(stdDev),
+            sum = (old.sum?: emptyList()).plus(sum),
+            stdErr = (old.stdErr?: emptyList()).plus(stdErr),
+            coefOfVar = (old.coefOfVar?: emptyList()).plus(coefOfVar),
         )
     }
 
@@ -62,11 +62,11 @@ class SummaryStatComputation {
         return SummaryStat(
             min = if(min!=null) listOf(min) else null,
             max = if(max!=null) listOf(max) else null,
-            mean = if(mean!=null) listOf(mean) else null,
-            median = if(median!=null) listOf(median) else null,
-            sum = if(sum!=null) listOf(sum) else null,
-            nrNaN = if(nrNaN!=null) listOf(nrNaN) else null,
-            nrValid = if(nrValid!=null) listOf(nrValid) else null
+            mean = listOf(mean),
+            median = listOf(median),
+            sum = listOf(sum),
+            nrNaN = listOf(nrNaN),
+            nrValid = listOf(nrValid),
         )
     }
 
