@@ -1,7 +1,6 @@
 package ch.unil.pafanalysis.html_plot
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlot
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotParams
 import com.google.gson.Gson
 
@@ -27,15 +26,18 @@ object HtmlScatterPlot {
 
     fun addScript(html: String?, step: AnalysisStep): String? {
         val params = gson.fromJson(step.parameters, ScatterPlotParams::class.java)
-        val res = gson.fromJson(step.results, ScatterPlot::class.java)
 
         val colorBy = """
-            var params = {"colorBy": "${params.colorBy}"};
+            var params = {
+                "colorBy": "${params.colorBy}",
+                "xAxis": "${params.xAxis}",
+                "yAxis": "${params.yAxis}",
+                "showProteinACs": "${params.showProteinACs}",
+            };
         """.trimIndent()
 
-        val otherFieldValue = if((res.data?.get(0)?.other?.size ?: 0) > 0) "undefined" else res.data?.get(0)?.other?.get(0)?.name
         val otherField = """
-          var otherField = "$otherFieldValue";  
+          var otherField = undefined;  
         """.trimIndent()
 
         return replaceTooltip(html?.replace("__SCRIPT__", colorBy + otherField + script))
