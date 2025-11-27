@@ -20,7 +20,6 @@ class CorrelationTableComputation() {
         ints: List<List<Double>>?,
         selHeaders: List<Header>?,
         params: CorrelationTableParams,
-        withR: Boolean = true
     ): CorrelationTable {
         if(ints == null || selHeaders == null) throw StepException("No intensities or headers found.")
 
@@ -28,7 +27,7 @@ class CorrelationTableComputation() {
             ints.mapIndexed{ k, col2 ->
                 if(k == i) OneCorrelation(i, k, 1.0)
                 else if(k < i) null
-                else OneCorrelation(k, i, computeCorr(col1, col2, params.correlationType, withR))
+                else OneCorrelation(k, i, computeCorr(col1, col2, params.correlationType))
             }
         }.filterNotNull()
 
@@ -38,36 +37,13 @@ class CorrelationTableComputation() {
             )
     }
 
-    private fun computeCorr(x: List<Double>, y: List<Double>, method: String?, withR: Boolean): Double {
-        return if(withR) computeCorrR(x, y, method) else computeCorrJ(x, y, method)
-    }
-
-    private fun computeCorrJ(x: List<Double>, y: List<Double>, method: String?): Double {
+    private fun computeCorr(x: List<Double>, y: List<Double>, method: String?): Double {
         val (a, b) = x.zip(y).filter{ a -> ! (a.first.isNaN() || a.second.isNaN()) }.unzip()
         return if(method == "spearman"){
             spearman.correlation(a.toDoubleArray(), b.toDoubleArray())
         }else{
             pearsons.correlation(a.toDoubleArray(), b.toDoubleArray())
         }.pow(2.0)
-    }
-
-
-    private fun computeCorrR(x: List<Double>, y: List<Double>, method: String?): Double {
-        val code = RCode.create()
-        code.addDoubleArray("x", x.toDoubleArray())
-        code.addDoubleArray("y", y.toDoubleArray())
-
-        code.addString("method", method)
-        code.addRCode("r_corr <- cor(x, y, method = method, use = \"complete.obs\")")
-        code.addRCode("r2_corr <- r_corr^2")
-        // Create caller
-        val caller = RCaller.create(code, RCallerOptions.create())
-
-        // Run and pull variable from R
-        caller.runAndReturnResult("r2_corr")
-
-        // Extract as double
-        return caller.parser.getAsDoubleArray("r2_corr")[0]
     }
 
 }
