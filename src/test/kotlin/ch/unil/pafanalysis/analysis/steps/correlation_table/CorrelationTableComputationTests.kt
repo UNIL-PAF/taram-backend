@@ -54,9 +54,9 @@ class CorrelationTableComputationTests {
 
 
     @Test
-    fun runCorrelation() {
+    fun runPearsonCorrelationR() {
         val params = CorrelationTableParams(correlationType = CorrelationType.PEARSON.value)
-        val corr = corrComp?.runCorrelation(ints, selHeaders, params)
+        val corr = corrComp?.runCorrelation(ints, selHeaders, params, withR = true)
         val expectedNr = if(selHeaders?.size != null) selHeaders!!.size.toDouble() * (selHeaders!!.size.toDouble()+1) / 2 else 0.0
         assert(corr?.correlationMatrix?.size?.toDouble() == expectedNr)
 
@@ -64,8 +64,70 @@ class CorrelationTableComputationTests {
         assert(corr?.experimentNames == listOf("KO-13703", "KO-13704", "KO-13705", "KO-13706"))
 
         assert(corr?.correlationMatrix?.first() == OneCorrelation(x=0, y=0, v=1.0))
+
+        println(corr?.correlationMatrix?.get(1)?.v)
+        println(corr?.correlationMatrix?.get(3)?.v)
+
         assert(roundNumber(corr?.correlationMatrix?.get(1)?.v) == roundNumber(0.926948787944895))
         assert(roundNumber(corr?.correlationMatrix?.get(3)?.v) == roundNumber(0.946079978718819))
+    }
+
+    @Test
+    fun runSpearmanCorrelationR() {
+        val params = CorrelationTableParams(correlationType = CorrelationType.SPEARMAN.value)
+        val corr = corrComp?.runCorrelation(ints, selHeaders, params, withR = true)
+        val expectedNr = if(selHeaders?.size != null) selHeaders!!.size.toDouble() * (selHeaders!!.size.toDouble()+1) / 2 else 0.0
+        assert(corr?.correlationMatrix?.size?.toDouble() == expectedNr)
+
+        assert(corr?.groupNames == null)
+        assert(corr?.experimentNames == listOf("KO-13703", "KO-13704", "KO-13705", "KO-13706"))
+
+        assert(corr?.correlationMatrix?.first() == OneCorrelation(x=0, y=0, v=1.0))
+
+        println(corr?.correlationMatrix?.get(1)?.v)
+        println(corr?.correlationMatrix?.get(3)?.v)
+
+        assert(roundNumber(corr?.correlationMatrix?.get(1)?.v) == roundNumber(0.911657154285502))
+        assert(roundNumber(corr?.correlationMatrix?.get(3)?.v) == roundNumber(0.934514331708836))
+    }
+
+    @Test
+    fun runPearsonCorrelationJ() {
+        val params = CorrelationTableParams(correlationType = CorrelationType.PEARSON.value)
+        val corr = corrComp?.runCorrelation(ints, selHeaders, params, withR = false)
+        val expectedNr = if(selHeaders?.size != null) selHeaders!!.size.toDouble() * (selHeaders!!.size.toDouble()+1) / 2 else 0.0
+        assert(corr?.correlationMatrix?.size?.toDouble() == expectedNr)
+
+        assert(corr?.groupNames == null)
+        assert(corr?.experimentNames == listOf("KO-13703", "KO-13704", "KO-13705", "KO-13706"))
+
+        assert(corr?.correlationMatrix?.first() == OneCorrelation(x=0, y=0, v=1.0))
+
+        println(corr?.correlationMatrix?.get(1)?.v)
+        println(corr?.correlationMatrix?.get(3)?.v)
+
+        assert(roundNumber(corr?.correlationMatrix?.get(1)?.v) == roundNumber(0.926948787944895))
+        assert(roundNumber(corr?.correlationMatrix?.get(3)?.v) == roundNumber(0.946079978718819))
+    }
+
+
+    @Test
+    fun runSpearmanCorrelationJ() {
+        val params = CorrelationTableParams(correlationType = CorrelationType.SPEARMAN.value)
+        val corr = corrComp?.runCorrelation(ints, selHeaders, params, withR = false)
+        val expectedNr = if(selHeaders?.size != null) selHeaders!!.size.toDouble() * (selHeaders!!.size.toDouble()+1) / 2 else 0.0
+        assert(corr?.correlationMatrix?.size?.toDouble() == expectedNr)
+
+        assert(corr?.groupNames == null)
+        assert(corr?.experimentNames == listOf("KO-13703", "KO-13704", "KO-13705", "KO-13706"))
+
+        assert(corr?.correlationMatrix?.first() == OneCorrelation(x=0, y=0, v=1.0))
+
+        println(corr?.correlationMatrix?.get(1)?.v)
+        println(corr?.correlationMatrix?.get(3)?.v)
+
+        assert(roundNumber(corr?.correlationMatrix?.get(1)?.v) == roundNumber(0.911657154285502))
+        assert(roundNumber(corr?.correlationMatrix?.get(3)?.v) == roundNumber(0.934514331708836))
     }
 
 }
