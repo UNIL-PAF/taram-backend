@@ -29,7 +29,9 @@ class CheckStepHints {
     private fun selAnalysis(analysisGroup: AnalysisGroup?): Analysis? {
         // we prefer locked ones
         return if(analysisGroup?.analysisList?.any{it.isLocked == true} == true){
-            analysisGroup.analysisList?.filter{it.isLocked == true}?.first()
+            analysisGroup.analysisList.first { it.isLocked == true }
+        }else if(analysisGroup?.analysisList.isNullOrEmpty()){
+            null
         }else analysisGroup?.analysisList?.first()
     }
 

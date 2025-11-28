@@ -44,7 +44,7 @@ class AnalysisController {
 
     @DeleteMapping("/{analysisId}")
     fun deleteAnalysis(@PathVariable(value = "analysisId") analysisId: Int): Int? {
-        return analysisService?.delete(analysisId)
+        return analysisService?.delete(analysisId, addNewIfLast = true)
     }
 
     @PostMapping(path = ["/duplicate/{analysisId}"])

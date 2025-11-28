@@ -83,11 +83,23 @@ class AnalysisService {
         return analysisName
     }
 
-    fun delete(analysisId: Int): Int? {
+    fun delete(analysisId: Int, addNewIfLast: Boolean = false): Int? {
         val analysis = analysisRepo?.findById(analysisId)
+
         val steps: List<AnalysisStep>? = sortAnalysisSteps(analysis?.analysisSteps)?.asReversed()
         steps?.forEach { analysisStepService?.deleteStep(it.id!!, relinkRemaining = false) }
-        return analysisRepo?.deleteById(analysisId)
+        val deletedId =  analysisRepo?.deleteById(analysisId)
+
+        // check if this is the last analysis in this result
+        if(addNewIfLast && analysis?.result?.id != null){
+            val analysisList = analysisRepo?.findByResultId(analysis.result.id)
+            analysisList?.forEach{println(it.id)}
+            if((analysisList?.filter { it.id != analysisId }?.size ?: 0) == 0){
+                createNewAnalysis(analysis.result)
+            }
+        }
+
+        return deletedId
     }
 
     fun getByResultId(resultId: Int): List<Analysis>? {
