@@ -67,13 +67,14 @@ class PdfService {
         val pageSize: PageSize = PageSize.A4
         val document: Document? = Document(pdf, pageSize, false)
 
-        val plotWidth: Float = pageSize?.width?.minus(document?.rightMargin?: 0f)?.minus(document?.leftMargin?: 0f)
+        val plotWidth: Float = pageSize.width.minus(document?.rightMargin?: 0f).minus(document?.leftMargin?: 0f)
 
         addLogo(document, pdf, plotWidth)
         addResultInfo(analysis, document)
 
-        addOverview(steps, document, plotWidth)
         addZipDescription(document)
+
+        addOverview(steps, document, plotWidth)
         addConclusion(analysis, document)
         // make a page break
         document?.add(AreaBreak());
@@ -115,21 +116,29 @@ class PdfService {
 
     private fun addZipDescription(document: Document?){
         val myDiv = Div()
-            .setMarginTop(15f)
-            .setWidth(280f)
+            .setMarginTop(5f)
+            .setMarginBottom(15f)
+            .setWidth(380f)
             .setBackgroundColor(lightCyan)
-            .setBorder(Border.NO_BORDER)
+            .setBorder(SolidBorder(ColorConstants.RED, 2f))
             .setPadding(2f)
             .setPaddingLeft(5f)
             .setBorderRadius(BorderRadius(2f))
 
         val list = com.itextpdf.layout.element.List()
 
+        val myFontSize = 10f
+
         val item1 = ListItem()
-        val item1Title = Text("plots: ").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
-        val item1Text = Text("Contains all plots in PNG, SVG and ").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
-        val item1Text2 = Text("interactive HTML").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
-        val item1Text3 = Text(" formats.").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        val item1Title = Text("plots: ").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(myFontSize)
+        val item1Text = Text("Contains all plots in PNG, SVG and ").setFont(PdfFontFactory.createFont(myFont)).setFontSize(myFontSize)
+        val item1Text2 = Text("interactive, clickable HTML")
+            .setFont(PdfFontFactory.createFont(myBoldFont))
+            .setFontSize(myFontSize)
+            .setUnderline(
+                ColorConstants.RED, 1.0f, 1.0f, 0.0f, -2.0f, 0.0f, 0
+            );
+        val item1Text3 = Text(" formats.").setFont(PdfFontFactory.createFont(myFont)).setFontSize(myFontSize)
         val item1Para = Paragraph().setMargin(0.0f)
         item1Para.add(item1Title)
         item1Para.add(item1Text)
@@ -139,8 +148,8 @@ class PdfService {
         list.add(item1)
 
         val item2 = ListItem()
-        val item2Title = Text("tables: ").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(fontSizeConst)
-        val item2Text = Text("Contains all tables in tab-separated format.").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        val item2Title = Text("tables: ").setFont(PdfFontFactory.createFont(myBoldFont)).setFontSize(myFontSize)
+        val item2Text = Text("Contains all tables in tab-separated format.").setFont(PdfFontFactory.createFont(myFont)).setFontSize(myFontSize)
         val item2Para = Paragraph().setMargin(0.0f)
         item2Para.add(item2Title)
         item2Para.add(item2Text)
@@ -148,7 +157,7 @@ class PdfService {
         list.add(item2)
 
         val p1 = Paragraph().setMargin(0.0f)
-        val t1 = Text("The ZIP file includes two folders:").setFont(PdfFontFactory.createFont(myFont)).setFontSize(fontSizeConst)
+        val t1 = Text("The ZIP file includes two folders:").setFont(PdfFontFactory.createFont(myFont)).setFontSize(myFontSize)
         p1.add(t1)
         myDiv.add(p1)
         val p2 = Paragraph()
