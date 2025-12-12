@@ -30,7 +30,7 @@ class InitialResultRunnerTests {
 
         val spectronautSetup = spectronautSetupParser?.parseSetup(setupPath)
         val (columnInfo, _) =
-            columnInfoService?.createAndSaveColumnInfo(filePath.path, resPath, ResultType.Spectronaut)!!
+            columnInfoService?.createColumnInfo(filePath.path, resPath, ResultType.Spectronaut)!!
 
         val newColumnInfo = spectronautRunner?.matchSpectronautGroups(columnInfo, spectronautSetup!!)
         val selExp = newColumnInfo?.columnMapping?.experimentDetails?.values?.find{it.name == "17985"}

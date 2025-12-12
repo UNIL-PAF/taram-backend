@@ -2,7 +2,9 @@ package ch.unil.pafanalysis.analysis.steps.initial_result
 
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.service.ColumnInfoService
+import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.AdaptMaxQuantTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.InitialMaxQuantRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.MaxQuantGeneParsing
@@ -12,7 +14,6 @@ import ch.unil.pafanalysis.common.Crc32HashComputations
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
-import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,56 +36,11 @@ class AsyncInitialResultRunner(): CommonStep(){
     private var columnInfoService: ColumnInfoService? = null
 
     @Async
-    fun run(emptyStep: AnalysisStep?, result: Result?): AnalysisStep?{
-        val stepPath = setMainPaths(emptyStep?.analysis, emptyStep)
-
-        val resultType = getResultType(emptyStep?.analysis?.result?.type)
-        val outputRoot = getOutputRoot()
-        val resultPath = getResultPath(emptyStep?.analysis)
-        val newTable = copyResultsTable(outputRoot?.plus(stepPath), result?.resFile, resultPath, resultType)
+    fun run(emptyStep: AnalysisStep?): AnalysisStep?{
+        val stepWithPath = setMainPaths(emptyStep?.analysis, emptyStep)
 
         val step: AnalysisStep? = try {
-            val (columnInfo, commonResOrig) =
-                columnInfoService?.createAndSaveColumnInfo(resultPath + "/" + result?.resFile, resultPath, resultType)!!
-            val origTable = readTable.getTable(newTable.path, commonResOrig?.headers)
-
-            val (maxQuantGeneParsingStatus, adaptedTable) = if(resultType == ResultType.Spectronaut){
-                Pair(null, AdaptSpectronautTable.adaptTable(origTable))
-            } else if(resultType == ResultType.MaxQuant){
-                AdaptMaxQuantTable.adaptTable(origTable)
-            } else Pair(null, origTable)
-
-            val adaptedCommonRes = commonResOrig?.copy(headers = adaptedTable?.headers)
-
-            if(adaptedTable != null) writeTable.write(newTable.path, adaptedTable)
-            val newTableHash = Crc32HashComputations().computeFileHash(newTable)
-            val initialResult = createInitialResult(resultPath, resultType, adaptedTable)
-
-            // for spectronaut we can try to get the groups from the setup
-            val newColInfo = if(initialResult?.spectronautSetup != null){
-                val newColumnInfo = initialSpectronautRunner?.matchSpectronautGroups(columnInfo, initialResult.spectronautSetup)
-                columnInfoRepository?.saveAndFlush(newColumnInfo!!)
-            } else columnInfo
-
-            val newInitialResult = if(initialResult?.maxQuantParameters != null && maxQuantGeneParsingStatus != null){
-                val newMaxQuantParams = initialResult.maxQuantParameters.copy(
-                    someGenesParsedFromFasta = if(maxQuantGeneParsingStatus == MaxQuantGeneParsing.Some) true else null,
-                    allGenesParsedFromFasta = if(maxQuantGeneParsingStatus == MaxQuantGeneParsing.All) true else null
-                )
-                initialResult.copy(maxQuantParameters = newMaxQuantParams)
-            } else initialResult
-
-            emptyStep?.copy(
-                resultPath = stepPath,
-                resultTablePath = "$stepPath/${newTable.name}",
-                resultTableHash = newTableHash,
-                status = AnalysisStepStatus.DONE.value,
-                results = gson.toJson(newInitialResult),
-                columnInfo = emptyStep.columnInfo ?: newColInfo,
-                commonResult = emptyStep.commonResult ?: adaptedCommonRes,
-                tableNr = 1,
-                nrProteinGroups = initialResult?.nrProteinGroups
-            )
+            prepareInitialTable(stepWithPath)
         } catch (e: Exception) {
             e.printStackTrace()
             emptyStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)
@@ -101,7 +57,6 @@ class AsyncInitialResultRunner(): CommonStep(){
     fun updateColumnParams(analysisStep: AnalysisStep, params: String) {
 
         try {
-
             val logger: Logger = LoggerFactory.getLogger(AsyncInitialResultRunner::class.java)
 
             val oldExpDetails = analysisStep.columnInfo?.columnMapping?.experimentDetails
@@ -120,11 +75,23 @@ class AsyncInitialResultRunner(): CommonStep(){
                 colMapping.experimentDetails?.mapValues { a -> if (a.value.group == null) a.value.copy(isSelected = false) else a.value }
             } else colMapping.experimentDetails
 
-            val newHeaderOrder: List<Int?>? = getNewHeaderOrder(newExpDetails, analysisStep.commonResult?.headers)
-            val newHeaders: List<Header>? =
-                updateHeaders(newExpDetails, analysisStep.commonResult?.headers, oldExpDetails, newHeaderOrder)
+            val initialResult: InitialResult? = gson.fromJson(analysisStep.results, InitialResult::class.java)
 
-            val (newTablePath, newTableHash) = updateResFile(analysisStep, newHeaders, newHeaderOrder)
+            // if there is no initial table we have to create it
+            val (initialTable, initialCommonRes) = if(initialResult?.initialCommonResult == null || initialResult.initialTablePath == null) {
+                val originalTableAndInfo = getOriginalTableAndInfo(analysisStep)
+                if(originalTableAndInfo?.table != null) writeTable.write(getOutputRoot() + originalTableAndInfo.tablePath, originalTableAndInfo.table)
+                Pair(originalTableAndInfo?.table, originalTableAndInfo?.commonResult)
+            }else{
+                val existingInitialTable = ReadTableData().getTable(getOutputRoot() + initialResult.initialTablePath, initialResult.initialCommonResult.headers)
+                Pair(existingInitialTable, initialResult.initialCommonResult)
+            }
+
+            val newHeaderOrder: List<Int?>? = getNewHeaderOrder(newExpDetails, initialCommonRes?.headers)
+            val newHeaders: List<Header>? =
+                updateHeaders(newExpDetails, initialCommonRes?.headers, oldExpDetails, newHeaderOrder)
+
+            val (newTablePath, newTableHash, fltHeaders) = updateResFileX(analysisStep, newHeaders, newHeaderOrder, initialTable, newExpDetails)
 
             val newColumnMapping: ColumnMapping? =
                 analysisStep.columnInfo?.columnMapping?.copy(
@@ -138,7 +105,7 @@ class AsyncInitialResultRunner(): CommonStep(){
             val newColumnInfo: ColumnInfo? =
                 analysisStep.columnInfo?.copy(columnMapping = newColumnMapping, columnMappingHash = columnHash)
             columnInfoRepository?.saveAndFlush(newColumnInfo!!)
-            val newCommonRes = analysisStep.commonResult?.copy(headers = newHeaders)
+            val newCommonRes = analysisStep.commonResult?.copy(headers = fltHeaders)
 
             val finalStep = analysisStep.copy(
                 status = AnalysisStepStatus.DONE.value,
@@ -157,27 +124,118 @@ class AsyncInitialResultRunner(): CommonStep(){
         }
     }
 
-    private fun updateResFile(analysisStep: AnalysisStep?,
+    private fun createInitialTable(table: Table, stepPath: String?): String?{
+        val initialTablePath = "$stepPath/initial_table.txt"
+        val fullPath = getOutputRoot()?.plus(initialTablePath)
+        return if(fullPath !== null){
+            writeTable.write(fullPath, table)
+            initialTablePath
+        }else null
+    }
+
+    data class OriginalTableAndInfo(
+        val table: Table,
+        val tablePath: String,
+        val columnInfo: ColumnInfo,
+        val commonResult: CommonResult,
+        val mqGeneParsing: MaxQuantGeneParsing?
+    )
+
+    private fun getOriginalTableAndInfo(analysisStep: AnalysisStep?): OriginalTableAndInfo?{
+        val resultType = getResultType(analysisStep?.analysis?.result?.type)
+        val outputRoot = getOutputRoot()
+        val sourcePath = getResultPath(analysisStep?.analysis)
+        val result = analysisStep?.analysis?.result
+
+        val newTable = copyResultsTable(outputRoot?.plus(analysisStep?.resultPath), result?.resFile, sourcePath, resultType)
+        val (columnInfo, commonResOrig) =
+            columnInfoService?.createColumnInfo(sourcePath + "/" + result?.resFile, sourcePath, resultType)!!
+
+        val origTable = readTable.getTable(newTable.path, commonResOrig.headers)
+
+        val (maxQuantGeneParsingStatus, adaptedTable) = if(resultType == ResultType.Spectronaut){
+            Pair(null, AdaptSpectronautTable.adaptTable(origTable))
+        } else if(resultType == ResultType.MaxQuant){
+            AdaptMaxQuantTable.adaptTable(origTable)
+        } else Pair(null, origTable)
+
+        return if(adaptedTable == null) null else OriginalTableAndInfo(adaptedTable, "${analysisStep?.resultPath}/${newTable.name}", columnInfo,
+            commonResOrig.copy(headers = adaptedTable.headers), maxQuantGeneParsingStatus)
+    }
+
+    private fun prepareInitialTable(analysisStep: AnalysisStep?): AnalysisStep?{
+        val resultType = getResultType(analysisStep?.analysis?.result?.type)
+        val resultPath = getResultPath(analysisStep?.analysis)
+        val originalTableAndInfo = getOriginalTableAndInfo(analysisStep)
+            ?: throw StepException("Cannot parse the original table.")
+
+        writeTable.write(getOutputRoot() + originalTableAndInfo.tablePath, originalTableAndInfo.table)
+        val initialTablePath = createInitialTable(originalTableAndInfo.table, analysisStep?.resultPath)
+
+        // save and flush columnInfo
+        columnInfoRepository?.saveAndFlush(originalTableAndInfo.columnInfo)
+
+        val newTableHash = Crc32HashComputations().computeFileHash(File(getOutputRoot() + originalTableAndInfo.tablePath))
+        val freshResult = createInitialResult(resultPath, resultType, originalTableAndInfo.table)?.copy(initialCommonResult = originalTableAndInfo.commonResult)
+        val initialResult = freshResult?.copy(initialTablePath = initialTablePath)
+
+        // for spectronaut we can try to get the groups from the setup
+        val newColInfo = if(initialResult?.spectronautSetup != null){
+            val newColumnInfo = initialSpectronautRunner?.matchSpectronautGroups(originalTableAndInfo.columnInfo, initialResult.spectronautSetup)
+            columnInfoRepository?.saveAndFlush(newColumnInfo!!)
+        } else originalTableAndInfo.columnInfo
+
+        val newInitialResult = if(initialResult?.maxQuantParameters != null && originalTableAndInfo.mqGeneParsing != null){
+            val newMaxQuantParams = initialResult.maxQuantParameters.copy(
+                someGenesParsedFromFasta = if(originalTableAndInfo.mqGeneParsing == MaxQuantGeneParsing.Some) true else null,
+                allGenesParsedFromFasta = if(originalTableAndInfo.mqGeneParsing == MaxQuantGeneParsing.All) true else null
+            )
+            initialResult.copy(maxQuantParameters = newMaxQuantParams)
+        } else initialResult
+
+        return analysisStep?.copy(
+            resultTablePath = analysisStep.resultPath + "/" + File(originalTableAndInfo.tablePath).name,
+            resultTableHash = newTableHash,
+            status = AnalysisStepStatus.DONE.value,
+            results = gson.toJson(newInitialResult),
+            columnInfo = analysisStep.columnInfo ?: newColInfo,
+            commonResult = analysisStep.commonResult ?: originalTableAndInfo.commonResult,
+            tableNr = 1,
+            nrProteinGroups = initialResult?.nrProteinGroups
+        )
+    }
+
+    private fun updateResFileX(analysisStep: AnalysisStep?,
                               newHeaders: List<Header>?,
-                              headerOrder: List<Int?>?): Pair<String?, Long?> {
-        val resFilePath = getOutputRoot() + analysisStep?.resultTablePath
-        val oldTable = ReadTableData().getTable(resFilePath, analysisStep?.commonResult?.headers)
-
+                              headerOrder: List<Int?>?,
+                              initialTable: Table?,
+                              newExpDetails: Map<String, ExpInfo>?): Triple<String?, Long?, List<Header>?> {
         // remove headerOrder positions with null
-        val usedCols = oldTable.cols?.filterIndexed { i, _ ->  headerOrder!![i] != null}
+        val usedCols = initialTable?.cols?.filterIndexed { i, _ ->  headerOrder!![i] != null}
         val usedOrder = headerOrder?.filterNotNull()
-        val newCols = usedCols?.mapIndexed { i, h -> usedOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: oldTable.cols
+        val newCols = usedCols?.mapIndexed { i, h -> usedOrder!![i] to h }?.sortedBy { it.first }?.map{it.second} ?: initialTable?.cols
 
-        WriteTableData().write(resFilePath, Table(headers = newHeaders, cols = newCols))
+        val (fltHeaders, fltIdx) = (newHeaders ?: emptyList()).fold(Pair(emptyList<Header>(), emptyList<Int>())){ acc, el ->
+            if(el.experiment == null || (newExpDetails?.contains(el.experiment.name) == true && newExpDetails[el.experiment.name]?.isSelected == true)) {
+                Pair(acc.first.plus(el), acc.second)
+            }else{
+                Pair(acc.first, acc.second.plus(el.idx))
+            }
+        }
+
+        val colsFlt = newCols?.filterIndexed{i, _ -> !fltIdx.contains(i)}
+        val corrIdxHeaders = fltHeaders.mapIndexed { i, h -> h.copy(idx = i)  }
+        WriteTableData().write(getOutputRoot() + analysisStep?.resultTablePath, Table(headers = corrIdxHeaders, cols = colsFlt))
 
         val resultType = getResultType(analysisStep?.analysis?.result?.type)
-        return getResultTablePath(
+        val resTable =  getResultTablePath(
             modifiesResult = true,
             oldStep = analysisStep,
             oldTablePath = analysisStep?.resultTablePath,
-            stepPath = analysisStep?.resultPath,
-            resultType = resultType
+            resultType = resultType,
         )
+
+        return Triple(resTable.first, resTable.second, corrIdxHeaders)
     }
 
     private fun getNewHeaderOrder(experimentDetails: Map<String, ExpInfo>?, headers: List<Header>?): List<Int?>? {
@@ -227,7 +285,7 @@ class AsyncInitialResultRunner(): CommonStep(){
     private fun createInitialResult(
         resultPath: String?,
         type: ResultType?,
-        table: Table?
+        table: Table?,
     ): InitialResult? {
         val initialRes = if (type == ResultType.MaxQuant) {
             InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "parameters.txt")
@@ -240,26 +298,22 @@ class AsyncInitialResultRunner(): CommonStep(){
     private fun copyResultsTable(
         outputPath: String?,
         resultFile: String?,
-        resultPath: String?,
+        sourcePath: String?,
         resultType: ResultType?
     ): File {
         val timestamp = Timestamp(System.currentTimeMillis())
-
-        return if (resultType == ResultType.MaxQuant) {
-            copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "proteinGroups")
-        } else {
-            copyResultTableWithName(outputPath, resultFile, resultPath, timestamp, "Report")
-        }
+        val fileName =  if (resultType == ResultType.MaxQuant) "proteinGroups" else "Report"
+        return copyResultTableWithName(outputPath, resultFile, sourcePath, timestamp, fileName)
     }
 
     private fun copyResultTableWithName(
         outputPath: String?,
         resultFile: String?,
-        resultPath: String?,
+        sourcePath: String?,
         timestamp: Timestamp,
         fileName: String?
     ): File {
-        val originalTable = File("$resultPath/$resultFile")
+        val originalTable = File("$sourcePath/$resultFile")
         val newTableName = "${fileName}_${timestamp.time}.txt"
         val newTable = File("$outputPath/$newTableName")
         originalTable.copyTo(newTable)

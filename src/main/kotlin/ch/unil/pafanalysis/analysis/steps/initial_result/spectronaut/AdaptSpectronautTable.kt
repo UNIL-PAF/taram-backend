@@ -6,7 +6,7 @@ import ch.unil.pafanalysis.common.Table
 
 object AdaptSpectronautTable{
 
-    fun adaptTable(table: Table?): Table? {
+    fun adaptTable(table: Table?): Table {
         val iBaqHeaders = table?.headers?.filter{it.experiment?.field?.equals("ibaq", ignoreCase = true) == true}?.map{it.idx}
 
         val newCols = table?.cols?.mapIndexed{ i, col ->

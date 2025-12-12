@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.analysis.steps.initial_result
 
+import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.initial_result.spectronaut.SpectronautSetup
 
 data class MaxQuantParameters(
@@ -15,5 +16,7 @@ data class InitialResult(
     val spectronautSetup: SpectronautSetup? = null,
     val nrProteinGroups: Int? = null,
     val fastaFiles: List<String>? = null,
-    val softwareVersion: String? = null
+    val softwareVersion: String? = null,
+    val initialCommonResult: CommonResult? = null,
+    val initialTablePath: String? = null,
 )

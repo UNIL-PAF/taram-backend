@@ -136,15 +136,12 @@ open class CommonStep {
         try {
             val stepWithParams =
                 if (params != null) currentStep?.copy(parameters = params) else currentStep
-
-            val stepPath = setMainPaths(oldStep?.analysis, stepWithParams)
             val resultType = getResultType(stepWithParams?.analysis?.result?.type)
             val resultTablePathAndHash =
-                getResultTablePath(modifiesResult, oldStep, stepPath, stepWithParams?.resultTablePath, resultType)
+                getResultTablePath(modifiesResult, oldStep, stepWithParams?.resultTablePath, resultType)
 
             val newStep =
                 stepWithParams?.copy(
-                    resultPath = stepPath,
                     resultTablePath = resultTablePathAndHash.first,
                     resultTableHash = resultTablePathAndHash.second,
                     status = AnalysisStepStatus.RUNNING.value,
@@ -218,14 +215,14 @@ open class CommonStep {
         return env?.getProperty("output.path")
     }
 
-    fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): String {
+    fun setMainPaths(analysis: Analysis?, emptyStep: AnalysisStep?): AnalysisStep? {
         val outputPath: String = analysis?.id.toString()
         val outputRoot = getOutputRoot()
         createResultDir(outputRoot?.plus(outputPath))
 
         val stepPath = "$outputPath/${emptyStep?.id}"
         createResultDir(outputRoot?.plus(stepPath))
-        return stepPath
+        return emptyStep?.copy(resultPath = stepPath)
     }
 
     fun getCopyDifference(step: AnalysisStep?): String? {
@@ -399,7 +396,6 @@ open class CommonStep {
     fun getResultTablePath(
         modifiesResult: Boolean?,
         oldStep: AnalysisStep?,
-        stepPath: String?,
         oldTablePath: String?,
         resultType: ResultType?
     ): Pair<String?, Long?> {
@@ -411,7 +407,7 @@ open class CommonStep {
             } else {
                 "/Report_"
             }
-            val newTab = stepPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
+            val newTab = oldStep?.resultPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
             val newFile = Path(getOutputRoot()?.plus(newTab)!!)
             Path(oldTab).copyTo(newFile, overwrite = true)
 

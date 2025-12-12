@@ -7,7 +7,6 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.results.model.Result
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,14 +35,14 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
         throw Exception("InitialResultRunner does not implement ordinary run function.")
     }
 
-    fun prepareRun(analysisId: Int?, result: Result?): AnalysisStep? {
+    fun prepareRun(analysisId: Int?): AnalysisStep? {
         val analysis =
             analysisRepository?.findById(analysisId ?: throw StepException("No valid analysisId was provided."))
         return createEmptyInitialResult(analysis)
     }
 
-    fun run(emptyStep: AnalysisStep?, result: Result?): AnalysisStep? {
-       asyncInitialResultRunner?.run(emptyStep, result)
+    fun run(emptyStep: AnalysisStep?): AnalysisStep? {
+       asyncInitialResultRunner?.run(emptyStep)
        return emptyStep
     }
 
@@ -54,9 +53,7 @@ class InitialResultRunner() : CommonStep(), CommonRunner {
     fun updateColumnParams(analysisStep: AnalysisStep, params: String): AnalysisStep {
         val runningStep =
             analysisStepRepository?.saveAndFlush(analysisStep.copy(status = AnalysisStepStatus.RUNNING.value))
-
         asyncInitialResultRunner?.updateColumnParams(analysisStep, params)
-
         return runningStep!!
     }
 

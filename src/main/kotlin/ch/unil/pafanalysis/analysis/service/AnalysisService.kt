@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.hints.StepHintsService
 import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.results.model.Result
@@ -35,8 +34,8 @@ class AnalysisService {
         )
         val analysis: Analysis? = analysisRepo?.saveAndFlush(newAnalysis)
 
-        val emptyRun = initialResult?.prepareRun(analysis?.id, result)
-        initialResult?.run(emptyRun, result)
+        val emptyRun = initialResult?.prepareRun(analysis?.id)
+        initialResult?.run(emptyRun)
 
         val analysisList = listOf(analysis)
         return if (analysisList.any { it == null }) null else analysisList as List<Analysis>
