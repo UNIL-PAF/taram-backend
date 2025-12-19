@@ -55,8 +55,7 @@ class ResultController {
 
     @GetMapping("/available-dirs")
     fun availableDirs(): Iterable<AvailableDir>? {
-        val existingRes = resultRepository?.findAll()
-        return CheckForNewDirs.checkAll(existingRes?.asSequence(), getResultPaths())
+        return CheckForNewDirs.checkAll(getResultPaths())
     }
 
     @DeleteMapping("/{resultId}")
