@@ -136,18 +136,19 @@ open class CommonStep {
         try {
             val stepWithParams =
                 if (params != null) currentStep?.copy(parameters = params) else currentStep
-            val resultType = getResultType(stepWithParams?.analysis?.result?.type)
+            val stepWithPath = setMainPaths(oldStep?.analysis, stepWithParams)
+            val resultType = getResultType(stepWithPath?.analysis?.result?.type)
             val resultTablePathAndHash =
-                getResultTablePath(modifiesResult, oldStep, stepWithParams?.resultTablePath, resultType)
+                getResultTablePath(modifiesResult, oldStep, stepWithPath?.resultTablePath, resultType)
 
             val newStep =
-                stepWithParams?.copy(
+                stepWithPath?.copy(
                     resultTablePath = resultTablePathAndHash.first,
                     resultTableHash = resultTablePathAndHash.second,
                     status = AnalysisStepStatus.RUNNING.value,
                     commonResult = oldStep?.commonResult,
                     imputationTablePath = oldStep?.imputationTablePath,
-                    tableNr = if (stepWithParams.modifiesResult == true) {
+                    tableNr = if (stepWithPath.modifiesResult == true) {
                         oldStep?.tableNr?.plus(1)
                     } else oldStep?.tableNr,
                     version = version
