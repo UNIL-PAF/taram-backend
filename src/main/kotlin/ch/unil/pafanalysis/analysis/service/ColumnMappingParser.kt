@@ -53,7 +53,7 @@ class ColumnMappingParser {
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
         return if (type == ResultType.MaxQuant) {
-            val summaryFile = resultPath.plus("summary.txt")
+            val summaryFile = resultPath.plus("/summary.txt")
             if (! File(summaryFile).exists()) throw StepException("Could not find summary.txt in results directory.")
             getMaxQuantExperiments(columns, summaryFile, colTypes)
         } else {

@@ -288,7 +288,7 @@ class AsyncInitialResultRunner(): CommonStep(){
         table: Table?,
     ): InitialResult? {
         val initialRes = if (type == ResultType.MaxQuant) {
-            InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "parameters.txt")
+            InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "/parameters.txt")
         } else {
             initialSpectronautRunner?.createInitialSpectronautResult(resultPath, table)
         }
