@@ -264,4 +264,16 @@ class ColumnMappingParserTests {
 
     }
 
+    @Test
+    fun parseSpectronautTestRichetin() {
+        val resFile = "./src/test/resources/results/spectronaut/Richetin_20605-42/20260105_142243_20605_Report.tsv"
+        val (colMapping, commonResults) = colParser!!.parse(resFile, null, ResultType.Spectronaut)
+
+        assert(colMapping.experimentNames == listOf(
+            "20605", "20606", "20607", "20608", "20609", "20610", "20611", "20612", "20613", "20614",
+            "20615", "20616", "20617", "20618", "20619", "20620", "20621", "20622", "20623", "20624",
+            "20625", "20626", "20627", "20628", "20629", "20630", "20631", "20632", "20633", "20634",
+            "20635", "20636", "20637", "20638", "20639", "20640", "20641", "20642"))
+    }
+
 }

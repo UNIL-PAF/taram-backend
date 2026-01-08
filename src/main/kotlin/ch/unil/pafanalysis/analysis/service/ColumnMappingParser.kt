@@ -99,11 +99,11 @@ class ColumnMappingParser {
         }
 
         val selField = endingSizes?.toList()?.maxByOrNull { it.second }!!.first
-        val selCols = columns?.filter{it.matches(Regex(".+${selField}$"))}
+        val selCols = columns.filter{it.matches(Regex(".+${selField}$"))}
         val (commonStart, commonEnd) = ParseSpectronautColNames.getCommonStartAndEnd(selCols, selField)
         val dynRegex = Regex("^.*?_${commonStart}(.+)${commonEnd}.+")
 
-        return columns!!.foldIndexed(ColumnsParsed()) { i, acc, s ->
+        return columns.foldIndexed(ColumnsParsed()) { i, acc, s ->
             val matchResult = if(dynRegex.matches(s)){
                 val myMatch = dynRegex.matchEntire(s)
                 if(myMatch != null){
