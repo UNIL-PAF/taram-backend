@@ -194,6 +194,8 @@ class ColumnMappingParser {
         val expIdx = headers.indexOf("Experiment")
         val fileIdx = headers.indexOf("Raw file")
 
+        if(expIdx == -1) throw StepException("Column [Experiment] missing in summary.txt. Please define Experiments.")
+
         return lines.subList(1, lines.size - 1)
             .fold(ColumnsParsed()) { sum, el ->
                 val l = el.split("\t")
