@@ -239,7 +239,7 @@ class PdfService {
         val analysisName = if(analysis?.name != null) analysis.name else if(analysis?.idx != null) "#${analysis.idx + 1}" else ""
         addInfoCell("Analysis", analysisName, infoTable)
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)
 
         val (versionNr, _) = getBackendVersion()
@@ -281,8 +281,9 @@ class PdfService {
     }
 
     private fun addLogo(document: Document?, pdf: PdfDocument, plotWidth: Float){
-        val imagePath = "/resources/images/personalized_logo_blue_cropped.pdf"
+        val imagePath = "/resources/images/UNIL-LOGOTYPE-BLUE-CMYK.pdf"
         val img1 = pdfToImage(imagePath, pdf).setBorder(Border.NO_BORDER)
+        img1.scaleToFit(100f, 50f)
         img1.setHorizontalAlignment(HorizontalAlignment.RIGHT).setBorder(Border.NO_BORDER)
         val table = Table(1)
         table.setWidth(plotWidth)
