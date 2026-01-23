@@ -253,7 +253,7 @@ class PdfService {
         document?.add(div)
     }
 
-    private fun getBackendVersion(): Pair<String, String> {
+    private fun  getBackendVersion(): Pair<String, String> {
         val v = env?.getProperty("taram.version") ?: ":-/"
         val githubBase = "https://github.com/UNIL-PAF/taram-backend/releases/tag/"
         return Pair(v, githubBase + v)
@@ -281,7 +281,7 @@ class PdfService {
     }
 
     private fun addLogo(document: Document?, pdf: PdfDocument, plotWidth: Float){
-        val imagePath = "/resources/images/UNIL-LOGOTYPE-BLUE-CMYK.pdf"
+        val imagePath = "/resources/images/UNIL-LOGOTYPE-BLACK-CMYK.pdf"
         val img1 = pdfToImage(imagePath, pdf).setBorder(Border.NO_BORDER)
         img1.scaleToFit(100f, 50f)
         img1.setHorizontalAlignment(HorizontalAlignment.RIGHT).setBorder(Border.NO_BORDER)
