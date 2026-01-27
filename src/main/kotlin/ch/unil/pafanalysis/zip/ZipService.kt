@@ -1,6 +1,5 @@
 package ch.unil.pafanalysis.zip
 
-import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
@@ -12,21 +11,28 @@ import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
 import ch.unil.pafanalysis.html_plot.HtmlPlot
 import ch.unil.pafanalysis.pdf.PdfService
+import ch.unil.pafanalysis.results.model.Result
+import ch.unil.pafanalysis.results.model.ResultType
+import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service
-import org.springframework.util.ResourceUtils
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
+import java.nio.file.*
+import java.nio.file.StandardCopyOption.*
+import kotlin.io.path.*
 
 
 @Service
 class ZipService {
+
+    @Autowired
+    private lateinit var resultRepository: ResultRepository
 
     @Autowired
     private var analysisRepo: AnalysisRepository? = null
@@ -63,9 +69,31 @@ class ZipService {
         createPlots(steps, zipSelection, zipDir)
         createTables(steps, zipSelection, zipDir)
         createSummary(steps, zipSelection, zipDir)
+        createToolParams(analysis?.result, zipDir)
         addDocs(zipDir)
 
         return File(ZipTool().zipDir(zipDir, "$zipName.zip", createTempDirectory().pathString, true))
+    }
+
+    private fun createToolParams(result: Result?, zipDir: String){
+        val isMaxQuant = result?.type == ResultType.MaxQuant.value
+        val resultPathName = if(isMaxQuant) "result.path.maxquant" else "result.path.spectronaut"
+        val resultPath = Path(env?.getProperty(resultPathName).plus(result?.path))
+
+        val paramsDir = "$zipDir/${result?.type?.lowercase()}_params"
+        File(paramsDir).mkdir()
+
+        val extensions = if(isMaxQuant) emptyList() else listOf(".params", ".setup.txt", ".log.txt")
+        val exactMatches = if(isMaxQuant) listOf("mqpar.xml", "parameters.txt", "summary.txt") else emptyList()
+
+        Files.list(resultPath).use { stream ->
+            stream.filter { a -> a.isRegularFile() && (extensions.any { a.name.endsWith(it, ignoreCase = true) } || exactMatches.any { it == a.name}) }
+                .forEach { src ->
+                    val dest = Path(paramsDir).resolve(src.fileName)
+                    val opts = arrayOf(COPY_ATTRIBUTES)
+                    Files.copy(src, dest, *opts)
+                }
+        }
     }
 
     private fun addDocs(zipDir: String){
