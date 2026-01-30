@@ -6,6 +6,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
@@ -85,6 +86,10 @@ class ZipService {
 
         val extensions = if(isMaxQuant) emptyList() else listOf(".params", ".setup.txt", ".log.txt")
         val exactMatches = if(isMaxQuant) listOf("mqpar.xml", "parameters.txt", "summary.txt") else emptyList()
+
+        if(!resultPath.exists()){
+            throw StepException("Directory [/${result?.path}] does not exist. Please adapt the File path for ${result?.name} if necessary.")
+        }
 
         Files.list(resultPath).use { stream ->
             stream.filter { a -> a.isRegularFile() && (extensions.any { a.name.endsWith(it, ignoreCase = true) } || exactMatches.any { it == a.name}) }

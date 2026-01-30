@@ -24,9 +24,9 @@ class ResultService {
         return resultRepository?.deleteById(resultId)
     }
 
-    fun setInfo(resultId: Int, name: String, description: String?): String? {
+    fun setInfo(resultId: Int, name: String, description: String?, path: String): String? {
         val res = resultRepository?.findById(resultId)
-        val newRes = res?.copy(name = name, description = description)
+        val newRes = res?.copy(name = name, description = description, path = path)
         val savedRes = resultRepository?.saveAndFlush(newRes!!)
         return savedRes.toString()
     }
