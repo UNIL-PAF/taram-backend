@@ -19,4 +19,5 @@ data class InitialResult(
     val softwareVersion: String? = null,
     val initialCommonResult: CommonResult? = null,
     val initialTablePath: String? = null,
+    val qcPath: String? = null,
 )

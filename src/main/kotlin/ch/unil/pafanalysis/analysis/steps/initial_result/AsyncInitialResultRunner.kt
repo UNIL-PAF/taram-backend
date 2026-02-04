@@ -35,12 +35,22 @@ class AsyncInitialResultRunner(): CommonStep(){
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
+
+    @Autowired
+    private var ptxQcComputation: PtxQcComputation? = null
+
     @Async
     fun run(emptyStep: AnalysisStep?): AnalysisStep?{
         val stepWithPath = setMainPaths(emptyStep?.analysis, emptyStep)
 
         val step: AnalysisStep? = try {
-            prepareInitialTable(stepWithPath)
+            val s = prepareInitialTable(stepWithPath)
+            val qcPath = ptxQcComputation?.run(s)
+            if(qcPath != null){
+                val initialResult: InitialResult = gson.fromJson(s?.results, InitialResult::class.java)
+                val newInitialResult = initialResult.copy(qcPath = qcPath)
+                s?.copy(results = gson.toJson(newInitialResult))
+            } else s
         } catch (e: Exception) {
             e.printStackTrace()
             emptyStep?.copy(status = AnalysisStepStatus.ERROR.value, error = e.message)

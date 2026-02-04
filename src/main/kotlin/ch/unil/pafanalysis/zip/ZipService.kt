@@ -14,7 +14,6 @@ import ch.unil.pafanalysis.html_plot.HtmlPlot
 import ch.unil.pafanalysis.pdf.PdfService
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
-import ch.unil.pafanalysis.results.service.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
@@ -24,16 +23,12 @@ import java.nio.file.Files
 import kotlin.io.path.Path
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
-import java.nio.file.*
 import java.nio.file.StandardCopyOption.*
 import kotlin.io.path.*
 
 
 @Service
 class ZipService {
-
-    @Autowired
-    private lateinit var resultRepository: ResultRepository
 
     @Autowired
     private var analysisRepo: AnalysisRepository? = null

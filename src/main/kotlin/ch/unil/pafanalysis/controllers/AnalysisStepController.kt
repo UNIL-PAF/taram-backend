@@ -9,6 +9,8 @@ import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResultRunner
 import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.FullEnrichmentTable
 import ch.unil.pafanalysis.analysis.steps.one_d_enrichment.OneDEnrichmentRunner
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
+import java.nio.file.Files
 
 @CrossOrigin(origins = ["http://localhost:3000", "http://taram-dev.dcsr.unil.ch", "http://taram.dcsr.unil.ch"], maxAge = 3600)
 @RestController
@@ -224,4 +227,18 @@ class AnalysisStepController {
         return response;
     }
 
+
+    @GetMapping("/generated-file/{stepId}")
+    fun downloadHtml(@PathVariable(value = "stepId") stepId: Int): ResponseEntity<Resource> {
+        val generatedFile = analysisStepService?.getGeneratedFile(stepId)
+        return if(generatedFile != null){
+            val resource = FileSystemResource(generatedFile)
+
+            ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(resource)
+        }else{
+            ResponseEntity.notFound().build()
+        }
+    }
 }

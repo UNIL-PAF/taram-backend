@@ -1,16 +1,17 @@
 package ch.unil.pafanalysis.analysis.service
 
-import ch.unil.pafanalysis.analysis.model.Analysis
-import ch.unil.pafanalysis.analysis.model.AnalysisStep
-import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
-import ch.unil.pafanalysis.analysis.model.ColumnInfo
+import ch.unil.pafanalysis.analysis.model.*
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
+import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.common.*
 import ch.unil.pafanalysis.html_plot.HtmlPlot
+import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Service
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -19,6 +20,8 @@ import kotlin.io.path.pathString
 
 @Service
 class AnalysisStepService {
+
+    val gson = Gson()
 
     @Autowired
     private var columnInfoRepository: ColumnInfoRepository? = null
@@ -208,6 +211,17 @@ class AnalysisStepService {
                 false
             }
         }.map{it!!}
+    }
+
+    fun getGeneratedFile(stepId: Int): File?{
+        val step = analysisStepRepo?.findById(stepId)
+        return if(step?.type == AnalysisStepType.INITIAL_RESULT.value){
+            val initialResult = gson.fromJson(step.results, InitialResult::class.java)
+            if(initialResult?.qcPath != null){
+                val qcFile = File(env?.getProperty("output.path") + initialResult.qcPath)
+                if(qcFile.exists()) qcFile else null
+            } else null
+        } else null
     }
 
 }
