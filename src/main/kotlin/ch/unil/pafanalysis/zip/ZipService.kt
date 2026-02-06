@@ -1,5 +1,6 @@
 package ch.unil.pafanalysis.zip
 
+import ch.unil.pafanalysis.analysis.model.Analysis
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.service.AnalysisRepository
@@ -8,12 +9,15 @@ import ch.unil.pafanalysis.analysis.service.AnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
 import ch.unil.pafanalysis.analysis.steps.StepNames
+import ch.unil.pafanalysis.analysis.steps.add_column.AddColumnParams
+import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.common.EchartsServer
 import ch.unil.pafanalysis.common.ZipTool
 import ch.unil.pafanalysis.html_plot.HtmlPlot
 import ch.unil.pafanalysis.pdf.PdfService
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultType
+import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ClassPathResource
@@ -29,6 +33,9 @@ import kotlin.io.path.*
 
 @Service
 class ZipService {
+
+    @Autowired
+    private lateinit var gson: Gson
 
     @Autowired
     private var analysisRepo: AnalysisRepository? = null
@@ -65,13 +72,14 @@ class ZipService {
         createPlots(steps, zipSelection, zipDir)
         createTables(steps, zipSelection, zipDir)
         createSummary(steps, zipSelection, zipDir)
-        createToolParams(analysis?.result, zipDir)
+        createToolParams(analysis, zipDir)
         addDocs(zipDir)
 
         return File(ZipTool().zipDir(zipDir, "$zipName.zip", createTempDirectory().pathString, true))
     }
 
-    private fun createToolParams(result: Result?, zipDir: String){
+    private fun createToolParams(analysis: Analysis?, zipDir: String){
+        val result = analysis?.result
         val isMaxQuant = result?.type == ResultType.MaxQuant.value
         val resultPathName = if(isMaxQuant) "result.path.maxquant" else "result.path.spectronaut"
         val resultPath = Path(env?.getProperty(resultPathName).plus(result?.path))
@@ -94,6 +102,17 @@ class ZipService {
                     Files.copy(src, dest, *opts)
                 }
         }
+
+        if(isMaxQuant) copyPtxQcReport(analysis, paramsDir)
+    }
+
+    private fun copyPtxQcReport(analysis: Analysis?, paramsDir: String){
+        // get the initial-result
+        val initialRes = analysis?.analysisSteps?.first()
+        val initialResRes = gson.fromJson(initialRes?.results, InitialResult::class.java)
+        val pdfPath = initialResRes.qcPath?.replace(".html", ".pdf")
+        val pdfFile = File(env?.getProperty("output.path") +  pdfPath)
+        if(pdfFile.exists()){pdfFile.copyTo(File("$paramsDir/${pdfFile.name}"), false)}
     }
 
     private fun addDocs(zipDir: String){
