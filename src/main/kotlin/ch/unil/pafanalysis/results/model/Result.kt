@@ -15,7 +15,8 @@ data class Result (
     val status: String? = null,
     val path: String? = null,
     val fileCreationDate: LocalDateTime? = null,
-    val lastModifDate: LocalDateTime? = null
+    val lastModifDate: LocalDateTime? = null,
+    val runPTXQC: Boolean? = null,
 )
 
 enum class ResultStatus(val value: String) {

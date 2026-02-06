@@ -45,7 +45,7 @@ class AsyncInitialResultRunner(): CommonStep(){
 
         val step: AnalysisStep? = try {
             val s = prepareInitialTable(stepWithPath)
-            val qcPath = ptxQcComputation?.run(s)
+            val qcPath = if(s?.analysis?.result?.runPTXQC == true) ptxQcComputation?.run(s) else null
             if(qcPath != null){
                 val initialResult: InitialResult = gson.fromJson(s?.results, InitialResult::class.java)
                 val newInitialResult = initialResult.copy(qcPath = qcPath)
