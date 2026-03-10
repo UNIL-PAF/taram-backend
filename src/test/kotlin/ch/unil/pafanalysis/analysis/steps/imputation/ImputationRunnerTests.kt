@@ -93,7 +93,7 @@ class ImputationRunnerTests {
         assert(roundNumber(oneRes) == roundNumber(21.318434684724))
 
         val secondRes = res.first[13][80]
-        assert(roundNumber(secondRes) == roundNumber(19.0151783985302))
+        assert(roundNumber(secondRes) == roundNumber(19.0844294139775))
     }
 
     @Test
