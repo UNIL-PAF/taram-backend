@@ -23,6 +23,7 @@ object StepNames {
             "one-d-enrichment"->"1D Enrichment"
             "add-column"->"Add column"
             "correlation-table"->"Correlations"
+            "limma"->"Limma"
             else -> throw Exception("Type [$type] doesnt exist.")
         }
     }

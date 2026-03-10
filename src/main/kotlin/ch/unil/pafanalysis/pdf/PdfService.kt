@@ -65,9 +65,9 @@ class PdfService {
         val pdf = PdfDocument(PdfWriter(filePath))
 
         val pageSize: PageSize = PageSize.A4
-        val document: Document? = Document(pdf, pageSize, false)
+        val document: Document = Document(pdf, pageSize, false)
 
-        val plotWidth: Float = pageSize.width.minus(document?.rightMargin?: 0f).minus(document?.leftMargin?: 0f)
+        val plotWidth: Float = pageSize.width.minus(document.rightMargin?: 0f).minus(document.leftMargin?: 0f)
 
         addLogo(document, pdf, plotWidth)
         addResultInfo(analysis, document)
@@ -77,12 +77,12 @@ class PdfService {
         addOverview(steps, document, plotWidth)
         addConclusion(analysis, document)
         // make a page break
-        document?.add(AreaBreak());
+        document.add(AreaBreak());
 
         addSteps(steps, document, pdf, plotWidth, zipSelection)
         addHeaderAndFooter(document, pdf, pageSize, plotWidth)
 
-        document?.close()
+        document.close()
         pdf.close()
 
         return filePath
@@ -189,7 +189,7 @@ class PdfService {
 
         fun getTables(step: AnalysisStep?, stepNr: Int): String {
             return if(step?.modifiesResult == true){
-                when(step?.type){
+                when(step.type){
                     AnalysisStepType.ONE_D_ENRICHMENT.value -> "Table $stepNr, Enrichment table $stepNr"
                     else -> "Table $stepNr"
                 }
@@ -313,7 +313,7 @@ class PdfService {
             div?.setMarginBottom(30f)
             div?.isKeepTogether = true
             // only add the step if it is in the zipSelection
-            if(zipSelection?.steps === null || zipSelection?.steps.contains(step.id!!)){
+            if(zipSelection?.steps === null || zipSelection.steps.contains(step.id!!)){
                 document?.add(div)
             }
         }
@@ -329,11 +329,11 @@ class PdfService {
         // left header pos
         val xPosLeft = 78f
 
-        val yPosTop = pageSize?.height.minus(8f)
+        val yPosTop = pageSize.height.minus(8f)
         val leftHeader = Paragraph("PAF - UNIL").setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
         // right header
-        val xPosRight= pageSize?.width.minus(36f)
+        val xPosRight= pageSize.width.minus(36f)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val rightHeader = Paragraph(LocalDateTime.now().format(formatter)).setFont(PdfFontFactory.createFont(myFont)).setFontSize(headerFontSize)
 
