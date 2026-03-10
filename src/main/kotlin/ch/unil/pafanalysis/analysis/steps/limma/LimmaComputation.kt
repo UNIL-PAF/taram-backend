@@ -155,12 +155,17 @@ class LimmaComputation {
 
     private fun computeLimmaR(ints: List<List<Double>>, groups: List<String?>, comps: List<GroupComp>?): LimmaRes {
         val myGroups: List<String> = groups.map{ it ?: throw StepException("Groups have to be defined.") }
-        val contrasts = comps?.joinToString(separator = ",\n") { (g1, g2) -> "${g1}_${g2} = $g1 - $g2" }
+        fun makeRName(x: String): String = x.replace(Regex("[^0-9A-Za-z_]"), ".")
+        val contrasts = comps?.joinToString(separator = ",\n") { (g1, g2) ->
+            val g1R = makeRName(g1)
+            val g2R = makeRName(g2)
+            "${g1R}_${g2R} = $g1R - $g2R"
+        }
 
         val code = RCode.create()
         code.R_require("limma")
         code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
-        code.addStringArray("groups", myGroups.toTypedArray())
+        code.addStringArray("groups", myGroups.map{makeRName(it) }.toTypedArray())
 
         code.addRCode("""
             group_f <- factor(groups)
