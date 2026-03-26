@@ -28,15 +28,15 @@ class ParseSpectronautSetup() {
 
     private fun getRunParts(lines: List<String>): List<List<String>> {
         return lines.fold(emptyList<List<String>>()){ acc, v ->
-            if(v.contains("Run")){
+            (if(v.contains("Run")){
                 acc.plusElement(listOf(v.trim()))
             }else{
-                if(acc.size > 0){
+                if(acc.isNotEmpty()){
                     val last = acc[acc.size-1]
-                    val newLast = last?.plus(v.trim())
+                    val newLast = last.plus(v.trim())
                     acc.dropLast(1).plusElement(newLast)
                 }else acc
-            }
+            })
         }
     }
 
