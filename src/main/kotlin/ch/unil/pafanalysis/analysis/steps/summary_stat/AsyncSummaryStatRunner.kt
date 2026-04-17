@@ -43,26 +43,43 @@ class AsyncSummaryStatRunner() : CommonStep() {
         } else headers
     }
 
-    private fun orderInts(origHeaders: List<Header>, orderedHeaders: List<Header>, ints: List<List<Double>>): List<List<Double>> {
-        val origIdx = origHeaders.map{it.idx}
-        val orderedIdx = orderedHeaders.map{it.idx}
-
+    private fun orderInts(origIdx: List<Int>, orderedIdx: List<Int>, ints: List<List<Double>>): List<List<Double>> {
         return orderedIdx.fold(emptyList()){ acc, v ->
             val pos = origIdx.indexOf(v)
             acc.plusElement(ints[pos])
         }
     }
 
-    private fun getNrPeps(step: AnalysisStep?, table: Table?): List<Int>? {
-        val selHeaders: List<Header>? = if(step?.analysis?.result?.type == ResultType.MaxQuant.value){
-            step.commonResult?.headers?.filter{it.experiment?.field == "Razor.unique.peptides"}
-        }else if(step?.analysis?.result?.type == ResultType.Spectronaut.value){
-            step.commonResult?.headers?.filter{it.experiment?.field == "NrOfPrecursorsIdentified"}
-        } else null
+    private fun orderPeps(origIdx: List<Int>, orderedIdx: List<Int>, peps: List<Int>?): List<Int>? {
+        if(peps == null) return null
+        return orderedIdx.fold(emptyList()){ acc, v ->
+            val pos = origIdx.indexOf(v)
+            acc.plusElement(peps[pos])
+        }
+    }
+
+    private fun getNrPeps(origIdx: List<Int>, orderedIdx: List<Int>, step: AnalysisStep?, table: Table?): Pair<List<Int>?, String?> {
+        val headers = step?.commonResult?.headers
+
+        val (selHeaders, pepField) = when (step?.analysis?.result?.type) {
+            ResultType.MaxQuant.value ->
+                headers?.filter { it.experiment?.field == "Razor.unique.peptides" } to
+                        "Razor.unique.peptides"
+
+            ResultType.Spectronaut.value -> {
+                val field = if (headers?.any { it.experiment?.field == "NrOfStrippedSequencesIdentified" } == true)
+                    "NrOfStrippedSequencesIdentified"
+                else
+                    "NrOfPrecursorsIdentified"
+                headers?.filter { it.experiment?.field == field } to field
+            }
+            else -> null to null
+        }
 
         return if(!selHeaders.isNullOrEmpty()){
-            readTableData.getDoubleMatrix(table, selHeaders).map{a -> a.sumOf { it.toInt() } }
-        } else null
+            val nrPeps = readTableData.getDoubleMatrix(table, selHeaders).map{a -> a.sumOf { it.toInt() } }
+            orderPeps(origIdx, orderedIdx, nrPeps) to pepField
+        } else null to null
     }
 
     fun transformTable(
@@ -75,10 +92,12 @@ class AsyncSummaryStatRunner() : CommonStep() {
         val (headers, ints) = readTableData.getDoubleMatrix(table, intCol, expDetails)
         val groupsOrdered = step?.columnInfo?.columnMapping?.groupsOrdered
         val orderedHeaders = orderHeaders(headers, params.orderByGroups, groupsOrdered, expDetails)
-        val orderedInts = orderInts(headers, orderedHeaders, ints)
+        val origIdx = headers.map{it.idx}
+        val orderedIdx = orderedHeaders.map{it.idx}
+        val orderedInts = orderInts(origIdx, orderedIdx, ints)
         val summaryStat = SummaryStatComputation().getSummaryStat(orderedInts, orderedHeaders, expDetails)
-        val nrPeps = getNrPeps(step, table)
-        return summaryStat.copy(nrOfPeps = nrPeps)
+        val (nrPeps, pepField) = getNrPeps(origIdx, orderedIdx, step, table)
+        return summaryStat.copy(nrOfPeps = nrPeps, pepField = pepField)
     }
 
 }
