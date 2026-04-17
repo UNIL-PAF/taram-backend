@@ -126,7 +126,7 @@ class TTestComputation {
             Header(name = "t.statistic.$compName", idx = nrHeaders + 3 + idxOffset, ColType.NUMBER, Experiment(comp = comp)),
         )
         val qValHeader = if(qVals == null) emptyList() else listOf(Header(name = "adj.p.value.$compName", idx = nrHeaders + 1, ColType.NUMBER, Experiment(comp = comp)))
-        val newHeaders: List<Header>? = table?.headers.plus(pValHeader).plus(qValHeader).plus(foldHeader)
+        val newHeaders: List<Header> = table.headers.plus(pValHeader).plus(qValHeader).plus(foldHeader)
 
         val pValCol = listOf<List<Any>>(pVals)
         val qValCol = if(qVals == null) emptyList<List<Any>>() else listOf(qVals)

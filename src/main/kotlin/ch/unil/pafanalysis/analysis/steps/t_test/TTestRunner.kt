@@ -9,10 +9,14 @@ import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+/*
+    @Deprecated:
+    T-test should be used through StatTest
+ */
 @Service
 class TTestRunner() : CommonStep(), CommonRunner {
 
-    val version = "1.0"
+    val version = "DEPRECATED_1.0"
 
     @Autowired
     var asyncTTestRunner: AsyncTTestRunner? = null

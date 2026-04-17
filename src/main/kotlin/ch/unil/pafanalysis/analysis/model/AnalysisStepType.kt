@@ -23,4 +23,5 @@ enum class AnalysisStepType(val value: String, val hasPlot: Boolean = false) {
     ONE_D_ENRICHMENT("one-d-enrichment"),
     CORRELATION_TABLE("correlation-table", true),
     LIMMA("limma"),
+    STAT_TEST("stat-test"),
 }

@@ -26,7 +26,7 @@ class AsyncTTestRunner() : CommonStep() {
 
             newStep?.copy(
                 results = gson.toJson(res.tTest),
-                commonResult = newStep?.commonResult?.copy(headers = res.headers)
+                commonResult = newStep.commonResult?.copy(headers = res.headers)
             )
         }
         tryToRun(funToRun, newStep)
@@ -41,7 +41,7 @@ class AsyncTTestRunner() : CommonStep() {
         val params = gson.fromJson(step?.parameters, TTestParams().javaClass)
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
         val (resTable, headers, tTestRes) = tTestComputation?.run(table, params, step)!!
-        writeTableData?.write(outputRoot + step?.resultTablePath!!, resTable!!)
+        writeTableData.write(outputRoot + step?.resultTablePath!!, resTable!!)
         return TTestRes(tTestRes, headers)
     }
 }

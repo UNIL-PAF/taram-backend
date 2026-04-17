@@ -1,22 +1,21 @@
-package ch.unil.pafanalysis.analysis.steps.limma
+package ch.unil.pafanalysis.analysis.steps.stat_test
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
+import ch.unil.pafanalysis.analysis.steps.limma.AsyncLimmaRunner
+import ch.unil.pafanalysis.analysis.steps.limma.LimmaParams
+import ch.unil.pafanalysis.analysis.steps.limma.LimmaPdf
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
-/*
-    @Deprecated:
-    Limma should be used through StatTest
- */
 @Service
-class LimmaRunner() : CommonStep(), CommonRunner {
+class StatTestRunner() : CommonStep(), CommonRunner {
 
-    val version = "DEPRECATED_1.0"
+    val version = "1.0"
 
     @Autowired
     var asyncLimmaRunner: AsyncLimmaRunner? = null
