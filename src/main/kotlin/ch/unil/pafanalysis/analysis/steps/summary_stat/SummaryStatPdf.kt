@@ -27,10 +27,13 @@ class SummaryStatPdf() : PdfCommon() {
 
         val stepDiv = Div()
 
+        val pepField = res.pepField
+            ?: if(step.analysis?.result?.type == ResultType.Spectronaut.value) {
+                "NrOfPrecursorsIdentified"
+            } else "Razor.unique.peptides"
+
         val nrPepDescription = if(res.nrOfPeps != null){
-            "\n\"Nr of peptides\" = sum of " + if(step.analysis?.result?.type == ResultType.Spectronaut.value) {
-                "\"NrOfPrecursorsIdentified\""
-            } else "\"Razor.unique.peptides\""
+            "\n\"Nr of peptides\" = sum of \"$pepField\""
         } else ""
 
 
