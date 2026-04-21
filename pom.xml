@@ -10,7 +10,7 @@
     </parent>
     <groupId>ch.unil</groupId>
     <artifactId>taram-backend</artifactId>
-    <version>v2.13.0</version>
+    <version>v2.14.4</version>
     <name>taram-backend</name>
     <description>The backend of Taram, a proteomics analysis pipeline.</description>
     <properties>
@@ -105,6 +105,13 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

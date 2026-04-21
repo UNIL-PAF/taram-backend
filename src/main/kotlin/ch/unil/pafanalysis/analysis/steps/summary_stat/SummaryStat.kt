@@ -14,4 +14,5 @@ data class SummaryStat(
     val stdErr: List<Double>? = null,
     val coefOfVar: List<Double>? = null,
     val nrOfPeps: List<Int>? = null,
+    val pepField: String? = null,
 )

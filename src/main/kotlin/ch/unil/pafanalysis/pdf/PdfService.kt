@@ -7,6 +7,7 @@ import ch.unil.pafanalysis.analysis.service.AnalysisRepository
 import ch.unil.pafanalysis.analysis.service.AnalysisService
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepNames
+import ch.unil.pafanalysis.common.VersionService
 import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.zip.ZipDataSelection
 import com.itextpdf.io.font.constants.StandardFonts
@@ -50,6 +51,9 @@ class PdfService {
 
     @Autowired
     private var env: Environment? = null
+
+    @Autowired
+    private var versionService: VersionService? = null
 
     private val fontSizeConst = 8f
     val myFont = StandardFonts.HELVETICA
@@ -242,7 +246,7 @@ class PdfService {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         addInfoCell("Report creation date", LocalDateTime.now().format(formatter), infoTable)
 
-        val (versionNr, _) = getBackendVersion()
+        val versionNr = versionService?.version() ?: ""
         addInfoCell("Report created with", "TARAM $versionNr", infoTable)
 
         div.setBorder(SolidBorder(antCyan, 1f))
@@ -251,12 +255,6 @@ class PdfService {
         div.add(infoTable)
 
         document?.add(div)
-    }
-
-    private fun  getBackendVersion(): Pair<String, String> {
-        val v = env?.getProperty("taram.version") ?: ":-/"
-        val githubBase = "https://github.com/UNIL-PAF/taram-backend/releases/tag/"
-        return Pair(v, githubBase + v)
     }
 
     private fun addInfoCell(name: String, cont: String, table: Table) {

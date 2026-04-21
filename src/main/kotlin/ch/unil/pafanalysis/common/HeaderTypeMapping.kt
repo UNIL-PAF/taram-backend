@@ -11,7 +11,7 @@ class HeaderTypeMapping {
         "id" to listOf("id", null),
         "proteinIds" to listOf("Majority.protein.IDs", "PG.ProteinGroups"),
         "geneNames" to listOf("Gene.names", "PG.Genes"),
-        "description" to listOf("Protein.names", "PG.FASTAHeader"),
+        "description" to listOf("Protein.names", "PG.ProteinDescriptions"),
     )
 
     fun getCol(name: String, type: String?): String {
