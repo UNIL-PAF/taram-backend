@@ -10,7 +10,12 @@ data class StatTestParams (
     val paired: Boolean? = null,
     val filterOnValid: Boolean? = null,
     val minNrValid: Int? = null,
-    val statTestType: StatTestType? = null
+    val statTestType: String? = null,
+    val limmaParams: LimmaParams? = null,
+)
+
+data class LimmaParams(
+    val trend: Boolean? = null,
 )
 
 enum class MulitTestCorr(val value: String) {

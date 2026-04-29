@@ -18,12 +18,12 @@ class StatTestRunner() : CommonStep(), CommonRunner {
     val version = "1.0"
 
     @Autowired
-    var asyncLimmaRunner: AsyncLimmaRunner? = null
+    var asyncStatTestRunner: AsyncStatTestRunner? = null
 
     @Autowired
     var limmaPdf: LimmaPdf? = null
 
-    override var type: AnalysisStepType? = AnalysisStepType.LIMMA
+    override var type: AnalysisStepType? = AnalysisStepType.STAT_TEST
 
     fun getParameters(step: AnalysisStep?): LimmaParams {
         return if(step?.parameters != null) gson.fromJson(step.parameters, LimmaParams().javaClass) else LimmaParams()
@@ -35,7 +35,7 @@ class StatTestRunner() : CommonStep(), CommonRunner {
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
         val newStep = runCommonStep(type!!, version, oldStepId, true, step, params)
-           asyncLimmaRunner?.runAsync(oldStepId, newStep)
+        asyncStatTestRunner?.runAsync(oldStepId, newStep)
         return newStep!!
     }
 

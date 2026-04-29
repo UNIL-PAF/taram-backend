@@ -46,7 +46,7 @@ class AsyncStatTestRunner() : CommonStep() {
         val statTestParams = gson.fromJson(step?.parameters, StatTestParams().javaClass)
         val table = readTableData.getTable(outputRoot + step?.resultTablePath, step?.commonResult?.headers)
 
-        val (resTable, statTest) = if(statTestParams.statTestType == StatTestType.WELCH_T_TEST || statTestParams.statTestType == StatTestType.STUDENT_T_TEST) {
+        val (resTable, statTest) = if(statTestParams.statTestType == StatTestType.WELCH_T_TEST.value || statTestParams.statTestType == StatTestType.STUDENT_T_TEST.value) {
             computeTTest(table, statTestParams, step)
         } else computeLimma(table, statTestParams, step)
 
@@ -68,7 +68,7 @@ class AsyncStatTestRunner() : CommonStep() {
             paired = statTestParams.paired,
             filterOnValid = statTestParams.filterOnValid,
             minNrValid = statTestParams.minNrValid,
-            equalVariance = if(statTestParams.statTestType == StatTestType.STUDENT_T_TEST) true else false,
+            equalVariance = if(statTestParams.statTestType == StatTestType.STUDENT_T_TEST.value) true else false,
         )
         val (resTable, _, tTestRes) = tTestComputation?.run(table, tTestParams, step)!!
         return Pair(resTable, getStatTest(tTestRes))

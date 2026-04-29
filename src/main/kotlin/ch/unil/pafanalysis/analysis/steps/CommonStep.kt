@@ -21,6 +21,7 @@ import ch.unil.pafanalysis.analysis.steps.remove_columns.RemoveColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.remove_imputed.RemoveImputedRunner
 import ch.unil.pafanalysis.analysis.steps.rename_columns.RenameColumnsRunner
 import ch.unil.pafanalysis.analysis.steps.scatter_plot.ScatterPlotRunner
+import ch.unil.pafanalysis.analysis.steps.stat_test.StatTestRunner
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStatRunner
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestRunner
 import ch.unil.pafanalysis.analysis.steps.umap.UmapRunner
@@ -115,6 +116,9 @@ open class CommonStep {
     @Autowired
     private var limmaRunner: LimmaRunner? = null
 
+    @Autowired
+    private var statTestRunner: StatTestRunner? = null
+
     val gson = Gson()
 
     val hashComp: Crc32HashComputations = Crc32HashComputations()
@@ -204,6 +208,7 @@ open class CommonStep {
             AnalysisStepType.UMAP.value -> umapRunner
             AnalysisStepType.CORRELATION_TABLE.value -> corrTableRunner
             AnalysisStepType.LIMMA.value -> limmaRunner
+            AnalysisStepType.STAT_TEST.value -> statTestRunner
             else -> throw StepException("Analysis step [$type] not found.")
         }
     }
@@ -307,6 +312,7 @@ open class CommonStep {
             AnalysisStepType.ONE_D_ENRICHMENT.value -> oneDEnrichmentRunner?.getParameters(step).toString()
             AnalysisStepType.CORRELATION_TABLE.value -> corrTableRunner?.getParameters(step).toString()
             AnalysisStepType.LIMMA.value -> limmaRunner?.getParameters(step).toString()
+            AnalysisStepType.STAT_TEST.value -> statTestRunner?.getParameters(step).toString()
             else -> throw RuntimeException("Cannot parse parameters for type [${step?.type}]")
         }
         return hashComp.computeStringHash(filterParams)
