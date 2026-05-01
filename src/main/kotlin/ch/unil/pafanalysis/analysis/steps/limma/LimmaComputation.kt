@@ -155,7 +155,7 @@ class LimmaComputation {
 
     private fun computeLimmaR(ints: List<List<Double>>, groups: List<String?>, comps: List<GroupComp>?): LimmaRes {
         val myGroups: List<String> = groups.map{ it ?: throw StepException("Groups have to be defined.") }
-        fun makeRName(x: String): String = x.replace(Regex("[^0-9A-Za-z_]"), ".")
+        fun makeRName(x: String): String = 'X' + x.replace(Regex("[^0-9A-Za-z_]"), ".")
         val contrasts = comps?.joinToString(separator = ",\n") { (g1, g2) ->
             val g1R = makeRName(g1)
             val g2R = makeRName(g2)
