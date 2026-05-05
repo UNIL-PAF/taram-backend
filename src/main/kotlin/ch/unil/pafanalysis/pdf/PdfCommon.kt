@@ -145,10 +145,10 @@ open class PdfCommon {
             .setBorderRadius(BorderRadius(2f))
     }
 
-    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false, dense: Boolean = false): Paragraph {
+    fun getParagraph(s: String, bold: Boolean = false, underline: Boolean = false, dense: Boolean = false, fontSize: Float = fontSizeConst): Paragraph {
         val t = Text(s)
         val p = Paragraph(t)
-        p.setFontSize(fontSizeConst)
+        p.setFontSize(fontSize)
         p.setFont(if(bold) PdfFontFactory.createFont(myBoldFont) else PdfFontFactory.createFont(myFont))
         if(underline) p.setUnderline()
         if(dense) p.setMargin(0f).setPadding(0f)

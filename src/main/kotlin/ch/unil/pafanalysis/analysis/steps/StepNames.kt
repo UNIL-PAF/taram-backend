@@ -24,6 +24,7 @@ object StepNames {
             "add-column"->"Add column"
             "correlation-table"->"Correlations"
             "limma"->"Limma"
+            "stat-test"->"Statistical test"
             else -> throw Exception("Type [$type] doesnt exist.")
         }
     }

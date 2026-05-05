@@ -21,7 +21,7 @@ class StatTestRunner() : CommonStep(), CommonRunner {
     var asyncStatTestRunner: AsyncStatTestRunner? = null
 
     @Autowired
-    var limmaPdf: LimmaPdf? = null
+    var statTestPdf: StatTestPdf? = null
 
     override var type: AnalysisStepType? = AnalysisStepType.STAT_TEST
 
@@ -30,7 +30,7 @@ class StatTestRunner() : CommonStep(), CommonRunner {
     }
 
     override fun createPdf(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, stepNr: Int): Div? {
-        return limmaPdf?.createPdf(step, pdf, plotWidth, stepNr)
+        return statTestPdf?.createPdf(step, pdf, plotWidth, stepNr)
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {

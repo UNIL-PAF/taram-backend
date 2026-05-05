@@ -96,6 +96,7 @@ class AsyncStatTestRunner() : CommonStep() {
             paired = statTestParams.paired,
             filterOnValid = statTestParams.filterOnValid,
             minNrValid = statTestParams.minNrValid,
+            trend = statTestParams.limmaParams?.trend
         )
         val (resTable, limmaRes) = limmaComputation?.run(table, limmaParams, step)!!
         return Pair(resTable, getStatTest(limmaRes))

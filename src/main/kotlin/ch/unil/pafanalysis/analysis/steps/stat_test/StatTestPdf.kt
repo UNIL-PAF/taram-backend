@@ -1,6 +1,7 @@
 package ch.unil.pafanalysis.analysis.steps.stat_test
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.analysis.steps.limma.Limma
 import ch.unil.pafanalysis.analysis.steps.limma.LimmaParams
 import ch.unil.pafanalysis.pdf.PdfCommon
@@ -30,20 +31,44 @@ class StatTestPdf() : PdfCommon() {
     )
 
     fun createPdf(step: AnalysisStep, pdf: PdfDocument?, plotWidth: Float, stepNr: Int): Div? {
-        val res = gson.fromJson(step.results, Limma::class.java)
-        val parsedParams = gson.fromJson(step.parameters, LimmaParams::class.java)
+        val res = gson.fromJson(step.results, StatTest::class.java)
+        val parsedParams = gson.fromJson(step.parameters, StatTestParams::class.java)
+
+        val testType = when(parsedParams.statTestType) {
+            StatTestType.WELCH_T_TEST.value -> "Welch's t-test"
+            StatTestType.STUDENT_T_TEST.value -> "Student's t-test"
+            StatTestType.LIMMA.value -> "Limma"
+            else -> throw Exception("There is no statistical test [${parsedParams.statTestType}].")
+        }
+
 
         val stepDiv = Div()
-        val description = "Limma is a statistical framework that applies linear models and empirical Bayes shrinkage to high‑throughput expression or abundance data."
-        stepDiv.add(titleDiv("$stepNr. Limma", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
+
+        val testDescription = when(parsedParams.statTestType) {
+                StatTestType.WELCH_T_TEST.value -> "Welch's t-test assumes unequal variances."
+                StatTestType.STUDENT_T_TEST.value -> "Student's t-test assumes equal variances."
+                StatTestType.LIMMA.value -> "Limma is a statistical framework that applies linear models and empirical Bayes shrinkage to improve the reliability and statistical power of differential expression analysis, particularly in studies with small sample sizes."
+                else -> throw Exception("There is no statistical test [${parsedParams.statTestType}].")
+        }
+
+        val description = "$testDescription\nThe Benjamini–Hochberg correction adjusts significance thresholds to control the false discovery rate in large datasets."
+
+        val stepName = StepNames.getName(step.type)
+        stepDiv.add(titleDiv("$stepNr. $stepName", plotWidth = plotWidth, description = description, table = "Table $stepNr", nrProteins = step.nrProteinGroups, link = "$stepNr-${step.type}"))
 
         // 1. parameters
-        val paramsData: List<Pair<String, String>> = listOf(
+        val limmaParams: List<Pair<String, String>> = if(parsedParams.statTestType == StatTestType.LIMMA.value){
+            listOf(
+                Pair("Trend:", if(parsedParams.limmaParams?.trend == true) "true" else "false"),
+            )} else emptyList()
+
+        val paramsData: List<Pair<String, String>> = limmaParams.plus(listOf(
             Pair("Significance threshold:", parsedParams.signThres.toString()),
             Pair("Multiple testing correction:", multiTestCorrText[parsedParams.multiTestCorr] ?: "")
-        )
+        ))
 
         val paramsDiv = Div()
+        paramsDiv.add(getParagraph(testType, true, underline = true, fontSize = 10f).setPaddingLeft(3f))
         paramsDiv.add(getTwoRowTable(paramsData))
         if(parsedParams.filterOnValid == true){
             paramsDiv.add(getOneRowTable(listOf(getParagraph("Only compute comparisons when there are at least ${parsedParams.minNrValid} valid (non-imputed) values in one group.", dense = true, bold = true))))
@@ -54,7 +79,7 @@ class StatTestPdf() : PdfCommon() {
         return stepDiv
     }
 
-    private fun createResTable(res: Limma, filterOnValid: Boolean?): Table {
+    private fun createResTable(res: StatTest, filterOnValid: Boolean?): Table {
         val table = Table(if(filterOnValid == true) 3 else 2)
 
         val header1 = Cell().setBorder(SolidBorder(ColorConstants.LIGHT_GRAY, 1f))

@@ -62,7 +62,7 @@ class LimmaComputation {
         val (header, ints) = readTableData.getDoubleMatrixByRow(table, field, expDetails)
         val groups: List<String?> = header.map{h -> expDetails?.get(h.experiment?.name)?.group}
 
-        val limmaRes = computeLimmaR(ints, groups, comps)
+        val limmaRes = computeLimmaR(ints, groups, comps, params)
 
         fun getValids(group: String): List<Boolean> {
             val groupIdxs = imputationTable?.headers?.withIndex()?.filter{expDetails?.get(it.value.experiment?.name)?.group == group}?.map{it.index}
@@ -153,7 +153,7 @@ class LimmaComputation {
         val fc: List<List<Double>>?
     )
 
-    private fun computeLimmaR(ints: List<List<Double>>, groups: List<String?>, comps: List<GroupComp>?): LimmaRes {
+    private fun computeLimmaR(ints: List<List<Double>>, groups: List<String?>, comps: List<GroupComp>?, params: LimmaParams?): LimmaRes {
         val myGroups: List<String> = groups.map{ it ?: throw StepException("Groups have to be defined.") }
         fun makeRName(x: String): String = 'X' + x.replace(Regex("[^0-9A-Za-z_]"), ".")
         val contrasts = comps?.joinToString(separator = ",\n") { (g1, g2) ->
@@ -166,6 +166,7 @@ class LimmaComputation {
         code.R_require("limma")
         code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
         code.addStringArray("groups", myGroups.map{makeRName(it) }.toTypedArray())
+        code.addBoolean("trend", params?.trend ?: false )
 
         code.addRCode("""
             group_f <- factor(groups)
@@ -177,7 +178,7 @@ class LimmaComputation {
               levels = design
             )
             fit2 <- contrasts.fit(fit, contrast)
-            fit2 <- eBayes(fit2)
+            fit2 <- eBayes(fit2, trend=trend)
 
             p_vals <- fit2${'$'}p.value
             p_vals[is.na(p_vals)] <- NaN
