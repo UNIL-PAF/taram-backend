@@ -124,7 +124,7 @@ class ZipService {
     }
 
     private fun prettyName(s: String): String {
-        return s.replace("\\s+".toRegex(), "-").replace("--+".toRegex(), "-")
+        return s.replace("\\s+".toRegex(), "-").replace("--+".toRegex(), "-").replace(Regex("[^A-Za-z0-9_-]"), "_")
     }
 
     private fun createZipDir(dirName: String): String {
