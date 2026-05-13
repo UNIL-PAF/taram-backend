@@ -130,9 +130,10 @@ class LimmaComputation {
         val tCols = (tStatistics ?: throw StepException("T-statistics are missing in limma results."))
             .mapIndexed{ i, a ->  if(validList?.get(i) == false) Double.NaN else a}
 
-        val addCols: List<List<Any>> = listOf(pValCol, adjPValCol, foldCols, signCols, tCols)
-        val newCols = table.cols?.plus(addCols)
         val nrSign = signCols.map { if (it) 1 else 0 }.sum()
+
+        val addCols: List<List<Any>> = listOf(pValCol, adjPValCol, foldCols, signCols.map{it.toString()}, tCols)
+        val newCols = table.cols?.plus(addCols)
 
         val newLimmaComps = limmaComps.plusElement(
             LimmaComparision(
