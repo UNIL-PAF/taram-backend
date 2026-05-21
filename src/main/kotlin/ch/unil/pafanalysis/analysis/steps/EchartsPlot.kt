@@ -5,5 +5,6 @@ data class EchartsPlot(
     val echartsHash: Long? = null,
     val outputPath: String? = null,
     val width: Double? = null,
-    val height: Double? = null
+    val height: Double? = null,
+    val pdfWidth: Double? = null,
 )
