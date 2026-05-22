@@ -2,6 +2,7 @@ package ch.unil.pafanalysis.analysis.steps.scatter_plot
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.common.EchartsServer
+import ch.unil.pafanalysis.common.EchartsSize
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
@@ -19,7 +20,8 @@ class ScatterPlotPdf() : PdfCommon() {
         val div = Div()
         div.add(titleDiv("$stepNr. Scatter plot", plotWidth, link = "$stepNr-${step.type}"))
         div.add(Paragraph(" "))
-        val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
+        val echartsSize = EchartsSize(700.0, 600.0, pdfWidth = 550.0)
+        val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth, plotWidth, echartsSize)
         div.add(plot)
 
         val scatterParams = gson.fromJson(step?.parameters, ScatterPlotParams().javaClass)
