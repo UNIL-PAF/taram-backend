@@ -38,14 +38,14 @@ class EchartsServer {
 
     val gson = Gson()
 
-    fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument, plotWidth: Float, plotHeight: Float? = null, echartsSize: EchartsSize? = null): Image? {
+    fun makeEchartsPlot(step: AnalysisStep, pdf: PdfDocument, echartsSize: EchartsSize): Image? {
         val results = gson.fromJson(step.results, BoxPlot::class.java)
 
         val echartsPlot = results.plot?.copy(
             outputPath = step.resultPath,
-            width = echartsSize?.width,
-            height = echartsSize?.height,
-            pdfWidth = echartsSize?.pdfWidth,)
+            width = echartsSize.svgWidth,
+            height = echartsSize.svgHeight,
+            pdfWidth = echartsSize.pdfWidth,)
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/pdf")
 
         // create outputPath if it doesn't exist
@@ -82,7 +82,7 @@ class EchartsServer {
         val pdfPlotCopy: PdfFormXObject = pdfPlot.copyAsFormXObject(pdf)
         sourcePdf.close()
         val img = Image(pdfPlotCopy)
-        return img.scaleToFit(plotWidth, plotHeight ?: 300f)
+        return img.scaleToFit(echartsSize.itextWidth, echartsSize.itextHeight)
     }
 
     fun getSvgPlot(step: AnalysisStep?, svgPath: String): String? {

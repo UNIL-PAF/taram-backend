@@ -3,6 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.umap
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.t_test.TTestParams
 import ch.unil.pafanalysis.common.EchartsServer
+import ch.unil.pafanalysis.common.EchartsSize
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
@@ -43,7 +44,8 @@ class UmapPdf() : PdfCommon() {
         div.add(colTable)
 
         div.add(Paragraph(" "))
-        val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth)
+        val echartsSize = EchartsSize(700.0, 550.0, plotWidth, plotWidth, pdfWidth = 550.0)
+        val plot = echartsServer?.makeEchartsPlot(step, pdf, echartsSize)
         div.add(plot)
         return div
     }

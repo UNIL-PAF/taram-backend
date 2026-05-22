@@ -1,3 +1,3 @@
 package ch.unil.pafanalysis.common
 
-data class EchartsSize(val width: Double, val height: Double, val pdfWidth: Double)
+data class EchartsSize(val svgWidth: Double, val svgHeight: Double, val itextWidth: Float, val itextHeight: Float, val pdfWidth: Double)

@@ -30,8 +30,8 @@ class CorrelationTablePdf() : PdfCommon() {
         div.add(titleDiv("$stepNr. Correlations", plotWidth, description = description, link = "$stepNr-${step.type}"))
 
         div.add(Paragraph(" "))
-        val echartsSize = EchartsSize(700.0, 600.0, pdfWidth = 550.0)
-        val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth, plotWidth, echartsSize)
+        val echartsSize = EchartsSize(700.0, 600.0, plotWidth, plotWidth, pdfWidth = 550.0)
+        val plot = echartsServer?.makeEchartsPlot(step, pdf, echartsSize)
         div.add(plot)
 
         return div

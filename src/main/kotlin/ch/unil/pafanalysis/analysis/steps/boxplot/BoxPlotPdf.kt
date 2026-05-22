@@ -23,8 +23,8 @@ class BoxPlotPdf() : PdfCommon() {
         div.add(titleDiv("$stepNr. Boxplot", plotWidth, description = description, link = "$stepNr-${step.type}"))
 
         div.add(Paragraph(" "))
-        val echartsSize = EchartsSize(700.0, 400.0, pdfWidth = 580.0)
-        val plot = echartsServer?.makeEchartsPlot(step, pdf, plotWidth, 350f, echartsSize)
+        val echartsSize = EchartsSize(700.0, 400.0, plotWidth, 350f, pdfWidth = 580.0)
+        val plot = echartsServer?.makeEchartsPlot(step, pdf, echartsSize)
         div.add(plot)
 
         val boxplotData = gson.fromJson(step.results, BoxPlot().javaClass)
