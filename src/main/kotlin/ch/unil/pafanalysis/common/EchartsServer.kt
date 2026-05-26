@@ -85,8 +85,9 @@ class EchartsServer {
         return img.scaleToFit(echartsSize.itextWidth, echartsSize.itextHeight)
     }
 
-    fun getSvgPlot(step: AnalysisStep?, svgPath: String): String? {
+    fun getSvgPlot(step: AnalysisStep?, svgPath: String, width: Double, height: Double): String? {
         val results = gson.fromJson(step?.results, BoxPlot::class.java)
+        val plotOption = results.plot?.copy(width = width, height = height)
 
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/svg?path=$svgPath")
         val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
@@ -95,7 +96,7 @@ class EchartsServer {
             .uri(URI.create(echartsServerUrl))
             .timeout(Duration.ofSeconds(5))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(results.plot)))
+            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(plotOption)))
             .build();
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -107,8 +108,9 @@ class EchartsServer {
         return env?.getProperty("output.path") + response.body()
     }
 
-    fun getPngPlot(step: AnalysisStep?, svgPath: String): String? {
+    fun getPngPlot(step: AnalysisStep?, svgPath: String, width: Double, height: Double, zoomFactor: Int): String? {
         val results = gson.fromJson(step?.results, BoxPlot::class.java)
+        val plotOption = results.plot?.copy(zoom = zoomFactor, width = width, height = height)
 
         val echartsServerUrl = env?.getProperty("echarts.server.url").plus("/png?path=$svgPath")
         val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
@@ -117,7 +119,7 @@ class EchartsServer {
             .uri(URI.create(echartsServerUrl))
             .timeout(Duration.ofSeconds(5))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(results.plot)))
+            .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(plotOption)))
             .build();
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
