@@ -7,4 +7,5 @@ data class EchartsPlot(
     val width: Double? = null,
     val height: Double? = null,
     val pdfWidth: Double? = null,
+    val zoom: Int? = null,
 )

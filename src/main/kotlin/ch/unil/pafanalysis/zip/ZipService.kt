@@ -12,6 +12,7 @@ import ch.unil.pafanalysis.analysis.steps.StepNames
 import ch.unil.pafanalysis.analysis.steps.add_column.AddColumnParams
 import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.common.EchartsServer
+import ch.unil.pafanalysis.common.PlotSizeHelper
 import ch.unil.pafanalysis.common.ZipTool
 import ch.unil.pafanalysis.html_plot.HtmlPlot
 import ch.unil.pafanalysis.pdf.PdfService
@@ -29,6 +30,7 @@ import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 import java.nio.file.StandardCopyOption.*
 import kotlin.io.path.*
+import kotlin.math.roundToInt
 
 
 @Service
@@ -205,12 +207,18 @@ class ZipService {
         }.replace(" ", "-")
     }
 
+
+
     private fun getPlot(step: AnalysisStep?, idx: Int, path: String){
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
         val resName = getPlotNames(step?.type).plus("-").plus(idx)
 
-        echartsServer?.getSvgPlot(step, "${step?.resultPath}/$resName.svg")
-        echartsServer?.getPngPlot(step, "${step?.resultPath}/$resName.png")
+        val svgSize = PlotSizeHelper.getSvgDimension(step?.type, zoomFactor = 4)
+        echartsServer?.getSvgPlot(step, "${step?.resultPath}/$resName.svg", svgSize.width, svgSize.height)
+
+        val pngSize = PlotSizeHelper.getDefaultPngDimension(step?.type)
+        echartsServer?.getPngPlot(step, "${step?.resultPath}/$resName.png", pngSize.width, pngSize.height, pngSize.zoom)
+
         htmlPlot?.getHtmlPlot(step, "${step?.resultPath}/$resName.html", resName)
 
         // move generated files

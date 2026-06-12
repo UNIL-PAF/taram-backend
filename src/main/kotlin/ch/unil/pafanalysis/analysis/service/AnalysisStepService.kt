@@ -182,18 +182,20 @@ class AnalysisStepService {
         } else origTable
     }
 
-    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, html: Boolean?): String? {
+    fun getZip(stepId: Int, svg: Boolean?, png: Boolean?, html: Boolean?, zoom: Int = 4): String? {
         val step = analysisStepRepo?.findById(stepId)
         val resultDir = env?.getProperty("output.path").plus(step?.resultPath)
         val name = step?.id.toString().plus("-").plus(step?.type)
         val dataDir: Path = Files.createDirectories(Path("$resultDir/$name"))
 
         if(svg == true){
-            echartsServer?.getSvgPlot(step, "${step?.resultPath}/$name/$name.svg")
+            val (width, height, _) = PlotSizeHelper.getSvgDimension(step?.type, zoomFactor = zoom)
+            echartsServer?.getSvgPlot(step, "${step?.resultPath}/$name/$name.svg", width = width, height = height)
         }
 
         if(png == true){
-            echartsServer?.getPngPlot(step, "${step?.resultPath}/$name/$name.png")
+            val (width, height, zoom) = PlotSizeHelper.getPngDimension(step?.type, zoomFactor = zoom)
+            echartsServer?.getPngPlot(step, "${step?.resultPath}/$name/$name.png", width, height, zoom)
         }
 
         if(html == true){

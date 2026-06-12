@@ -204,11 +204,11 @@ class AnalysisStepController {
         @RequestParam svg: Boolean? = null,
         @RequestParam png: Boolean? = null,
         @RequestParam html: Boolean? = null,
+        @RequestParam zoom: Int? = null,
     ): ResponseEntity<ByteArray>? {
         var response: ResponseEntity<ByteArray>? = null
         try {
-            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, html)
-
+            val zipFile: String? = analysisStepService?.getZip(stepId, svg, png, html, zoom ?: 4)
             val inputStream: InputStream = FileInputStream(zipFile)
             val contents = inputStream.readAllBytes()
             inputStream.close()
