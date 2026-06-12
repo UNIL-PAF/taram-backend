@@ -28,7 +28,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     }
 
     private fun invalidToNull(d: Double?): Double?{
-        return if(d?.isNaN() != false || d?.isInfinite()?:true) return null else d
+        return if(d?.isNaN() != false || d.isInfinite() ?:true) return null else d
     }
 
     private fun createVolcanoObj(analysisStep: AnalysisStep?): VolcanoPlot {
@@ -53,15 +53,16 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
 
         val proteinName = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))
         val geneName = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))
+        val desc = readTableData.getStringColumn(table, hMap.getCol("description", resType))
         val qVals = if(hasQVal) {
             val qVals1 = readTableData.getDoubleColumn(table, "q.value$compName")
-            if(qVals1 != null) qVals1 else readTableData.getDoubleColumn(table, "adj.p.value$compName")
+            qVals1 ?: readTableData.getDoubleColumn(table, "adj.p.value$compName")
         } else null
 
         if (foldChanges == null) throw StepException("You have to run a statistical test before this plot.")
 
         // nr petides or precursors quantified
-        val pepOrPreHeader = table.headers?.find { a ->
+        val pepOrPreHeader = table.headers.find { a ->
             a.experiment == null && (a.name?.contains("NrOfPrecursorsIdentified") ?: false || a.name?.contains("Razor.unique.peptides") ?: false)
         }
         val pepOrPreQuant = if(pepOrPreHeader?.name != null) readTableData.getDoubleColumn(table, pepOrPreHeader.name) else null
@@ -69,23 +70,25 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
         val volcanoData = value?.mapIndexed { i, v ->
             val plotValTarget = if(params?.useAdjustedPVal == true) qVals?.get(i) ?: Double.NaN else v
             val plotPVal = if (params?.log10PVal == true) log10(plotValTarget) * -1 else plotValTarget
-            val isSign = v <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges?.get(i)) >= (params?.fcThresh
+            val isSign = v <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(foldChanges[i]) >= (params?.fcThresh
                 ?: 10000.0)
-            val qIsSign = if(qVals != null && foldChanges != null) qVals[i] <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(
+            val qIsSign = if(qVals != null) qVals[i] <= (params?.pValThresh ?: 0.0) && kotlin.math.abs(
                 foldChanges[i]
             ) >= (params?.fcThresh
                 ?: 10000.0) else null
 
             val qVal = qVals?.get(i)
-            val other = if(pepOrPreQuant != null) listOf(VolcanoPointInfo(pepOrPreHeader?.name, pepOrPreQuant?.get(i))) else null
+            val other = if(pepOrPreQuant != null) listOf(VolcanoPointInfo(pepOrPreHeader?.name, pepOrPreQuant[i])) else null
 
             val genes = geneName?.get(i)
+            val shortDesc = desc?.get(i)?.split(";")?.get(0)
 
             VolcanoPoint(
                 prot = proteinName?.get(i)?.split(";")?.get(0),
                 gene = genes?.split(";")?.get(0),
-                multiGenes= genes?.split(";")?.size ?: 0 > 1,
-                fc = invalidToNull(foldChanges?.get(i)),
+                desc = if((shortDesc?.length ?: 0) > 25) shortDesc?.take(25) + "..." else shortDesc,
+                multiGenes= (genes?.split(";")?.size ?: 0) > 1,
+                fc = invalidToNull(foldChanges[i]),
                 pVal = invalidToNull(v),
                 qVal = invalidToNull(qVal),
                 plotVal = invalidToNull(plotPVal),

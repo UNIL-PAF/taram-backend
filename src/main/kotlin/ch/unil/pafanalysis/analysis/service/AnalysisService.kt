@@ -92,7 +92,7 @@ class AnalysisService {
         // check if this is the last analysis in this result
         if(addNewIfLast && analysis?.result?.id != null){
             val analysisList = analysisRepo?.findByResultId(analysis.result.id)
-            
+
             if((analysisList?.filter { it.id != analysisId }?.size ?: 0) == 0){
                 createNewAnalysis(analysis.result)
             }
