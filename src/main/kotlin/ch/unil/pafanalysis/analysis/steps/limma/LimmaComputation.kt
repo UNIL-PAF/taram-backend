@@ -156,6 +156,14 @@ class LimmaComputation {
 
     private fun computeLimmaR(ints: List<List<Double>>, groups: List<String?>, comps: List<GroupComp>?, params: LimmaParams?): LimmaRes {
         val myGroups: List<String> = groups.map{ it ?: throw StepException("Groups have to be defined.") }
+
+        val pairs: List<Int> = myGroups.fold(Pair(emptyList<Int>(), emptyMap<String, Int>())) { acc, name ->
+            val idx = acc.second.getOrElse(name){0} + 1
+            Pair(acc.first + idx, acc.second + (name to idx))
+        }.first
+
+        println("paired = " + params?.paired)
+
         fun makeRName(x: String): String = 'X' + x.replace(Regex("[^0-9A-Za-z_]"), ".")
         val contrasts = comps?.joinToString(separator = ",\n") { (g1, g2) ->
             val g1R = makeRName(g1)
@@ -167,12 +175,22 @@ class LimmaComputation {
         code.R_require("limma")
         code.addDoubleMatrix("m", ints.map { it.toDoubleArray() }.toTypedArray())
         code.addStringArray("groups", myGroups.map{makeRName(it) }.toTypedArray())
+        code.addIntArray("pairs", pairs.toIntArray())
         code.addBoolean("trend", params?.trend ?: false )
+        code.addBoolean("paired", params?.paired ?: false )
 
         code.addRCode("""
             group_f <- factor(groups)
-            design <- model.matrix(~ 0 + group_f)
-            colnames(design) <- levels(group_f)
+            design <- if(paired){
+                    model.matrix(~ 0 + group_f + pairs)
+                }else {
+                    model.matrix(~ 0 + group_f)
+                }
+            colnames(design) <- if(paired){
+                    c(levels(group_f), "pairs")
+                } else {
+                    levels(group_f)
+                }
             fit <- lmFit(m, design)
             contrast <- makeContrasts(
               $contrasts,
