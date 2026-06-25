@@ -33,7 +33,8 @@ class ResultController {
 
     private fun getResultPaths(): ResultPaths = ResultPaths(
         maxQuantPath = env?.getProperty("result.path.maxquant"),
-        spectronautPath = env?.getProperty("result.path.spectronaut")
+        spectronautPath = env?.getProperty("result.path.spectronaut"),
+        fragpipePath = env?.getProperty("result.path.fragpipe")
     )
 
     @PostMapping("/add")

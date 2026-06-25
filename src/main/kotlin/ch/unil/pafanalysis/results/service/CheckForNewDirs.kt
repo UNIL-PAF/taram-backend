@@ -1,14 +1,9 @@
 package ch.unil.pafanalysis.results.service
 
 import ch.unil.pafanalysis.results.model.AvailableDir
-import ch.unil.pafanalysis.results.model.Result
 import ch.unil.pafanalysis.results.model.ResultPaths
 import ch.unil.pafanalysis.results.model.ResultType
-import org.apache.commons.io.FilenameUtils
-import org.apache.commons.io.filefilter.WildcardFileFilter
 import org.springframework.stereotype.Component
-import java.io.File
-import java.io.FileFilter
 import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.FileVisitOption
@@ -21,10 +16,6 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.EnumSet
-import kotlin.io.path.name
-import kotlin.io.path.pathString
-import kotlin.io.path.readAttributes
-
 
 @Component
 class CheckForNewDirs {
@@ -33,11 +24,10 @@ class CheckForNewDirs {
         // the filename and a boolean indicating if it is an exact match or a pattern
         private val maxQuantResName = listOf(Pair("proteinGroups.txt", true))
         private val spectronautResName = listOf(Pair("_Report[^\\.]*.xls", false), Pair("_Report[^\\.]*.tsv", false), Pair("_Report[^\\.]*.txt", false))
+        private val fragPipeResName = listOf(Pair("combined_protein.tsv", true))
 
         fun checkAll(resultPaths: ResultPaths): List<AvailableDir>{
-            val maxQuantDirs = checkMaxQuant(resultPaths)
-            val spectronautDirs = checkSpectronaut(resultPaths)
-            val allDirs =  maxQuantDirs.plus(spectronautDirs)
+            val allDirs = checkMaxQuant(resultPaths).plus(checkSpectronaut(resultPaths)).plus(checkFragpipe(resultPaths))
             val distinctDirs = allDirs.distinctBy { a -> a.path + a.type }
             return distinctDirs.sortedBy { it.fileCreationDate }.reversed()
         }
@@ -46,12 +36,16 @@ class CheckForNewDirs {
             return checkCommon(resultPaths.maxQuantPath!!, maxQuantResName, ResultType.MaxQuant)
         }
 
+        private fun checkFragpipe(resultPaths: ResultPaths): List<AvailableDir>{
+            return checkCommon(resultPaths.fragpipePath!!, fragPipeResName, ResultType.FragPipe)
+        }
+
         private fun checkSpectronaut(resultPaths: ResultPaths): List<AvailableDir>{
             return checkCommon(resultPaths.spectronautPath!!, spectronautResName, ResultType.Spectronaut)
         }
 
-        private fun checkCommon(path: String, resFileNames: List<Pair<String, Boolean>>, resType: ResultType): List<AvailableDir>{
 
+        private fun checkCommon(path: String, resFileNames: List<Pair<String, Boolean>>, resType: ResultType): List<AvailableDir>{
             val matcher = FileSystems.getDefault().getPathMatcher("glob:*.{txt,tsv,xls}")
             val root: Path = Paths.get(path)
             val opts: Set<FileVisitOption> = EnumSet.noneOf(FileVisitOption::class.java)
@@ -106,7 +100,7 @@ class CheckForNewDirs {
                 }
             }
 
-            return dirList.mapNotNull {
+            return dirList.plus(currentAvailableDir).mapNotNull {
                 val resFile = it?.resFileList?.find { a -> isFileValid(a, resFileNames) }
                 it?.copy(resFile = resFile)
             }
