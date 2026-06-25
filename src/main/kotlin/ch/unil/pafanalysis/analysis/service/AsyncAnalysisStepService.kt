@@ -33,6 +33,7 @@ class AsyncAnalysisStepService {
         newSteps.forEach { newStep ->
             val resultPath = "$analysisId/${newStep.id}"
             File(outputRoot + resultPath).mkdir()
+
             val oldStep = analysisStepRepository?.findById(newStep.id!!)
 
             val newFile: String? = if(newStep.modifiesResult == true){
@@ -73,7 +74,7 @@ class AsyncAnalysisStepService {
         val newFile = resultPath + "/" + oldFile.name
 
         // create path if it doesnt exist
-        Files.createDirectories(Paths.get(resultPath))
+        Files.createDirectories(Paths.get(outputRoot + resultPath))
 
         oldFile.copyTo(File(outputRoot + newFile ))
         return newFile
