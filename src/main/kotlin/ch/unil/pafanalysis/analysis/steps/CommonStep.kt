@@ -145,7 +145,7 @@ open class CommonStep {
             val stepWithParams =
                 if (params != null) currentStep?.copy(parameters = params) else currentStep
             val stepWithPath = setMainPaths(oldStep?.analysis, stepWithParams)
-            val resultType = getResultType(stepWithPath?.analysis?.result?.type)
+            val resultType = ResultType.fromValue(stepWithPath?.analysis?.result?.type)
             val resultTablePathAndHash =
                 getResultTablePath(modifiesResult, oldStep, stepWithPath?.resultTablePath, resultType)
 
@@ -214,12 +214,14 @@ open class CommonStep {
     }
 
     fun getResultPath(analysis: Analysis?): String? {
-        val resultType = getResultType(analysis?.result?.type)
-        return env?.getProperty(if (resultType == ResultType.MaxQuant) "result.path.maxquant" else "result.path.spectronaut") + analysis?.result?.path
-    }
-
-    fun getResultType(type: String?): ResultType? {
-        return if (type == ResultType.MaxQuant.value) ResultType.MaxQuant else ResultType.Spectronaut
+        val resultType = ResultType.fromValue(analysis?.result?.type)
+        val property = when (resultType) {
+            ResultType.MaxQuant -> "maxquant"
+            ResultType.Spectronaut -> "spectronaut"
+            ResultType.FragPipe -> "fragpipe"
+            else -> throw StepException("Analysis step [$resultType] not found.")
+        }
+        return env?.getProperty("result.path.$property") + analysis?.result?.path
     }
 
     fun getOutputRoot(): String? {

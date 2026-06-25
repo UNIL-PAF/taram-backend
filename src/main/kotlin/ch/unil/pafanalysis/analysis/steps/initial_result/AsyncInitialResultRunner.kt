@@ -152,7 +152,7 @@ class AsyncInitialResultRunner(): CommonStep(){
     )
 
     private fun getOriginalTableAndInfo(analysisStep: AnalysisStep?): OriginalTableAndInfo?{
-        val resultType = getResultType(analysisStep?.analysis?.result?.type)
+        val resultType = ResultType.fromValue(analysisStep?.analysis?.result?.type)
         val outputRoot = getOutputRoot()
         val sourcePath = getResultPath(analysisStep?.analysis)
         val result = analysisStep?.analysis?.result
@@ -174,7 +174,7 @@ class AsyncInitialResultRunner(): CommonStep(){
     }
 
     private fun prepareInitialTable(analysisStep: AnalysisStep?): AnalysisStep?{
-        val resultType = getResultType(analysisStep?.analysis?.result?.type)
+        val resultType = ResultType.fromValue(analysisStep?.analysis?.result?.type)
         val resultPath = getResultPath(analysisStep?.analysis)
         val originalTableAndInfo = getOriginalTableAndInfo(analysisStep)
             ?: throw StepException("Cannot parse the original table.")
@@ -237,7 +237,7 @@ class AsyncInitialResultRunner(): CommonStep(){
         val corrIdxHeaders = fltHeaders.mapIndexed { i, h -> h.copy(idx = i)  }
         WriteTableData().write(getOutputRoot() + analysisStep?.resultTablePath, Table(headers = corrIdxHeaders, cols = colsFlt))
 
-        val resultType = getResultType(analysisStep?.analysis?.result?.type)
+        val resultType = ResultType.fromValue(analysisStep?.analysis?.result?.type)
         val resTable =  getResultTablePath(
             modifiesResult = true,
             oldStep = analysisStep,
