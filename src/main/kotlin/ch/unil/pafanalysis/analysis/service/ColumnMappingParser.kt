@@ -17,7 +17,7 @@ class ColumnMappingParser {
 
     val checkTypes = CheckTypes()
 
-    fun parse(filePath: String?, resultPath: String?, resultType: ResultType?): Pair<ColumnMapping, CommonResult> {
+    fun parse(filePath: String?, resultPath: String?, resultType: ResultType): Pair<ColumnMapping, CommonResult> {
         val (columns, colTypes) = getColumns(filePath)
         return getColumnMapping(resultPath, columns, resultType, colTypes)
     }
@@ -49,15 +49,17 @@ class ColumnMappingParser {
     private fun getColumnMapping(
         resultPath: String?,
         columns: List<String>?,
-        type: ResultType?,
+        type: ResultType,
         colTypes: List<ColType>?
     ): Pair<ColumnMapping, CommonResult> {
-        return if (type == ResultType.MaxQuant) {
-            val summaryFile = resultPath.plus("/summary.txt")
-            if (! File(summaryFile).exists()) throw StepException("Could not find summary.txt in results directory.")
-            getMaxQuantExperiments(columns, summaryFile, colTypes)
-        } else {
-            getSpectronautExperiments(columns, colTypes)
+        return when (type) {
+            ResultType.MaxQuant -> {
+                val summaryFile = resultPath.plus("/summary.txt")
+                if (! File(summaryFile).exists()) throw StepException("Could not find summary.txt in results directory.")
+                getMaxQuantExperiments(columns, summaryFile, colTypes)
+            }
+            ResultType.Spectronaut -> getSpectronautExperiments(columns, colTypes)
+            ResultType.FragPipe -> getFragPipeExperiments(columns, colTypes)
         }
     }
 
@@ -67,6 +69,26 @@ class ColumnMappingParser {
         val expDetails: Map<String, ExpInfo> = emptyMap(),
         val headers: List<Header> = emptyList()
     )
+
+    private fun getFragPipeExperiments(
+        columns: List<String>?,
+        colTypes: List<ColType>?
+    ): Pair<ColumnMapping, CommonResult> {
+        val cols = parseFragPipeColumns(columns, colTypes)
+
+        if(cols.expNames.isEmpty()) throw StepException("Could not parse column names from FragPipe result.")
+
+        val colMapping = ColumnMapping(
+            experimentDetails = cols.expDetails,
+            experimentNames = cols.expNames.toList(),
+            intCol = if (cols.expFields.contains("Quantity")) "Quantity" else null
+        )
+
+        val commonResult = CommonResult(
+            headers = cols.headers
+        )
+        return Pair(colMapping, commonResult)
+    }
 
 
     private fun getSpectronautExperiments(
@@ -88,6 +110,71 @@ class ColumnMappingParser {
         )
         return Pair(colMapping, commonResult)
     }
+
+    private fun findSameStart(subName: String, lastFound: Pair<String, List<String>?>?, name: String, cols: List<String>?): Pair<String, List<String>?>?{
+        val matches = cols?.filter{it.startsWith(subName)}
+        val nrMatches = matches?.size ?: 0
+        val newPart = name.replace(subName, "").trimStart().split(Regex("\\s")).first()
+        val newSubName = "$subName $newPart"
+        val matchWithoutStart = matches?.mapNotNull{
+            val a = it.replace(subName, "").trimStart()
+            a.ifEmpty { null }
+        }
+
+        return if(nrMatches <= 1 || newPart.isEmpty()) {
+                lastFound ?: Pair(subName, matchWithoutStart)
+            }else {
+                findSameStart(newSubName, Pair(subName, matchWithoutStart), name, cols)
+            }
+        }
+
+    private fun parseFragPipeColumns(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
+        val startMap = columnsOrig?.mapNotNull { c ->
+            val first = c.split(Regex("\\s"))[0]
+            findSameStart(first, null, c, columnsOrig)
+        }?.toMap()
+
+        val expAndFields = startMap?.filterValues { it?.isNotEmpty() == true }
+            ?.entries
+            ?.groupBy({ it.value }, { it.key })
+            ?.filterValues { it.size > 1 }
+
+        if(expAndFields == null || expAndFields.size != 1) throw StepException("Something went wrong while parsing the column headers.")
+        val experiments: List<String> = expAndFields.values.first()
+        val expFields = expAndFields.keys.first()
+
+        return columnsOrig.foldIndexed(ColumnsParsed()) { i, acc, col ->
+            val exp = experiments.find{exp -> col.startsWith(exp)}
+            val expField = expFields?.filter{exp -> col.endsWith(exp)}?.maxByOrNull { it.length } ?: ""
+            val colName = col.replace(" ", ".")
+
+            val accWithExp = if (exp != null) {
+            acc.copy(
+                expNames = acc.expNames.plus(exp),
+                expFields = acc.expFields.plus(expField),
+                headers = acc.headers.plus(
+                    Header(
+                        name = colName,
+                        idx = i,
+                        type = colTypes?.get(i),
+                        experiment = Experiment(name = exp, field = expField)
+                    )
+                ),
+                expDetails = acc.expDetails.plus(
+                    Pair(
+                        exp,
+                        ExpInfo(
+                            isSelected = true,
+                            name = exp,
+                            originalName = exp
+                        )
+                    )
+                )
+            )} else acc.copy(headers = acc.headers.plus(Header(name = colName, idx = i, type = colTypes?.get(i))))
+            accWithExp
+        }
+    }
+
 
     private fun parseSpectronautColumns(columnsOrig: List<String>?, colTypes: List<ColType>?):ColumnsParsed {
         // Remove trailing " (Settings)"

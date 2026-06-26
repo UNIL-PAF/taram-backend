@@ -16,7 +16,7 @@ class ColumnInfoService {
     @Autowired
     private var columnParser: ColumnMappingParser? = null
 
-    fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType?): Pair<ColumnInfo, CommonResult> {
+    fun createColumnInfo(filePath: String?, resultPath: String?, type: ResultType): Pair<ColumnInfo, CommonResult> {
         val (columnMapping, commonResult) = columnParser!!.parse(filePath, resultPath, type)
         val crc32Hash = Crc32HashComputations().computeStringHash(columnMapping.toString())
         return Pair(ColumnInfo(columnMapping = columnMapping, columnMappingHash = crc32Hash), commonResult)

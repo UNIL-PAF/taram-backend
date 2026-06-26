@@ -35,7 +35,6 @@ class AsyncInitialResultRunner(): CommonStep(){
     @Autowired
     private var columnInfoService: ColumnInfoService? = null
 
-
     @Autowired
     private var ptxQcComputation: PtxQcComputation? = null
 

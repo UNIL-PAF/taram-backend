@@ -214,8 +214,7 @@ open class CommonStep {
     }
 
     fun getResultPath(analysis: Analysis?): String? {
-        val resultType = ResultType.fromValue(analysis?.result?.type)
-        val property = when (resultType) {
+        val property = when (val resultType = ResultType.fromValue(analysis?.result?.type)) {
             ResultType.MaxQuant -> "maxquant"
             ResultType.Spectronaut -> "spectronaut"
             ResultType.FragPipe -> "fragpipe"
@@ -417,11 +416,13 @@ open class CommonStep {
         val pathAndHash = if (modifiesResult != null && modifiesResult) {
             val oldTab = getOutputRoot()?.plus("/") + oldStep?.resultTablePath
 
-            val tabName = if (resultType == ResultType.MaxQuant) {
-                "/proteinGroups_"
-            } else {
-                "/Report_"
+            val tabName = when (resultType) {
+                ResultType.MaxQuant -> "/proteinGroups_"
+                ResultType.Spectronaut -> "/Report_"
+                ResultType.FragPipe -> "combined_protein_"
+                else -> throw StepException("Invalid result type")
             }
+
             val newTab = oldStep?.resultPath + tabName + Timestamp(System.currentTimeMillis()).time + ".txt"
             val newFile = Path(getOutputRoot()?.plus(newTab)!!)
             Path(oldTab).copyTo(newFile, overwrite = true)
