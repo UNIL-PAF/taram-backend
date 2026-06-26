@@ -5,6 +5,8 @@ import ch.unil.pafanalysis.analysis.service.ColumnInfoService
 import ch.unil.pafanalysis.analysis.steps.CommonResult
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
+import ch.unil.pafanalysis.analysis.steps.initial_result.fragpipe.AdaptFragPipeTable
+import ch.unil.pafanalysis.analysis.steps.initial_result.fragpipe.InitialFragPipeRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.AdaptMaxQuantTable
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.InitialMaxQuantRunner
 import ch.unil.pafanalysis.analysis.steps.initial_result.maxquant.MaxQuantGeneParsing
@@ -162,11 +164,11 @@ class AsyncInitialResultRunner(): CommonStep(){
 
         val origTable = readTable.getTable(newTable.path, commonResOrig.headers)
 
-        val (maxQuantGeneParsingStatus, adaptedTable) = if(resultType == ResultType.Spectronaut){
-            Pair(null, AdaptSpectronautTable.adaptTable(origTable))
-        } else if(resultType == ResultType.MaxQuant){
-            AdaptMaxQuantTable.adaptTable(origTable)
-        } else Pair(null, origTable)
+        val (maxQuantGeneParsingStatus, adaptedTable) = when(resultType){
+            ResultType.Spectronaut -> Pair(null, AdaptSpectronautTable.adaptTable(origTable))
+            ResultType.MaxQuant -> AdaptMaxQuantTable.adaptTable(origTable)
+            ResultType.FragPipe -> Pair(null, AdaptFragPipeTable.adaptTable(origTable))
+        }
 
         return if(adaptedTable == null) null else OriginalTableAndInfo(adaptedTable, "${analysisStep?.resultPath}/${newTable.name}", columnInfo,
             commonResOrig.copy(headers = adaptedTable.headers), maxQuantGeneParsingStatus)
@@ -293,13 +295,13 @@ class AsyncInitialResultRunner(): CommonStep(){
 
     private fun createInitialResult(
         resultPath: String?,
-        type: ResultType?,
+        type: ResultType,
         table: Table?,
     ): InitialResult? {
-        val initialRes = if (type == ResultType.MaxQuant) {
-            InitialMaxQuantRunner().createInitialMaxQuantResult(resultPath, "/parameters.txt")
-        } else {
-            initialSpectronautRunner?.createInitialSpectronautResult(resultPath, table)
+        val initialRes = when (type){
+            ResultType.MaxQuant -> InitialMaxQuantRunner.createInitialMaxQuantResult(resultPath, "/parameters.txt")
+            ResultType.Spectronaut -> initialSpectronautRunner?.createInitialSpectronautResult(resultPath, table)
+            ResultType.FragPipe -> InitialFragPipeRunner.createInitialResult(resultPath, "/fragpipe.workflow")
         }
         return initialRes?.copy(nrProteinGroups = table?.cols?.get(0)?.size)
     }
@@ -308,11 +310,10 @@ class AsyncInitialResultRunner(): CommonStep(){
         outputPath: String?,
         resultFile: String?,
         sourcePath: String?,
-        resultType: ResultType?
+        resultType: ResultType
     ): File {
         val timestamp = Timestamp(System.currentTimeMillis())
-        val fileName =  if (resultType == ResultType.MaxQuant) "proteinGroups" else "Report"
-        return copyResultTableWithName(outputPath, resultFile, sourcePath, timestamp, fileName)
+        return copyResultTableWithName(outputPath, resultFile, sourcePath, timestamp, getResTableName(resultType))
     }
 
     private fun copyResultTableWithName(

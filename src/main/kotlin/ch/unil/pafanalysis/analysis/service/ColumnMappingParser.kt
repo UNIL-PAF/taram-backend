@@ -81,7 +81,7 @@ class ColumnMappingParser {
         val colMapping = ColumnMapping(
             experimentDetails = cols.expDetails,
             experimentNames = cols.expNames.toList(),
-            intCol = if (cols.expFields.contains("Quantity")) "Quantity" else null
+            intCol = if (cols.expFields.contains("MaxLFQ.Intensity")) "MaxLFQ.Intensity" else null
         )
 
         val commonResult = CommonResult(
@@ -145,7 +145,7 @@ class ColumnMappingParser {
 
         return columnsOrig.foldIndexed(ColumnsParsed()) { i, acc, col ->
             val exp = experiments.find{exp -> col.startsWith(exp)}
-            val expField = expFields?.filter{exp -> col.endsWith(exp)}?.maxByOrNull { it.length } ?: ""
+            val expField = (expFields?.filter{exp -> col.endsWith(exp)}?.maxByOrNull { it.length } ?: "").replace(" ", ".")
             val colName = col.replace(" ", ".")
 
             val accWithExp = if (exp != null) {

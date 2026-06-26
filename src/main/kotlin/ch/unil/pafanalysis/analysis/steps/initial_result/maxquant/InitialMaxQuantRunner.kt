@@ -5,7 +5,7 @@ import ch.unil.pafanalysis.analysis.steps.initial_result.InitialResult
 import ch.unil.pafanalysis.analysis.steps.initial_result.MaxQuantParameters
 import java.io.File
 
-class InitialMaxQuantRunner() {
+object InitialMaxQuantRunner {
 
     fun createInitialMaxQuantResult(maxQuantPath: String?, fileName: String?): InitialResult {
         val (mqParams, fastaFiles, version) = parseMaxquantParameters(maxQuantPath.plus(fileName))
