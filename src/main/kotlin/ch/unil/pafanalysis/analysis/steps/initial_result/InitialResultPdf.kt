@@ -145,7 +145,7 @@ class InitialResultPdf() : PdfCommon() {
     }
 
     private fun getDataTable(initialResult: InitialResult, intCol: String): List<Pair<String, List<String>>> {
-        return if (initialResult?.spectronautSetup != null) {
+        return if (initialResult.spectronautSetup != null) {
             val analysisDate = initialResult.spectronautSetup.analysisDate?.replace(Regex("\\s+\\d+.+UTC.+"), "")
 
             val myList = listOf(
@@ -159,24 +159,24 @@ class InitialResultPdf() : PdfCommon() {
                 myList.plusElement(Pair("Libraries:", initialResult.spectronautSetup.libraries?.map { it.name ?: "" } ?: emptyList()))
             } else myList
 
-        } else {
+        } else if(initialResult.maxQuantParameters != null) {
             val mainList = listOf(
                 Pair("Default intensity column:", listOf(intCol)),
-                Pair("Software version: ", listOf(initialResult?.softwareVersion ?: "")),
+                Pair("Software version: ", listOf(initialResult.softwareVersion ?: "")),
                 Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
                 Pair(
                     "Match between runs:",
-                    listOf(if (initialResult.maxQuantParameters?.matchBetweenRuns == true) "TRUE" else if (initialResult.maxQuantParameters?.matchBetweenRuns == false) "FALSE" else "")
+                    listOf(if (initialResult.maxQuantParameters.matchBetweenRuns == true) "TRUE" else if (initialResult.maxQuantParameters?.matchBetweenRuns == false) "FALSE" else "")
                 )
             )
-            if (initialResult.maxQuantParameters?.someGenesParsedFromFasta == true) {
+            if (initialResult.maxQuantParameters.someGenesParsedFromFasta == true) {
                 mainList.plusElement(
                     Pair(
                         "Parsing info:",
                         listOf("Some gene and protein names were parsed from column \"Fasta.headers\".")
                     )
                 )
-            } else if (initialResult.maxQuantParameters?.allGenesParsedFromFasta == true) {
+            } else if (initialResult.maxQuantParameters.allGenesParsedFromFasta == true) {
                 mainList.plusElement(
                     Pair(
                         "Parsing info:",
@@ -184,6 +184,12 @@ class InitialResultPdf() : PdfCommon() {
                     )
                 )
             } else mainList
+        } else {
+            listOf(
+                Pair("Default intensity column:", listOf(intCol)),
+                Pair("Software version: ", listOf(initialResult.softwareVersion ?: "")),
+                Pair("Fasta files:", initialResult.fastaFiles ?: emptyList()),
+            )
         }
     }
 
