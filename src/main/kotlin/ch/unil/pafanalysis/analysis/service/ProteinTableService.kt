@@ -47,8 +47,7 @@ class ProteinTableService {
 
         val protTable = readTable.getStringColumn(table, hMap.getCol("proteinIds", resType))
         val prots = protTable?.map { it.split(";")[0] }
-        val allProts = protTable
-        val genes = readTable.getStringColumn(table, hMap.getCol("geneNames", resType))//?.map { it.split(";")?.get(0) }
+        val genes = readTable.getStringColumn(table, hMap.getCol("geneNames", resType))
         val descs = readTable.getStringColumn(table, hMap.getCol("description", resType))
         val intCol = readTable.getDoubleColumn(table, defaultInt!!)
 
@@ -77,7 +76,7 @@ class ProteinTableService {
             ProteinGroup(
                 key = ids?.get(i) ?: i,
                 prot = prots?.get(i),
-                protGroup = allProts?.get(i),
+                protGroup = protTable?.get(i),
                 gene = genes?.get(i),
                 desc = descs?.get(i),
                 int = colOrMean,
