@@ -37,13 +37,13 @@ class CheckForNewDirs {
         }
 
         private fun checkFragpipe(resultPaths: ResultPaths): List<AvailableDir>{
-            return checkCommon(resultPaths.fragpipePath!!, fragPipeResName, ResultType.FragPipe)
+            val a =  checkCommon(resultPaths.fragpipePath!!, fragPipeResName, ResultType.FragPipe)
+            return a.filter{it.resFile != null}
         }
 
         private fun checkSpectronaut(resultPaths: ResultPaths): List<AvailableDir>{
             return checkCommon(resultPaths.spectronautPath!!, spectronautResName, ResultType.Spectronaut)
         }
-
 
         private fun checkCommon(path: String, resFileNames: List<Pair<String, Boolean>>, resType: ResultType): List<AvailableDir>{
             val matcher = FileSystems.getDefault().getPathMatcher("glob:*.{txt,tsv,xls}")
@@ -72,7 +72,6 @@ class CheckForNewDirs {
                 override fun visitFile(file: Path, attrs: BasicFileAttributes?): FileVisitResult {
                     if(matcher.matches(file.fileName)){
                         val filePath = file.parent.toString().replace(path, "")
-
                         if(currentAvailableDir == null){
                             currentAvailableDir = createAvailableDir(file, attrs, filePath)
                         }else if(currentAvailableDir?.path != filePath){
