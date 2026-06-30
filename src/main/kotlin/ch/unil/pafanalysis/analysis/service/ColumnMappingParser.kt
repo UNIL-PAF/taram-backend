@@ -81,7 +81,7 @@ class ColumnMappingParser {
         val colMapping = ColumnMapping(
             experimentDetails = cols.expDetails,
             experimentNames = cols.expNames.toList(),
-            intCol = if (cols.expFields.contains("MaxLFQ.Intensity")) "MaxLFQ.Intensity" else null
+            intCol = if (cols.expFields.contains("Intensity")) "Intensity" else null
         )
 
         val commonResult = CommonResult(
