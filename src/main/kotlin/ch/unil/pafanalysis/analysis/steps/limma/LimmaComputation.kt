@@ -162,9 +162,7 @@ class LimmaComputation {
             Pair(acc.first + idx, acc.second + (name to idx))
         }.first
 
-        println("paired = " + params?.paired)
-
-        fun makeRName(x: String): String = 'X' + x.replace(Regex("[^0-9A-Za-z_]"), ".")
+        fun makeRName(x: String): String = 'X' + x.replace("+", "plus").replace("-", "minus").replace(Regex("[^0-9A-Za-z_]"), ".")
         val contrasts = comps?.joinToString(separator = ",\n") { (g1, g2) ->
             val g1R = makeRName(g1)
             val g2R = makeRName(g2)
