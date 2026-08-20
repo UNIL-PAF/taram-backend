@@ -57,8 +57,9 @@ class AnalysisStepService {
         newAnalysis: Analysis,
         copyAllSteps: Boolean
     ) {
+
         var stepBefore: AnalysisStep? = null
-        val fltSteps = sortedSteps.filterIndexed { i: Int, _: AnalysisStep -> i == 0 || copyAllSteps }
+        val fltSteps = if(copyAllSteps) sortedSteps else listOf(sortedSteps.first().copy(nextId = null))
 
         val columnInfo = columnInfoRepository?.saveAndFlush(fltSteps.first().columnInfo!!.copy(id = 0))
 
