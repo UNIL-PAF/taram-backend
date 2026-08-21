@@ -45,7 +45,7 @@ class AsyncNormalizationRunner() : CommonStep() {
         val table = readTableData.getTable(getOutputRoot() + step?.resultTablePath, step?.commonResult?.headers)
         val (selHeaders, ints) = readTableData.getDoubleMatrix(table, intCol, step?.columnInfo?.columnMapping?.experimentDetails)
 
-        val normInts = normComp!!.runNormalization(ints, params)
+        val normInts = normComp!!.runNormalization(step, ints, params, intCol)
 
         val newCols: List<List<Any>>? = table.cols?.mapIndexed { i, c ->
             val selHeader = selHeaders.withIndex().find { it.value.idx == i }
