@@ -1,11 +1,12 @@
 package ch.unil.pafanalysis.analysis.steps.volcano
 
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
+import ch.unil.pafanalysis.analysis.model.AnalysisStepStatus
 import ch.unil.pafanalysis.analysis.model.AnalysisStepType
+import ch.unil.pafanalysis.analysis.service.AsyncAnalysisStepService
 import ch.unil.pafanalysis.analysis.steps.CommonRunner
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.EchartsPlot
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlot
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.layout.element.Div
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +24,10 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     var asyncVolcanoPlotRunner: AsyncVolcanoPlotRunner? = null
 
     @Autowired
+    private var asyncAnaysisStepService: AsyncAnalysisStepService? = null
+
+
+    @Autowired
     private var volcanoPdf: VolcanoPdf? = null
 
     fun getParameters(step: AnalysisStep?): VolcanoPlotParams {
@@ -34,9 +39,31 @@ class VolcanoPlotRunner() : CommonStep(), CommonRunner {
     }
 
     override fun run(oldStepId: Int, step: AnalysisStep?, params: String?): AnalysisStep {
-        val newStep = runCommonStep(type!!, version, oldStepId, false, step, params)
-        asyncVolcanoPlotRunner?.runAsync(oldStepId, newStep)
-        return newStep!!
+        val myParams = params ?: step?.parameters
+        val volcanoParams = gson.fromJson(myParams, VolcanoPlotParams().javaClass)
+
+        val lastStep: AnalysisStep? = if(volcanoParams.plotAllComps == true){
+            val oldStep: AnalysisStep? = analysisStepRepository?.findById(oldStepId)
+            val availableComps = oldStep?.commonResult?.headers?.mapNotNull { it.experiment?.comp }?.distinct()
+
+            val newSteps = availableComps?.fold(Pair(emptyList<AnalysisStep?>(), oldStepId)) { acc, comp ->
+                val newParams = volcanoParams?.copy(comparison = ComparisonParams(group1 = comp.group1, group2 = comp.group2), plotAllComps = false)
+                val newStep = runCommonStep(type!!, version, acc.second, false, step, gson.toJson(newParams))
+                Pair(acc.first.plus(newStep), newStep!!.id!!)
+            }?.first
+
+            if((newSteps?.size ?: 0) > 1){
+                asyncAnaysisStepService?.setAllStepsStatus(newSteps?.get(1), AnalysisStepStatus.IDLE)
+            }
+
+            asyncVolcanoPlotRunner?.runAsync(newSteps?.first())
+            newSteps?.last()
+        }else{
+            val newStep = runCommonStep(type!!, version, oldStepId, false, step, params)
+            asyncVolcanoPlotRunner?.runAsync(newStep)
+            newStep
+        }
+        return lastStep!!
     }
 
     override fun updatePlotOptions(step: AnalysisStep, echartsPlot: EchartsPlot): String {

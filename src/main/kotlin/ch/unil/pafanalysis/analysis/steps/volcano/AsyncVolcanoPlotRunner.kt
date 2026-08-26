@@ -16,7 +16,7 @@ class AsyncVolcanoPlotRunner() : CommonStep() {
     private val hMap = HeaderTypeMapping()
 
     @Async
-    fun runAsync(oldStepId: Int, newStep: AnalysisStep?) {
+    fun runAsync(newStep: AnalysisStep?){
 
         val funToRun: () -> AnalysisStep? = {
             val volcano = createVolcanoObj(newStep)

@@ -271,6 +271,7 @@ open class CommonStep {
     fun updateNextStep(step: AnalysisStep) {
         if (step.nextId != null) {
             val nextStep = analysisStepRepository?.findById(step.nextId)
+
             if(nextStep != null) {
                 update(nextStep, step)
             }
@@ -319,7 +320,7 @@ open class CommonStep {
         return hashComp.computeStringHash(filterParams)
     }
 
-    fun tryToRun(runFun: () -> AnalysisStep?, step: AnalysisStep?) {
+    fun tryToRun(runFun: () -> AnalysisStep?, step: AnalysisStep?): AnalysisStep? {
         try {
             val newStep = runFun()
 
@@ -344,16 +345,19 @@ open class CommonStep {
                 )
             analysisStepRepository?.saveAndFlush(updatedStep!!)!!
             updateNextStep(updatedStep!!)
+            return updatedStep
         } catch (e: Exception) {
             println("Error in asyncRun ${step?.id}")
             e.printStackTrace()
-            analysisStepRepository?.saveAndFlush(
-                step!!.copy(
-                    status = AnalysisStepStatus.ERROR.value,
-                    error = e.message?.take(255),
-                    stepHash = Crc32HashComputations().getRandomHash()
-                )
+            val errorStep = step!!.copy(
+                status = AnalysisStepStatus.ERROR.value,
+                error = e.message?.take(255),
+                stepHash = Crc32HashComputations().getRandomHash()
             )
+            analysisStepRepository?.saveAndFlush(
+                errorStep
+            )
+            return errorStep
         }
     }
 
@@ -362,6 +366,7 @@ open class CommonStep {
 
         if (newHash != step.stepHash) {
             val runningStep = analysisStepRepository?.saveAndFlush(step.copy(status = AnalysisStepStatus.RUNNING.value))
+
             try {
                 getRunner(runningStep!!.type)?.run(stepBefore.id!!, runningStep)
             } catch (e: Exception) {

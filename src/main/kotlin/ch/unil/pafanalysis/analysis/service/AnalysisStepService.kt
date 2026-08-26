@@ -48,7 +48,7 @@ class AnalysisStepService {
     fun updatePlotOptions(stepId: Int, echartsPlot: EchartsPlot): String? {
         return if(analysisStepRepo?.existsById(stepId) == true){
             val step = analysisStepRepo?.findById(stepId)!!
-            return commonStep?.getRunner(step.type)?.updatePlotOptions(step, echartsPlot)
+            commonStep?.getRunner(step.type)?.updatePlotOptions(step, echartsPlot)
         }else null
     }
 
