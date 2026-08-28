@@ -288,6 +288,7 @@ open class CommonStep {
             }
             AnalysisStepType.VOLCANO_PLOT.value -> volcanoPlotRunner?.getParameters(step)?.selProteins?.map{Pair(it, null)}
             AnalysisStepType.SCATTER_PLOT .value -> scatterPlotRunner?.getParameters(step)?.selProteins?.map{Pair(it, null)}
+            AnalysisStepType.NORMALIZATION .value -> normalizationRunner?.getParameters(step)?.selProts?.map{Pair(it, null)}
             else -> null
         }
     }

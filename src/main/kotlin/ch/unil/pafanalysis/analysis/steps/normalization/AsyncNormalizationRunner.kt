@@ -3,8 +3,10 @@ package ch.unil.pafanalysis.analysis.steps.normalization
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.summary_stat.SummaryStat
+import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.SummaryStatComputation
+import ch.unil.pafanalysis.common.Table
 import ch.unil.pafanalysis.common.WriteTableData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Async
@@ -15,6 +17,7 @@ class AsyncNormalizationRunner() : CommonStep() {
 
     private val readTableData = ReadTableData()
     private val writeTableData = WriteTableData()
+    private val hMap = HeaderTypeMapping()
 
     @Autowired
     val normComp: NormalizationComputation? = null
@@ -58,6 +61,9 @@ class AsyncNormalizationRunner() : CommonStep() {
 
         val summaryStatComp = SummaryStatComputation()
         val basicStat = summaryStatComp.getBasicSummaryStat(normInts, selHeaders)
+
+        val selGenes = if(!params.selProts.isNullOrEmpty()) getSelGenes(table, params, step?.analysis?.result?.type) else null
+
         return Normalization(
             min = basicStat.min?.first(),
             max = basicStat.max?.first(),
@@ -65,8 +71,25 @@ class AsyncNormalizationRunner() : CommonStep() {
             median = basicStat.median?.first(),
             sum = basicStat.sum?.first(),
             nrValid = basicStat.nrValid?.first(),
-            nrNaN = basicStat.nrNaN?.first()
+            nrNaN = basicStat.nrNaN?.first(),
+            selGenes = selGenes
         )
+    }
+
+    private fun getSelGenes(table: Table?,
+                            params: NormalizationParams?,
+                            resType: String?): List<String>? {
+
+        val protGroup =
+            readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")[0] }
+        val genes = readTableData.getStringColumn(table, hMap.getCol("geneNames", resType))?.map { it.split(";")[0] }
+
+        return params?.selProts?.map { p ->
+            val i = protGroup?.indexOf(p)
+            if (i != null && i >= 0) {
+                genes?.get(i)
+            } else null
+        }?.filterNotNull()
     }
 
 }

@@ -4,7 +4,7 @@ data class NormalizationParams (
     val normalizationType: String? = null,
     val normalizationCalculation: String? = null,
     val intCol: String? = null,
-    val selProts: List<String>? = null,
+    val selProts: List<String>? = null
 )
 
 enum class NormalizationType(val value: String) {

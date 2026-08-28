@@ -4,17 +4,11 @@ import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.analysis.model.ExpInfo
 import ch.unil.pafanalysis.analysis.steps.CommonStep
 import ch.unil.pafanalysis.analysis.steps.StepException
-import ch.unil.pafanalysis.analysis.steps.boxplot.BoxPlotParams
-import ch.unil.pafanalysis.analysis.steps.boxplot.SelProtData
-import ch.unil.pafanalysis.common.DefaultColors
 import ch.unil.pafanalysis.common.HeaderTypeMapping
 import ch.unil.pafanalysis.common.ReadTableData
 import ch.unil.pafanalysis.common.Table
 import com.google.common.math.Quantiles
 import org.springframework.stereotype.Service
-import kotlin.collections.ifEmpty
-import kotlin.collections.sortedByDescending
-import kotlin.math.log2
 
 @Service
 class NormalizationComputation() : CommonStep() {
@@ -38,9 +32,10 @@ class NormalizationComputation() : CommonStep() {
             }
             NormalizationType.MEAN.value -> fun(orig: List<Double>, i: Int?): Double { return orig.average() }
             NormalizationType.SEL_PROT.value -> fun(orig: List<Double>, i: Int?): Double {
-                val avg = selProtNorm?.filterNotNull()?.average() ?: 0.0
-                val normVals = selProtNorm?.map{a -> a?.minus(avg)}
-                return normVals?.get(i ?: 0) ?: 0.0
+                if(selProtNorm == null) throw StepException("There is no data available for selected proteins.")
+                val median = Quantiles.median().compute(selProtNorm.mapNotNull { it?.takeUnless(Double::isNaN) })
+                val normVals = selProtNorm.map{a -> a?.minus(median)}
+                return normVals[i ?: 0] ?: 0.0
             }
             else -> {
                 throw StepException("${params.normalizationType} is not implemented.")
@@ -62,8 +57,22 @@ class NormalizationComputation() : CommonStep() {
             getOutputRoot().plus(step?.resultTablePath),
             step?.commonResult?.headers
         )
+
         val selProts = getSelProtData(table, intCol, params, step?.analysis?.result?.type, step?.columnInfo?.columnMapping?.experimentDetails)
-        return selProts?.get(0)
+        return transpose(selProts)?.map{ col ->
+            Quantiles.median().compute(col.mapNotNull { it?.takeUnless(Double::isNaN) })
+        }
+    }
+
+    private fun transpose(matrix: List<List<Double?>>?): List<List<Double?>>? {
+        val rows = matrix?.size
+        val cols = matrix?.get(0)?.size ?: return null
+
+        return List(cols) { c ->
+            List(rows ?: 0) { r ->
+                matrix[r][c]
+            }
+        }
     }
 
     private fun getSelProtData(table: Table?,
@@ -71,16 +80,14 @@ class NormalizationComputation() : CommonStep() {
                                params: NormalizationParams?,
                                resType: String?,
                                expDetails: Map<String, ExpInfo>?): List<List<Double?>>? {
-        val (headers, intMatrix) = readTableData.getDoubleMatrix(table, intCol, expDetails)
+        val (_, intMatrix) = readTableData.getDoubleMatrix(table, intCol, expDetails)
 
         val protGroup = readTableData.getStringColumn(table, hMap.getCol("proteinIds", resType))?.map { it.split(";")[0] }
         val selProts: List<List<Double?>>? = params?.selProts?.map{p ->
             val i = protGroup?.indexOf(p)
             if(i != null && i >= 0){
                 intMatrix.map { if (it[i].isNaN()) null else it[i] }
-            }else{
-                null
-            }
+            }else null
         }?.filterNotNull()
 
         return selProts

@@ -7,5 +7,6 @@ data class Normalization(
     val median: Double?,
     val nrValid: Int?,
     val nrNaN: Int?,
-    val sum: Double?
+    val sum: Double?,
+    val selGenes: List<String>? = null
 )
