@@ -20,7 +20,12 @@ class NormalizationPdf() : PdfCommon() {
         "none" to "None"
     )
 
-    fun normText(params: NormalizationParams): String {
+    fun normText(params: NormalizationParams, res: Normalization): String {
+        if(params.normalizationType == NormalizationType.SEL_PROT.value) {
+            val selThings = if(!res.selGenes.isNullOrEmpty()) res.selGenes else params.selProts
+            return "Normalized to the median of the selected proteins [" + selThings?.joinToString(", ") + "]"
+        }
+
         val myType = normType[params.normalizationType]
         return if(params.normalizationCalculation == NormalizationCalculation.DIVISION.value){
             "Divide by $myType"
@@ -44,7 +49,7 @@ class NormalizationPdf() : PdfCommon() {
 
         // 1. parameters
         val paramsDiv = Div().setPaddingLeft(2f)
-        paramsDiv.add(getParagraph(normText(parsedParams), dense = true))
+        paramsDiv.add(getParagraph(normText(parsedParams, res), dense = true))
         colTable.addCell(getParamsCell(paramsDiv, 10*colWidth))
 
         // 2. data
