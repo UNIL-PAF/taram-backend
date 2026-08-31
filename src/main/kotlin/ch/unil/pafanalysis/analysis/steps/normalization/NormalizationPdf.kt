@@ -3,10 +3,7 @@ package ch.unil.pafanalysis.analysis.steps.normalization
 import ch.unil.pafanalysis.analysis.model.AnalysisStep
 import ch.unil.pafanalysis.pdf.PdfCommon
 import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.layout.borders.Border
-import com.itextpdf.layout.element.Cell
 import com.itextpdf.layout.element.Div
-import com.itextpdf.layout.element.Paragraph
 import com.itextpdf.layout.element.Table
 import org.springframework.stereotype.Service
 
