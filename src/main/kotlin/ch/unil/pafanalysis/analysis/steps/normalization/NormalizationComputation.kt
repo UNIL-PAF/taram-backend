@@ -24,7 +24,7 @@ class NormalizationComputation() : CommonStep() {
     ): List<List<Double>> {
         if (params.normalizationType == NormalizationType.NONE.value) return ints
 
-        val selProtNorm = computeSelProtNorm(step, params, intCol)
+        val selProtNorm = if(params.normalizationType == NormalizationType.SEL_PROT.value) computeSelProtNorm(step, params, intCol) else null
 
         val myNumber = when (params.normalizationType) {
             NormalizationType.MEDIAN.value -> fun(orig: List<Double>, i: Int?): Double {

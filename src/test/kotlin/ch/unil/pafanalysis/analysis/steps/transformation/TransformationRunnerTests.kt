@@ -60,7 +60,7 @@ class TransformationRunnerTests {
         val res1 = transformation?.runTransformation(ints!!, transParams)
 
         val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
-        val res2 = normalization?.runNormalization(res1!!, normParams)
+        val res2 = normalization?.runNormalization(null, res1!!, normParams, null)
 
         val imputParams = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())
         val res3 = imputation?.runImputation(res2!!, imputParams)
@@ -76,7 +76,7 @@ class TransformationRunnerTests {
         val res1 = transformation?.runTransformation(ints!!, transParams)
 
         val normParams = NormalizationParams(normalizationType = NormalizationType.MEDIAN.value, normalizationCalculation = NormalizationCalculation.SUBSTRACTION.value)
-        val res2 = normalization?.runNormalization(res1!!, normParams)
+        val res2 = normalization?.runNormalization(null, res1!!, normParams, null)
 
         val imputParams = ImputationParams(imputationType = ImputationType.NORMAL.value, normImputationParams = NormImputationParams())
         val res3 = imputation?.runImputation(res2!!, imputParams)?.first
