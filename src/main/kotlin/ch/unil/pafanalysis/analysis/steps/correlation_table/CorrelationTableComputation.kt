@@ -2,9 +2,6 @@ package ch.unil.pafanalysis.analysis.steps.correlation_table
 
 import ch.unil.pafanalysis.analysis.model.Header
 import ch.unil.pafanalysis.analysis.steps.StepException
-import com.github.rcaller.rstuff.RCaller
-import com.github.rcaller.rstuff.RCallerOptions
-import com.github.rcaller.rstuff.RCode
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation
 import org.apache.commons.math3.stat.correlation.SpearmansCorrelation
 import org.springframework.stereotype.Service
