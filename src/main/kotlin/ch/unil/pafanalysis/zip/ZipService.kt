@@ -82,18 +82,34 @@ class ZipService {
 
     private fun createToolParams(analysis: Analysis?, zipDir: String){
         val result = analysis?.result
-        val isMaxQuant = result?.type == ResultType.MaxQuant.value
-        val resultPathName = if(isMaxQuant) "result.path.maxquant" else "result.path.spectronaut"
-        val resultPath = Path(env?.getProperty(resultPathName).plus(result?.path))
+        val resultType = result?.type ?: throw StepException("No result type defined.")
+        val resultPathName = when(resultType){
+            ResultType.MaxQuant.value -> "result.path.maxquant"
+            ResultType.Spectronaut.value -> "result.path.spectronoint"
+            ResultType.FragPipe.value -> "result.path.fragpipe"
+            else -> throw StepException("No result type defined.")
+        }
+        val resultPath = Path(env?.getProperty(resultPathName).plus(result.path))
 
-        val paramsDir = "$zipDir/${result?.type?.lowercase()}_params"
+        val paramsDir = "$zipDir/${resultType.lowercase()}_params"
         File(paramsDir).mkdir()
 
-        val extensions = if(isMaxQuant) emptyList() else listOf(".params", ".setup.txt", ".log.txt")
-        val exactMatches = if(isMaxQuant) listOf("mqpar.xml", "parameters.txt", "summary.txt") else emptyList()
+        val extensions =  when(resultType){
+            ResultType.MaxQuant.value -> emptyList()
+            ResultType.Spectronaut.value -> listOf(".params", ".setup.txt", ".log.txt")
+            ResultType.FragPipe.value -> emptyList()
+            else -> throw StepException("No result type defined.")
+        }
+
+        val exactMatches = when(resultType){
+            ResultType.MaxQuant.value -> listOf("mqpar.xml", "parameters.txt", "summary.txt")
+            ResultType.Spectronaut.value -> emptyList()
+            ResultType.FragPipe.value -> listOf("fragpipe.workflow")
+            else -> throw StepException("No result type defined.")
+        }
 
         if(!resultPath.exists()){
-            throw StepException("Directory [/${result?.path}] does not exist. Please adapt the File path for ${result?.name} if necessary.")
+            throw StepException("Directory [/${result.path}] does not exist. Please adapt the File path for ${result.name} if necessary.")
         }
 
         Files.list(resultPath).use { stream ->
@@ -105,7 +121,7 @@ class ZipService {
                 }
         }
 
-        if(isMaxQuant) copyPtxQcReport(analysis, paramsDir)
+        if(resultType == ResultType.MaxQuant.value) copyPtxQcReport(analysis, paramsDir)
     }
 
     private fun copyPtxQcReport(analysis: Analysis?, paramsDir: String){
