@@ -85,7 +85,7 @@ class ZipService {
         val resultType = result?.type ?: throw StepException("No result type defined.")
         val resultPathName = when(resultType){
             ResultType.MaxQuant.value -> "result.path.maxquant"
-            ResultType.Spectronaut.value -> "result.path.spectronoint"
+            ResultType.Spectronaut.value -> "result.path.spectronaut"
             ResultType.FragPipe.value -> "result.path.fragpipe"
             else -> throw StepException("No result type defined.")
         }
